@@ -95,65 +95,84 @@ int main( int argc, char *argv[] )
 #if 0
    base::ByteBuffer buffer( 100 );
 
-   double double_in = 123.456;
    uint64_t uint64_in = 789;
-   char char_in[ 11 ] = "fuck_char*";
    std::string string_in( "fuck_string" );
+   double double_in = 123.456;
 
-   buffer.push_back( char_in, 11 );
-   buffer.push_back( uint64_in );
-   buffer.push_back( string_in );
-   buffer.push_back( double_in );
+   buffer << uint64_in << string_in << double_in;
+   buffer.print( );
 
-   double double_out = 0;
    uint64_t uint64_out = 0;
-   char char_out[ 11 ];
    std::string string_out;
+   double double_out = 0;
 
-   buffer.pop_back( double_out );
-   buffer.pop_back( string_out, string_in.size( ) + 1 );
-   buffer.pop_back( uint64_out );
-   buffer.pop_back( char_out, strlen( char_in ) + 1 );
+   buffer >> double_out >> string_out >> uint64_out;
+   buffer.print( );
 
    DBG_INF( "%f", double_out );
    DBG_INF( "%s", string_out.c_str( ) );
    DBG_INF( "%ld", uint64_out );
-   DBG_INF( "%s", char_out );
 #endif
 
+#if 0
+   base::ByteBuffer buffer( 100 );
+
+   uint64_t uint64_in = 789;
+   std::string string_in( "fuck_string" );
+   double double_in = 123.456;
+
+   buffer.push_back( uint64_in );
+   buffer.print( );
+   buffer.push_back( string_in );
+   buffer.print( );
+   buffer.push_back( double_in );
+   buffer.print( );
+
+   uint64_t uint64_out = 0;
+   std::string string_out;
+   double double_out = 0;
+
+   buffer.pop_back( double_out );
+   buffer.print( );
+   buffer.pop_back( string_out );
+   buffer.print( );
+   buffer.pop_back( uint64_out );
+   buffer.print( );
+
+   DBG_INF( "%f", double_out );
+   DBG_INF( "%s", string_out.c_str( ) );
+   DBG_INF( "%ld", uint64_out );
+#endif
+
+#if 1
    DBG_INF( "-----------------------------------------------" );
    {
-      base::ByteBuffer buffer( 100 );
+      // base::ByteBuffer buffer( 100 );
       base::TBaseEvent_ID< uint64_t > event_id( "event" );
-      DBG_INF( "%s", event_id.to_string( ).c_str( ) );
-      bool result = event_id.to_buffer( buffer );
-
-      DBG_INF( "result: %d", result );
-      buffer.info( );
-      buffer.print( );
+      // DBG_INF( "%s", event_id.c_str( ) );
+      // event_id.to_buffer( buffer );
    }
 
    {
       base::ByteBuffer buffer( 100 );
       base::TBaseEvent_ID< std::string > event_name( "event" );
-      DBG_INF( "%s", event_name.to_string( ).c_str( ) );
-      bool result = event_name.to_buffer( buffer );
-
-      DBG_INF( "result: %d", result );
-      buffer.info( );
+      DBG_INF( "%s", event_name.c_str( ) );
+      buffer << event_name;
       buffer.print( );
 
       base::TBaseEvent_ID< std::string > event_name_new( "event_new" );
-      DBG_INF( "%s", event_name_new.to_string( ).c_str( ) );
-      event_name_new.from_buffer( buffer );
-      DBG_INF( "%s", event_name_new.to_string( ).c_str( ) );
+      DBG_INF( "%s", event_name_new.c_str( ) );
+      buffer >> event_name_new;
+      buffer.print( );
+      DBG_INF( "%s", event_name_new.c_str( ) );
    }
    DBG_INF( "-----------------------------------------------" );
+#endif
 
    
 
 
-return 0;
+// return 0;
 
 
 

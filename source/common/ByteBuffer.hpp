@@ -16,6 +16,12 @@ namespace base {
 class ByteBuffer
 {
 public:
+   template< typename TYPE >
+      ByteBuffer& operator << ( const TYPE& value );
+   template< typename TYPE >
+      ByteBuffer& operator >> ( TYPE& value );
+
+public:
    ByteBuffer( );
    ByteBuffer( const size_t );
    ByteBuffer( const uint8_t*, const size_t );
@@ -29,8 +35,6 @@ public:
 
 public:
    bool push_back( const void*, const size_t, const bool is_reallocate = false );
-   bool push_back( const uint8_t*, const size_t, const bool is_reallocate = false );
-   bool push_back( const char*, const size_t, const bool is_reallocate = false );
    bool push_back( const std::string&, const bool is_reallocate = false );
 
    template< typename TYPE >
@@ -42,9 +46,7 @@ public:
 
 public:
    bool pop_back( const void*, const size_t );
-   bool pop_back( const uint8_t*, const size_t );
-   bool pop_back( const char*, const size_t );
-   bool pop_back( std::string&, const size_t );
+   bool pop_back( std::string& );
 
    template< typename TYPE >
       typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
@@ -91,6 +93,21 @@ inline
 const size_t ByteBuffer::capacity( ) const
 {
    return m_capacity;
+}
+
+
+template< typename TYPE >
+ByteBuffer& ByteBuffer::operator << ( const TYPE& value )
+{
+   push_back( value );
+   return *this;
+}
+
+template< typename TYPE >
+ByteBuffer& ByteBuffer::operator >> ( TYPE& value )
+{
+   pop_back( value );
+   return *this;
 }
 
 
