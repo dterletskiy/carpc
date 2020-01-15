@@ -48,30 +48,4 @@ struct is_base_of< D, D >
 
 
 
-/**************************************************
- * 
- *************************************************/
-template< typename T >
-const std::string to_string( const T& data )
-{
-   if constexpr( std::is_integral< T >::value )
-   {
-      // return itoa( data );
-
-      // return std::to_string( data ).c_str( );
-
-      std::stringstream ss;
-      ss << data;
-      return ss.str( );
-   }
-   else if constexpr( std::is_same< T, std::string >::value )
-   {
-      return data;
-   }
-
-   return { "NoName" };
-}
-
-
-
 } // namespace base

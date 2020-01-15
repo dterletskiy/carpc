@@ -14,6 +14,60 @@ namespace base {
 
 /*************************
  *
+ * Event_ID implementation
+ *
+ ************************/
+ByteBuffer& operator << ( ByteBuffer& buffer, const Event_ID& event_id )
+{
+   buffer << event_id.m_id;
+   return buffer;
+}
+
+ByteBuffer& operator >> ( ByteBuffer& buffer, Event_ID& event_id )
+{
+   buffer >> event_id.m_id;
+   return buffer;
+}
+
+Event_ID::Event_ID( const std::string& id )
+   : m_id( id )
+{
+}
+
+Event_ID::~Event_ID( )
+{
+}
+
+const char* Event_ID::c_str( ) const
+{
+   return m_id.c_str( );
+}
+
+const bool Event_ID::operator==( const Event_ID& id ) const
+{
+   return m_id == id.m_id;
+}
+
+const bool Event_ID::operator!=( const Event_ID& id ) const
+{
+   return m_id != id.m_id;
+}
+
+const bool Event_ID::operator>( const Event_ID& id ) const 
+{
+   return m_id > id.m_id;
+}
+
+const bool Event_ID::operator<( const Event_ID& id ) const 
+{
+   return m_id < id.m_id;
+}
+
+
+
+
+/*************************
+ *
  * Event implementation
  *
  ************************/

@@ -17,9 +17,9 @@ class ByteBuffer
 {
 public:
    template< typename TYPE >
-      ByteBuffer& operator << ( const TYPE& value );
+      ByteBuffer& operator << ( const TYPE& );
    template< typename TYPE >
-      ByteBuffer& operator >> ( TYPE& value );
+      ByteBuffer& operator >> ( TYPE& );
 
 public:
    ByteBuffer( );
@@ -34,26 +34,20 @@ public:
    void reset( );
 
 public:
-   bool push_back( const void*, const size_t, const bool is_reallocate = false );
-   bool push_back( const std::string&, const bool is_reallocate = false );
+   bool push( const void*, const size_t, const bool is_reallocate = false );
+   bool push( const std::string&, const bool is_reallocate = false );
 
    template< typename TYPE >
       typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
-         push_back( const TYPE& value, const bool is_reallocate = false )
-         {
-            return push_back( static_cast< const void* >( &value ), sizeof( TYPE ), is_reallocate );
-         }
+         push( const TYPE&, const bool is_reallocate = false );
 
 public:
-   bool pop_back( const void*, const size_t );
-   bool pop_back( std::string& );
+   bool pop( const void*, const size_t );
+   bool pop( std::string& );
 
    template< typename TYPE >
       typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
-         pop_back( TYPE& value )
-         {
-            return pop_back( static_cast< const void* >( &value ), sizeof( TYPE ) );
-         }
+         pop( TYPE& );
 
 public:
    const uint8_t* const buffer( ) const;
@@ -95,19 +89,32 @@ const size_t ByteBuffer::capacity( ) const
    return m_capacity;
 }
 
-
 template< typename TYPE >
 ByteBuffer& ByteBuffer::operator << ( const TYPE& value )
 {
-   push_back( value );
+   push( value, true );
    return *this;
 }
 
 template< typename TYPE >
 ByteBuffer& ByteBuffer::operator >> ( TYPE& value )
 {
-   pop_back( value );
+   pop( value );
    return *this;
+}
+
+template< typename TYPE >
+typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+ByteBuffer::push( const TYPE& value, const bool is_reallocate )
+{
+   return push( static_cast< const void* >( &value ), sizeof( TYPE ), is_reallocate );
+}
+
+template< typename TYPE >
+typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+ByteBuffer::pop( TYPE& value )
+{
+   return pop( static_cast< const void* >( &value ), sizeof( TYPE ) );
 }
 
 

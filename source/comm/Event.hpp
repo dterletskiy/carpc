@@ -1,11 +1,41 @@
 #pragma once
 
+#include "common/Types.hpp"
+#include "common/ByteBuffer.hpp"
 #include "Types.hpp"
-#include "tools/Tools.hpp"
 
 
 
 namespace base {
+
+
+
+/****************************************
+ *
+ * Event_ID declaration
+ *
+ ***************************************/
+class Event_ID
+{
+   friend ByteBuffer& operator << ( ByteBuffer&, const Event_ID& );
+   friend ByteBuffer& operator >> ( ByteBuffer&, Event_ID& );
+
+public:
+   Event_ID( const std::string& );
+   ~Event_ID( );
+
+public:
+   const char* c_str( ) const;
+
+public:
+   const bool operator==( const Event_ID& ) const;
+   const bool operator!=( const Event_ID& ) const;
+   const bool operator>( const Event_ID& ) const;
+   const bool operator<( const Event_ID& ) const;
+
+protected:
+   std::string    m_id;
+};
 
 
 

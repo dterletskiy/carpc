@@ -112,9 +112,9 @@ void ByteBuffer::reset( )
    m_size = m_capacity = 0;   
 }
 
-bool ByteBuffer::push_back( const void* p_buffer, const size_t size, const bool is_reallocate )
+bool ByteBuffer::push( const void* p_buffer, const size_t size, const bool is_reallocate )
 {
-   // Nothing to push_back
+   // Nothing to push
    if( 0 == size ) return false;
    // Buffer is not allocated
    if( nullptr == p_buffer ) return false;
@@ -134,7 +134,7 @@ bool ByteBuffer::push_back( const void* p_buffer, const size_t size, const bool 
    return true;
 }
 
-bool ByteBuffer::push_back( const std::string& string, const bool is_reallocate )
+bool ByteBuffer::push( const std::string& string, const bool is_reallocate )
 {
    const char* p_buffer = string.c_str( );
    const size_t size = string.size( );
@@ -147,12 +147,12 @@ bool ByteBuffer::push_back( const std::string& string, const bool is_reallocate 
       return false;
 
    // Storing string content
-   if( false == push_back( static_cast< const void* >( p_buffer ), size, is_reallocate ) )
+   if( false == push( static_cast< const void* >( p_buffer ), size, is_reallocate ) )
       return false;
 
    // Storing size of string. In case of error prevoius buffer state will be restored.
    // In this case stored string content will be deleted.
-   if( false == push_back( size, is_reallocate ) )
+   if( false == push( size, is_reallocate ) )
    {
       m_size = size_backup;
       return false;
@@ -161,11 +161,11 @@ bool ByteBuffer::push_back( const std::string& string, const bool is_reallocate 
    return true;
 }
 
-bool ByteBuffer::pop_back( const void* p_buffer, const size_t size )
+bool ByteBuffer::pop( const void* p_buffer, const size_t size )
 {
-   // Not enough data to pop_back
+   // Not enough data to pop
    if( size > m_size ) return false;
-   // Nothing to pop_back
+   // Nothing to pop
    if( 0 == size ) return false;
    // Buffer is not allocated
    if( nullptr == p_buffer ) return false;
@@ -179,7 +179,7 @@ bool ByteBuffer::pop_back( const void* p_buffer, const size_t size )
    return true;
 }
 
-bool ByteBuffer::pop_back( std::string& string )
+bool ByteBuffer::pop( std::string& string )
 {
    // Backup buffer state.
    size_t size_backup = m_size;
@@ -187,20 +187,20 @@ bool ByteBuffer::pop_back( std::string& string )
    size_t size = 0;
 
    // Reading size of string content
-   if( false == pop_back( size ) )
+   if( false == pop( size ) )
       return false;
 
    // Error in case of rest of data in buffer less then size to be read.
-   // push_back previously poped data to restore previous buffer state.
+   // push previously poped data to restore previous buffer state.
    if( size > m_size )
    {
-      // push_back( size );
+      // push( size );
       m_size = size_backup;
       return false;
    }
 
    char p_buffer[ size + 1 ]; // +1 for termitating '\0'
-   if( false == pop_back( static_cast< void* >( p_buffer ), size ) )
+   if( false == pop( static_cast< void* >( p_buffer ), size ) )
       return false;
 
    // Adding termitating '\0'
