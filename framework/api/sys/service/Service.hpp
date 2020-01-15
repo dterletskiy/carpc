@@ -17,7 +17,7 @@ class Service
    : public std::enable_shared_from_this< Service >
 {
 public:
-   Service( ServiceBrockerPtr, const ServiceInfo& );
+   Service( const ServiceInfo& );
    ~Service( );
    Service( const Service& ) = delete;
    Service& operator=( const Service& ) = delete;
@@ -35,9 +35,6 @@ public:
 private:
    size_t                  m_wd_timeout;
 
-private:
-   ServiceBrockerPtrW     mp_service_brocker;
-
 public:
    bool start( );
    void stop( );
@@ -49,7 +46,6 @@ private:
    bool                    m_started = false;
 
 public:
-   bool send_event( const EventPtr );
    bool insert_event( const EventPtr );
 private:
    EventPtr get_event( );
@@ -62,8 +58,6 @@ public:
    void set_notification( const EventTypeID&, const OptEventInfoID, IEventConsumer* );
    void clear_notification( const EventTypeID&, const OptEventInfoID, IEventConsumer* );
    void clear_all_notifications( const EventTypeID&, IEventConsumer* );
-   void clear_all_notifications( );
-   bool is_subscribed( const EventTypeID&, const OptEventInfoID );
    bool is_subscribed( const EventPtr );
    const std::optional< time_t > process_started( ) const;
 private:

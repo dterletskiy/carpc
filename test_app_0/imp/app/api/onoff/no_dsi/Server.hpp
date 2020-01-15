@@ -1,17 +1,16 @@
 #pragma once
 
 // Application
-#include "imp/app/api/onoff/Data.hpp"
-// Framework
+#include "Data.hpp"
 
 
 
-namespace api::onoff {
+namespace api::onoff::no_dsi {
 
 
 
 class Server
-   : public ServiceOnOff::OnOffEvent::Consumer
+   : public OnOffEvent::Consumer
 {
 public:
    Server( );
@@ -22,9 +21,9 @@ public:
    void response_trigger_state( const bool );
 
 private:
-   void process_event( const ServiceOnOff::OnOffEvent::Event& ) override;
+   void process_event( const OnOffEvent::Event& ) override;
 };
 
 
 
-} // namespace api::onoff
+} // namespace api::onoff::no_dsi

@@ -2,10 +2,11 @@
 
 // Framework
 #include "api/sys/comm/Event.hpp"
+#include "api/sys/helpers/macros/strings.hpp"
 
 
 
-namespace api::onoff {
+namespace api::onoff::dsi {
 
 
 
@@ -98,8 +99,8 @@ public:
 
 
 
-} // namespace api::onoff
+} // namespace api::onoff::dsi
 
 
 
-DECLARE_DSI_EVENT( ServiceOnOff, OnOffEvent, api::onoff::OnOffEventData, api::onoff::eOnOff );
+DECLARE_DSI_EVENT( ServiceOnOff, OnOffEvent, api::onoff::dsi::OnOffEventData, api::onoff::dsi::eOnOff );

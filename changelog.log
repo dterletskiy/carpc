@@ -21,6 +21,12 @@ version 1.1.0 (2019-12-18_10-53-25)
  - Implemented "send_to_context" and "create_send_to_context" methods for Event
  - Implemented "Timer"
 
-
 version 1.1.1 (2019-12-21_18-14-44)
  - Added __rdtsc function (CPU ticks)
+
+version 1.1.2 (2019-12-29_16-01)
+ - Removed "ServiceBrocker". Send ETC event directly to each service event pull.
+ - Renamed "ServiceBrockerDSI" to "ServiceBrocker"
+ - Creating event from buffer and buffer from event moved to EventRegistry.
+ - Mothods "to_buffer" and "from_buffer" now work identically
+ - Implemented DSI and non DSI request/response examples

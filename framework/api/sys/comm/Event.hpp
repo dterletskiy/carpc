@@ -2,8 +2,19 @@
 
 #include "api/sys/comm/TGenerator.hpp"
 #include "api/sys/comm/EventRegistry.hpp"
-#include "api/sys/comm/EventCreator.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
+
+
+
+namespace base {
+
+   template< typename TYPE >
+   inline EventPtr create_event( )
+   {
+      return std::make_shared< TYPE >( eCommType::IPC );
+   }
+
+} // namespace base
 
 
 

@@ -3,8 +3,8 @@
 
 
 
-// #define UNIX_SOCKET
-#define INET_SOCKET
+#define UNIX_SOCKET
+// #define INET_SOCKET
 
 
 namespace base::configuration::dsi {

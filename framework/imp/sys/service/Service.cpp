@@ -1,5 +1,4 @@
 #include "api/sys/comm/Event.hpp"
-#include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/Service.hpp"
 #include "imp/sys/service/ServiceEventConsumer.hpp"
 
@@ -13,10 +12,9 @@ namespace base {
 
 
 
-Service::Service( ServiceBrockerPtr p_service_brocker, const ServiceInfo& info )
+Service::Service( const ServiceInfo& info )
    : m_name( info.m_name )
    , m_wd_timeout( info.m_wd_timeout )
-   , mp_service_brocker( p_service_brocker )
    , m_events( )
    , m_buffer_cond_var( )
    , m_event_consumers_map( )
@@ -25,12 +23,12 @@ Service::Service( ServiceBrockerPtr p_service_brocker, const ServiceInfo& info )
 {
    mp_thread = std::make_shared< base::os::Thread >( std::bind( &Service::thread_loop, this ) );
 
-   SYS_INF( "'%s': creating", m_name.c_str( ) );
+   SYS_TRC( "'%s': created", m_name.c_str( ) );
 }
 
 Service::~Service( )
 {
-   SYS_INF( "'%s': destroying", m_name.c_str( ) );
+   SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
 }
 
 const TID Service::id( ) const
@@ -56,7 +54,7 @@ void Service::thread_loop( )
    while( started( ) )
    {
       EventPtr p_event = get_event( );
-      SYS_INF( "'%s': processing event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
+      SYS_TRC( "'%s': processing event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
       notify( p_event );
    }
 
@@ -81,39 +79,18 @@ bool Service::start( )
 void Service::stop( )
 {
    SYS_INF( "'%s': stopping", m_name.c_str( ) );
-   // clear_all_notifications( ); // @TDA: this leads to crash
    m_started = false;
-}
-
-bool Service::send_event( const EventPtr p_event )
-{
-   if( false == m_started )
-   {
-      SYS_WRN( "'%s': is not started", m_name.c_str( ) );
-      return false;
-   }
-
-   if( ServiceBrockerPtr p_service_brocker = mp_service_brocker.lock() )
-   {
-      p_service_brocker->insert_event( p_event );
-      return true;
-   }
-   else
-   {
-      SYS_ERR( "ServiceBrocker does not exist" );
-      return false;
-   }
 }
 
 bool Service::insert_event( const EventPtr p_event )
 {
-   if( false == m_started )
+   if( false == started( ) )
    {
       SYS_WRN( "'%s': is not started", m_name.c_str( ) );
       return false;
    }
-   SYS_INF( "'%s': inserting event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
 
+   SYS_TRC( "'%s': inserting event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
    m_buffer_cond_var.lock( );
    m_events.push_back( p_event );
    m_buffer_cond_var.notify( );
@@ -127,13 +104,13 @@ EventPtr Service::get_event( )
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )
    {
-      SYS_INF( "'%s': waiting for event...", m_name.c_str( ) );
+      SYS_TRC( "'%s': waiting for event...", m_name.c_str( ) );
       m_buffer_cond_var.wait( );
    }
    EventPtr p_event = m_events.front( );
    m_events.pop_front( );
    ++m_processed_events;
-   SYS_INF( "'%s': received event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
+   SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
    m_buffer_cond_var.unlock( );
 
    return p_event;
@@ -145,13 +122,14 @@ void Service::notify( const EventPtr p_event )
    if( iterator == m_event_consumers_map.end( ) )
       return;
 
-   SYS_INF( "'%s': %zu consumers will be processed", m_name.c_str( ), iterator->second.size( ) );
-   for( IEventConsumer* p_consumer : iterator->second )
+   auto& consumers_set = iterator->second; // @TDA: this copy is needed to avoid modifying consumers set during iterating it.
+   SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
+   for( IEventConsumer* p_consumer : consumers_set )
    {
       m_process_started = time( nullptr );
-      SYS_INF( "'%s': start processing at %ld", m_name.c_str( ), m_process_started.value( ) );
+      SYS_TRC( "'%s': start processing at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->name( ).c_str( ) );
       p_event->process( p_consumer );
-      SYS_INF( "'%s': finished processing started at %ld", m_name.c_str( ), m_process_started.value( ) );
+      SYS_TRC( "'%s': finished processing started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->name( ).c_str( ) );
    }
    m_process_started.reset( );
 }
@@ -198,34 +176,23 @@ void Service::clear_all_notifications( const EventTypeID& event_type_id, IEventC
       if( event_type_id != pair.first.first )
          continue;
 
-      auto consumers = pair.second;
-      auto iterator = consumers.find( p_consumer );
-      if( consumers.end( ) == iterator )
+      auto& consumers_set = pair.second;
+      auto iterator = consumers_set.find( p_consumer );
+      if( consumers_set.end( ) == iterator )
          continue;
 
-      consumers.erase( iterator );
+      consumers_set.erase( iterator );
    }
-}
-
-void Service::clear_all_notifications( )
-{
-   m_event_consumers_map.clear( );
-}
-
-bool Service::is_subscribed( const EventTypeID& event_type_id, const OptEventInfoID event_info_id )
-{
-   const auto& iterator = m_event_consumers_map.find( std::make_pair( event_type_id, event_info_id ) );
-   if( iterator == m_event_consumers_map.end( ) )
-      return false;
-
-   return true;
 }
 
 bool Service::is_subscribed( const EventPtr p_event )
 {
    const auto& iterator = m_event_consumers_map.find( std::make_pair( p_event->type_id( ), p_event->is_broadcast( ) ) );
    if( iterator == m_event_consumers_map.end( ) )
+   {
+      SYS_TRC( "'%s': is not subscribed on event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
       return false;
+   }
 
    return true;
 }

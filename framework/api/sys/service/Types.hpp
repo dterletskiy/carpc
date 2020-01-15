@@ -12,14 +12,9 @@ namespace base {
    extern const ServiceProcessPtr InvalidServicePtrPtr;
 
    class ServiceBrocker;
-   using ServiceBrockerPtr    = std::shared_ptr< ServiceBrocker >;
-   using ServiceBrockerPtrW   = std::weak_ptr< ServiceBrocker >;
+   using ServiceBrockerPtr   = std::shared_ptr< ServiceBrocker >;
+   using ServiceBrockerPtrW  = std::weak_ptr< ServiceBrocker >;
    extern const ServiceBrockerPtr InvalidServiceBrockerPtr;
-
-   class ServiceBrockerDSI;
-   using ServiceBrockerDsiPtr   = std::shared_ptr< ServiceBrockerDSI >;
-   using ServiceBrockerDsiPtrW  = std::weak_ptr< ServiceBrockerDSI >;
-   extern const ServiceBrockerDsiPtr InvalidServiceBrockerDsiPtr;
 
    class Service;
    using ServicePtr           = std::shared_ptr< Service >;

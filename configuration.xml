@@ -5,7 +5,7 @@
    <version major="0" minor="1" patch="0"/>
 
    <configuration>
-      <config name="SYS_TRACE" status="active"/>
+      <config name="SYS_TRACE" status="inactive"/>
       <config name="DBG_TRACE" status="active"/>
       <config name="COLORED_TRACE" status="active"/>
       <config name="MEMORY_HOOK" status="inactive"/>
@@ -42,7 +42,7 @@
       <setting type="flag" value="-std=c++17" status="active"/>
       <setting type="flag" value="-Wall" status="active"/>
       <setting type="flag" value="-Wextra" status="inactive"/>
-      <setting type="flag" value="-Ofast" status="inactive"/>
+      <setting type="flag" value="-Ofast" status="active"/>
       <setting type="flag" value="-g3" status="inactive"/>
       <setting type="flag" value="-ggdb" status="inactive"/>
       <setting type="flag" value="-rdynamic" status="inactive"/>

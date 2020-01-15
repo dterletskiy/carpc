@@ -57,7 +57,7 @@ long int Performance::info( ) const
    if( std::nullopt == m_delta )
       return 0;
 
-   DBG_TRC( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
+   // DBG_TRC( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
    return m_delta.value( ).count( );
 }
 

@@ -20,7 +20,7 @@ class ByteBufferT;
 class EventRegistry
 {
 public:
-   using EventCreator = EventPtr(*)( const eCommType );
+   using EventCreator = EventPtr(*)( );
    using Registry = std::map< EventTypeID, EventCreator >;
 
 public:
@@ -32,15 +32,13 @@ private:
    static EventRegistryPtr mp_instance;
 
 public:
-   EventPtr create_event( const EventTypeID& ) const;
-   EventPtr create_event( const EventTypeID&, ByteBufferT& ) const;
    EventPtr create_event( ByteBufferT& ) const;
-
-   void dump( ) const;
+   bool create_buffer( ByteBufferT&, EventPtr ) const;
 
 public:
    bool register_event( const EventTypeID&, EventCreator );
    const Registry& registry( ) const;
+   void dump( ) const;
 private:
    Registry m_registry;
 };

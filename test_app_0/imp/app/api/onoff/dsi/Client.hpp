@@ -1,12 +1,12 @@
 #pragma once
 
 // Application
-#include "imp/app/api/onoff/Data.hpp"
+#include "Data.hpp"
 // Framework
 
 
 
-namespace api::onoff {
+namespace api::onoff::dsi {
 
 
 
@@ -27,4 +27,4 @@ private:
 
 
 
-} // namespace api::onoff
+} // namespace api::onoff::dsi

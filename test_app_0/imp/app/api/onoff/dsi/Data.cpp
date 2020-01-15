@@ -1,9 +1,9 @@
 // Application
-#include "imp/app/api/onoff/Data.hpp"
+#include "Data.hpp"
 
 
 
-namespace api::onoff {
+namespace api::onoff::dsi {
 
 
 
@@ -139,7 +139,7 @@ bool OnOffEventData::from_buffer( base::ByteBufferT& buffer )
 
 
 
-} // namespace api::onoff
+} // namespace api::onoff::dsi
 
 
 

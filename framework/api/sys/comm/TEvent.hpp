@@ -92,7 +92,7 @@ public:
    {
       if constexpr( IS_DSI_EVENT )
       {
-         return buffer.push( *_TEventBase::mp_data, _TEventBase::s_type_id );
+         return buffer.push( *_TEventBase::mp_data );
       }
       return false;
    }
@@ -199,7 +199,7 @@ public:
    {
       if constexpr( IS_DSI_EVENT )
       {
-         return buffer.push( *_TEventBase::mp_data, m_id, _TEventBase::s_type_id );
+         return buffer.push( *_TEventBase::mp_data, m_id );
       }
       return false;
    }

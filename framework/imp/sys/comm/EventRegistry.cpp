@@ -17,10 +17,12 @@ EventRegistryPtr EventRegistry::mp_instance;
 
 EventRegistry::EventRegistry( )
 {
+   SYS_TRC( "created" );
 }
 
 EventRegistry::~EventRegistry( )
 {
+   SYS_TRC( "destroyed" );
 }
 
 
@@ -42,28 +44,6 @@ bool EventRegistry::register_event( const EventTypeID& event_type, EventCreator 
    return true;
 }
 
-#if 0
-EventPtr EventRegistry::create_event( const EventTypeID& event_type ) const
-{
-   auto iterator = m_registry.find( event_type );
-   if( m_registry.end( ) == iterator )
-      return nullptr;
-
-   return iterator->second( eCommType::IPC );
-}
-
-EventPtr EventRegistry::create_event( const EventTypeID& event_type, ByteBufferT& buffer ) const
-{
-   auto iterator = m_registry.find( event_type );
-   if( m_registry.end( ) == iterator )
-      return nullptr;
-
-   EventPtr p_event = iterator->second( eCommType::IPC );
-   p_event->from_buffer( buffer );
-   return p_event;
-}
-#endif
-
 EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
 {
    EventTypeID event_type;
@@ -72,13 +52,33 @@ EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
 
    auto iterator = m_registry.find( event_type );
    if( m_registry.end( ) == iterator )
+   {
+      SYS_ERR( "event '%s' is not registered", event_type.c_str( ) )
       return nullptr;
+   }
 
-   EventPtr p_event = iterator->second( eCommType::IPC );
+   EventPtr p_event = iterator->second( );
    if( false == p_event->from_buffer( buffer ) )
       return nullptr;
 
    return p_event;
+}
+
+bool EventRegistry::create_buffer( ByteBufferT& buffer, EventPtr p_event ) const
+{
+   if( m_registry.end( ) == m_registry.find( p_event->type_id( ) ) )
+   {
+      SYS_ERR( "event '%s' is not registered", p_event->type_id( ).c_str( ) )
+      return false;
+   }
+
+   if( false == p_event->to_buffer( buffer ) )
+      return false;
+
+   if( false == buffer.push( p_event->type_id( ) ) )
+      return false;
+
+   return true;
 }
 
 void EventRegistry::dump( ) const

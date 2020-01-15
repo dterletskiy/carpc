@@ -1,7 +1,6 @@
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/service/Service.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"
-#include "api/sys/service/ServiceBrockerDSI.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/comm/IEvent.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
@@ -73,6 +72,14 @@ const bool Event::send( EventPtr p_event, const eCommType comm_type )
       }
       case eCommType::ITC:
       {
+         bool result = true;
+         ServicePtrList service_list = base::ServiceProcess::instance( )->service_list( );
+         for( auto p_service : service_list )
+            result &= p_service->insert_event( p_event );
+         return result;
+      }
+      case eCommType::IPC:
+      {
          ServiceBrockerPtr p_service_brocker = ServiceProcess::instance( )->service_brocker( );
          if( InvalidServiceBrockerPtr == p_service_brocker )
          {
@@ -82,21 +89,7 @@ const bool Event::send( EventPtr p_event, const eCommType comm_type )
 
          return p_service_brocker->insert_event( p_event );
       }
-      case eCommType::IPC:
-      {
-         ServiceBrockerDsiPtr p_service_brocker_dsi = ServiceProcess::instance( )->service_brocker_dsi( );
-         if( InvalidServiceBrockerDsiPtr == p_service_brocker_dsi )
-         {
-            SYS_ERR( "ServiceBrockerDSI is not started" );
-            return false;
-         }
-
-         return p_service_brocker_dsi->insert_event( p_event );
-      }
-      default:
-      {
-         break;
-      }
+      default: break;
    }
 
    return true;

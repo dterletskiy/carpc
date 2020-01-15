@@ -77,12 +77,13 @@ namespace {
 
          if( m_count >= ++m_iteration )
          {
-            DBG_TRC( "iteration: %zu", m_iteration );
+            // DBG_TRC( "iteration: %zu", m_iteration );
             m_function( *m_parameter );
             return true;
          }
 
          m_performance.stop( base::format_string( "... done ", m_count, " ", base::c_str( *m_parameter ), " events" ) );
+         DBG_MSG( "microseconds per event: %f", static_cast< float >( m_performance.info( ) ) / m_count );
 
          if( m_parameters.end( ) == ++m_parameter )
          {
@@ -105,9 +106,10 @@ namespace {
       size_t               m_iteration;
       base::tools::Performance   m_performance;
    };
-   static size_t s_count = 5;
+   static size_t s_count = 1000000;
    auto send_event = [ ]( const base::eCommType _type ) { ServiceDSI::PingEvent::Event::create_send( { base::c_str( _type ) }, _type ); };
    Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC }, s_count );
+   // Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC }, s_count );
 
 }
 
@@ -128,22 +130,6 @@ void OnOff::process_event( const ServiceDSI::PingEvent::Event& event )
 
    if( false == s_event_test.execute( ) )
          shutdown( );
-
-   // DBG_TRC( "id = %#zx", static_cast< size_t >( event.id( ) ) );
-   // switch( event.id( ) )
-   // {
-   //    case events::eEventID::request:
-   //    {
-   //       DBG_WRN( "request" );
-   //       break;
-   //    }
-   //    case events::eEventID::response:
-   //    {
-   //       DBG_WRN( "response" );
-   //       break;
-   //    }
-   //    default: break;
-   // }
 }
 
 void OnOff::process_timer( const base::TimerID id )

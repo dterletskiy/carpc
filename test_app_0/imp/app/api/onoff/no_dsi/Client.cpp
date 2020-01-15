@@ -1,40 +1,40 @@
 // Application
-#include "imp/app/api/onoff/Client.hpp"
+#include "Client.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOffClientBase"
 
 
 
-namespace api::onoff {
+namespace api::onoff::no_dsi {
 
 
 
 Client::Client( )
 {
    // DBG_TRC( "Created" );
-   ServiceOnOff::OnOffEvent::Event::set_notification( true, this, eOnOff::ResponseTriggerState );
+   OnOffEvent::Event::set_notification( true, this, eOnOff::ResponseTriggerState );
 }
 
 Client::~Client( )
 {
    // DBG_TRC( "Destroyed" );
-   ServiceOnOff::OnOffEvent::Event::set_notification( false, this, eOnOff::ResponseTriggerState );
+   OnOffEvent::Event::set_notification( false, this, eOnOff::ResponseTriggerState );
 }
 
 void Client::request_trigger_state( const std::string& state )
 {
    DBG_TRC( "state: %s", state.c_str( ) );
 
-   ServiceOnOff::OnOffEvent::Data data( std::make_shared< RequestTriggerStateData >( state ) );
-   ServiceOnOff::OnOffEvent::Event::create_send(
+   OnOffEvent::Data data( std::make_shared< RequestTriggerStateData >( state ) );
+   OnOffEvent::Event::create_send(
            data
          , eOnOff::RequestTriggerState
-         , base::eCommType::IPC
+         , base::eCommType::ITC
       );
 }
 
-void Client::process_event( const ServiceOnOff::OnOffEvent::Event& event )
+void Client::process_event( const OnOffEvent::Event& event )
 {
    DBG_TRC( "id = %s", to_string( event.id( ) ).c_str( ) );
    switch( event.id( ) )
@@ -51,4 +51,4 @@ void Client::process_event( const ServiceOnOff::OnOffEvent::Event& event )
 
 
 
-} // namespace api::onoff
+} // namespace api::onoff::no_dsi

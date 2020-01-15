@@ -28,21 +28,16 @@ public:
    void boot( );
 
 public:
-   ServiceBrockerDsiPtr service_brocker_dsi( ) const;
-private:
-   ServiceBrockerDsiPtr       mp_service_brocker_dsi = InvalidServiceBrockerDsiPtr;
-
-public:
    ServiceBrockerPtr service_brocker( ) const;
 private:
-   ServiceBrockerPtr          mp_service_brocker = InvalidServiceBrockerPtr;
+   ServiceBrockerPtr       mp_service_brocker = InvalidServiceBrockerPtr;
 
 public:
    ServicePtr service( const TID& ) const;
    ServicePtr current_service( ) const;
    ServicePtrList service_list( ) const;
 private:
-   ServicePtrList             m_service_list;
+   ServicePtrList          m_service_list;
 
 private:
    os::linux::timer::TimerID  m_timer_id;

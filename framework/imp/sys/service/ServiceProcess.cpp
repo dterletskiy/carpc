@@ -1,5 +1,4 @@
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/service/ServiceBrockerDSI.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/Service.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
@@ -42,12 +41,12 @@ ServiceProcessPtr ServiceProcess::mp_instance;
 ServiceProcess::ServiceProcess( )
    : m_service_list( )
 {
-   SYS_INF( "Created" );
+   SYS_TRC( "created" );
 }
 
 ServiceProcess::~ServiceProcess( )
 {
-   SYS_INF( "Destroyed" );
+   SYS_TRC( "destroyed" );
 }
 
 ServiceProcessPtr ServiceProcess::instance( )
@@ -61,11 +60,6 @@ ServiceProcessPtr ServiceProcess::instance( )
    return mp_instance;
 }
 
-ServiceBrockerDsiPtr ServiceProcess::service_brocker_dsi( ) const
-{
-   return mp_service_brocker_dsi;
-}
-
 ServiceBrockerPtr ServiceProcess::service_brocker( ) const
 {
    return mp_service_brocker;
@@ -73,10 +67,10 @@ ServiceBrockerPtr ServiceProcess::service_brocker( ) const
 
 ServicePtr ServiceProcess::service( const TID& id ) const
 {
-   SYS_INF( "Service TID: %#lx", id );
+   SYS_TRC( "Service TID: %#lx", id );
    for( auto& p_service : m_service_list )
    {
-      SYS_INF( "Processing service TID: %#lx", p_service->id( ) );
+      SYS_TRC( "Processing service TID: %#lx", p_service->id( ) );
       if( id == p_service->id( ) )
          return p_service;
    }
@@ -102,10 +96,6 @@ ServicePtrList ServiceProcess::service_list( ) const
 
 bool ServiceProcess::start( const ServiceInfoVector& service_infos )
 {
-   // Creating service brocker DSI thread
-   mp_service_brocker_dsi = ServiceBrockerDSI::instance( );
-   if( nullptr == mp_service_brocker_dsi )
-      return false;
    // Creating service brocker thread
    mp_service_brocker = ServiceBrocker::instance( );
    if( nullptr == mp_service_brocker )
@@ -113,21 +103,17 @@ bool ServiceProcess::start( const ServiceInfoVector& service_infos )
    // Creating service threads
    for( const auto& service_info : service_infos )
    {
-      ServicePtr p_service = std::make_shared< Service >( mp_service_brocker, service_info );
+      ServicePtr p_service = std::make_shared< Service >( service_info );
       if( nullptr == p_service )
          return false;
       m_service_list.emplace_back( p_service );
    }
 
-   // Starting service brocker DSI thread
-   if( false == mp_service_brocker_dsi->start( ) )
-   {
-      SYS_ERR( "DSI Service Brocker can't be started" );
-      // return false;
-   }
    // Starting service brocker thread
    if( false == mp_service_brocker->start( ) )
-      return false;
+   {
+      // return false;
+   }
    // Starting service threads
    for( const auto p_service : m_service_list )
       if( false == p_service->start( ) )
@@ -136,7 +122,6 @@ bool ServiceProcess::start( const ServiceInfoVector& service_infos )
    // Watchdog timer
    if( false == os::linux::timer::create( m_timer_id, timer_handler ) )
       return false;
-   SYS_MSG( "Timer ID: %#lx", (long) m_timer_id );
    if( false == os::linux::timer::start( m_timer_id, 1000000000, os::linux::timer::eTimerType::continious ) )
       return false;
 
@@ -149,7 +134,6 @@ bool ServiceProcess::stop( )
       p_service->stop( );
    m_service_list.clear( );
    mp_service_brocker->stop( );
-   mp_service_brocker_dsi->stop( );
 
    os::linux::timer::remove( m_timer_id );
 
@@ -158,7 +142,7 @@ bool ServiceProcess::stop( )
 
 void ServiceProcess::boot( )
 {
-   SYS_INF( "booting..." );
+   SYS_MSG( "booting..." );
 
    sleep(1);
 
@@ -167,21 +151,16 @@ void ServiceProcess::boot( )
    for( auto& p_service : m_service_list )
       p_service->wait( );
    SYS_MSG( "All services are finished" );
+
    SYS_MSG( "Stopping Service Brocker" );
-   ServiceEvent::Event::create_send( { eServiceCommand::ping, "ping" }, eCommType::ITC );
    mp_service_brocker->stop( );
    mp_service_brocker->wait( );
    SYS_MSG( "Service Brocker is finished" );
-   SYS_MSG( "Stopping Service Brocker DSI" );
-   mp_service_brocker_dsi->stop( );
-   mp_service_brocker_dsi->wait( );
-   SYS_MSG( "Service Brocker DSI is finished" );
 
    os::linux::timer::remove( m_timer_id );
 
    m_service_list.clear( );
    mp_service_brocker.reset( );
-   mp_service_brocker_dsi.reset( );
 }
 
 
