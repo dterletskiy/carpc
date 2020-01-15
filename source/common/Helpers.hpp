@@ -52,7 +52,7 @@ struct is_base_of< D, D >
  * 
  *************************************************/
 template< typename T >
-const char* c_str( const T& data )
+const std::string to_string( const T& data )
 {
    if constexpr( std::is_integral< T >::value )
    {
@@ -62,14 +62,14 @@ const char* c_str( const T& data )
 
       std::stringstream ss;
       ss << data;
-      return ss.str( ).c_str( );
+      return ss.str( );
    }
    else if constexpr( std::is_same< T, std::string >::value )
    {
-      return data.c_str( );
+      return data;
    }
 
-   return "NoName";
+   return { "NoName" };
 }
 
 

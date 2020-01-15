@@ -27,7 +27,7 @@ public:
 public:
    IServiceBrockerPtr service_brocker( ) const override;
 private:
-   IServiceBrockerPtr   mp_service_brocker;
+   IServiceBrockerPtr   mp_service_brocker = InvalidServiceBrockerPtr;
 
 public:
    IServicePtr service( const TID& ) const override;

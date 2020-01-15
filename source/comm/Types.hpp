@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/Types.hpp"
+#include "common/ByteBuffer.hpp"
 #include "common/Helpers.hpp"
 #include "tools/Tools.hpp"
 
@@ -14,11 +15,43 @@ namespace base {
    class TBaseEvent_ID
    {
    public:
+      bool to_buffer( ByteBuffer& buffer )
+      {
+         if constexpr( std::is_integral< T >::value )
+         {
+            return buffer.push_back( m_id );
+         }
+         else if constexpr( std::is_same< T, std::string >::value )
+         {
+            bool result = buffer.push_back( m_id );
+            if( false == result ) return false;
+            return buffer.push_back( (size_t)m_id.size( ) );
+         }
+         return false;
+      }
+      bool from_buffer( ByteBuffer& buffer )
+      {
+         if constexpr( std::is_integral< T >::value )
+         {
+            return buffer.pop_back( m_id );
+         }
+         else if constexpr( std::is_same< T, std::string >::value )
+         {
+            size_t size = 0;
+            bool result = buffer.pop_back( size );
+            if( false == result ) return false;
+            return buffer.pop_back( m_id, size + 1 ); 
+         }
+         return false;
+      }
+
+   public:
       TBaseEvent_ID( const std::string& name ) { id( name.c_str( ) ); }
       TBaseEvent_ID( const char* const name ) { id( name ); }
       ~TBaseEvent_ID( ) { }
 
-      const char* c_str( ) const { return base::c_str( m_id ); }
+      const char* c_str( ) const { return base::to_string( m_id ).c_str( ); }
+      const std::string to_string( ) const { return base::to_string( m_id ); }
 
    public:
       const bool operator==( const TBaseEvent_ID& id ) const { return m_id == id.m_id; }

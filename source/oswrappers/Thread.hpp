@@ -1,5 +1,14 @@
 #pragma once
 
+#if OS == STD
+   #include <thread>
+#endif
+#if OS == LINUX
+   #include <pthread.h>
+#endif
+#if OS == WINDOWS
+#endif
+
 #include "common/Types.hpp"
 
 namespace base::os {

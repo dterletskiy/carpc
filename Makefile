@@ -1,5 +1,12 @@
 # Compiler and Linker
 CC          := g++
+# Debugger
+DEBUGGER 	:= lldb
+# tar
+TAR 			:= tar
+
+TIME := $(shell date +"%H-%M-%S")
+DATE := $(shell date +"%Y-%m-%d")
 
 # The Target Binary Program
 TARGET      := program
@@ -17,7 +24,8 @@ OBJEXT      := o
 
 # Flags, Libraries and Includes
 CCONST		:= -DLINUX=0 -DWINDOWS=1 -DSTD=2 -DOS=LINUX
-# CCONFIG		:= -DHOOK_MEMORY_ALLOCATOR
+CCONFIG		:= -DCOLORED_TRACE
+# CCONFIG		+= -DHOOK_MEMORY_ALLOCATOR
 CFLAGS      := -fopenmp -g -std=c++17 $(CCONST) $(CCONFIG)
 # CFLAGS      += -Wall -O3 -g
 LIB         := -fopenmp -lrt -ldl
@@ -63,6 +71,9 @@ perf:
 disassm:
 	objdump -S --disassemble $(TARGETDIR)/$(TARGET) > $(TARGETDIR)/$(TARGET).s
 
+debug:
+	$(DEBUGGER) $(TARGETDIR)/$(TARGET)
+
 # Set configuration
 config:
 	reset
@@ -75,6 +86,9 @@ resources: directories
 directories:
 	@mkdir -p $(TARGETDIR)
 	@mkdir -p $(BUILDDIR)
+
+archive:
+	$(TAR) -cvf ../RPC_$(DATE)_$(TIME).tar ../
 
 # Pull in dependency info for *existing* .o files
 -include $(OBJECTS:.$(OBJEXT)=.$(DEPEXT))

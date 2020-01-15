@@ -12,10 +12,6 @@ namespace base {
 
 
 
-const IServicePtr InvalidServicePtr;
-
-
-
 Service::Service( IServiceBrockerPtr p_service_brocker, const ServiceInfo& info )
    : mp_service_brocker( p_service_brocker )
    , m_events( )
@@ -59,6 +55,8 @@ void Service::thread_loop( )
       SYS_INF( "'%s': processing event (%s)", m_name.c_str( ), p_event->type_id( ).c_str( ) );
       notify( p_event );
    }
+
+   // ServiceEvent::set_notification( false, this );
 
    // Destroying components
    m_components.clear( );

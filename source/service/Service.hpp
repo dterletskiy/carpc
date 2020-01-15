@@ -79,10 +79,6 @@ private:
 
 
 
-extern const IServicePtr InvalidServicePtr;
-
-
-
 inline
 const std::string& Service::name( ) const
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #if OS == STD
+   #include <thread>
    #include <mutex>
 #elif OS == LINUX
    #include <pthread.h>

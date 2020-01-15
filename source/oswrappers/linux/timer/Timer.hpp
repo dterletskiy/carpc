@@ -9,7 +9,7 @@
 
 
 
-namespace base::os {
+namespace base::os::linux {
 
 
 
@@ -30,7 +30,7 @@ bool start_timer( const timer_t& timer_id, long int freq_nanosecs, eTimerType ty
 
 
 
-} // namespace base::os
+} // namespace base::os::linux
 
 
 

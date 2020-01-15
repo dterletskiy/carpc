@@ -128,11 +128,11 @@ void ServiceProcess::boot( )
    SYS_MSG( );
 
    // testing
-   os::TimerID timer_id;
-   if( false == os::create_timer( timer_id, event_handler ) )
+   os::linux::TimerID   timer_id;
+   if( false == os::linux::create_timer( timer_id, event_handler ) )
       return;
    DBG_MSG( "Timer ID: %#lx", (long) timer_id );
-   if( false == os::start_timer( timer_id, 1000000000, os::eTimerType::continious ) )
+   if( false == os::linux::start_timer( timer_id, 1000000000, os::linux::eTimerType::continious ) )
       return;
 
    sleep( 1 );
@@ -168,7 +168,7 @@ void ServiceProcess::boot( )
    mp_service_brocker->wait( );
    DBG_MSG( "Service Brocker is finished" );
 
-   os::delete_timer( timer_id );
+   os::linux::delete_timer( timer_id );
 
    m_service_list.clear( );
    mp_service_brocker.reset( );

@@ -77,6 +77,7 @@ public:
    using _ConsumerType  = typename _Generator::Config::ConsumerType;
    using _DataType      = typename _Generator::Config::DataType;
    using _DataTypePtr   = typename std::shared_ptr< _DataType >;
+   using _ServiceType   = typename _Generator::Config::ServiceType;
 
    TEvent( const _DataType& data, const eCommType comm_type )
       : Event( comm_type )
@@ -90,14 +91,18 @@ public:
       return Event::set_notification( is_set, p_consumer, s_type_id );
    }
 
-   static std::shared_ptr< TEvent< _Generator > > create( const _DataType& data, const eCommType comm_type )
+   static std::shared_ptr< _EventType > create( const _DataType& data, const eCommType comm_type = eCommType::ETC )
    {
-      return std::make_shared< TEvent< _Generator > >( data, comm_type );
+      eCommType type = comm_type;
+      if constexpr( false == std::is_same< _ServiceType, void >::value )
+         type = eCommType::IPC;
+
+      return std::make_shared< _EventType >( data, comm_type );
    }
 
    bool send( ) override
    {
-      return Event::send( TEvent< _Generator >::shared_from_this( ), s_type_id );
+      return Event::send( _EventType::shared_from_this( ), s_type_id );
    }
 
    static bool send_event( const _DataType& data, const eCommType comm_type = eCommType::ETC )
@@ -127,11 +132,11 @@ private:
  * TGenerator declaration
  *
  ***************************************/
-template< typename _DataType >
+template< typename _DataType, typename _ServiceType = void >
 class TGenerator
 {
 private:
-   using Generator      = TGenerator< _DataType >;
+   using Generator      = TGenerator< _DataType, _ServiceType >;
    using _EventType     = TEvent< Generator >;
    using _ConsumerType  = TEventConsumer< Generator >;
 
@@ -141,6 +146,7 @@ public:
       using EventType      = _EventType;
       using DataType       = _DataType;
       using ConsumerType   = _ConsumerType;
+      using ServiceType    = _ServiceType;
    };
 };
 
@@ -160,10 +166,15 @@ public:
 
 
 #define DECLARE_DSI_EVENT( eventType, dataType, consumerType, serviceName ) \
-   using eventType      = base::TGenerator< dataType >::Config::EventType; \
-   using consumerType   = eventType::_ConsumerType;
+   namespace serviceName { \
+      class serviceName; \
+      using eventType      = base::TGenerator< dataType, serviceName >::Config::EventType; \
+      using consumerType   = eventType::_ConsumerType; \
+   }
 
 #define INIT_DSI_EVENT( eventType, serviceName ) \
-   template< > base::Event_ID eventType::s_type_id = { #eventType"."#serviceName }
+   namespace serviceName { \
+     template< > base::Event_ID eventType::s_type_id = { #eventType"."#serviceName }; \
+   }
 
 

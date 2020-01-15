@@ -1,3 +1,4 @@
+#include "common/Helpers.hpp"
 #include "oswrappers/Mutex.hpp"
 #include "Tools.hpp"
 
@@ -23,6 +24,7 @@ const ID generate_id( const char* const name_space )
       id = ++( iterator->second );
    }
 
+   SYS_TRC( "%s", base::to_string( id ).c_str( ) );
    return id;
 }
 

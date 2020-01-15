@@ -9,15 +9,19 @@ namespace base {
    class IServiceProcess;
    using IServiceProcessPtr   = std::shared_ptr< IServiceProcess >;
    using IServiceProcessPtrW  = std::weak_ptr< IServiceProcess >;
+   extern const IServiceProcessPtr InvalidServicePtrPtr;
 
    class IServiceBrocker;
    using IServiceBrockerPtr   = std::shared_ptr< IServiceBrocker >;
    using IServiceBrockerPtrW  = std::weak_ptr< IServiceBrocker >;
+   extern const IServiceBrockerPtr InvalidServiceBrockerPtr;
 
    class IService;
    using IServicePtr          = std::shared_ptr< IService >;
    using IServicePtrList      = std::list< IServicePtr >;
    using IServicePtrW         = std::weak_ptr< IService >;
+   extern const IServicePtr InvalidServicePtr;
+
 
 
    class IComponent;

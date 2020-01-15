@@ -112,14 +112,14 @@ void ByteBuffer::reset( )
    m_size = m_capacity = 0;   
 }
 
-bool ByteBuffer::add( const uint8_t* p_buffer, const size_t size, const bool is_reallocate )
+bool ByteBuffer::push_back( const void* p_buffer, const size_t size, const bool is_reallocate )
 {
-   // Nothing to add
+   // Nothing to push_back
    if( 0 == size ) return false;
-
+   // Buffer is not allocated
+   if( nullptr == p_buffer ) return false;
    // Buffer is not allocated
    if( nullptr == mp_buffer ) return false;
-
    // Reallocating buffer is requested with saving prevous content
    if( ( m_capacity - m_size ) < size && false == is_reallocate ) return false;
 
@@ -135,14 +135,63 @@ bool ByteBuffer::add( const uint8_t* p_buffer, const size_t size, const bool is_
    return true;
 }
 
-bool ByteBuffer::add( const char* p_buffer, const size_t size, const bool is_reallocate )
+bool ByteBuffer::push_back( const uint8_t* p_buffer, const size_t size, const bool is_reallocate )
 {
-   return add( (uint8_t*) p_buffer, size, is_reallocate );
+   return push_back( static_cast< const void* >( p_buffer ), size, is_reallocate );
 }
 
-bool ByteBuffer::add( const std::string& string, const bool is_reallocate )
+bool ByteBuffer::push_back( const char* p_buffer, const size_t size, const bool is_reallocate )
 {
-   return add( string.c_str( ), string.size( ) + 1 /* for termination '\0' */ );
+   return push_back( static_cast< const void* >( p_buffer ), size, is_reallocate );
+}
+
+bool ByteBuffer::push_back( const std::string& string, const bool is_reallocate )
+{
+   return push_back( string.c_str( ), string.size( ) + 1 /* for termination '\0' */ );
+}
+
+bool ByteBuffer::pop_back( const void* p_buffer, const size_t size )
+{
+   // Not enough data to pop_back
+   if( size > m_size ) return false;
+   // Nothing to pop_back
+   if( 0 == size ) return false;
+   // Buffer is not allocated
+   if( nullptr == p_buffer ) return false;
+   // Buffer is not allocated
+   if( nullptr == mp_buffer ) return false;
+
+   void* _p_buffer = const_cast< void* >( p_buffer );
+   memcpy( _p_buffer, mp_buffer + m_size - size, size );
+   m_size -= size;
+
+   return true;
+}
+
+bool ByteBuffer::pop_back( const uint8_t* p_buffer, const size_t size )
+{
+   return pop_back( static_cast< const void* >( p_buffer ), size );
+}
+
+bool ByteBuffer::pop_back( const char* p_buffer, const size_t size /* here size should also include termination '\0' */ )
+{
+   return pop_back( static_cast< const void* >( p_buffer ), size );
+}
+
+bool ByteBuffer::pop_back( std::string& string, const size_t size /* here size should also include termination '\0' */ )
+{
+   char p_buffer[ size ];
+   if( false == pop_back( static_cast< void* >( p_buffer ), size ) )
+      return false;
+
+   if( 0 != p_buffer[ size - 1 ] )
+   {
+      SYS_WRN( "missing termitation '\0'" );
+      p_buffer[ size - 1 ] = 0;
+   }
+
+   string = p_buffer;
+   return true;
 }
 
 

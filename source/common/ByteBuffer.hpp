@@ -2,6 +2,9 @@
 #include <memory.h>
 #include <string.h>
 
+#include "Trace.hpp"
+#define CLASS_ABBR "B_BUFFER"
+
 #pragma once
 
 
@@ -23,9 +26,32 @@ public:
    bool reallocate( const size_t, const bool is_store = false );
    bool trancate( );
    void reset( );
-   bool add( const uint8_t*, const size_t, const bool is_reallocate = false );
-   bool add( const char*, const size_t, const bool is_reallocate = false );
-   bool add( const std::string&, const bool is_reallocate = false );
+
+public:
+   bool push_back( const void*, const size_t, const bool is_reallocate = false );
+   bool push_back( const uint8_t*, const size_t, const bool is_reallocate = false );
+   bool push_back( const char*, const size_t, const bool is_reallocate = false );
+   bool push_back( const std::string&, const bool is_reallocate = false );
+
+   template< typename TYPE >
+      typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+         push_back( const TYPE& value, const bool is_reallocate = false )
+         {
+            return push_back( static_cast< const void* >( &value ), sizeof( TYPE ), is_reallocate );
+         }
+
+public:
+   bool pop_back( const void*, const size_t );
+   bool pop_back( const uint8_t*, const size_t );
+   bool pop_back( const char*, const size_t );
+   bool pop_back( std::string&, const size_t );
+
+   template< typename TYPE >
+      typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+         pop_back( TYPE& value )
+         {
+            return pop_back( static_cast< const void* >( &value ), sizeof( TYPE ) );
+         }
 
 public:
    const uint8_t* const buffer( ) const;
@@ -70,3 +96,5 @@ const size_t ByteBuffer::capacity( ) const
 
 
 } // namespace base
+
+#undef CLASS_ABBR

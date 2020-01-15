@@ -66,6 +66,9 @@ bool Event::send( EventPtr p_event, const Event_ID& type_id )
       case eCommType::ITC:
       {
          IServiceBrockerPtr p_service_brocker = ServiceProcess::instance( )->service_brocker( );
+         if( InvalidServiceBrockerPtr == p_service_brocker )
+            return false;
+
          return p_service_brocker->insert_event( p_event );
       }
       default:
