@@ -60,7 +60,7 @@ public:
    using _EventType = typename _Generator::Config::EventType;
 
    TEventConsumer( ) { }
-   ~TEventConsumer( ) override { }
+   ~TEventConsumer( ) override { _EventType::set_notification( false, this ); }
 
    virtual void process_event( const _EventType& ) = 0;
 };
@@ -112,11 +112,12 @@ class TEvent
    , public std::enable_shared_from_this< TEvent< _Generator > >
 {
 public:
-   using _EventType     = typename _Generator::Config::EventType;
-   using _ConsumerType  = typename _Generator::Config::ConsumerType;
-   using _DataType      = typename _Generator::Config::DataType;
-   using _DataTypePtr   = typename std::shared_ptr< _DataType >;
-   using _ServiceType   = typename _Generator::Config::ServiceType;
+   using _EventType           = typename _Generator::Config::EventType;
+   using _ConsumerType        = typename _Generator::Config::ConsumerType;
+   using _DataType            = typename _Generator::Config::DataType;
+   using _DataTypePtr         = typename std::shared_ptr< _DataType >;
+   using _ServiceType         = typename _Generator::Config::ServiceType;
+   using _EventProcessorPtr   = void ( _ConsumerType::* )( const _EventType& );
 
 public:
    TEvent( const eCommType comm_type )
@@ -259,7 +260,7 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
    namespace eventType { \
       class eventType; \
       using Event       = base::TGenerator< dataType, eventType >::Config::EventType; \
-      using Consumer    = Event::_ConsumerType; \
+      using Consumer    = Event::Config::ConsumerType; \
       using Data        = dataType; \
    }
 
@@ -276,7 +277,7 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
       class serviceName; \
       class eventType; \
       using Event       = base::TGenerator< dataType, eventType, serviceName >::Config::EventType; \
-      using Consumer    = Event::_ConsumerType; \
+      using Consumer    = Event::Config::ConsumerType; \
       using Data        = dataType; \
    }
 
@@ -291,7 +292,7 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
 #if 0 // Depricated event macros
 #define DECLARE_EVENT( eventType, dataType, consumerType ) \
    using eventType      = base::TGenerator< dataType >::Config::EventType; \
-   using consumerType   = eventType::_ConsumerType;
+   using consumerType   = eventType::Config::ConsumerType;
 
 #define INIT_EVENT( eventType ) \
    template< > base::Event_ID eventType::s_type_id = { #eventType };
@@ -305,7 +306,7 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
    namespace serviceName { \
       class serviceName; \
       using eventType      = base::TGenerator< dataType, serviceName >::Config::EventType; \
-      using consumerType   = eventType::_ConsumerType; \
+      using consumerType   = eventType::Config::ConsumerType; \
    }
 
 #define INIT_DSI_EVENT( eventType, serviceName ) \
