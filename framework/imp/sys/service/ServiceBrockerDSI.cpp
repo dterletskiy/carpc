@@ -144,7 +144,7 @@ void ServiceBrockerDSI::thread_loop_send( )
    while( started_send( ) )
    {
       EventPtr p_event = get_event( );
-      SYS_INF( "processing event (%s)", p_event->type_id( ).c_str( ) );
+      SYS_INF( "sending event (%s)", p_event->type_id( ).c_str( ) );
       base::ByteBufferT buffer;
       if( false == p_event->to_buffer( buffer ) )
       {

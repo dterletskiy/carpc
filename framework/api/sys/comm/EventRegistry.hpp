@@ -1,7 +1,6 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
-#include "Types.hpp"
+#include "api/sys/comm/Types.hpp"
 
 
 
@@ -22,7 +21,7 @@ class EventRegistry
 {
 public:
    using EventCreator = EventPtr(*)( const eCommType );
-   using Registry = std::map< std::string, EventCreator >;
+   using Registry = std::map< EventTypeID, EventCreator >;
 
 public:
    ~EventRegistry( );
@@ -33,14 +32,14 @@ private:
    static EventRegistryPtr mp_instance;
 
 public:
-   EventPtr create_event( const std::string& ) const;
-   EventPtr create_event( const std::string&, ByteBufferT& ) const;
+   EventPtr create_event( const EventTypeID& ) const;
+   EventPtr create_event( const EventTypeID&, ByteBufferT& ) const;
    EventPtr create_event( ByteBufferT& ) const;
 
    void dump( ) const;
 
 public:
-   bool register_event( const std::string&, EventCreator );
+   bool register_event( const EventTypeID&, EventCreator );
    const Registry& registry( ) const;
 private:
    Registry m_registry;

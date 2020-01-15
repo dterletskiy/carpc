@@ -12,17 +12,17 @@ namespace application::onoff {
 
 Client::Client( )
 {
-   DBG_MSG( "Created" );
+   // DBG_TRC( "Created" );
 }
 
 Client::~Client( )
 {
-   DBG_MSG( "Destroyed" );
+   // DBG_TRC( "Destroyed" );
 }
 
 void Client::response_trigger_state( const bool result )
 {
-   DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
+   DBG_TRC( "result: %s", BOOL_TO_STRING( result ) );
 }
 
 

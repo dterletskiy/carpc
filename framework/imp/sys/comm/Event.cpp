@@ -33,7 +33,7 @@ Event::~Event( )
 {
 }
 
-bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const Event_ID& type_id )
+bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const EventTypeID& type_id )
 {
    SYS_INF( "event id: %s / consumer: %p / is_set: %s", type_id.c_str( ), p_consumer, BOOL_TO_STRING( is_set ) );
    ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );

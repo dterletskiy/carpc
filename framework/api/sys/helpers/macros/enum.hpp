@@ -11,6 +11,7 @@
  * 
  * Macro defines class enumeration without default values for items.
  * This macro also defines method to_string what converts enumeration to string value.
+ * It is implemented as lambde to have a possibility to use this macro in functions, classes, headers.
  * !!! Default values for enumeration itemes should not be used !!!
  * link: http://qaru.site/questions/9343/is-there-a-simple-way-to-convert-c-enum-to-string
  * Examples:
@@ -54,6 +55,7 @@ auto to_string = []( NAME value ) -> const std::string \
  * 
  * Macro defines class enumeration without default values for items.
  * This macro also defines method to_string what converts enumeration to string value.
+ * It is implemented as lambde to have a possibility to use this macro in classes, headers.
  * !!! Default values for enumeration itemes should not be used !!!
  * This macro also generates additional methods what allow to iterate by enumeration values in for.
  * !!! This macro should be used outside of any function !!!

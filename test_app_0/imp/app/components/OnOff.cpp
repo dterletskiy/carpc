@@ -111,9 +111,9 @@ namespace {
 bool OnOff::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
-   // s_event_test.execute( );
-   sleep(5);
+   // sleep(5);
    m_client.request_trigger_state( "Unloaded" );
+   s_event_test.execute( );
 
    return true;
 }

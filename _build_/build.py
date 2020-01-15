@@ -7,6 +7,8 @@ import base
 import console
 import settings
 import project
+import datetime
+import shutil
 
 
 
@@ -50,7 +52,11 @@ def choose_action( _actions: list ) -> str:
    return _actions[ number ]
 # def choose_action
 
-
+def archive( dir_name: str ):
+   output_filename: str = dir_name + "_" + datetime.datetime.now( ).strftime( "%Y-%m-%d_%H-%M-%S" )
+   print( "date and time =", output_filename )
+   shutil.make_archive( output_filename, 'zip', dir_name )
+# def archive
 
 
 
@@ -61,6 +67,7 @@ SESSION=os.environ.get( 'SESSION', "default" )
 ROOT = "/home/scorpion/Source/RPC"
 projects: list = [ "framework", "hooks", "servicebrocker", "application", "test_app_0" ]
 actions: dict = {
+   'archive':     [ project.clean_all, archive                                ],
    'clean':       [ project.clean_all                                         ],
    'info':        [ project.info_all                                          ],
    'compile':     [ project.compile_all                                       ],
@@ -77,5 +84,8 @@ action_name: str = choose_action( list( actions.keys( ) ) )
 
 project.init( project_names, PROJECTS, ROOT, SESSION, COMPILER )
 for processor in actions.get( action_name ):
-   pass
-   processor( PROJECTS )
+   if archive == processor:
+      archive( ROOT )
+   else:
+      processor( PROJECTS )
+

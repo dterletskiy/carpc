@@ -33,7 +33,7 @@ EventRegistryPtr EventRegistry::instance( )
    return mp_instance;
 }
 
-bool EventRegistry::register_event( const std::string& event_type, EventCreator p_creator )
+bool EventRegistry::register_event( const EventTypeID& event_type, EventCreator p_creator )
 {
    if( nullptr == p_creator )
       return false;
@@ -42,7 +42,8 @@ bool EventRegistry::register_event( const std::string& event_type, EventCreator 
    return true;
 }
 
-EventPtr EventRegistry::create_event( const std::string& event_type ) const
+#if 0
+EventPtr EventRegistry::create_event( const EventTypeID& event_type ) const
 {
    auto iterator = m_registry.find( event_type );
    if( m_registry.end( ) == iterator )
@@ -51,7 +52,7 @@ EventPtr EventRegistry::create_event( const std::string& event_type ) const
    return iterator->second( eCommType::IPC );
 }
 
-EventPtr EventRegistry::create_event( const std::string& event_type, ByteBufferT& buffer ) const
+EventPtr EventRegistry::create_event( const EventTypeID& event_type, ByteBufferT& buffer ) const
 {
    auto iterator = m_registry.find( event_type );
    if( m_registry.end( ) == iterator )
@@ -61,10 +62,11 @@ EventPtr EventRegistry::create_event( const std::string& event_type, ByteBufferT
    p_event->data( buffer );
    return p_event;
 }
+#endif
 
 EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
 {
-   std::string event_type;
+   EventTypeID event_type;
    if( false == buffer.pop( event_type ) )
       return nullptr;
 

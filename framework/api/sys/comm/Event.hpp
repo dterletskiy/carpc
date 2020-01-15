@@ -3,7 +3,6 @@
 #include "api/sys/common/Types.hpp"
 #include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/comm/Types.hpp"
-#include "api/sys/comm/Event_ID.hpp"
 #include "api/sys/comm/EventRegistry.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
@@ -53,7 +52,7 @@ public:
    Event( const Event& );
    virtual ~Event( );
 
-   static bool set_notification( bool, IEventConsumer*, const Event_ID& );
+   static bool set_notification( bool, IEventConsumer*, const EventTypeID& );
    static bool send( EventPtr, const eCommType comm_type = eCommType::NONE );
 
 public:
@@ -65,7 +64,7 @@ public:
    virtual void process( IEventConsumer* ) = 0;
 
 public:
-   virtual const Event_ID& type_id( ) = 0;
+   virtual const EventTypeID& type_id( ) = 0;
    const eCommType& comm_type( ) const;
 protected:
    eCommType   m_comm_type;
@@ -213,8 +212,8 @@ public:
    }
 
 public:
-   const Event_ID& type_id( ) override { return s_type_id; }
-   static Event_ID         s_type_id;
+   const EventTypeID& type_id( ) override { return s_type_id; }
+   static EventTypeID         s_type_id;
 
 public:
    const _IdType id( ) const { return m_id; }
@@ -324,7 +323,7 @@ enum class eDummyEventID : size_t { dummy = SIZE_MAX };
    }
 
 #define INIT_EVENT( eventType ) \
-   template< > base::Event_ID eventType::Event::s_type_id = { #eventType };
+   template< > base::EventTypeID eventType::Event::s_type_id = { #eventType };
 
 #define REGISTER_EVENT( eventType ) \
    base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
@@ -364,7 +363,7 @@ enum class eDummyEventID : size_t { dummy = SIZE_MAX };
    }
 
 #define INIT_DSI_EVENT( serviceName, eventType ) \
-      template< > base::Event_ID serviceName::eventType::Event::s_type_id = { #eventType"."#serviceName };
+      template< > base::EventTypeID serviceName::eventType::Event::s_type_id = { #eventType"."#serviceName };
 
 #define REGISTER_DSI_EVENT( serviceName, eventType ) \
    base::EventRegistry::instance( )->register_event( #eventType"."#serviceName, base::create_event< serviceName::eventType::Event > );

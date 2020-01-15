@@ -12,19 +12,19 @@ namespace api::onoff {
 
 Server::Server( )
 {
-   // DBG_MSG( "Created" );
+   // DBG_TRC( "Created" );
    OnOffEvent::Event::set_notification( true, this );
 }
 
 Server::~Server( )
 {
-   // DBG_MSG( "Destroyed" );
+   // DBG_TRC( "Destroyed" );
    OnOffEvent::Event::set_notification( false, this );
 }
 
 void Server::response_trigger_state( const bool result )
 {
-   // DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
+   DBG_TRC( "result: %s", BOOL_TO_STRING( result ) );
 
    OnOffEvent::Data data( std::make_shared< ResponseTriggerStateData >( result ) );
    OnOffEvent::Event::create_send(
@@ -36,7 +36,7 @@ void Server::response_trigger_state( const bool result )
 
 void Server::process_event( const OnOffEvent::Event& event )
 {
-   // DBG_MSG( "id = %s", to_string( event.id( ) ).c_str( ) );
+   DBG_TRC( "id = %s", to_string( event.id( ) ).c_str( ) );
    switch( event.id( ) )
    {
       case eOnOff::RequestTriggerState:

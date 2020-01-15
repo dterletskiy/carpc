@@ -12,17 +12,17 @@ namespace application::onoff {
 
 Server::Server( )
 {
-   DBG_MSG( "Created" );
+   // DBG_MSG( "Created" );
 }
 
 Server::~Server( )
 {
-   DBG_MSG( "Destroyed" );
+   // DBG_MSG( "Destroyed" );
 }
 
 void Server::request_trigger_state( const std::string& state )
 {
-   DBG_MSG( "state: %s", state.c_str( ) );
+   DBG_TRC( "state: %s", state.c_str( ) );
    response_trigger_state( true );
 }
 

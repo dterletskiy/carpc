@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <memory>
 
 
@@ -16,5 +17,7 @@ namespace base {
 
    class EventRegistry;
    using EventRegistryPtr = std::shared_ptr< EventRegistry >;
+
+   using EventTypeID = std::string;
 
 } // namespace base

@@ -1,5 +1,14 @@
-version 1.0.0
+version 1.0.0 (2019-12-02_19-34-34)
+ - introduced python build system
+
+version 1.0.1 (2019-12-05_10-40-26)
  - Remover OS dependency in Thread, Mutex and ConditionVariable classes. STD implementation was removed.
  - Android os support was implemented
+ - Extended ByteBuffer with implementation for optional
  - improved build system
  - coloros in build system
+
+version 1.0.2 
+ - Remover "send_event" depricated method from Service class
+ - class "Event_ID" replaced by typedef "EventTypeID"
+ - improved build system
