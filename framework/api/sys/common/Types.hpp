@@ -28,38 +28,12 @@
 #include <memory>
 #include <optional>
 
-#if OS == STD
-   #include <thread>
-   #include <mutex>
-   #include <condition_variable>
-#endif
-#if OS == LINUX
-   #include <pthread.h>
-#endif
-#if OS == WINDOWS
-#endif
-
 #pragma once
 
 
 
 namespace base {
 
-
-
-using ID             = std::uint64_t;
-
-using IStream        = std::istream;
-using OStream        = std::ostream;
-
-using IPC_BUFFER     = char*;
-
-#if OS == LINUX
-   #define TID       pthread_t
-#elif OS == STD
-   #define TID       std::thread::id
-#endif
-
-
+   using ID = std::uint64_t;
 
 } // namespace base

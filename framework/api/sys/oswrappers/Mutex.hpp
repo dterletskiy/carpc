@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
+#include "api/sys/oswrappers/Types.hpp"
 
 
 
@@ -28,19 +28,9 @@ private:
    bool        m_auto_lock = false;
 
 public:
-   #if OS == STD
-      std::mutex& mutex( );
-   #elif OS == LINUX
-      pthread_mutex_t& mutex( );
-   #elif OS == WINDOWS
-   #endif
+   pthread_mutex_t& mutex( );
 private:
-   #if OS == STD
-      std::mutex        m_mutex;
-   #elif OS == LINUX
-      pthread_mutex_t   m_mutex = PTHREAD_MUTEX_INITIALIZER;
-   #elif OS == WINDOWS
-   #endif
+   pthread_mutex_t   m_mutex = PTHREAD_MUTEX_INITIALIZER;
 };
 
 
@@ -52,12 +42,7 @@ const char* const Mutex::name( ) const
 }
 
 inline
-#if OS == STD
-   std::mutex& Mutex::mutex( )
-#elif OS == LINUX
-   pthread_mutex_t& Mutex::mutex( )
-#elif OS == WINDOWS
-#endif
+pthread_mutex_t& Mutex::mutex( )
 {
    return m_mutex;
 }

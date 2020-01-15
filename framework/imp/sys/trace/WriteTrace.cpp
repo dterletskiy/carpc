@@ -30,8 +30,6 @@ namespace base::trace::write {
 
    }
 
-char p_buffer[ 1024 ];
-
-
+   char p_buffer[ 1024 ];
 
 } // namespace base::trace::write

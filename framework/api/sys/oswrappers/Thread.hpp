@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/sys/common/Types.hpp"
+#include "api/sys/oswrappers/Types.hpp"
 
 
 
@@ -34,13 +35,8 @@ private:
    FunctionThread             mp_function;
    bool                       m_created = false;
    TID                        m_id;
-   #if OS == LINUX
-      static void* thread_loop( void* );
-      pthread_attr_t          m_attr;
-   #elif OS == STD
-      std::thread             m_thread;
-      std::uint64_t           m_ui64id = 0;
-   #endif
+   static void* thread_loop( void* );
+   pthread_attr_t          m_attr;
 };
 using ThreadPtr = std::shared_ptr< base::os::Thread >;
 
@@ -49,16 +45,11 @@ using ThreadPtr = std::shared_ptr< base::os::Thread >;
 template< typename _Fn, typename... _Args >
 Thread::Thread( _Fn&& p_function, _Args&&... args )
    : mp_function( )
-#if OS == STD
-   , m_thread{ }
-#endif
 {
    SYS_INF( );
-   #if OS == LINUX
-      pthread_attr_init( &m_attr );
-      pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
-      pthread_attr_setscope( &m_attr,PTHREAD_SCOPE_PROCESS );
-   #endif
+   pthread_attr_init( &m_attr );
+   pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
+   pthread_attr_setscope( &m_attr,PTHREAD_SCOPE_PROCESS );
 
    mp_function = std::bind( p_function, args... );
 }

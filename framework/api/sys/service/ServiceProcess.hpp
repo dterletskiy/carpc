@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/timer.hpp"
 #include "api/sys/service/Types.hpp"
 

@@ -1,0 +1,5 @@
+version 1.0.0
+ - Remover OS dependency in Thread, Mutex and ConditionVariable classes. STD implementation was removed.
+ - Android os support was implemented
+ - improved build system
+ - coloros in build system

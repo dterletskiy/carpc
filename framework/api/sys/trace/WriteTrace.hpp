@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdio.h>
 #include <unistd.h>
+#include <iostream>
 
 #include "api/sys/oswrappers/linux/time.hpp"
 #include "api/sys/trace/Base.hpp"
@@ -46,12 +46,12 @@ namespace base::trace::write {
 
 
 
-#define DBG_MESSAGE_CODE( USER_FORMAT, ... ) \
+#define DBG_WRITE_CODE_NO_THREAD_SAFE( USER_FORMAT, ... ) \
    base::trace::write::message( \
         PREFIX_FORMAT_CODE USER_FORMAT NEW_LINE \
       , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
    );
-#define DBG_MESSAGE_PID_TID_CODE( USER_FORMAT, ... ) \
+#define DBG_WRITE_PID_TID_CODE_NO_THREAD_SAFE( USER_FORMAT, ... ) \
    base::trace::write::message( \
         PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
       , base::os::linux::microseconds( ) \

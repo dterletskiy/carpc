@@ -21,12 +21,7 @@ Mutex::~Mutex( )
 
 void Mutex::lock( )
 {
-   #if OS == STD
-      m_mutex.lock( );
-   #elif OS == LINUX
-      pthread_mutex_lock( &m_mutex );
-   #elif OS == WINDOWS
-   #endif
+   pthread_mutex_lock( &m_mutex );
 
    m_locked = true;
    // printf( "%d: locked", m_id );
@@ -34,12 +29,7 @@ void Mutex::lock( )
 
 void Mutex::unlock( )
 {
-   #if OS == STD
-      m_mutex.unlock( );
-   #elif OS == LINUX
-      pthread_mutex_unlock( &m_mutex );
-   #elif OS == WINDOWS
-   #endif
+   pthread_mutex_unlock( &m_mutex );
 
    m_locked = false;
    // printf( "%d: unlocked", m_id );

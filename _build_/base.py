@@ -3,6 +3,7 @@
 import os
 import stat
 import time
+import console
 
 
 
@@ -24,6 +25,20 @@ def class_attributes( cls ):
       result[ s_type ][ f_type ].append( name )
 
    return result
+
+def string_to_int( string: str, exit_code: int = 1 ) -> int:
+   if str != type( string ):
+      console.debug.error( "value is not a string: ", string )
+      if 0 != exit_code: exit( exit_code )
+      else: return None
+
+   try:
+      number = int( string )
+      return number
+   except ValueError:
+      console.debug.error( "wrong string value: ", string )
+      if 0 != exit_code: exit( exit_code )
+      else: return None
 
 def to_string( container, new_line = True ):
    # if True == new_line: print( type( container ) )

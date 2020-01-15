@@ -1,4 +1,5 @@
 // Framework
+#include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/tools/Tools.hpp"
 // Application
@@ -22,53 +23,13 @@ namespace memory {
 
 
 
-#if 0
-#include "oswrappers/Thread.hpp"
 
-void thread_loop( int index )
+
+
+
+
+void boot( )
 {
-   int count = 0;
-   while( count < 10000 )
-   {
-      DBG_TRC( "Thread ID: %#x / index: %d", pthread_self( ), index );
-      ++count;
-   }
-}
-
-base::os::Thread thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { thread_loop, 45 };
-
-void __constructor__( ) __attribute__(( constructor(102) ));
-void __destructor__( ) __attribute__(( destructor(102) ));
-
-void __constructor__( )
-{
-   DBG_INF( );
-   // thread.run( );
-}
-
-void __destructor__( )
-{
-   DBG_INF( );
-   // thread.join( );
-}
-#endif
-
-
-
-
-
-
-
-
-int main( int argc, char* argv[] )
-{
-   memory::dump( );
-
-
-
-
-#if 1
-
    base::ServiceInfoVector services =
    {
         { "OnOff_Service", { application::onoff::creator }, 5 }
@@ -83,15 +44,44 @@ int main( int argc, char* argv[] )
       p_process->boot( );
    }
 
-#endif
-
    DBG_TRC( "Main: program exiting." );
    DBG_INF( "Main: program exiting." );
    DBG_MSG( "Main: program exiting." );
    DBG_WRN( "Main: program exiting." );
    DBG_ERR( "Main: program exiting." );
-
-   memory::dump( );
-
-   return 0;
 }
+
+#if OS == LINUX
+
+
+   int main( int argc, char* argv[] )
+   {
+      memory::dump( );
+      boot( );
+      memory::dump( );
+
+      return 0;
+   }
+
+#elif OS == ANDROID
+
+   #include <jni.h>
+
+   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot };
+
+   void __constructor__( ) __attribute__(( constructor(102) ));
+   void __destructor__( ) __attribute__(( destructor(102) ));
+
+   void __constructor__( ) { DBG_INF( "library loaded" ); }
+   void __destructor__( ) { DBG_INF( "library unloaded" ); }
+
+   extern "C" JNIEXPORT jstring JNICALL
+   Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
+   {
+      DBG_TRC( "JNI" );
+      boot_thread.run( );
+
+      return env->NewStringUTF( "@TDA: Hello from C++" );
+   }
+
+#endif

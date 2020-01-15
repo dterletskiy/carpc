@@ -2,21 +2,21 @@
 
 <project name="test_app_0" type="local">
 
-   <version major="0" minor="1" patch="0" />
+   <version major="0" minor="1" patch="0"/>
 
    <configuration>
-      <config name="type" status="executable" />
-      <config name="MEMORY_HOOK" status="active" />
+      <config name="type" status="executable"/>
+      <config name="MEMORY_HOOK" status="inactive"/>
    </configuration>
 
    <settings type="compilation">
-      <setting type="include" value="/home/scorpion/Source/RPC/test_app_0" status="active" />
-      <setting type="include" value="/home/scorpion/Source/RPC/framework" status="active" />
+      <setting type="include" value="/home/scorpion/Source/RPC/test_app_0" status="active"/>
+      <setting type="include" value="/home/scorpion/Source/RPC/framework" status="active"/>
    </settings>
 
    <settings type="link">
-      <setting type="include" value="/home/scorpion/Source/RPC/framework_product/lib" status="active" />
-      <setting type="flag" value="-lframework" status="active" />
+      <setting type="include" value="/home/scorpion/Source/RPC/framework_product/lib" status="active"/>
+      <setting type="flag" value="-lframework" status="active"/>
    </settings>
 
 </project>

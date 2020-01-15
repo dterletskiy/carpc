@@ -53,6 +53,8 @@ public:
    bool push( const void*, const size_t, const bool is_reallocate = true );
    bool push( const std::string&, const bool is_reallocate = true );
    template< typename TYPE >
+      bool push( const std::optional< TYPE >&, const bool is_reallocate = true );
+   template< typename TYPE >
       bool push( const std::vector< TYPE >&, const bool is_reallocate = true );
    template< typename TYPE >
       bool push( const std::list< TYPE >&, const bool is_reallocate = true );
@@ -97,6 +99,8 @@ private:
 public:
    bool pop( const void*, const size_t );
    bool pop( std::string& );
+   template< typename TYPE >
+      bool pop( std::optional< TYPE >& );
    template< typename TYPE >
       bool pop( std::vector< TYPE >& );
    template< typename TYPE >
@@ -151,6 +155,28 @@ ByteBufferT::ByteBufferT( const TYPE& data )
  * Push buffer methods
  *
  ****************************************/
+template< typename TYPE >
+bool ByteBufferT::push( const std::optional< TYPE >& optional, const bool is_reallocate )
+{
+   if( false == m_transaction.start( Transaction::eType::push ) )
+      return false;
+
+   if( std::nullopt != optional )
+   {
+      if( false == push( optional.value( ) ) )
+         return m_transaction.error( );
+      if( false == push( static_cast< size_t >( 1 ) ) )
+         return m_transaction.error( );
+   }
+   else
+   {
+      if( false == push( static_cast< size_t >( 0 ) ) )
+         return m_transaction.error( );
+   }
+
+   return m_transaction.finish( );
+}
+
 template< typename TYPE >
 bool ByteBufferT::push( const std::vector< TYPE >& vector, const bool is_reallocate )
 {
@@ -246,6 +272,27 @@ bool ByteBufferT::push_stl_associative_container( const TYPE_CONTAINER& containe
  * Pop buffer methods
  *
  ****************************************/
+template< typename TYPE >
+bool ByteBufferT::pop( std::optional< TYPE >& optional )
+{
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
+
+   size_t has_value = false;
+   if( false == pop( has_value ) )
+      return m_transaction.error( );
+
+   if( 1 == has_value )
+   {
+      TYPE value;
+      if( false == pop( value ) )
+         return m_transaction.error( );
+      optional = value;
+   }
+   else optional = std::nullopt;
+
+   return m_transaction.finish( );
+}
 
 template< typename TYPE >
 bool ByteBufferT::pop( std::vector< TYPE >& vector )
@@ -307,12 +354,16 @@ template< typename TYPE >
 typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
 ByteBufferT::pop( TYPE& value )
 {
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
+
    using ENUM_TYPE = std::underlying_type_t< TYPE >;
    ENUM_TYPE _value;
    if( false == pop( _value ) )
-      return false;
+      m_transaction.error( );
    value = static_cast< TYPE >( _value );
-   return true;
+
+   return m_transaction.finish( );
 }
 
 template< typename TYPE_CONTAINER >

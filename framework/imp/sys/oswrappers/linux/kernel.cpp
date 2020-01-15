@@ -1,6 +1,10 @@
+// #define EXECINFO
+
 #include <string.h>
 #include <fcntl.h>
-#include <execinfo.h>
+#ifdef EXECINFO
+   #include <execinfo.h>
+#endif
 
 #include "api/sys/oswrappers/linux/kernel.hpp"
 
@@ -29,7 +33,7 @@ int set_nonblock( int fd )
 const char* wrn_duffer_size = "not enough buffer size\n";
 void back_trace( int _fd )
 {
-#if 1
+#ifdef EXECINFO
    static const size_t buffer_size = 256;
    void* buffer[ buffer_size ];
 

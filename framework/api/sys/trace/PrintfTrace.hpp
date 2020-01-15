@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>
+#include <iostream>
 
 #include "api/sys/oswrappers/linux/time.hpp"
 #include "api/sys/trace/Base.hpp"

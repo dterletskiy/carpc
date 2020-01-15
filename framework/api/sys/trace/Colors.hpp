@@ -1,12 +1,5 @@
 #pragma once
 
-#include <stdio.h>
-#include <iostream>
-#include <ctime>
-#include <time.h>
-#include <sys/time.h>
-
-
 
 
 #define CLR_PREFIX   "\x1B["
