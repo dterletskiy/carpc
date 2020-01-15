@@ -14,13 +14,7 @@ namespace base {
 
 
 
-Event::Event( const eCommType comm_type )
-   : m_comm_type( comm_type )
-{
-}
-
-Event::Event( const Event& event )
-   : m_comm_type( event.m_comm_type )
+Event::Event( )
 {
 }
 
@@ -118,11 +112,6 @@ const bool Event::send_to_context( EventPtr p_event, ServicePtrW pw_service  )
    }
 
    return p_service->insert_event( p_event );
-}
-
-const eCommType& Event::comm_type( ) const
-{
-   return m_comm_type;
 }
 
 

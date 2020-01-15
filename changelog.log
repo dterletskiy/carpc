@@ -13,10 +13,14 @@ version 1.0.2 (2019-12-08_05-45-51)
  - class "Event_ID" replaced by typedef "EventTypeID"
  - improved build system
 
-version 1.1.0 
+version 1.1.0 (2019-12-18_10-53-25)
  - Event class was splitted on two: with id and without id
  - Base event was splitted to several files
  - Subscription to event by id was added (for request/response concept)
  - Extended request/response concept for DSI support
  - Implemented "send_to_context" and "create_send_to_context" methods for Event
  - Implemented "Timer"
+
+
+version 1.1.1 (2019-12-21_18-14-44)
+ - Added __rdtsc function (CPU ticks)

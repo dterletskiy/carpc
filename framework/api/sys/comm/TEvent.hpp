@@ -42,7 +42,7 @@ public:
       : _TEventBase( data, comm_type )
    {
    }
-   virtual ~TEvent( ) { }
+   ~TEvent( ) override { }
 
 // static functions
 public:
@@ -149,7 +149,7 @@ public:
       , m_id( id )
    {
    }
-   virtual ~TEvent( ) { }
+   ~TEvent( ) override { }
 
 // static functions
 public:

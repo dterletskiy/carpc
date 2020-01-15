@@ -81,7 +81,7 @@ bool Service::start( )
 void Service::stop( )
 {
    SYS_INF( "'%s': stopping", m_name.c_str( ) );
-   clear_all_notifications( );
+   // clear_all_notifications( ); // @TDA: this leads to crash
    m_started = false;
 }
 

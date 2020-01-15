@@ -14,8 +14,7 @@ namespace base {
 class Event
 {
 public:
-   Event( const eCommType comm_type = eCommType::ITC );
-   Event( const Event& );
+   Event( );
    virtual ~Event( );
 
 public:
@@ -36,9 +35,7 @@ public:
 public:
    virtual const std::string name( ) const = 0;
    virtual const EventTypeID& type_id( ) const = 0;
-   const eCommType& comm_type( ) const;
-protected:
-   eCommType   m_comm_type;
+   virtual const eCommType& comm_type( ) const = 0;
 };
 
 

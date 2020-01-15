@@ -27,27 +27,21 @@ public:
 // constructors
 public:
    TEventBase( const eCommType comm_type )
-      : Event( comm_type )
+      : Event( )
+      , m_comm_type( comm_type )
    {
-      if constexpr( IS_DSI_EVENT )
-         m_comm_type = eCommType::IPC;
    }
    TEventBase( const _DataType& data, const eCommType comm_type )
-      : Event( comm_type )
+      : Event( )
+      , m_comm_type( comm_type )
    {
-      if constexpr( IS_DSI_EVENT )
-         m_comm_type = eCommType::IPC;
-
       mp_data = std::make_shared< _DataType >( data );
    }
-   virtual ~TEventBase( ) { }
+   ~TEventBase( ) override { }
 
 // virual function
 public:
    const bool is_dsi( ) const override { return IS_DSI_EVENT; }
-   const std::string name( ) const override { return s_type_id; }
-   const EventTypeID& type_id( ) const override { return s_type_id; }
-   static EventTypeID         s_type_id;
 
    const bool send( const eCommType comm_type = eCommType::NONE ) override
    {
@@ -58,6 +52,19 @@ public:
       return Event::send_to_context( TEventBase< _Generator >::shared_from_this( ), pw_service );
    }
 
+// s_type_id
+public:
+   const std::string name( ) const override { return s_type_id; }
+   const EventTypeID& type_id( ) const override { return s_type_id; }
+protected:
+   static EventTypeID      s_type_id;
+
+// m_comm_type
+public:
+   const eCommType& comm_type( ) const override { return m_comm_type; }
+private:
+   eCommType               m_comm_type;
+
 // data
 public:
    _DataTypePtr data( ) const { return mp_data; }
@@ -67,7 +74,7 @@ public:
       return nullptr != mp_data;
    }
 protected:
-   _DataTypePtr      mp_data = nullptr; // @TDA-issue: newer check for nullptr during serrialization
+   _DataTypePtr            mp_data = nullptr; // @TDA-issue: newer check for nullptr during serrialization
 };
 
 
