@@ -1,6 +1,11 @@
 #pragma once
 
+#include <assert.h>
 #include "api/sys/common/Types.hpp"
+
+
+
+
 
 
 
@@ -98,8 +103,8 @@ namespace detail
  *    std::cout << GET_FIRST_ARG( 1, 2, 3, 4, 5 ) << std::endl;
  * 
  ***************************************************************************************************/
-#define _FIRST_ARG_(N, ...) N
-#define _FIRST_ARG(args) _FIRST_ARG_ args
+#define __FIRST_ARG__(N, ...) N
+#define _FIRST_ARG_(args) __FIRST_ARG__ args
 #define GET_FIRST_ARG(...) _FIRST_ARG((__VA_ARGS__, 0))
 
 
@@ -132,6 +137,72 @@ _ISEMPTY_(                                                                      
 #define PASTE5(_0, _1, _2, _3, _4) _0 ## _1 ## _2 ## _3 ## _4
 #define _ISEMPTY_(_0, _1, _2, _3) HAS_COMMA(PASTE5(_IS_EMPTY_CASE_, _0, _1, _2, _3))
 #define _IS_EMPTY_CASE_0001 ,
+
+
+
+/****************************************************************************************************
+ * 
+ * Macro defines class enumeration without default values for items.
+ * This macro also defines method to_string what converts enumeration to string value.
+ * !!! Default values for enumeration itemes should not be used !!!
+ * link: http://qaru.site/questions/9343/is-there-a-simple-way-to-convert-c-enum-to-string
+ * Examples:
+ *    DEFINE_ENUM( eColors, size_t, _RED, _GREEN, _BLUE );
+ *    std::cout << to_string( eColors::_RED ) << std::endl;
+ * 
+ ***************************************************************************************************/
+#define DEFINE_ENUM( NAME, TYPE, ... ) \
+   enum class NAME : TYPE \
+   { \
+      __VA_ARGS__, \
+      _COUNT_, \
+      _FIRST_ = __FIRST_ARG__( __VA_ARGS__ ), \
+      _LAST_ = static_cast< TYPE >( __FIRST_ARG__( __VA_ARGS__ ) ) + _COUNT_ - 1 \
+   }; \
+auto to_string = []( NAME value ) -> const std::string \
+{ \
+   static std::string enum_name = #NAME "::"; \
+   static std::vector< std::string > strings; \
+   if( strings.empty( ) ) \
+   { \
+      static std::string str = #__VA_ARGS__; \
+      static size_t len = str.length(); \
+      std::ostringstream temp; \
+      for( size_t i = 0; i < len; i++ ) \
+      { \
+         if( isspace( str[i] ) ) continue; \
+         else if( str[i] == ',' ) \
+         { \
+            strings.push_back( temp.str() ); \
+            temp.str( std::string() );\
+         } \
+         else temp << str[i]; \
+      } \
+      strings.push_back( temp.str() ); \
+   } \
+   return enum_name + strings[ static_cast< size_t >( value ) ]; \
+};
+
+/****************************************************************************************************
+ * 
+ * Macro defines class enumeration without default values for items.
+ * This macro also defines method to_string what converts enumeration to string value.
+ * !!! Default values for enumeration itemes should not be used !!!
+ * This macro also generates additional methods what allow to iterate by enumeration values in for.
+ * !!! This macro should be used outside of any function !!!
+ * link: http://qaru.site/questions/9343/is-there-a-simple-way-to-convert-c-enum-to-string
+ * Examples:
+ *    DEFINE_ENUM( eColors, size_t, _RED, _GREEN, _BLUE );
+ *    for( const auto& item : eColors() )
+ *       std::cout << to_string( item ) << std::endl;
+ * 
+ ***************************************************************************************************/
+#define DEFINE_ENUM_EX( NAME, TYPE, ... ) \
+DEFINE_ENUM( NAME, TYPE, __VA_ARGS__ ); \
+inline NAME operator++( NAME& x ) { return x = ( NAME )( static_cast< TYPE >(x) + 1 ); }; \
+inline NAME operator*( NAME c ) { return c; }; \
+inline NAME begin( NAME r ) { return NAME::_FIRST_; }; \
+inline NAME end( NAME r ) { NAME l = NAME::_LAST_; return ++l; };
 
 
 
@@ -274,6 +345,19 @@ struct is_base_of< D, D >
  * 
  ***************************************************************************************************/
 void copy( void* _p_destination, void* _p_source, const size_t _size );
+
+/****************************************************************************************************
+ * 
+ * Building formated string
+ * 
+ ***************************************************************************************************/
+template< typename ... TYPES >
+const std::string format_string( const TYPES ... args )
+{
+   std::ostringstream ss;
+   (void)std::initializer_list< int >{ ( ss << args, 0 )... };
+   return ss.str( );
+}
 
 
 

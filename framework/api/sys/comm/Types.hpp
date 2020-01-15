@@ -7,6 +7,7 @@
 namespace base {
 
    enum class eCommType : size_t { IPC, ITC, ETC, NONE };
+   const char* c_str( const eCommType );
 
    class IEventConsumer;
 

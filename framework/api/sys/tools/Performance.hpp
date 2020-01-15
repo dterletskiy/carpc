@@ -16,8 +16,8 @@ public:
    Performance( const std::string& );
    ~Performance( );
 
-   void start( );
-   void stop( );
+   void start( const std::string& message = "" );
+   void stop( const std::string& message = "" );
    long int info( ) const;
 
 private:

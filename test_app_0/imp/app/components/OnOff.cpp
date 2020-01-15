@@ -21,124 +21,68 @@ OnOff::OnOff( const base::ServicePtr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   events::PingEventETC::Event::set_notification( true, this );
-   events::PingEventITC::Event::set_notification( true, this );
-   ServiceDSI::PingEventDSI::Event::set_notification( true, this );
-   events::EventEx::Event::set_notification( true, this );
+   ServiceDSI::PingEvent::Event::set_notification( true, this );
 }
 
 OnOff::~OnOff( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   events::PingEventETC::Event::set_notification( false, this );
-   events::PingEventITC::Event::set_notification( false, this );
-   ServiceDSI::PingEventDSI::Event::set_notification( false, this );
-   events::EventEx::Event::set_notification( false, this );
+   ServiceDSI::PingEvent::Event::set_notification( false, this );
 }
 
 namespace {
-   const size_t events_count = 1;
+   const size_t s_events_count = 10;
+   const std::vector< base::eCommType > s_comm_type_vector = { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC };
+   auto s_comm_type_iterator = s_comm_type_vector.begin( );
 }
 
 bool OnOff::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
-   DBG_WRN( "Sending %ld ETC events...", events_count );
+   DBG_WRN( "Sending %ld %s events...", s_events_count, base::c_str( *s_comm_type_iterator ) );
    start_performance( );
-   events::PingEventETC::Event::create_send( { "OnOff event ETC" }, base::eCommType::ETC );
+   ServiceDSI::PingEvent::Event::create_send( { base::c_str( *s_comm_type_iterator ) }, *s_comm_type_iterator );
    return true;
 }
 
-void OnOff::process_event( const events::PingEventETC::Event& event )
+void OnOff::process_event( const ServiceDSI::PingEvent::Event& event )
 {
-   DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
+   // DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
 
-   static size_t itc_events_count = 1;
-   if( itc_events_count >= events_count )
+   static size_t count = 1;
+   if( s_events_count > count )
    {
-      stop_performance( );
-      DBG_WRN( "Done %ld ETC events...", events_count );
-      DBG_WRN( "Sending %ld ITC events...", events_count );
-      start_performance( );
-      events::PingEventITC::Event::create_send( { "OnOff event ITC" }, base::eCommType::ITC );
+      ++count;
+      ServiceDSI::PingEvent::Event::create_send( { base::c_str( *s_comm_type_iterator ) }, *s_comm_type_iterator );
    }
    else
    {
-      ++itc_events_count;
-      events::PingEventETC::Event::create_send( { "OnOff" }, base::eCommType::ETC );
-   }
-}
-
-void OnOff::process_event( const events::PingEventITC::Event& event )
-{
-   DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
-
-   static size_t itc_events_count = 1;
-   if( itc_events_count >= events_count )
-   {
       stop_performance( );
-      DBG_WRN( "Done %ld ITC events...", events_count );
-      DBG_WRN( "Sending %ld DSI events...", events_count );
-      start_performance( );
-      ServiceDSI::PingEventDSI::Event::create_send( { "OnOff event DSI" } );
-   }
-   else
-   {
-      ++itc_events_count;
-      events::PingEventITC::Event::create_send( { "OnOff event ITC" }, base::eCommType::ITC );
-   }
-}
-
-void OnOff::process_event( const ServiceDSI::PingEventDSI::Event& event )
-{
-   DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
-
-   static size_t ipc_events_count = 1;
-   if( ipc_events_count >= events_count )
-   {
-      stop_performance( );
-      DBG_WRN( "Done %ld DSI events...", events_count );
-      auto event = events::EventEx::Event::create( { "OnOff extended event ETC" }, base::eCommType::ETC );
-      event->id( events::eEventID::request );
-      event->send( );
-   }
-   else
-   {
-      ++ipc_events_count;
-      ServiceDSI::PingEventDSI::Event::create_send( { "OnOff event DSI" } );
-   }
-
-   switch( event.id( ) )
-   {
-      case events::eEventID::request: DBG_WRN( "request" ); break;
-      case events::eEventID::response: DBG_WRN( "response" ); break;
-      default: break;
-   }
-}
-
-void OnOff::process_event( const events::EventEx::Event& event )
-{
-   DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
-
-   DBG_TRC( "id = %#zx", static_cast< size_t >( event.id( ) ) );
-   switch( event.id( ) )
-   {
-      case events::eEventID::request:
+      DBG_WRN( "Done %ld %s events...", s_events_count, base::c_str( *s_comm_type_iterator ) );
+      if( s_comm_type_vector.end( ) != ++s_comm_type_iterator )
       {
-         DBG_WRN( "request" );
-         auto event = events::EventEx::Event::create( { "OnOff extended event ETC" }, base::eCommType::ETC );
-         event->id( events::eEventID::response );
-         event->send( );
-         break;
+         count = 1;
+         DBG_WRN( "Sending %ld %s events...", s_events_count, base::c_str( *s_comm_type_iterator ) );
+         start_performance( );
+         ServiceDSI::PingEvent::Event::create_send( { base::c_str( *s_comm_type_iterator ) }, *s_comm_type_iterator );
       }
-      case events::eEventID::response:
-      {
-         DBG_WRN( "response" );
-         shutdown( );
-         break;
-      }
-      default: break;
    }
+
+   // DBG_TRC( "id = %#zx", static_cast< size_t >( event.id( ) ) );
+   // switch( event.id( ) )
+   // {
+   //    case events::eEventID::request:
+   //    {
+   //       DBG_WRN( "request" );
+   //       break;
+   //    }
+   //    case events::eEventID::response:
+   //    {
+   //       DBG_WRN( "response" );
+   //       break;
+   //    }
+   //    default: break;
+   // }
 }
 
 

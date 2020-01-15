@@ -22,7 +22,7 @@
 
 MEMORY_HOOK := 0
 ACTIVE_TRACE := 1
-ACTIVE_SYS_TRACE := 1
+ACTIVE_SYS_TRACE := 0
 ACTIVE_DBG_TRACE := 1
 
 
@@ -72,7 +72,7 @@ TARGET_DISASSM          := disassm
 #                                         #
 ###########################################
 PROJECT_NAME                 := RPC
-ROOT_DIR                     :=$(PWD)
+ROOT_DIR                     := $(PWD)
 
 PROJECT_FRAMEWORK_NAME       := framework
 PROJECT_FRAMEWORK_DIR        := $(ROOT_DIR)/$(PROJECT_FRAMEWORK_NAME)

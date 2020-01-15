@@ -17,8 +17,13 @@ Performance::~Performance( )
 {
 }
 
-void Performance::start( )
+void Performance::start( const std::string& message )
 {
+   if( false == message.empty( ) )
+   {
+      DBG_TRC( "%s", message.c_str( ) );
+   }
+
    m_start.reset( );
    m_finish.reset( );
    m_delta.reset( );
@@ -26,7 +31,7 @@ void Performance::start( )
    m_start = std::chrono::system_clock::now( );
 }
 
-void Performance::stop( )
+void Performance::stop( const std::string& message )
 {
    m_finish = std::chrono::system_clock::now( );
 
@@ -38,7 +43,13 @@ void Performance::stop( )
    }
 
    m_delta = std::chrono::duration_cast< std::chrono::microseconds >( m_finish.value( ) - m_start.value( ) );
-   DBG_INF( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
+   m_start.reset( );
+   m_finish.reset( );
+   if( false == message.empty( ) )
+   {
+      DBG_TRC( "%s", message.c_str( ) );
+   }
+   static_cast< void >( info( ) );
 }
 
 long int Performance::info( ) const
@@ -46,7 +57,7 @@ long int Performance::info( ) const
    if( std::nullopt == m_delta )
       return 0;
 
-   DBG_INF( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
+   DBG_TRC( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
    return m_delta.value( ).count( );
 }
 

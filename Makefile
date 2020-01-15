@@ -51,8 +51,8 @@ info: config \
 	$(PROJECT_SERVICEBROCKER_NAME)_info \
 	$(PROJECT_APP0_NAME)_info \
 
-archive: config
-	@$(TAR) -cvf $(ROOT_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(ROOT_DIR)
+archive: clean
+	@$(TAR) -cvf $(ROOT_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar ../$(PROJECT_NAME)
 
 
 

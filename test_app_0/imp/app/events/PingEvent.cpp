@@ -1,5 +1,9 @@
+#include "api/sys/common/Helpers.hpp"
 // Application
 #include "imp/app/events/PingEvent.hpp"
+
+#include "api/sys/trace/Trace.hpp"
+#define CLASS_ABBR "PingEvent"
 
 
 
@@ -30,9 +34,6 @@ namespace application::events {
 
    bool PingEventData::to_buffer( base::ByteBufferT& buffer ) const
    {
-      // if( false == buffer.push( static_cast< size_t >( type ) ) )
-      //    return false;
-
       if( false == buffer.push( info ) )
          return false;
 
@@ -44,23 +45,11 @@ namespace application::events {
       if( false == buffer.pop( info ) )
          return false;
 
-      // size_t _type;
-      // if( false == buffer.pop( _type ) )
-      //    return false;
-      // type = static_cast< ePing >( _type );
-
       return true;
    }
-
-   INIT_EVENT( PingEventETC );
-   INIT_EVENT( PingEventITC );
-
-
-
-   INIT_EVENT( EventEx );
 
 } // namespace application::events
 
 
 
-INIT_DSI_EVENT_EX( ServiceDSI, PingEventDSI );
+INIT_DSI_EVENT( ServiceDSI, PingEvent );

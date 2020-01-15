@@ -26,8 +26,8 @@ private:
    ServicePtrW    mp_service;
 
 protected:
-   void start_performance( );
-   void stop_performance( );
+   void start_performance( const std::string& message = "" );
+   void stop_performance( const std::string& message = "" );
 private:
    base::tools::Performance   m_performance;
 };
@@ -47,15 +47,15 @@ const ID& Component::id( ) const
 }
 
 inline
-void Component::start_performance( )
+void Component::start_performance( const std::string& message )
 {
-   m_performance.start( );
+   m_performance.start( message );
 }
 
 inline
-void Component::stop_performance( )
+void Component::stop_performance( const std::string& message )
 {
-   m_performance.stop( );
+   m_performance.stop( message );
 }
 
 

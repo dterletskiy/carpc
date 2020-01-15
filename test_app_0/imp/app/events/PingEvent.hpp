@@ -21,18 +21,12 @@ public:
    bool to_buffer( base::ByteBufferT& ) const;
    bool from_buffer( base::ByteBufferT& );
 
-   std::string    info;
+   std::string    info = "";
 };
 
 
 
-DECLARE_EVENT( PingEventETC, PingEventData );
-DECLARE_EVENT( PingEventITC, PingEventData );
-
-
-
 enum class eEventID : size_t { request, response };
-DECLARE_EVENT_EX( EventEx, PingEventData, eEventID );
 
 
 
@@ -40,4 +34,4 @@ DECLARE_EVENT_EX( EventEx, PingEventData, eEventID );
 
 
 
-DECLARE_DSI_EVENT_EX( ServiceDSI, PingEventDSI, application::events::PingEventData, application::events::eEventID );
+DECLARE_DSI_EVENT( ServiceDSI, PingEvent, application::events::PingEventData );

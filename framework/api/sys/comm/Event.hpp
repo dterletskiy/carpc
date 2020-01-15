@@ -99,8 +99,24 @@ public:
       if constexpr( IS_DSI_EVENT )
          m_comm_type = eCommType::IPC;
    }
+   TEvent( const _IdType id, const eCommType comm_type )
+      : Event( comm_type )
+      , m_id( id )
+   {
+      if constexpr( IS_DSI_EVENT )
+         m_comm_type = eCommType::IPC;
+   }
    TEvent( const _DataType& data, const eCommType comm_type )
       : Event( comm_type )
+   {
+      if constexpr( IS_DSI_EVENT )
+         m_comm_type = eCommType::IPC;
+
+      mp_data = std::make_shared< _DataType >( data );
+   }
+   TEvent( const _DataType& data, const _IdType id, const eCommType comm_type )
+      : Event( comm_type )
+      , m_id( id )
    {
       if constexpr( IS_DSI_EVENT )
          m_comm_type = eCommType::IPC;
@@ -121,19 +137,39 @@ public:
       return std::make_shared< _EventType >( comm_type );
    }
 
+   static std::shared_ptr< _EventType > create( const _IdType id, const eCommType comm_type = eCommType::ETC )
+   {
+      return std::make_shared< _EventType >( id, comm_type );
+   }
+
    static std::shared_ptr< _EventType > create( const _DataType& data, const eCommType comm_type = eCommType::ETC )
    {
       return std::make_shared< _EventType >( data, comm_type );
    }
 
+   static std::shared_ptr< _EventType > create( const _DataType& data, const _IdType id, const eCommType comm_type = eCommType::ETC )
+   {
+      return std::make_shared< _EventType >( data, id, comm_type );
+   }
+
    static bool create_send( const eCommType comm_type = eCommType::ETC )
    {
-      return create( comm_type )->send( );
+      return create( comm_type )->send( comm_type );
+   }
+
+   static bool create_send( const _IdType id, const eCommType comm_type = eCommType::ETC )
+   {
+      return create( id, comm_type )->send( comm_type );
    }
 
    static bool create_send( const _DataType& data, const eCommType comm_type = eCommType::ETC )
    {
-      return create( data, comm_type )->send( );
+      return create( data, comm_type )->send( comm_type );
+   }
+
+   static bool create_send( const _DataType& data, const _IdType id, const eCommType comm_type = eCommType::ETC )
+   {
+      return create( data, id, comm_type )->send( comm_type );
    }
 
 public:
@@ -249,10 +285,37 @@ enum class eDummyEventID : size_t { dummy };
 
 
 
-#define DECLARE_EVENT( eventType, dataType ) \
+#define _ARG_2_( _0, _1, _2, ... )  _2
+#define _DETECT_TYPE_( ... )        _ARG_2_( __VA_ARGS__, USER_ID, DEFAULT_ID )
+
+/**********************************************************************************
+ *
+ * This DECLARE_EVENT macro allowes to declare event with user defined id type
+ * or with default id type depending on third parameter.
+ * If third parameter is empty will be defined event with default eDummyEventID
+ * using DECLARE_EVENT_DEFAULT_ID macro.
+ * If third parameter is not empty will be defined event with user defined type
+ * mentioned in third parameter using DECLARE_EVENT_USER_ID macro.
+ *
+ *********************************************************************************/
+#define __DECLARE__(  TYPE, EVENT, DATA, ... )  DECLARE_EVENT_ ## TYPE ( EVENT, DATA, ##__VA_ARGS__ )
+#define _DECLARE_(  TYPE, EVENT, DATA, ... )    __DECLARE__( TYPE, EVENT, DATA, ##__VA_ARGS__ )
+#define DECLARE_EVENT( EVENT, DATA, ... )       _DECLARE_( _DETECT_TYPE_( DUMMY, ##__VA_ARGS__ ), EVENT, DATA, ##__VA_ARGS__ )
+
+
+
+#define DECLARE_EVENT_DEFAULT_ID( eventType, dataType ) \
    namespace eventType { \
       class eventType; \
       using Event       = base::TGenerator< dataType, eDummyEventID, eventType >::Config::EventType; \
+      using Consumer    = Event::_ConsumerType; \
+      using Data        = dataType; \
+   }
+
+#define DECLARE_EVENT_USER_ID( eventType, dataType, idType ) \
+   namespace eventType { \
+      class eventType; \
+      using Event       = base::TGenerator< dataType, idType, eventType >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
    }
@@ -265,11 +328,34 @@ enum class eDummyEventID : size_t { dummy };
 
 
 
-#define DECLARE_DSI_EVENT( serviceName, eventType, dataType ) \
+/**********************************************************************************
+ *
+ * This DECLARE_DSI_EVENT macro allowes to declare event with user defined id type
+ * or with default id type depending on third parameter.
+ * If third parameter is empty will be defined event with default eDummyEventID
+ * using DECLARE_DSI_EVENT_DEFAULT_ID macro.
+ * If third parameter is not empty will be defined event with user defined type
+ * mentioned in third parameter using DECLARE_DSI_EVENT_USER_ID macro.
+ *
+ *********************************************************************************/
+#define __DECLARE_DSI__(  TYPE, SERVICE, EVENT, DATA, ... )  DECLARE_DSI_EVENT_ ## TYPE ( SERVICE, EVENT, DATA, ##__VA_ARGS__ )
+#define _DECLARE_DSI_(  TYPE, SERVICE, EVENT, DATA, ... )   __DECLARE_DSI__( TYPE, SERVICE, EVENT, DATA, ##__VA_ARGS__ )
+#define DECLARE_DSI_EVENT( SERVICE, EVENT, DATA, ... )      _DECLARE_DSI_( _DETECT_TYPE_( DUMMY, ##__VA_ARGS__ ), SERVICE, EVENT, DATA, ##__VA_ARGS__ )
+
+#define DECLARE_DSI_EVENT_DEFAULT_ID( serviceName, eventType, dataType ) \
    namespace serviceName::eventType { \
       class serviceName; \
       class eventType; \
       using Event       = base::TGenerator< dataType, eDummyEventID, eventType, serviceName >::Config::EventType; \
+      using Consumer    = Event::_ConsumerType; \
+      using Data        = dataType; \
+   }
+
+#define DECLARE_DSI_EVENT_USER_ID( serviceName, eventType, dataType, idType ) \
+   namespace serviceName::eventType { \
+      class serviceName; \
+      class eventType; \
+      using Event       = base::TGenerator< dataType, idType, eventType, serviceName >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
    }
@@ -279,75 +365,5 @@ enum class eDummyEventID : size_t { dummy };
 
 #define REGISTER_DSI_EVENT( serviceName, eventType ) \
    base::EventRegistry::instance( )->register_event( #eventType"."#serviceName, base::create_event< serviceName::eventType::Event > );
-
-
-
-#define DECLARE_EVENT_EX( eventType, dataType, idType ) \
-   namespace eventType { \
-      class eventType; \
-      using Event       = base::TGenerator< dataType, idType, eventType >::Config::EventType; \
-      using Consumer    = Event::_ConsumerType; \
-      using Data        = dataType; \
-   }
-
-#define INIT_EVENT_EX( eventType ) \
-   template< > base::Event_ID eventType::Event::s_type_id = { #eventType };
-
-#define REGISTER_EVENT_EX( eventType ) \
-   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
-
-
-
-#define DECLARE_DSI_EVENT_EX( serviceName, eventType, dataType, idType ) \
-   namespace serviceName::eventType { \
-      class serviceName; \
-      class eventType; \
-      using Event       = base::TGenerator< dataType, idType, eventType, serviceName >::Config::EventType; \
-      using Consumer    = Event::_ConsumerType; \
-      using Data        = dataType; \
-   }
-
-#define INIT_DSI_EVENT_EX( serviceName, eventType ) \
-      template< > base::Event_ID serviceName::eventType::Event::s_type_id = { #eventType"."#serviceName };
-
-#define REGISTER_DSI_EVENT_EX( serviceName, eventType ) \
-   base::EventRegistry::instance( )->register_event( #eventType"."#serviceName, base::create_event< serviceName::eventType::Event > );
-
-
-
-
-
-
-
-
-
-#if 0 // Depricated event macros
-#define DECLARE_EVENT( eventType, dataType, consumerType ) \
-   using eventType      = base::TGenerator< dataType >::Config::EventType; \
-   using consumerType   = eventType::_ConsumerType;
-
-#define INIT_EVENT( eventType ) \
-   template< > base::Event_ID eventType::s_type_id = { #eventType };
-
-#define REGISTER_EVENT( eventType ) \
-   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType > );
-
-
-
-#define DECLARE_DSI_EVENT( eventType, dataType, consumerType, serviceName ) \
-   namespace serviceName { \
-      class serviceName; \
-      using eventType      = base::TGenerator< dataType, serviceName >::Config::EventType; \
-      using consumerType   = eventType::_ConsumerType; \
-   }
-
-#define INIT_DSI_EVENT( eventType, serviceName ) \
-   namespace serviceName { \
-      template< > base::Event_ID eventType::s_type_id = { #eventType"."#serviceName }; \
-   }
-
-#define REGISTER_DSI_EVENT( eventType, serviceName ) \
-   base::EventRegistry::instance( )->register_event( #eventType"."#serviceName, base::create_event< serviceName::eventType > );
-#endif
 
 

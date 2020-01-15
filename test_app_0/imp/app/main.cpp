@@ -42,53 +42,25 @@ void doSomethingForAll( Args const&... args )
 
 
 
-// #define DEFINE_ENUM(  )
-
-
-
-enum class COLOR : size_t { Red = 100, Green, Yellow, Blue, Purple, White, Black, First = Red, Last = Black };
-
-COLOR operator++( COLOR& x )
-{
-   return x = ( COLOR )( static_cast< std::underlying_type< COLOR >::type >(x) + 1 ); 
-}
-
-COLOR operator*( COLOR c )
-{
-   return c;
-}
-
-COLOR begin( COLOR r )
-{
-   return COLOR::First;
-}
-
-COLOR end( COLOR r )
-{
-   COLOR l = COLOR::Last;
-   return ++l;
-}
 
 
 
 
-
+DEFINE_ENUM_EX( eColors, size_t, _RED, _GREEN, _BLUE );
 
 int main( int argc, char *argv[] )
 {
-   // for( const auto& c : COLOR() )
-   // {
-   //    std::cout << static_cast< size_t >( c ) << std::endl;
-   // }
+   for( const auto& item : eColors() )
+   {
+      std::cout << to_string( item ) << std::endl;
+   }
 
 
 
-
-
-#if 1
+#if 0
    memory::dump( );
 
-   REGISTER_DSI_EVENT( ServiceDSI, PingEventDSI );
+   REGISTER_DSI_EVENT( ServiceDSI, PingEvent );
    base::EventRegistry::instance( )->dump( );
 
    base::ServiceInfoVector services = { { "OnOff_Service", { application::onoff::creator }, 5 } };
