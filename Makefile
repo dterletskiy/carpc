@@ -36,15 +36,18 @@ DATE := $(shell date +"%Y-%m-%d")
 TARGET      := program
 
 # The Directories, Source, Includes, Objects, Binary and Resources
-SRCDIR      := source
-INCDIR      := inc
-BUILDDIR    := build
-TARGETDIR   := exe
-RESDIR      := resources
-PERFDIR     := perf
-SRCEXT      := cpp
-DEPEXT      := d
-OBJEXT      := o
+SRC_DIR      := source
+INC_DIR      := inc
+RES_DIR      := resources
+PRODUCT_DIR  := product
+OBJ_DIR      := $(PRODUCT_DIR)/obj
+GEN_DIR      := $(PRODUCT_DIR)/gen
+TARGET_DIR   := $(PRODUCT_DIR)/exe
+PERF_DIR     := $(PRODUCT_DIR)/perf
+# File extentions
+SRC_EXT      := cpp
+DEP_EXT      := d
+OBJ_EXT      := o
 
 # Flags, Libraries and Includes
 CCONST      := -DLINUX=0 -DWINDOWS=1 -DSTD=2 -DOS=LINUX
@@ -54,14 +57,14 @@ CFLAGS      := -fopenmp -g -std=c++17 $(CCONST) $(CCONFIG)
 # CFLAGS      += -Wall -O3 -g
 LDFLAGS     := -fopenmp -lrt -ldl
 # LDFLAGS     += -lm -larmadillo
-INC         := -I./$(SRCDIR) -I./$(SRCDIR)/trace -I/usr/local/include
-INCDEP      := -I./$(SRCDIR) -I./$(SRCDIR)/trace
+INC         := -I./$(SRC_DIR) -I./$(SRC_DIR)/framework -I./$(SRC_DIR)/framework/trace -I/usr/local/include
+INCDEP      := -I./$(SRC_DIR) -I./$(SRC_DIR)/framework -I./$(SRC_DIR)/framework/trace
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
 #---------------------------------------------------------------------------------
-SOURCES     := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
-OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
+SOURCES     := $(shell find $(SRC_DIR) -type f -name *.$(SRC_EXT))
+OBJECTS     := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.$(SRC_EXT)=.$(OBJ_EXT)))
 
 
 
@@ -76,27 +79,31 @@ clean_build: clean all
 
 # Full Clean, Objects and Binaries
 clean:
-	@rm -rf $(BUILDDIR)
-	@rm -rf $(TARGETDIR)
-	@rm -rf $(PERFDIR)
+	@rm -rf $(PRODUCT_DIR)
+
+# Make the Directories
+directories:
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(GEN_DIR)
+	@mkdir -p $(TARGET_DIR)
+	@mkdir -p $(PERF_DIR)
 
 # execute
 exec:
 	reset
-	$(TARGETDIR)/$(TARGET)
+	$(TARGET_DIR)/$(TARGET)
 
 perf:
 	reset
-	@mkdir -p $(PERFDIR)
-	sudo perf timechart record $(TARGETDIR)/$(TARGET)
-	sudo mv -f perf.data $(PERFDIR)/$(TARGET).data
-	sudo perf timechart -i $(PERFDIR)/$(TARGET).data -o $(PERFDIR)/$(TARGET).svg
+	sudo perf timechart record $(TARGET_DIR)/$(TARGET)
+	sudo mv -f perf.data $(PERF_DIR)/$(TARGET).data
+	sudo perf timechart -i $(PERF_DIR)/$(TARGET).data -o $(PERF_DIR)/$(TARGET).svg
 
 disassm:
-	objdump -S --disassemble $(TARGETDIR)/$(TARGET) > $(TARGETDIR)/$(TARGET).s
+	objdump -S --disassemble $(TARGET_DIR)/$(TARGET) > $(TARGET_DIR)/$(TARGET).s
 
 debug:
-	$(DEBUGGER) $(TARGETDIR)/$(TARGET)
+	$(DEBUGGER) $(TARGET_DIR)/$(TARGET)
 
 # Set configuration
 config:
@@ -111,33 +118,32 @@ info:
 
 # Copy Resources from Resources Directory to Target Directory
 resources: directories
-	@cp $(RESDIR)/* $(TARGETDIR)/
-
-# Make the Directories
-directories:
-	@mkdir -p $(TARGETDIR)
-	@mkdir -p $(BUILDDIR)
+	@cp $(RES_DIR)/* $(TARGET_DIR)/
 
 archive:
 	@$(TAR) -cvf ../RPC_$(DATE)_$(TIME).tar ../RPC
 
 # Pull in dependency info for *existing* .o files
--include $(OBJECTS:.$(OBJEXT)=.$(DEPEXT))
+-include $(OBJECTS:.$(OBJ_EXT)=.$(DEP_EXT))
 
 #Link
 $(TARGET): $(OBJECTS)
-	$(CXX) -o $(TARGETDIR)/$(TARGET) $^ $(LDFLAGS)
+	$(CXX) -o $(TARGET_DIR)/$(TARGET) $^ $(LDFLAGS)
 
 # Compile
-$(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
+$(OBJ_DIR)/%.$(OBJ_EXT): $(SRC_DIR)/%.$(SRC_EXT)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) $(INC) -c -o $@ $<
-	$(CXX) $(CFLAGS) $(INCDEP) -E $(SRCDIR)/$*.$(SRCEXT) > $(BUILDDIR)/$*.$(SRCEXT)
-	@$(CXX) $(CFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(BUILDDIR)/$*.$(DEPEXT)
-	@cp -f $(BUILDDIR)/$*.$(DEPEXT) $(BUILDDIR)/$*.$(DEPEXT).tmp
-	@sed -e 's|.*:|$(BUILDDIR)/$*.$(OBJEXT):|' < $(BUILDDIR)/$*.$(DEPEXT).tmp > $(BUILDDIR)/$*.$(DEPEXT)
-	@sed -e 's/.*://' -e 's/\\$$//' < $(BUILDDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(BUILDDIR)/$*.$(DEPEXT)
-	@rm -f $(BUILDDIR)/$*.$(DEPEXT).tmp
+	$(CXX) $(CFLAGS) $(INCDEP) -MM $(SRC_DIR)/$*.$(SRC_EXT) > $(OBJ_DIR)/$*.$(DEP_EXT)
+	@cp -f $(OBJ_DIR)/$*.$(DEP_EXT) $(OBJ_DIR)/$*.$(DEP_EXT).tmp
+	@sed -e 's|.*:|$(OBJ_DIR)/$*.$(OBJ_EXT):|' < $(OBJ_DIR)/$*.$(DEP_EXT).tmp > $(OBJ_DIR)/$*.$(DEP_EXT)
+	@sed -e 's/.*://' -e 's/\\$$//' < $(OBJ_DIR)/$*.$(DEP_EXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(OBJ_DIR)/$*.$(DEP_EXT)
+	@rm -f $(OBJ_DIR)/$*.$(DEP_EXT).tmp
+
+# Generate
+$(GEN_DIR)/%.$(SRC_EXT): $(SRC_DIR)/%.$(SRC_EXT)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CFLAGS) $(INCDEP) -E $(SRC_DIR)/$*.$(SRC_EXT) > $(GEN_DIR)/$*.$(SRC_EXT)
 
 # Non-File Targets
 .PHONY: all build clean_build clean perf

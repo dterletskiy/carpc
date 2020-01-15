@@ -2,12 +2,80 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dlfcn.h>
+#include <cstddef>
 
 #include "Hooks.hpp"
 
 #include "Trace.hpp"
 #define CLASS_ABBR "MEMORY"
 
+
+
+#ifdef HOOK_MEMORY_ALLOCATOR
+
+
+
+MemoryMap s_memory_map __attribute__ (( section ("MEMORY"), init_priority (101) )) = { };
+
+
+
+namespace memory {
+
+   void dump( ) { s_memory_map.dump( ); }
+
+}
+
+
+
+typedef void* ( *tp_linux_malloc )( size_t );
+static tp_linux_malloc __malloc = nullptr;
+void* malloc( size_t size )
+{
+   if( nullptr == __malloc )
+   {
+      SYS_SIMPLE_WRN( "__malloc = nullptr" );
+      __malloc = ( tp_linux_malloc ) dlsym(RTLD_NEXT, "malloc");
+   }
+   void* p = __malloc(size);
+   SYS_SIMPLE_TRC( "address = %p / size = %zu", p, size );
+
+   s_memory_map.insert( p, size );
+   return p;
+}
+
+typedef void ( *tp_linux_free )( void* );
+static tp_linux_free __free = nullptr;
+void free( void* p )
+{
+   if( nullptr == __free )
+   {
+      SYS_SIMPLE_WRN( "__free = nullptr" );
+      __free = ( tp_linux_free ) dlsym(RTLD_NEXT, "free");
+   }
+   SYS_SIMPLE_TRC( "address = %p", p );
+   s_memory_map.remove( p );
+
+   __free( p );
+}
+
+void* operator new( size_t size )
+{
+   void* p = malloc( size );
+   if( nullptr == p )
+   {
+      SYS_SIMPLE_WRN( "bad_alloc" );
+      throw std::bad_alloc();
+   }
+
+   SYS_SIMPLE_TRC( "address = %p / size = %zu", p, size );
+   return p;
+}
+
+void operator delete( void* p )
+{
+   free( p );
+   SYS_SIMPLE_TRC( "address = %p", p );
+}
 
 
 
@@ -77,67 +145,18 @@ void MemoryMap::dump( ) const
    SYS_SIMPLE_INF( "---------------- End Dump ----------------" );
 }
 
-MemoryMap s_memory_map __attribute__ (( section ("MEMORY"), init_priority (101) )) = { };
-// MemoryMap s_memory_map;
+
+
+#else
 
 
 
+namespace memory {
 
+   void dump( ) { }
 
-
-
-#ifdef HOOK_MEMORY_ALLOCATOR
-
-
-
-typedef void* ( *tp_linux_malloc )( size_t );
-static tp_linux_malloc __malloc = nullptr;
-void* malloc( size_t size )
-{
-   if( nullptr == __malloc )
-   {
-      SYS_SIMPLE_WRN( "__malloc = nullptr" );
-      __malloc = ( tp_linux_malloc ) dlsym(RTLD_NEXT, "malloc");
-   }
-   void* p = __malloc(size);
-   SYS_SIMPLE_TRC( "address = %p / size = %zu", p, size );
-
-   s_memory_map.insert( p, size );
-   return p;
 }
 
-typedef void ( *tp_linux_free )( void* );
-static tp_linux_free __free = nullptr;
-void free( void* p )
-{
-   if( nullptr == __free )
-   {
-      SYS_SIMPLE_WRN( "__free = nullptr" );
-      __free = ( tp_linux_free ) dlsym(RTLD_NEXT, "free");
-   }
-   SYS_SIMPLE_TRC( "address = %p", p );
-   s_memory_map.remove( p );
 
-   __free( p );
-}
-
-void* operator new( size_t size )
-{
-   void* p = malloc( size );
-   if( nullptr == p )
-   {
-      SYS_SIMPLE_WRN( "bad_alloc" );
-      throw std::bad_alloc();
-   }
-
-   SYS_SIMPLE_TRC( "address = %p / size = %zu", p, size );
-   return p;
-}
-
-void operator delete( void* p )
-{
-   free( p );
-   SYS_SIMPLE_TRC( "address = %p", p );
-}
 
 #endif
