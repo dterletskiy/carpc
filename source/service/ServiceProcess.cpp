@@ -1,13 +1,36 @@
 #include <sstream>
 
 #include "oswrappers/Mutex.hpp"
-#include "oswrappers/linux/timer/Timer.hpp"
+#include "ServiceBrockerDSI.hpp"
 #include "ServiceBrocker.hpp"
 #include "Service.hpp"
 #include "ServiceProcess.hpp"
 
 #include "Trace.hpp"
 #define CLASS_ABBR "SrvcProc"
+
+
+
+namespace {
+
+   void timer_handler( union sigval sv )
+   {
+      timer_t* timer_id = static_cast< timer_t* >( sv.sival_ptr );
+      SYS_INF( "WhatchDog timer: %#lx", (long) *timer_id );
+
+      for( const auto& p_service : base::ServiceProcess::instance( )->service_list( ) )
+      {
+         std::optional< time_t > time_stamp = p_service->process_started( );
+         if( std::nullopt == time_stamp )
+            continue;
+
+         if( p_service->wd_timeout( ) > static_cast< size_t >( time( nullptr ) - time_stamp.value( ) ) )
+            continue;
+
+         SYS_ERR( "WhatchDog error: '%s'", p_service->name( ).c_str( ) );
+      }
+   }
+}
 
 
 
@@ -18,8 +41,7 @@ namespace base {
 IServiceProcessPtr ServiceProcess::mp_instance;
 
 ServiceProcess::ServiceProcess( )
-   : mp_service_brocker( )
-   , m_service_list( )
+   : m_service_list( )
 {
    SYS_INF( "Created" );
 }
@@ -38,6 +60,11 @@ IServiceProcessPtr ServiceProcess::instance( )
    }
 
    return mp_instance;
+}
+
+IServiceBrockerDsiPtr ServiceProcess::service_brocker_dsi( ) const
+{
+   return mp_service_brocker_dsi;
 }
 
 IServiceBrockerPtr ServiceProcess::service_brocker( ) const
@@ -74,90 +101,67 @@ IServicePtrList ServiceProcess::service_list( ) const
    return m_service_list;
 }
 
-bool ServiceProcess::init( const ServiceInfoVector& service_infos )
+bool ServiceProcess::start( const ServiceInfoVector& service_infos )
 {
+   // Creating service brocker DSI thread
+   mp_service_brocker_dsi = ServiceBrockerDSI::instance( );
+   if( nullptr == mp_service_brocker_dsi )
+      return false;
    // Creating service brocker thread
    mp_service_brocker = ServiceBrocker::instance( );
-
+   if( nullptr == mp_service_brocker )
+      return false;
    // Creating service threads
    for( const auto& service_info : service_infos )
    {
       IServicePtr p_service = std::make_shared< Service >( mp_service_brocker, service_info );
+      if( nullptr == p_service )
+         return false;
       m_service_list.emplace_back( p_service );
    }
 
+   // Starting service brocker DSI thread
+   if( false == mp_service_brocker_dsi->start( ) )
+      return false;
    // Starting service brocker thread
    if( false == mp_service_brocker->start( ) )
       return false;
-
    // Starting service threads
    for( const auto p_service : m_service_list )
-      p_service->start( );
+      if( false == p_service->start( ) )
+         return false;
 
-   if( service_infos.size( ) != m_service_list.size( ) )
-   {
-      for( auto& p_service : m_service_list )
-         p_service->stop( );
-      m_service_list.clear( );
-      mp_service_brocker->stop( );
-   }
+   // Watchdog timer
+   if( false == os::linux::create_timer( m_timer_id, timer_handler ) )
+      return false;
+   DBG_MSG( "Timer ID: %#lx", (long) m_timer_id );
+   if( false == os::linux::start_timer( m_timer_id, 1000000000, os::linux::eTimerType::continious ) )
+      return false;
 
-   return !m_service_list.empty( );
+   return true;
 }
 
-void event_handler( union sigval sv )
+bool ServiceProcess::stop( )
 {
-   timer_t* timer_id = static_cast< timer_t* >( sv.sival_ptr );
-   SYS_INF( "WhatchDog timer: %#lx", (long) *timer_id );
+   for( auto& p_service : m_service_list )
+      p_service->stop( );
+   m_service_list.clear( );
+   mp_service_brocker->stop( );
+   mp_service_brocker_dsi->stop( );
 
-   for( const auto& p_service : ServiceProcess::instance( )->service_list( ) )
-   {
-      std::optional< time_t > time_stamp = p_service->process_started( );
-      if( std::nullopt == time_stamp )
-         continue;
+   os::linux::delete_timer( m_timer_id );
 
-      if( p_service->wd_timeout( ) > static_cast< size_t >( time( nullptr ) - time_stamp.value( ) ) )
-         continue;
-
-      SYS_ERR( "WhatchDog error: '%s'", p_service->name( ).c_str( ) );
-   }
+   return true;
 }
 
 void ServiceProcess::boot( )
 {
    SYS_MSG( );
 
-   // testing
-   os::linux::TimerID   timer_id;
-   if( false == os::linux::create_timer( timer_id, event_handler ) )
-      return;
-   DBG_MSG( "Timer ID: %#lx", (long) timer_id );
-   if( false == os::linux::start_timer( timer_id, 1000000000, os::linux::eTimerType::continious ) )
-      return;
+   // ServiceEvent::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
+   DsiService::DsiServiceEvent::send_event( { base::eServiceCommand::boot, "fuck" } );
 
-   sleep( 1 );
-   ServiceEvent::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
 
-#if 0
-   sleep( 5 );
-   DBG_MSG( "---------- boot ----------" );
-   ServiceEvent::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
-   sleep( 1 );
-
-   DBG_MSG( "---------- ping ----------" );
-   ServiceEvent::send_event( { eServiceCommand::ping, "first ping" }, eCommType::ITC );
-   sleep( 1 );
-   DBG_MSG( "---------- ping ----------" );
-   ServiceEvent::send_event( { eServiceCommand::ping, "second ping" }, eCommType::ITC );
-   sleep( 1 );
-   DBG_MSG( "---------- ping ----------" );
-   ServiceEvent::send_event( { eServiceCommand::ping, "third ping" }, eCommType::ITC );
-   sleep( 1 );
-
-   DBG_MSG( "---------- shutdown ----------" );
-   ServiceEvent::send_event( { eServiceCommand::shutdown, "shutdown" }, eCommType::ITC );
-   DBG_MSG( "-------------------------" );
-#endif
 
    for( auto& p_service : m_service_list )
       p_service->wait( );
@@ -167,11 +171,16 @@ void ServiceProcess::boot( )
    mp_service_brocker->stop( );
    mp_service_brocker->wait( );
    DBG_MSG( "Service Brocker is finished" );
+   DBG_MSG( "Stopping Service Brocker DSI" );
+   mp_service_brocker_dsi->stop( );
+   mp_service_brocker_dsi->wait( );
+   DBG_MSG( "Service Brocker DSI is finished" );
 
-   os::linux::delete_timer( timer_id );
+   os::linux::delete_timer( m_timer_id );
 
    m_service_list.clear( );
    mp_service_brocker.reset( );
+   mp_service_brocker_dsi.reset( );
 }
 
 

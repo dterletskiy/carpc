@@ -1,5 +1,6 @@
 #include "oswrappers/Thread.hpp"
 #include "service/ServiceProcess.hpp"
+#include "service/ServiceBrockerDSI.hpp"
 #include "service/ServiceBrocker.hpp"
 #include "service/Service.hpp"
 #include "Event.hpp"
@@ -124,6 +125,14 @@ bool Event::send( EventPtr p_event, const Event_ID& type_id )
             return false;
 
          return p_service_brocker->insert_event( p_event );
+      }
+      case eCommType::IPC:
+      {
+         IServiceBrockerDsiPtr p_service_brocker_dsi = ServiceProcess::instance( )->service_brocker_dsi( );
+         if( InvalidServiceBrockerDsiPtr == p_service_brocker_dsi )
+            return false;
+
+         return p_service_brocker_dsi->insert_event( p_event );
       }
       default:
       {

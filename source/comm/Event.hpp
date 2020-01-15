@@ -3,6 +3,10 @@
 #include "common/Types.hpp"
 #include "common/ByteBuffer.hpp"
 #include "Types.hpp"
+#include "EventRegistry.hpp"
+
+#include "Trace.hpp"
+#define CLASS_ABBR "Event"
 
 
 
@@ -80,6 +84,12 @@ public:
 
    static bool set_notification( bool, IEventConsumer*, const Event_ID& );
    static bool send( EventPtr, const Event_ID& );
+
+public:
+   virtual bool is_dsi( ) const = 0;
+   virtual bool to_buffer( ByteBuffer& ) const = 0;
+   // This function is used to set data from ByteBuffer only for DSI events
+   virtual bool data( ByteBuffer& ) = 0;
    virtual bool send( ) = 0;
    virtual void process( IEventConsumer* ) = 0;
 
@@ -97,6 +107,8 @@ protected:
  * TEvent declaration
  *
  ***************************************/
+#define IS_DSI_EVENT false == std::is_same_v< _ServiceType, void >
+
 template< typename _Generator >
 class TEvent
    : public Event
@@ -109,35 +121,71 @@ public:
    using _DataTypePtr   = typename std::shared_ptr< _DataType >;
    using _ServiceType   = typename _Generator::Config::ServiceType;
 
+public:
+   TEvent( const eCommType comm_type )
+      : Event( comm_type )
+   {
+      if constexpr( IS_DSI_EVENT )
+         m_comm_type = eCommType::IPC;
+   }
    TEvent( const _DataType& data, const eCommType comm_type )
       : Event( comm_type )
    {
+      if constexpr( IS_DSI_EVENT )
+         m_comm_type = eCommType::IPC;
+
       mp_data = std::make_shared< _DataType >( data );
    }
    virtual ~TEvent( ) { }
 
+
+public:
    static bool set_notification( bool is_set, _ConsumerType* p_consumer )
    {
       return Event::set_notification( is_set, p_consumer, s_type_id );
    }
 
-   static std::shared_ptr< _EventType > create( const _DataType& data, const eCommType comm_type = eCommType::ETC )
+   static std::shared_ptr< _EventType > create( const eCommType comm_type = eCommType::ETC )
    {
-      eCommType type = comm_type;
-      if constexpr( false == std::is_same< _ServiceType, void >::value )
-         type = eCommType::IPC;
-
-      return std::make_shared< _EventType >( data, comm_type );
+      return std::make_shared< _EventType >( comm_type );
    }
 
-   bool send( ) override
+   static std::shared_ptr< _EventType > create( const _DataType& data, const eCommType comm_type = eCommType::ETC )
    {
-      return Event::send( _EventType::shared_from_this( ), s_type_id );
+      return std::make_shared< _EventType >( data, comm_type );
    }
 
    static bool send_event( const _DataType& data, const eCommType comm_type = eCommType::ETC )
    {
       return create( data, comm_type )->send( );
+   }
+
+public:
+   bool is_dsi( ) const override { return IS_DSI_EVENT; }
+   bool to_buffer( ByteBuffer& buffer ) const override
+   {
+      if constexpr( IS_DSI_EVENT )
+      {
+         buffer << *mp_data;
+         buffer << s_type_id;
+         return true;
+      }
+      return false;
+   }
+   bool data( ByteBuffer& buffer ) override
+   {
+      if constexpr( IS_DSI_EVENT )
+      {
+         mp_data = std::make_shared< _DataType >( );
+         buffer >> *mp_data;
+         return true;
+      }
+      return false;
+   }
+
+   bool send( ) override
+   {
+      return Event::send( _EventType::shared_from_this( ), s_type_id );
    }
 
    void process( IEventConsumer* p_consumer ) override
@@ -151,9 +199,18 @@ public:
 
 public:
    _DataTypePtr data( ) const { return mp_data; }
+   bool data( const _DataType& data )
+   {
+      mp_data = std::make_shared< _DataType >( data );
+      return nullptr != mp_data;
+   }
 private:
    _DataTypePtr      mp_data;
 };
+
+
+
+#undef IS_DSI_EVENT
 
 
 
@@ -182,7 +239,25 @@ public:
 
 
 
+template< typename TYPE >
+EventPtr create_event( const eCommType comm_type = eCommType::ETC )
+{
+   return std::make_shared< TYPE >( comm_type );
+}
+
+template< typename TYPE >
+EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm_type = eCommType::ETC )
+{
+   return std::make_shared< TYPE >( data, comm_type );
+}
+
+
+
 } // namespace base
+
+
+
+#undef CLASS_ABBR
 
 
 
@@ -192,6 +267,9 @@ public:
 
 #define INIT_EVENT( eventType ) \
    template< > base::Event_ID eventType::s_type_id = { #eventType };
+
+#define REGISTER_EVENT( eventType ) \
+   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType > );
 
 
 
@@ -204,7 +282,10 @@ public:
 
 #define INIT_DSI_EVENT( eventType, serviceName ) \
    namespace serviceName { \
-     template< > base::Event_ID eventType::s_type_id = { #eventType"."#serviceName }; \
+      template< > base::Event_ID eventType::s_type_id = { #eventType"."#serviceName }; \
    }
+
+#define REGISTER_DSI_EVENT( eventType, serviceName ) \
+   base::EventRegistry::instance( )->register_event( #eventType"."#serviceName, base::create_event< serviceName::eventType > );
 
 

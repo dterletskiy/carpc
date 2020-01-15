@@ -16,6 +16,11 @@ namespace base {
    using IServiceBrockerPtrW  = std::weak_ptr< IServiceBrocker >;
    extern const IServiceBrockerPtr InvalidServiceBrockerPtr;
 
+   class IServiceBrockerDSI;
+   using IServiceBrockerDsiPtr   = std::shared_ptr< IServiceBrockerDSI >;
+   using IServiceBrockerDsiPtrW  = std::weak_ptr< IServiceBrockerDSI >;
+   extern const IServiceBrockerDsiPtr InvalidServiceBrockerDsiPtr;
+
    class IService;
    using IServicePtr          = std::shared_ptr< IService >;
    using IServicePtrList      = std::list< IServicePtr >;

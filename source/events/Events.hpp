@@ -17,17 +17,15 @@ enum class eServiceCommand : std::uint8_t
 
 class ServiceEventData
 {
+   friend ByteBuffer& operator << ( ByteBuffer&, const ServiceEventData& );
+   friend ByteBuffer& operator >> ( ByteBuffer&, ServiceEventData& );
+
 public:
-   ServiceEventData( const eServiceCommand _command, const std::string& _info )
-      : command( _command )
-      , info( _info )
-   { }
-   ServiceEventData( const ServiceEventData& data )
-   {
-      command = data.command;
-      info = data.info;
-   }
-   ~ServiceEventData( ) { };
+   ServiceEventData( );
+   ServiceEventData( const eServiceCommand, const std::string& );
+   ServiceEventData( const ServiceEventData& );
+   ServiceEventData( ByteBuffer& );
+   ~ServiceEventData( );
 
    eServiceCommand   command;
    std::string       info;
@@ -45,17 +43,14 @@ enum class eSysCommand : std::uint8_t
 
 class SysEventData
 {
+   friend ByteBuffer& operator << ( ByteBuffer&, const SysEventData& );
+   friend ByteBuffer& operator >> ( ByteBuffer&, SysEventData& );
+
 public:
-   SysEventData( const eSysCommand _command, const std::string& _info )
-      : command( _command )
-      , info( _info )
-   { }
-   SysEventData( const SysEventData& data )
-   {
-      command = data.command;
-      info = data.info;
-   }
-   ~SysEventData( ) { };
+   SysEventData( );
+   SysEventData( const eSysCommand, const std::string& );
+   SysEventData( const SysEventData& );
+   ~SysEventData( );
 
    eSysCommand    command;
    std::string    info;
@@ -64,4 +59,9 @@ DECLARE_EVENT( SysEvent, SysEventData, ISysEventConsumer );
 
 
 
-}
+} // namespace base
+
+
+
+using DsiServiceEventData = base::ServiceEventData;
+DECLARE_DSI_EVENT( DsiServiceEvent, base::ServiceEventData, IDsiServiceEventConsumer, DsiService );

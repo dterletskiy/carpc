@@ -14,8 +14,12 @@ public:
    virtual ~IServiceProcess( ) { };
 
 public:
-   virtual bool init( const ServiceInfoVector& ) = 0;
+   virtual bool start( const ServiceInfoVector& ) = 0;
+   virtual bool stop( ) = 0;
    virtual void boot( ) = 0;
+
+public:
+   virtual IServiceBrockerDsiPtr service_brocker_dsi( ) const = 0;
 
 public:
    virtual IServiceBrockerPtr service_brocker( ) const = 0;

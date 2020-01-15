@@ -11,18 +11,24 @@ namespace base {
 
 ByteBuffer::ByteBuffer( )
 {
-}
-
-ByteBuffer::ByteBuffer( const size_t capacity )
-{
-   if( true == allocate( capacity ) )
+   if( true == allocate( 100 ) )
       memset( mp_buffer, 0, m_size );
 }
 
-ByteBuffer::ByteBuffer( const uint8_t* p_buffer, const size_t size )
+ByteBuffer::ByteBuffer( const void* p_buffer, const size_t size )
 {
    if( true == allocate( size ) )
-      memcpy( mp_buffer, p_buffer, m_size );
+   {
+      // memcpy( mp_buffer, p_buffer, m_size );
+      if( false == push( p_buffer, size ) )
+      {
+         SYS_ERR( "unable to fullfil buffer" );
+      }
+   }
+   else
+   {
+      SYS_ERR( "unable to allocate %d bytes", size );
+   }
 }
 
 ByteBuffer::~ByteBuffer( )
@@ -30,7 +36,7 @@ ByteBuffer::~ByteBuffer( )
    reset( );
 }
 
-void ByteBuffer::print( ) const
+void ByteBuffer::dump( ) const
 {
    for( size_t i = 0; i < m_size; ++i )
       printf( "%#x ", mp_buffer[i] );

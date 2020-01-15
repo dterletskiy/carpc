@@ -23,8 +23,9 @@ public:
 
 public:
    ByteBuffer( );
-   ByteBuffer( const size_t );
-   ByteBuffer( const uint8_t*, const size_t );
+   ByteBuffer( const void*, const size_t );
+   template< typename TYPE >
+      ByteBuffer( const TYPE& );
    ~ByteBuffer( );
 
 public:
@@ -65,11 +66,18 @@ private:
    size_t   m_size = 0;
 
 public:
-   void print( ) const;
+   void dump( ) const;
    void info( ) const;
 };
 
 
+
+template< typename TYPE >
+ByteBuffer::ByteBuffer( const TYPE& data )
+{
+   if( false == allocate( sizeof( data ) ) ) return;
+   *this << data;
+}
 
 inline
 const uint8_t* const ByteBuffer::buffer( ) const

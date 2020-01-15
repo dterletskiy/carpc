@@ -15,6 +15,7 @@ namespace base {
 class Service
    : public IService
    , public IServiceEventConsumer
+   , public DsiService::IDsiServiceEventConsumer
 {
 public:
    Service( IServiceBrockerPtr, const ServiceInfo& );
@@ -71,6 +72,7 @@ private:
 
 protected:
    void process_event( const ServiceEvent& ) override;
+   void process_event( const DsiService::DsiServiceEvent& ) override;
 
 private:
    IComponentPtrList       m_components;

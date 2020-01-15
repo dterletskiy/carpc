@@ -16,6 +16,15 @@ enum class ePing : std::uint8_t
 
 struct PingEventData
 {
+//    friend base::ByteBuffer& operator << ( base::ByteBuffer&, const PingEventData& );
+//    friend base::ByteBuffer& operator >> ( base::ByteBuffer&, PingEventData& );
+
+// public:
+//    PingEventData( const ePing, const std::string& );
+//    PingEventData( const PingEventData& );
+//    PingEventData( base::ByteBuffer& );
+//    ~PingEventData( );
+
    ePing          type;
    std::string    info;
 };

@@ -11,4 +11,7 @@ namespace base {
    class Event;
    using EventPtr = std::shared_ptr< Event >;
 
+   class EventRegistry;
+   using EventRegistryPtr = std::shared_ptr< EventRegistry >;
+
 } // namespace base

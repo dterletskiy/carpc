@@ -1,6 +1,7 @@
-#include "common/ByteBuffer.hpp"
-#include "oswrappers/linux/socket/Helpers.hpp"
 #include "oswrappers/Thread.hpp"
+#include "oswrappers/linux/socket/Helpers.hpp"
+#include "oswrappers/linux/memory/Hooks.hpp"
+extern MemoryMap s_memory_map;
 
 #include "service/ServiceProcess.hpp"
 #include "application/components/OnOff.hpp"
@@ -43,56 +44,20 @@
 
 
 
-#include "oswrappers/linux/memory/Hooks.hpp"
-extern MemoryMap s_memory_map;
 
 
 
-#include "events/Events.hpp"
-
-class EventData
-{
-public:
-   EventData( const uint64_t _id, const std::string& _info )
-      : id( _id )
-      , info( _info )
-   { }
-   EventData( const EventData& data )
-   {
-      id = data.id;
-      info = data.info;
-   }
-   ~EventData( ) { };
-
-   uint64_t       id;
-   std::string    info;
-};
-DECLARE_EVENT( Event, EventData, IEventConsumer );
-INIT_EVENT( Event );
 
 
 
-template< typename TYPE >
-void foo( const TYPE& value )
-{
-   DBG_WRN( "undefined" );
-}
-
-template< >
-void foo< uint64_t >( const uint64_t& value )
-{
-   DBG_INF( "uint64_t: %ld", value );
-}
-
-void foo( const uint64_t& value )
-{
-   DBG_INF( "uint64_t: %ld", value );
-}
 
 
 int main( int argc, char *argv[] )
 {
    s_memory_map.dump( );
+
+   REGISTER_DSI_EVENT( DsiServiceEvent, DsiService );
+   base::EventRegistry::instance( )->dump( );
 
    base::ServiceInfoVector services =
    {
@@ -102,13 +67,13 @@ int main( int argc, char *argv[] )
    };
 
    base::IServiceProcessPtr p_process = base::ServiceProcess::instance( );
-   if( p_process->init( services ) )
+   if( p_process->start( services ) )
    {
       DBG_MSG( "Booting..." );
       p_process->boot( );
    }
 
-    s_memory_map.dump( );
+   s_memory_map.dump( );
 
 
 
