@@ -17,5 +17,15 @@ const char* c_str( const eCommType comm_type )
    }
 }
 
+const char* c_str( const eDummyEventID id )
+{
+   switch( id )
+   {
+      case eDummyEventID::dummy: return "eDummyEventID::dummy";
+      default:                   return "eDummyEventID::UNEFINED";
+   }
+}
+
+
 
 } // namespace base

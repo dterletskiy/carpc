@@ -56,7 +56,7 @@ void Service::thread_loop( )
    while( started( ) )
    {
       EventPtr p_event = get_event( );
-      SYS_INF( "'%s': processing event (%s)", m_name.c_str( ), p_event->type_id( ).c_str( ) );
+      SYS_INF( "'%s': processing event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
       notify( p_event );
    }
 
@@ -112,7 +112,7 @@ bool Service::insert_event( const EventPtr p_event )
       SYS_WRN( "'%s': is not started", m_name.c_str( ) );
       return false;
    }
-   SYS_INF( "'%s': inserting event (%s)", m_name.c_str( ), p_event->type_id( ).c_str( ) );
+   SYS_INF( "'%s': inserting event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
 
    m_buffer_cond_var.lock( );
    m_events.push_back( p_event );
@@ -133,7 +133,7 @@ EventPtr Service::get_event( )
    EventPtr p_event = m_events.front( );
    m_events.pop_front( );
    ++m_processed_events;
-   SYS_INF( "'%s': received event (%s)", m_name.c_str( ), p_event->type_id( ).c_str( ) );
+   SYS_INF( "'%s': received event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
    m_buffer_cond_var.unlock( );
 
    return p_event;
@@ -196,6 +196,15 @@ void Service::clear_all_notifications( )
 bool Service::is_subscribed( const EventTypeID& event_id )
 {
    const auto& iterator = m_event_consumers_map.find( event_id );
+   if( iterator == m_event_consumers_map.end( ) )
+      return false;
+
+   return true;
+}
+
+bool Service::is_subscribed( const EventPtr p_event )
+{
+   const auto& iterator = m_event_consumers_map.find( p_event->type_id( ) );
    if( iterator == m_event_consumers_map.end( ) )
       return false;
 

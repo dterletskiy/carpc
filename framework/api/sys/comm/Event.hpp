@@ -4,6 +4,7 @@
 #include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/comm/Types.hpp"
 #include "api/sys/comm/EventRegistry.hpp"
+#include "api/sys/helpers/functions/format.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
 
@@ -52,19 +53,21 @@ public:
    Event( const Event& );
    virtual ~Event( );
 
-   static bool set_notification( bool, IEventConsumer*, const EventTypeID& );
-   static bool send( EventPtr, const eCommType comm_type = eCommType::NONE );
+   static const bool set_notification( bool, IEventConsumer*, const EventTypeID& );
+   static const bool send( EventPtr, const eCommType comm_type = eCommType::NONE );
 
 public:
-   virtual bool is_dsi( ) const = 0;
-   virtual bool to_buffer( ByteBufferT& ) const = 0;
+   virtual const bool is_dsi( ) const = 0;
+   virtual const bool is_broadcast( ) const = 0;
+   virtual const bool to_buffer( ByteBufferT& ) const = 0;
    // This function is used to set data from ByteBufferT only for DSI events
-   virtual bool data( ByteBufferT& ) = 0;
-   virtual bool send( const eCommType comm_type = eCommType::NONE ) = 0;
+   virtual const bool data( ByteBufferT& ) = 0;
+   virtual const bool send( const eCommType comm_type = eCommType::NONE ) = 0;
    virtual void process( IEventConsumer* ) = 0;
 
 public:
-   virtual const EventTypeID& type_id( ) = 0;
+   virtual const std::string name( ) const = 0;
+   virtual const EventTypeID& type_id( ) const = 0;
    const eCommType& comm_type( ) const;
 protected:
    eCommType   m_comm_type;
@@ -78,6 +81,7 @@ protected:
  *
  ***************************************/
 #define IS_DSI_EVENT ( false == std::is_same_v< _ServiceType, void > )
+#define IS_BROADCAST ( false == std::is_same_v< _IdType, eDummyEventID > )
 
 template< typename _Generator >
 class TEvent
@@ -126,9 +130,15 @@ public:
    }
    virtual ~TEvent( ) { }
 
+   const std::string name( ) const override
+   {
+      return s_type_id;
+      // return format_string( s_type_id, static_cast< size_t >( m_id ) );
+   }
+
 
 public:
-   static bool set_notification( bool is_set, _ConsumerType* p_consumer )
+   static const bool set_notification( bool is_set, _ConsumerType* p_consumer )
    {
       return Event::set_notification( is_set, p_consumer, s_type_id );
    }
@@ -153,29 +163,29 @@ public:
       return std::make_shared< _EventType >( data, id, comm_type );
    }
 
-   static bool create_send( const eCommType comm_type = eCommType::ETC )
+   static const bool create_send( const eCommType comm_type = eCommType::ETC )
    {
       return create( comm_type )->send( comm_type );
    }
 
-   static bool create_send( const _IdType id, const eCommType comm_type = eCommType::ETC )
+   static const bool create_send( const _IdType id, const eCommType comm_type = eCommType::ETC )
    {
       return create( id, comm_type )->send( comm_type );
    }
 
-   static bool create_send( const _DataType& data, const eCommType comm_type = eCommType::ETC )
+   static const bool create_send( const _DataType& data, const eCommType comm_type = eCommType::ETC )
    {
       return create( data, comm_type )->send( comm_type );
    }
 
-   static bool create_send( const _DataType& data, const _IdType id, const eCommType comm_type = eCommType::ETC )
+   static const bool create_send( const _DataType& data, const _IdType id, const eCommType comm_type = eCommType::ETC )
    {
       return create( data, id, comm_type )->send( comm_type );
    }
 
 public:
-   bool is_dsi( ) const override { return IS_DSI_EVENT; }
-   bool to_buffer( ByteBufferT& buffer ) const override
+   const bool is_dsi( ) const override { return IS_DSI_EVENT; }
+   const bool to_buffer( ByteBufferT& buffer ) const override
    {
       if constexpr( IS_DSI_EVENT )
       {
@@ -189,7 +199,7 @@ public:
       }
       return false;
    }
-   bool data( ByteBufferT& buffer ) override
+   const bool data( ByteBufferT& buffer ) override
    {
       if constexpr( IS_DSI_EVENT )
       {
@@ -201,7 +211,7 @@ public:
       return false;
    }
 
-   bool send( const eCommType comm_type = eCommType::NONE ) override
+   const bool send( const eCommType comm_type = eCommType::NONE ) override
    {
       return Event::send( _EventType::shared_from_this( ), comm_type );
    }
@@ -212,10 +222,11 @@ public:
    }
 
 public:
-   const EventTypeID& type_id( ) override { return s_type_id; }
+   const EventTypeID& type_id( ) const override { return s_type_id; }
    static EventTypeID         s_type_id;
 
 public:
+   const bool is_broadcast( ) const override { return IS_BROADCAST; }
    const _IdType id( ) const { return m_id; }
    void id( const _IdType& id ) { m_id = id; }
 private:
@@ -235,6 +246,7 @@ private:
 
 
 #undef IS_DSI_EVENT
+#undef IS_BROADCAST
 
 
 
@@ -282,11 +294,6 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
 
 
 
-#include <stdint.h>
-enum class eDummyEventID : size_t { dummy = SIZE_MAX };
-
-
-
 #define _ARG_2_( _0, _1, _2, ... )  _2
 #define _DETECT_TYPE_( ... )        _ARG_2_( __VA_ARGS__, USER_ID, DEFAULT_ID )
 
@@ -294,7 +301,7 @@ enum class eDummyEventID : size_t { dummy = SIZE_MAX };
  *
  * This DECLARE_EVENT macro allowes to declare event with user defined id type
  * or with default id type depending on third parameter.
- * If third parameter is empty will be defined event with default eDummyEventID
+ * If third parameter is empty will be defined event with default base::eDummyEventID
  * using DECLARE_EVENT_DEFAULT_ID macro.
  * If third parameter is not empty will be defined event with user defined type
  * mentioned in third parameter using DECLARE_EVENT_USER_ID macro.
@@ -309,7 +316,7 @@ enum class eDummyEventID : size_t { dummy = SIZE_MAX };
 #define DECLARE_EVENT_DEFAULT_ID( eventType, dataType ) \
    namespace eventType { \
       class eventType; \
-      using Event       = base::TGenerator< dataType, eDummyEventID, eventType >::Config::EventType; \
+      using Event       = base::TGenerator< dataType, base::eDummyEventID, eventType >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
    }
@@ -334,7 +341,7 @@ enum class eDummyEventID : size_t { dummy = SIZE_MAX };
  *
  * This DECLARE_DSI_EVENT macro allowes to declare event with user defined id type
  * or with default id type depending on third parameter.
- * If third parameter is empty will be defined event with default eDummyEventID
+ * If third parameter is empty will be defined event with default base::eDummyEventID
  * using DECLARE_DSI_EVENT_DEFAULT_ID macro.
  * If third parameter is not empty will be defined event with user defined type
  * mentioned in third parameter using DECLARE_DSI_EVENT_USER_ID macro.
@@ -348,7 +355,7 @@ enum class eDummyEventID : size_t { dummy = SIZE_MAX };
    namespace serviceName::eventType { \
       class serviceName; \
       class eventType; \
-      using Event       = base::TGenerator< dataType, eDummyEventID, eventType, serviceName >::Config::EventType; \
+      using Event       = base::TGenerator< dataType, base::eDummyEventID, eventType, serviceName >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
    }

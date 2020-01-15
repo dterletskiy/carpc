@@ -33,7 +33,7 @@ Event::~Event( )
 {
 }
 
-bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const EventTypeID& type_id )
+const bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const EventTypeID& type_id )
 {
    SYS_INF( "event id: %s / consumer: %p / is_set: %s", type_id.c_str( ), p_consumer, BOOL_TO_STRING( is_set ) );
    ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
@@ -53,7 +53,7 @@ bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const Eve
    return true;
 }
 
-bool Event::send( EventPtr p_event, const eCommType comm_type )
+const bool Event::send( EventPtr p_event, const eCommType comm_type )
 {
    const eCommType type = comm_type == eCommType::NONE ? p_event->comm_type( ) : comm_type;
    switch( type )

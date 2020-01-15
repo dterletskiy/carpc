@@ -63,6 +63,7 @@ public:
    void clear_notification( const EventTypeID&, IEventConsumer* );
    void clear_all_notifications( );
    bool is_subscribed( const EventTypeID& );
+   bool is_subscribed( const EventPtr );
    const std::optional< time_t > process_started( ) const;
 private:
    void notify( const EventPtr );

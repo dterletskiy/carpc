@@ -102,7 +102,7 @@ namespace {
       size_t               m_iteration;
       base::tools::Performance   m_performance;
    };
-   static size_t s_count = 10;
+   static size_t s_count = 1000000;
    auto send_event = [ ]( const base::eCommType _type ) { ServiceDSI::PingEvent::Event::create_send( { base::c_str( _type ) }, _type ); };
    Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC }, s_count );
 
@@ -112,8 +112,8 @@ bool OnOff::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
    // sleep(5);
-   m_client.request_trigger_state( "Unloaded" );
-   s_event_test.execute( );
+   // m_client.request_trigger_state( "Unloaded" );
+   // s_event_test.execute( );
 
    return true;
 }

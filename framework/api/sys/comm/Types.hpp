@@ -2,15 +2,20 @@
 
 #include <string>
 #include <memory>
+#include <stdint.h>
 
 
 
 namespace base {
 
+   using EventTypeID = std::string;
+   using EventInfoID = size_t;
+
    enum class eCommType : size_t { IPC, ITC, ETC, NONE };
    const char* c_str( const eCommType );
 
-   class IEventConsumer;
+   enum class eDummyEventID : EventInfoID { dummy = SIZE_MAX };
+   const char* c_str( const eDummyEventID );
 
    class Event;
    using EventPtr = std::shared_ptr< Event >;
@@ -18,6 +23,6 @@ namespace base {
    class EventRegistry;
    using EventRegistryPtr = std::shared_ptr< EventRegistry >;
 
-   using EventTypeID = std::string;
+   // class IEventConsumer;
 
 } // namespace base

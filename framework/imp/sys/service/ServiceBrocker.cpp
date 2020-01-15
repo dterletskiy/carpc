@@ -47,7 +47,7 @@ void ServiceBrocker::thread_loop( )
    while( started( ) )
    {
       EventPtr p_event = get_event( );
-      SYS_INF( "processing event (%s)", p_event->type_id( ).c_str( ) );
+      SYS_INF( "processing event (%s)", p_event->name( ).c_str( ) );
       notify( p_event );
    }
 
@@ -79,7 +79,7 @@ bool ServiceBrocker::insert_event( const EventPtr p_event )
       SYS_WRN( "ServiceBrocker is not started" );
       return false;
    }
-   SYS_INF( "inserting event (%s)", p_event->type_id( ).c_str( ) );
+   SYS_INF( "inserting event (%s)", p_event->name( ).c_str( ) );
 
    m_buffer_cond_var.lock( );
    m_events.push_back( p_event );
@@ -98,7 +98,7 @@ EventPtr ServiceBrocker::get_event( )
    }
    EventPtr p_event = m_events.front( );
    m_events.pop_front( );
-   SYS_INF( "received event (%s)", p_event->type_id( ).c_str( ) );
+   SYS_INF( "received event (%s)", p_event->name( ).c_str( ) );
    m_buffer_cond_var.unlock( );
 
    return p_event;
@@ -109,7 +109,7 @@ void ServiceBrocker::notify( const EventPtr p_event )
    ServicePtrList service_list = base::ServiceProcess::instance( )->service_list( );
    for( auto p_service : service_list )
    {
-      if( true == p_service->is_subscribed( p_event->type_id( ) ) )
+      if( true == p_service->is_subscribed( p_event ) )
          p_service->insert_event( p_event );
    }
 }
