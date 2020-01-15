@@ -1,4 +1,5 @@
 // Framework
+#include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/tools/Tools.hpp"
 // Application
@@ -12,8 +13,10 @@
 namespace memory {
    #ifdef HOOK_MEMORY_ALLOCATOR
       extern void dump( );
+      extern void set_track_size( const size_t );
    #else
       inline void dump( ) { }
+      inline void set_track_size( const size_t ) { }
    #endif
 }
 
@@ -52,38 +55,51 @@ void __destructor__( )
 
 
 
+
+
+
+// #include "api/sys/oswrappers/linux/timer.hpp"
+// void timer_handler( union sigval sv )
+// {
+//    timer_t* timer_id = static_cast< timer_t* >( sv.sival_ptr );
+//    SYS_INF( "WhatchDog timer: %#lx", (long) *timer_id );
+// }
+
+void call_malloc( size_t size )
+{
+   DBG_MSG( "--------------------------------------" );
+   void* p = malloc( size );
+   SYS_SIMPLE_TRC( "%p", p );
+   free( p );
+   DBG_MSG( "--------------------------------------" );
+}
+
+void call_realloc( void* address, size_t size )
+{
+   DBG_MSG( "--------------------------------------" );
+   void* p = realloc( address, size );
+   SYS_SIMPLE_TRC( "%p", p );
+   free( p );
+   DBG_MSG( "--------------------------------------" );
+}
+
+void call_calloc( size_t number, size_t size )
+{
+   DBG_MSG( "--------------------------------------" );
+   void* p = calloc( number, size );
+   SYS_SIMPLE_TRC( "%p", p );
+   free( p );
+   DBG_MSG( "--------------------------------------" );
+}
+
 int main( int argc, char *argv[] )
 {
+   base::os::linux::back_trace( 0 );
    memory::dump( );
 
-   {
-      DBG_MSG( "--------------------------------------" );
-      void* p = malloc( 12345 );
-      SYS_SIMPLE_TRC( "%p", p );
-      free( p );
-      DBG_MSG( "--------------------------------------" );
-   }
-   {
-      DBG_MSG( "--------------------------------------" );
-      void* p = calloc( 12, 10 );
-      SYS_SIMPLE_TRC( "%p", p );
-      free( p );
-      DBG_MSG( "--------------------------------------" );
-   }
-   {
-      DBG_MSG( "--------------------------------------" );
-      size_t* p = new size_t;
-      SYS_SIMPLE_TRC( "%p", p );
-      delete p;
-      DBG_MSG( "--------------------------------------" );
-   }
-   {
-      DBG_MSG( "--------------------------------------" );
-      size_t* p = new size_t[5];
-      SYS_SIMPLE_TRC( "%p", p );
-      delete[] p;
-      DBG_MSG( "--------------------------------------" );
-   }
+   call_malloc( 123 );
+   call_malloc( 456 );
+   call_malloc( 123456789 );
 
 #if 0
    memory::dump( );

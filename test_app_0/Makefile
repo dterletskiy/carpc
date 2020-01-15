@@ -43,47 +43,31 @@ $(PROJECT_NAME): $(OBJECT_FILES)
 config:
 	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR) $(TARGET_DIR))
 
-$(TARGET_CLEAN):
+clean:
 	$(call delete_directories,$(PRODUCT_DIR))
 
-$(TARGET_GENERATE): config $(GENERATED_FILES)
+generate: config $(GENERATED_FILES)
 
-$(TARGET_BUILD): config $(PROJECT_NAME)
+build: config $(PROJECT_NAME)
 
-clean_build: $(TARGET_CLEAN) $(TARGET_BUILD)
+clean_build: clean build
 
-$(TARGET_INFO):
-	@echo "###########################################################"
-	@echo "#"
-	@echo "# information:  '$(PROJECT_NAME)'"
-	@echo "#"
-	@echo "###########################################################"
-	@echo PWD: $(PWD)
-	@echo PROJECT_NAME: $(PROJECT_NAME)
-	@echo PROJECT_DIR: $(PROJECT_DIR)
-	@echo PRODUCT_DIR: $(PRODUCT_DIR)
-	@echo INCLUDE: $(INCLUDE)
-	@echo --------------- Source files ---------------
-	@echo $(SOURCE_FILES)
-	@echo -------------- Generated files -------------
-	@echo $(GENERATED_FILES)
-	@echo --------------- Object files ---------------
-	@echo $(OBJECT_FILES)
-	@echo --------------------------------------------
-
-$(TARGET_ARCHIVE):
+archive:
 	@$(TAR) -cvf $(SOURCE_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(SOURCE_DIR)
 
-$(TARGET_EXECUTE):
+execute:
 	reset
 	$(TARGET_DIR)/$(PROJECT_NAME)
 
-$(TARGET_DEBUG):
+debug:
 	reset
 	$(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
 
-$(TARGET_DISASSM):
+disassm:
 	$(DISASSEMBLER) -S --disassemble $(TARGET_DIR)/$(PROJECT_NAME) > $(TARGET_DIR)/$(PROJECT_NAME).s
+
+info:
+	$(call print_info,$(PROJECT_NAME),$(PROJECT_DIR),$(PRODUCT_DIR),$(SOURCE_FILES),$(GENERATED_FILES),$(OBJECT_FILES))
 
 
 

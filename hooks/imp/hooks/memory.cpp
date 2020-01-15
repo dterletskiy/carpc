@@ -1,25 +1,26 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <cstring>
 #include <dlfcn.h>
 #include <malloc.h>
 #include <cstddef>
 
 #include "MemoryMap.hpp"
 
-#include "api/sys/oswrappers/linux/time.hpp"
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "MEMORY"
 
 
 
+
 namespace {
-   MemoryHeader* cast( void* p ) { return reinterpret_cast< MemoryHeader* >( p ); }
-   MemoryMap s_memory_map __attribute__ (( section ("MEMORY"), init_priority (101) )) = { };
+   hook::memory::MemoryMap s_memory_map __attribute__ (( section ("MEMORY"), init_priority (101) )) = { "/tmp/backtrace", 1024 * 1024 };
 }
 
 namespace memory {
    void dump( ) { s_memory_map.dump( ); }
+   void set_track_size( const size_t size ) { s_memory_map.set_track_size( size ); }
 }
 
 
@@ -27,50 +28,82 @@ namespace memory {
 extern "C" void* __libc_malloc( size_t size );
 extern "C" void* malloc( size_t size )
 {
-   void* address = __libc_malloc( size + s_header_size );
-   *cast( address ) = { __builtin_return_address(0), size, base::os::linux::microseconds( ) };
+   if( 0 == size )
+   {
+      SYS_SIMPLE_WRN( "size = 0" );
+      return nullptr;
+   }
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu", (address + s_header_size), size );
-   return address + s_header_size;
+   void* address = __libc_malloc( size + hook::memory::s_header_size );
+   s_memory_map.insert( address, __builtin_return_address(0), size );
+
+   SYS_SIMPLE_TRC( "address = %p / size = %zu", (address + hook::memory::s_header_size), size );
+   return address + hook::memory::s_header_size;
 }
 
 extern "C" void* __libc_memalign( size_t alignment, size_t size );
 extern "C" void* memalign( size_t alignment, size_t size )
 {
-   void* address = __libc_memalign( alignment, size );
-   *cast( address ) = { __builtin_return_address(0), size, base::os::linux::microseconds( ) };
+   if( 0 == size )
+   {
+      SYS_SIMPLE_WRN( "size = 0" );
+      return nullptr;
+   }
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / alignment = %zu", (address + s_header_size), size, alignment );
-   return address + s_header_size;
+   void* address = __libc_memalign( alignment, size );
+   s_memory_map.insert( address, __builtin_return_address(0), size );
+
+   SYS_SIMPLE_TRC( "address = %p / size = %zu / alignment = %zu", (address + hook::memory::s_header_size), size, alignment );
+   return address + hook::memory::s_header_size;
 }
 
 extern "C" void* __libc_realloc( void* address, size_t size );
 extern "C" void* realloc( void* address, size_t size )
 {
-   void* new_address = __libc_realloc( address ? (address - s_header_size) : address, (size + s_header_size) );
-   *cast( address ) = { __builtin_return_address(0), size, base::os::linux::microseconds( ) };
+   if( 0 == size )
+   {
+      SYS_SIMPLE_WRN( "size = 0" );
+      return nullptr;
+   }
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / new address = %p", address, size, (new_address + s_header_size) );
-   return new_address + s_header_size;
+   void* new_address = __libc_realloc( address ? (address - hook::memory::s_header_size) : address, (size + hook::memory::s_header_size) );
+   s_memory_map.remove( address - hook::memory::s_header_size );
+   s_memory_map.insert( new_address, __builtin_return_address(0), size );
+
+   SYS_SIMPLE_TRC( "address = %p / size = %zu / new address = %p", address, size, (new_address + hook::memory::s_header_size) );
+   return new_address + hook::memory::s_header_size;
 }
 
 extern "C" void* __libc_calloc( size_t number, size_t size );
 extern "C" void* calloc( size_t number, size_t size )
 {
-   void* address = __libc_calloc( number, size );
-   *cast( address ) = { __builtin_return_address(0), number * size, base::os::linux::microseconds( ) };
+   if( 0 == size || 0 == number )
+   {
+      SYS_SIMPLE_WRN( "size = %zu / number = %zu", size, number );
+      return nullptr;
+   }
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / number = %zu", (address + s_header_size), size, number );
-   return address + s_header_size;
+   // void* address = __libc_calloc( number, size );
+   void* address = __libc_malloc( number * size + hook::memory::s_header_size );
+   memset( address, 0, number * size + hook::memory::s_header_size );
+   s_memory_map.insert( address, __builtin_return_address(0), number * size );
+
+   SYS_SIMPLE_TRC( "address = %p / size = %zu / number = %zu", (address + hook::memory::s_header_size), size, number );
+   return address + hook::memory::s_header_size;
 }
 
 extern "C" void* __libc_free( void* address );
 extern "C" void free( void* address )
 {
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / caller = %p / time = %lu"
-                  , address, cast( address - s_header_size )->size, cast( address - s_header_size )->caller, cast( address - s_header_size )->time
-   );
-   __libc_free( address - s_header_size );
+   if( nullptr == address )
+   {
+      SYS_SIMPLE_WRN( "address = (nil)" );
+      return;
+   }
+
+   SYS_SIMPLE_TRC( "address = %p", address );
+   s_memory_map.remove( address - hook::memory::s_header_size );
+   __libc_free( address - hook::memory::s_header_size );
 }
 
 

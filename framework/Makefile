@@ -15,6 +15,7 @@ TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
 INCLUDE          += -I$(SOURCE_DIR) -I$(SOURCE_DIR)/trace
+# CFLAGS           += -fPIC
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
@@ -38,37 +39,27 @@ $(OBJECT_DIR)/%.$(OBJ_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
 config:
 	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR))
 
-$(TARGET_CLEAN):
+clean:
 	$(call delete_directories,$(PRODUCT_DIR))
 
-$(TARGET_GENERATE): config $(GENERATED_FILES)
+generate: config $(GENERATED_FILES)
 
-$(TARGET_BUILD): config $(OBJECT_FILES)
+build: config $(OBJECT_FILES)
 	ar rcs $(LIBRARY_DIR)/lib$(PROJECT_NAME).a $(OBJECT_FILES)
+# 	variant 1
+# gcc -g -shared -Wl,-soname,libhello.so.0 -o libhello.so.0.0 libhello.o -lc
+# 	variant 2
+# 	g++ -g -shared -Wl,-soname,lib$(PROJECT_NAME).so.0 -o $(LIBRARY_DIR)/lib$(PROJECT_NAME).so.0.0 $(OBJECT_FILES) $(LDFLAGS)
+# 	ldconfig -v -n $(LIBRARY_DIR)
+# 	ln -sf $(LIBRARY_DIR)/lib$(PROJECT_NAME).so.0 $(LIBRARY_DIR)/lib$(PROJECT_NAME).so
 
-clean_build: $(TARGET_CLEAN) $(TARGET_BUILD)
+clean_build: clean build
 
-$(TARGET_INFO):
-	@echo "###########################################################"
-	@echo "#"
-	@echo "# information:  '$(PROJECT_NAME)'"
-	@echo "#"
-	@echo "###########################################################"
-	@echo PWD: $(PWD)
-	@echo PROJECT_NAME: $(PROJECT_NAME)
-	@echo PROJECT_DIR: $(PROJECT_DIR)
-	@echo PRODUCT_DIR: $(PRODUCT_DIR)
-	@echo INCLUDE: $(INCLUDE)
-	@echo --------------- Source files ---------------
-	@echo $(SOURCE_FILES)
-	@echo -------------- Generated files -------------
-	@echo $(GENERATED_FILES)
-	@echo --------------- Object files ---------------
-	@echo $(OBJECT_FILES)
-	@echo --------------------------------------------
-
-$(TARGET_ARCHIVE):
+archive:
 	@$(TAR) -cvf $(SOURCE_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(SOURCE_DIR)
+
+infi:
+	$(call print_info,$(PROJECT_NAME),$(PROJECT_DIR),$(PRODUCT_DIR),$(SOURCE_FILES),$(GENERATED_FILES),$(OBJECT_FILES))
 
 
 

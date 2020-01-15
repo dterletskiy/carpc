@@ -74,29 +74,28 @@ ROOT_DIR                     :=$(PWD)
 PROJECT_FRAMEWORK_NAME       := framework
 PROJECT_FRAMEWORK_DIR        := $(ROOT_DIR)/$(PROJECT_FRAMEWORK_NAME)
 PRODUCT_FRAMEWORK_DIR        := $(PROJECT_FRAMEWORK_DIR)_product
+FRAMEWORK_MAKE_PARAMS        := PROJECT_NAME=$(PROJECT_FRAMEWORK_NAME) PROJECT_DIR=$(PROJECT_FRAMEWORK_DIR) PRODUCT_DIR=$(PRODUCT_FRAMEWORK_DIR)
 
 PROJECT_APPLICATION_NAME     := application
 PROJECT_APPLICATION_DIR      := $(ROOT_DIR)/$(PROJECT_APPLICATION_NAME)
 PRODUCT_APPLICATION_DIR      := $(PROJECT_APPLICATION_DIR)_product
+APPLICATION_MAKE_PARAMS      := PROJECT_NAME=$(PROJECT_APPLICATION_NAME) PROJECT_DIR=$(PROJECT_APPLICATION_DIR) PRODUCT_DIR=$(PRODUCT_APPLICATION_DIR)
 
 PROJECT_SERVICEBROCKER_NAME  := servicebrocker
 PROJECT_SERVICEBROCKER_DIR   := $(ROOT_DIR)/$(PROJECT_SERVICEBROCKER_NAME)
 PRODUCT_SERVICEBROCKER_DIR   := $(PROJECT_SERVICEBROCKER_DIR)_product
+SERVICEBROCKER_MAKE_PARAMS   := PROJECT_NAME=$(PROJECT_SERVICEBROCKER_NAME) PROJECT_DIR=$(PROJECT_SERVICEBROCKER_DIR) PRODUCT_DIR=$(PRODUCT_SERVICEBROCKER_DIR)
 
 PROJECT_HOOKS_NAME           := hooks
 PROJECT_HOOKS_DIR            := $(ROOT_DIR)/$(PROJECT_HOOKS_NAME)
 PRODUCT_HOOKS_DIR            := $(PROJECT_HOOKS_DIR)_product
+HOOKS_MAKE_PARAMS            := PROJECT_NAME=$(PROJECT_HOOKS_NAME) PROJECT_DIR=$(PROJECT_HOOKS_DIR) PRODUCT_DIR=$(PRODUCT_HOOKS_DIR)
 
 # @TDA: testing
 PROJECT_APP0_NAME            := test_app_0
 PROJECT_APP0_DIR             := $(ROOT_DIR)/$(PROJECT_APP0_NAME)
 PRODUCT_APP0_DIR             := $(PROJECT_APP0_DIR)_product
-PROJECT_APP1_NAME            := test_app_1
-PROJECT_APP1_DIR             := $(ROOT_DIR)/$(PROJECT_APP1_NAME)
-PRODUCT_APP1_DIR             := $(PROJECT_APP1_DIR)_product
-PROJECT_APP2_NAME            := test_app_2
-PROJECT_APP2_DIR             := $(ROOT_DIR)/$(PROJECT_APP2_NAME)
-PRODUCT_APP2_DIR             := $(PROJECT_APP2_DIR)_product
+APP0_MAKE_PARAMS             := PROJECT_NAME=$(PROJECT_APP0_NAME) PROJECT_DIR=$(PROJECT_APP0_DIR) PRODUCT_DIR=$(PRODUCT_APP0_DIR)
 
 
 
@@ -133,7 +132,7 @@ CFLAGS       += -fopenmp
 CFLAGS       += -Wall
 # CFLAGS       += -Wextra
 # CFLAGS       += -O3
-CFLAGS       += -g3
+CFLAGS       += -g3 -ggdb -rdynamic
 
 LDFLAGS      := -lrt -ldl
 LDFLAGS      += -fopenmp
@@ -197,4 +196,26 @@ define link
 endef
 
 define build_source_list
+endef
+
+define print_info
+	@echo "###########################################################"
+	@echo "#                                                       '#'"
+	@echo "            information:  '$(1)'"
+	@echo "#                                                       '#'"
+	@echo "###########################################################"
+	@echo PROJECT_NAME: $(1)
+	@echo PROJECT_DIR: $(2)
+	@echo PRODUCT_DIR: $(3)
+	@echo --------------- Source files ---------------
+	@echo $(4)
+	@echo -------------- Generated files -------------
+	@echo $(5)
+	@echo --------------- Object files ---------------
+	@echo $(6)
+	@echo --------------------------------------------
+endef
+
+define test
+	$(1) := 111
 endef

@@ -15,7 +15,6 @@ TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
 INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR)
-# CFLAGS           += -fPIC
 LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
 
 #---------------------------------------------------------------------------------
@@ -41,38 +40,21 @@ $(OBJECT_DIR)/%.$(OBJ_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
 config:
 	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR) $(TARGET_DIR))
 
-$(TARGET_CLEAN):
+clean:
 	$(call delete_directories,$(PRODUCT_DIR))
 
-$(TARGET_GENERATE): config $(GENERATED_FILES)
+generate: config $(GENERATED_FILES)
 
-$(TARGET_BUILD): config $(OBJECT_FILES)
-# 	g++ -shared -o $(LIBRARY_DIR)/lib$(PROJECT_NAME).so $(OBJECT_FILES) $(LDFLAGS)
+build: config $(OBJECT_FILES)
 	ar rcs $(LIBRARY_DIR)/lib$(PROJECT_NAME).a $(OBJECT_FILES)
 
-clean_build: $(TARGET_CLEAN) $(TARGET_BUILD)
+clean_build: clean build
 
-$(TARGET_INFO):
-	@echo "###########################################################"
-	@echo "#"
-	@echo "# information:  '$(PROJECT_NAME)'"
-	@echo "#"
-	@echo "###########################################################"
-	@echo PWD: $(PWD)
-	@echo PROJECT_NAME: $(PROJECT_NAME)
-	@echo PROJECT_DIR: $(PROJECT_DIR)
-	@echo PRODUCT_DIR: $(PRODUCT_DIR)
-	@echo INCLUDE: $(INCLUDE)
-	@echo --------------- Source files ---------------
-	@echo $(SOURCE_FILES)
-	@echo -------------- Generated files -------------
-	@echo $(GENERATED_FILES)
-	@echo --------------- Object files ---------------
-	@echo $(OBJECT_FILES)
-	@echo --------------------------------------------
-
-$(TARGET_ARCHIVE):
+archive:
 	@$(TAR) -cvf $(SOURCE_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(SOURCE_DIR)
+
+info:
+	$(call print_info,$(PROJECT_NAME),$(PROJECT_DIR),$(PRODUCT_DIR),$(SOURCE_FILES),$(GENERATED_FILES),$(OBJECT_FILES))
 
 
 

@@ -42,17 +42,17 @@ namespace base::trace::printf
 
 #define DBG_PRINTF_CODE( USER_FORMAT, ... ) \
    base::trace::printf::simple::dbg_lock( ); \
-   printf( \
+   ::printf( \
               PREFIX_FORMAT_CODE#USER_FORMAT \
             , FG_LIGHT_YELLOW, CLASS_ABBR, __FUNCTION__, __LINE__ \
             , ##__VA_ARGS__ \
    ); \
-   printf( NEW_LINE ); \
+   ::printf( NEW_LINE ); \
    base::trace::printf::simple::dbg_unlock( );
 
 #define DBG_PRINTF_MICROSECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
    base::trace::printf::extended::dbg_lock( ); \
-   printf( \
+   ::printf( \
               PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE#USER_FORMAT \
             , FG_LIGHT_MAGENTA, base::os::linux::microseconds( ) \
             , FG_YELLOW, "|" \
@@ -62,13 +62,13 @@ namespace base::trace::printf
             , FG_LIGHT_YELLOW, CLASS_ABBR, __FUNCTION__, __LINE__ \
             , ##__VA_ARGS__ \
    ); \
-   printf( NEW_LINE ); \
+   ::printf( NEW_LINE ); \
    base::trace::printf::extended::dbg_unlock( );
 
 #define DBG_PRINTF_DATE_TIME_MILLISECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
    base::trace::printf::extended::dbg_lock( ); \
    base::os::linux::local_time_of_date( base::trace::printf::extended::time_tm, base::trace::printf::extended::milliseconds ); \
-   printf( \
+   ::printf( \
               PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE#USER_FORMAT \
             , FG_LIGHT_MAGENTA \
                , base::trace::printf::extended::time_tm->tm_year + 1900, base::trace::printf::extended::time_tm->tm_mon + 1, base::trace::printf::extended::time_tm->tm_mday \
@@ -81,7 +81,7 @@ namespace base::trace::printf
             , FG_LIGHT_YELLOW, CLASS_ABBR, __FUNCTION__, __LINE__ \
             , ##__VA_ARGS__ \
    ); \
-   printf( NEW_LINE ); \
+   ::printf( NEW_LINE ); \
    base::trace::printf::extended::dbg_unlock( );
 
 

@@ -13,6 +13,13 @@ void local_time_of_date( tm*& _time_tm, size_t& _milliseconds )
    _milliseconds = tv.tv_usec;
 }
 
+uint64_t time( const eGranularity gran, clockid_t clk_id )
+{
+   timespec time_timespec;
+   clock_gettime( clk_id, &time_timespec );
+   return time_timespec.tv_sec * static_cast< size_t >( gran ) + time_timespec.tv_nsec / ( 1000000000 / static_cast< size_t >( gran ) );
+}
+
 uint64_t microseconds( clockid_t clk_id )
 {
    timespec time_timespec;
