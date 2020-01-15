@@ -1,0 +1,123 @@
+# AR           Программа работы с архивами; по умолчанию, `ar'. 
+# AS           Ассемблер; по умолчанию, `as'. 
+# CC           Компилятор Си; по умолчанию, `cc'. 
+# CXX          Компилятор C++; по умолчанию, `g++'. 
+# CO           Программа для извлечения файлов из RCS; по умолчанию, `co'. 
+# CPP          Препроцессор языка Си, выдающий результат на стандартный вывод; по умолчанию, `$(CC) -E'. 
+# FC           Препроцессор и компилятор для Фортрана и Ратфора; по умолчанию, `f77'. 
+# GET          Программа для извлечения файлов из SCCS; по умолчанию, `get'. 
+# LEX          Программа для преобразования Lex-грамматики в текст на языках Си или Ратфор; по умолчанию - `lex'. 
+# PC           Компилятор Паскаля; по умолчанию, `pc'. 
+# YACC         Программа для преобразования Yacc-грамматики в текст на Си; по умолчанию - `yacc'. 
+# YACCR        Программа для преобразования Yacc-грамматики в текст на языке Ратфор; по умолчанию - `yacc -r'. 
+# MAKEINFO     Программа для преобразования исходного файла формата Texinfo в файл формата Info; по умолчанию, `makeinfo'. 
+# TEX          Программа для преобразования исходных файлов на TeX в файлы формата DVI; по умолчанию - `tex'. 
+# TEXI2DVI     Программа, преобразующая исходные файлы в формате Texinfo, в DVI-файлы программы TeX; по умолчанию - `texi2dvi'. 
+# WEAVE        Программа, преобразующая текст из формата Web в формат TeX; по умолчанию - `weave'. 
+# CWEAVE       Программа, преобразующая текст на Си-Web в формат TeX; по умолчанию - `cweave'. 
+# TANGLE       Программа, преобразующая текст на Web в Паскаль; по умолчанию - `tangle'. 
+# CTANGLE      Программа, преобразующая текст на Си-Web в текст на Си; по умолчанию - `ctangle'. 
+# RM           Команда удаления файла; по умолчанию, `rm -f'. 
+
+
+
+
+
+
+
+TIME := $(shell date +"%H-%M-%S")
+DATE := $(shell date +"%Y-%m-%d")
+
+# Debugger
+DEBUGGER    := lldb
+# tar
+TAR         := tar
+
+# File extentions
+SRC_EXT      := cpp
+DEP_EXT      := d
+OBJ_EXT      := o
+
+# Include directories
+INCLUDE      := -I/usr/local/include
+
+CONSTANTS    := -DLINUX=0 -DWINDOWS=1 -DSTD=2 -DOS=LINUX
+
+CCONFIG      := -DCOLORED_TRACE
+# CCONFIG      += -DHOOK_MEMORY_ALLOCATOR
+
+CFLAGS       := -fopenmp -g -std=c++17 $(CONSTANTS) $(CCONFIG)
+# CFLAGS       += -Wall -O3 -g
+
+LDFLAGS      := -fopenmp -lrt -ldl
+# LDFLAGS      += -lm -larmadillo
+
+TARGET_BUILD            := build
+TARGET_EXECUTE          := execute
+TARGET_GENERATE         := generate
+TARGET_CLEAN            := clean
+TARGET_INFO             := info
+TARGET_ARCHIVE          := archive
+
+###########################################
+#                                         #
+#           Project directories           #
+#                                         #
+###########################################
+PROJECT_NAME                 := RPC
+ROOT_DIR                     :=$(PWD)
+
+PROJECT_FRAMEWORK_NAME       := framework
+PROJECT_FRAMEWORK_DIR        := $(ROOT_DIR)/$(PROJECT_FRAMEWORK_NAME)
+PRODUCT_FRAMEWORK_DIR        := $(PROJECT_FRAMEWORK_DIR)_product
+
+PROJECT_APPLICATION_NAME     := application
+PROJECT_APPLICATION_DIR      := $(ROOT_DIR)/$(PROJECT_APPLICATION_NAME)
+PRODUCT_APPLICATION_DIR      := $(PROJECT_APPLICATION_DIR)_product
+
+PROJECT_SERVICEBROCKER_NAME  := servicebrocker
+PROJECT_SERVICEBROCKER_DIR   := $(ROOT_DIR)/$(PROJECT_SERVICEBROCKER_NAME)
+PRODUCT_SERVICEBROCKER_DIR   := $(PROJECT_SERVICEBROCKER_DIR)_product
+
+
+
+###########################################
+#                                         #
+#                Functions                #
+#                                         #
+###########################################
+define create_directories
+	@echo "Create directories: " $(1)
+	@mkdir -p $(1)
+endef
+
+define delete_directories
+	@echo "Delete directories: " $(1)
+	@rm -rf $(1)
+endef
+
+define compile
+	@echo "---------------------------------------------------------"
+	@echo "Compiling..."
+	@echo "   Compiler:   " $(1)
+	@echo "   Flags:      " $(2)
+	@echo "   Includes:   " $(3)
+	@echo "   Object:     " $(4)
+	@echo "   Source:     " $(5)
+	$(call create_directories,$(dir $(4)))
+	$(1) $(2) $(3) -c -o $(4) $(5)
+	@echo "---------------------------------------------------------"
+endef
+
+define generate
+	@echo "---------------------------------------------------------"
+	@echo "Generating..."
+	@echo "   Compiler:   " $(1)
+	@echo "   Flags:      " $(2)
+	@echo "   Includes:   " $(3)
+	@echo "   Object:     " $(4)
+	@echo "   Source:     " $(5)
+	$(call create_directories,$(dir $(4)))
+	$(1) $(2) $(3) -E -o $(4) $(5)
+	@echo "---------------------------------------------------------"
+endef

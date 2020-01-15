@@ -4,7 +4,7 @@
 #include "component/Component.hpp"
 #include "component/Root.hpp"
 // Application
-#include "application/events/Events.hpp"
+#include "events/PingEvent.hpp"
 
 
 

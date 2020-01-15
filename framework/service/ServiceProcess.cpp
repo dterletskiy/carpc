@@ -158,6 +158,8 @@ void ServiceProcess::boot( )
 {
    SYS_MSG( );
 
+   sleep(1);
+
    // ServiceEvent::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
    DsiService::DsiServiceEvent::send_event( { base::eServiceCommand::boot, "fuck" } );
 

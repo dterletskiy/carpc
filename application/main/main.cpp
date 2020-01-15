@@ -1,13 +1,13 @@
 // // Framework
-// #include "service/ServiceProcess.hpp"
+#include "service/ServiceProcess.hpp"
 // // Application
-// #include "application/components/OnOff.hpp"
-// #include "application/components/Driver.hpp"
-// #include "application/components/Master.hpp"
-// #include "application/components/Slave.hpp"
+#include "components/OnOff.hpp"
+#include "components/Driver.hpp"
+#include "components/Master.hpp"
+#include "components/Slave.hpp"
 
-// #include "Trace.hpp"
-// #define CLASS_ABBR "MAIN"
+#include "Trace.hpp"
+#define CLASS_ABBR "MAIN"
 
 
 namespace memory {
@@ -49,39 +49,13 @@ void __destructor__( )
 
 
 
-#define HAVE_STD_OPTIONAL
 
-#ifdef HAVE_STD_OPTIONAL
-   #include <optional>
-
-   namespace std::experimental {
-      template< typename T >
-         using optional = std::optional< T >;
-      template< typename T >
-         using make_optional = std::make_optional< T >;
-
-      constexpr std::nullopt_t nullopt = std::nullopt;
-   }
-#else
-   #include <experimental/optional>
-#endif
-
-
-// #include <optional>
 
 
 
 
 int main( int argc, char *argv[] )
 {
-   // std::experimental::optional< bool > value = std::experimental::nullopt;
-   // std::optional< bool > value1 = std::nullopt;
-
-   std::experimental::optional< bool > value = std::experimental::make_optional< bool >( true );
-
-
-
-#if 0
    memory::dump( );
 
    REGISTER_DSI_EVENT( DsiServiceEvent, DsiService );
@@ -110,7 +84,6 @@ int main( int argc, char *argv[] )
    DBG_ERR( "Main: program exiting." );
 
    memory::dump( );
-# endif
 
    return 0;
 }
