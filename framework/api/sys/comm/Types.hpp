@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string>
-#include <memory>
-#include <stdint.h>
+#include "api/sys/common/Types.hpp"
 
 
 
@@ -10,19 +8,31 @@ namespace base {
 
    using EventTypeID = std::string;
    using EventInfoID = size_t;
+   using OptEventInfoID = std::optional< EventInfoID >;
+   using NoServiceType = void;
+   using NoIdInfoType = void;
+
+   struct EventSignature
+   {
+      EventSignature( const EventTypeID&, const OptEventInfoID& );
+      EventSignature( const EventSignature& );
+
+      bool operator==( const EventSignature& ) const;
+      bool operator!=( const EventSignature& ) const;
+      bool operator<( const EventSignature& ) const;
+      bool operator>( const EventSignature& ) const;
+
+      EventTypeID    m_type_id;
+      OptEventInfoID m_info_id;
+   };
 
    enum class eCommType : size_t { IPC, ITC, ETC, NONE };
    const char* c_str( const eCommType );
-
-   enum class eDummyEventID : EventInfoID { dummy = SIZE_MAX };
-   const char* c_str( const eDummyEventID );
 
    class Event;
    using EventPtr = std::shared_ptr< Event >;
 
    class EventRegistry;
    using EventRegistryPtr = std::shared_ptr< EventRegistry >;
-
-   // class IEventConsumer;
 
 } // namespace base

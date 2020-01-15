@@ -134,10 +134,10 @@ bool ServiceProcess::start( const ServiceInfoVector& service_infos )
          return false;
 
    // Watchdog timer
-   if( false == os::linux::create_timer( m_timer_id, timer_handler ) )
+   if( false == os::linux::timer::create( m_timer_id, timer_handler ) )
       return false;
    SYS_MSG( "Timer ID: %#lx", (long) m_timer_id );
-   if( false == os::linux::start_timer( m_timer_id, 1000000000, os::linux::eTimerType::continious ) )
+   if( false == os::linux::timer::start( m_timer_id, 1000000000, os::linux::timer::eTimerType::continious ) )
       return false;
 
    return true;
@@ -151,7 +151,7 @@ bool ServiceProcess::stop( )
    mp_service_brocker->stop( );
    mp_service_brocker_dsi->stop( );
 
-   os::linux::delete_timer( m_timer_id );
+   os::linux::timer::remove( m_timer_id );
 
    return true;
 }
@@ -177,7 +177,7 @@ void ServiceProcess::boot( )
    mp_service_brocker_dsi->wait( );
    SYS_MSG( "Service Brocker DSI is finished" );
 
-   os::linux::delete_timer( m_timer_id );
+   os::linux::timer::remove( m_timer_id );
 
    m_service_list.clear( );
    mp_service_brocker.reset( );

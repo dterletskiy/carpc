@@ -1,6 +1,7 @@
 #pragma once
 
 // Framework
+#include "api/sys/comm/Timer/Timer.hpp"
 #include "api/sys/component/RootComponent.hpp"
 // Application
 #include "imp/app/events/PingEvent.hpp"
@@ -19,6 +20,7 @@ base::ComponentPtr creator( base::ServicePtr );
 
 class OnOff
    : public base::RootComponent
+   , public base::ITimerConsumer
    , public ServiceDSI::PingEvent::Consumer
 {
 public:
@@ -34,6 +36,11 @@ private:
 private:
    Server m_server;
    Client m_client;
+
+// Timer
+private:
+   void process_timer( const base::TimerID ) override;
+   base::Timer m_timer;
 };
 
 

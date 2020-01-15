@@ -1,4 +1,5 @@
 #include "api/sys/helpers/functions/format.hpp"
+#include "api/sys/helpers/macros/strings.hpp"
 #include "api/sys/tools/Performance.hpp"
 // Application
 #include "imp/app/components/OnOff.hpp"
@@ -23,15 +24,16 @@ OnOff::OnOff( const base::ServicePtr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
    , m_server( )
    , m_client( )
+   , m_timer( this )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   ServiceDSI::PingEvent::Event::set_notification( true, this );
+   // ServiceDSI::PingEvent::Event::set_notification( true, this );
 }
 
 OnOff::~OnOff( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   ServiceDSI::PingEvent::Event::set_notification( false, this );
+   // ServiceDSI::PingEvent::Event::set_notification( false, this );
 }
 
 
@@ -75,6 +77,7 @@ namespace {
 
          if( m_count >= ++m_iteration )
          {
+            DBG_TRC( "iteration: %zu", m_iteration );
             m_function( *m_parameter );
             return true;
          }
@@ -102,7 +105,7 @@ namespace {
       size_t               m_iteration;
       base::tools::Performance   m_performance;
    };
-   static size_t s_count = 1000000;
+   static size_t s_count = 100000;
    auto send_event = [ ]( const base::eCommType _type ) { ServiceDSI::PingEvent::Event::create_send( { base::c_str( _type ) }, _type ); };
    Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC }, s_count );
 
@@ -114,27 +117,17 @@ bool OnOff::boot( const std::string& command )
    // sleep(5);
    // m_client.request_trigger_state( "Unloaded" );
    // s_event_test.execute( );
+   m_timer.start( 1000000000 );
 
    return true;
 }
 
 void OnOff::process_event( const ServiceDSI::PingEvent::Event& event )
 {
-   // DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
-   bool result = s_event_test.execute( );
-   if( !result )
-   {
-      s_count *= 10;
-      if( 10 >= s_count )
-      {
-         s_event_test.init( s_count );
-         s_event_test.execute( );
-      }
-      else
-      {
-         shutdown( );
-      }
-   }
+   DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
+
+   // if( false == s_event_test.execute( ) )
+   //       shutdown( );
 
    // DBG_TRC( "id = %#zx", static_cast< size_t >( event.id( ) ) );
    // switch( event.id( ) )
@@ -151,6 +144,19 @@ void OnOff::process_event( const ServiceDSI::PingEvent::Event& event )
    //    }
    //    default: break;
    // }
+}
+
+void OnOff::process_timer( const base::TimerID id )
+{
+   static size_t count = 0;
+   DBG_TRC( "Timer '%#lx' expired '%zu' times", (long)id, ++count );
+   DBG_TRC( "%s", BOOL_TO_STRING( m_timer.id( ) == id ) );
+
+   if( 10 < count )
+   {
+      m_timer.stop( );
+      m_timer.start( 5000000000 );
+   }
 }
 
 

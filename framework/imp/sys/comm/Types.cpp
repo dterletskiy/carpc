@@ -17,14 +17,45 @@ const char* c_str( const eCommType comm_type )
    }
 }
 
-const char* c_str( const eDummyEventID id )
+
+
+EventSignature::EventSignature( const EventTypeID& type_id, const OptEventInfoID& info_id )
+   : m_type_id( type_id )
+   , m_info_id( info_id )
+{ }
+
+EventSignature::EventSignature( const EventSignature& es )
+   : m_type_id( es.m_type_id )
+   , m_info_id( es.m_info_id )
+{ }
+
+bool EventSignature::operator==( const EventSignature& es ) const
 {
-   switch( id )
-   {
-      case eDummyEventID::dummy: return "eDummyEventID::dummy";
-      default:                   return "eDummyEventID::UNEFINED";
-   }
+   if( std::nullopt == m_info_id || std::nullopt == es.m_info_id )
+      return m_type_id == es.m_type_id;
+   else
+      return m_type_id == es.m_type_id && m_info_id == es.m_info_id;
 }
+
+bool EventSignature::operator!=( const EventSignature& es ) const
+{
+   return !( *this == es );
+}
+
+bool EventSignature::operator<( const EventSignature& es ) const
+{
+   if( m_type_id < es.m_type_id ) return true;
+   else if( m_info_id < es.m_info_id ) return true;
+   else return false;
+}
+
+bool EventSignature::operator>( const EventSignature& es ) const
+{
+   if( m_type_id > es.m_type_id ) return true;
+   else if( m_info_id > es.m_info_id ) return true;
+   else return true;
+}
+
 
 
 

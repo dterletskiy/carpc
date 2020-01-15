@@ -2,45 +2,32 @@
 
 <interface name="OnOff">
 
-   <version>
-      <major>0</major>
-      <minor>1</minor>
-      <patch>0</patch>
-      <description/>
-   </version>
+   <version major="0" minor="1" patch="0"/>
+   <description/>
 
-   <method>
-      <type>request</type>
-      <name>trigger_state</name>
+   <optionas name="ServiceOnOff" exported="true"/>
+
+   <method type="request" name="trigger_state">
       <description>Request trigger new state</description>
       <response>trigger_state</response>
       <parameters>
-         <parameter>
-            <type>string</type>
-            <name>state</name>
+         <parameter type="string" name="state">
             <description>Requested state</description>
          </parameter>
       </parameters>
    </method>
 
-   <method>
-      <type>response</type>
-      <name>trigger_state</name>
+   <method type="response" name="trigger_state">
       <description>Respose for request trigger new state</description>
       <parameters>
-         <parameter>
-            <type>bool</type>
-            <name>result</name>
+         <parameter type="bool" name="result">
             <description>If trigger could be processed</description>
          </parameter>
       </parameters>
    </method>
 
-   <attribute>
-      <type>string</type>
-      <name>state</name>
+   <attribute type="string" name="state" notify="on_change">
       <description>Current state</description>
-      <notify>on_change</notify>
    </attribute>
 
 </interface>

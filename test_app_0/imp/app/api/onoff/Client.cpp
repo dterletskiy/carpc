@@ -13,28 +13,28 @@ namespace api::onoff {
 Client::Client( )
 {
    // DBG_TRC( "Created" );
-   OnOffEvent::Event::set_notification( true, this );
+   ServiceOnOff::OnOffEvent::Event::set_notification( true, this, eOnOff::ResponseTriggerState );
 }
 
 Client::~Client( )
 {
    // DBG_TRC( "Destroyed" );
-   OnOffEvent::Event::set_notification( false, this );
+   ServiceOnOff::OnOffEvent::Event::set_notification( false, this, eOnOff::ResponseTriggerState );
 }
 
 void Client::request_trigger_state( const std::string& state )
 {
    DBG_TRC( "state: %s", state.c_str( ) );
 
-   OnOffEvent::Data data( std::make_shared< RequestTriggerStateData >( state ) );
-   OnOffEvent::Event::create_send(
+   ServiceOnOff::OnOffEvent::Data data( std::make_shared< RequestTriggerStateData >( state ) );
+   ServiceOnOff::OnOffEvent::Event::create_send(
            data
          , eOnOff::RequestTriggerState
-         , base::eCommType::ITC
+         , base::eCommType::IPC
       );
 }
 
-void Client::process_event( const OnOffEvent::Event& event )
+void Client::process_event( const ServiceOnOff::OnOffEvent::Event& event )
 {
    DBG_TRC( "id = %s", to_string( event.id( ) ).c_str( ) );
    switch( event.id( ) )

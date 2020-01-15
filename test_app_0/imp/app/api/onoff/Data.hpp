@@ -9,54 +9,97 @@ namespace api::onoff {
 
 
 
-struct BaseData
-{
+DEFINE_ENUM( eOnOff, size_t, RequestTriggerState, ResponseTriggerState, NotificationCurrentState, Undefined );
 
-};
+class BaseData;
 using tBaseDataPtr = std::shared_ptr< BaseData >;
 
-struct RequestTriggerStateData : public BaseData
+
+
+class BaseData
 {
-   RequestTriggerStateData( const std::string& _state )
-      : BaseData( )
-      , state( _state )
-   { }
+public:
+   BaseData( const eOnOff );
+   static tBaseDataPtr create( base::ByteBufferT& );
 
-   std::string state;
-};
+public:
+   virtual bool to_buffer( base::ByteBufferT& ) = 0;
+   virtual bool from_buffer( base::ByteBufferT& ) = 0;
 
-struct ResponseTriggerStateData : public BaseData
-{
-   ResponseTriggerStateData( const bool _result )
-      : BaseData( )
-      , result( _result )
-   { }
-
-   bool result;
-};
-
-struct NotificationCurrentStateData : public BaseData
-{
-   NotificationCurrentStateData( const std::string& _state )
-      : BaseData( )
-      , state( _state )
-   { }
-
-   std::string state;
-};
-
-DEFINE_ENUM_EX( eOnOff, size_t, RequestTriggerState, ResponseTriggerState, NotificationCurrentState );
-struct OnOffEventData
-{
-   OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
-
-   tBaseDataPtr ptr;
+public:
+   virtual const eOnOff id( ) const final;
+private:
+   eOnOff m_id = eOnOff::Undefined;
 };
 
 
 
-DECLARE_EVENT( OnOffEvent, api::onoff::OnOffEventData, api::onoff::eOnOff );
+class RequestTriggerStateData : public BaseData
+{
+public:
+   RequestTriggerStateData( );
+   RequestTriggerStateData( const std::string& );
+
+public:
+   bool to_buffer( base::ByteBufferT& ) override;
+   bool from_buffer( base::ByteBufferT& ) override;
+
+public:
+   std::string state = "";
+};
+
+
+
+class ResponseTriggerStateData : public BaseData
+{
+public:
+   ResponseTriggerStateData( );
+   ResponseTriggerStateData( const bool );
+
+public:
+   bool to_buffer( base::ByteBufferT& ) override;
+   bool from_buffer( base::ByteBufferT& ) override;
+
+public:
+   bool result = false;
+};
+
+
+
+class NotificationCurrentStateData : public BaseData
+{
+public:
+   NotificationCurrentStateData( );
+   NotificationCurrentStateData( const std::string& );
+
+public:
+   bool to_buffer( base::ByteBufferT& ) override;
+   bool from_buffer( base::ByteBufferT& ) override;
+
+public:
+   std::string state = "";
+};
+
+
+
+class OnOffEventData
+{
+public:
+   OnOffEventData( );
+   OnOffEventData( tBaseDataPtr );
+
+public:
+   bool to_buffer( base::ByteBufferT& ) const;
+   bool from_buffer( base::ByteBufferT& );
+
+public:
+   tBaseDataPtr ptr = nullptr;
+};
 
 
 
 } // namespace api::onoff
+
+
+
+DECLARE_DSI_EVENT( ServiceOnOff, OnOffEvent, api::onoff::OnOffEventData, api::onoff::eOnOff );

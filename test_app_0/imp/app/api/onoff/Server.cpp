@@ -1,5 +1,6 @@
 // Application
 #include "imp/app/api/onoff/Server.hpp"
+#include "api/sys/helpers/macros/strings.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOffServerBase"
@@ -13,28 +14,28 @@ namespace api::onoff {
 Server::Server( )
 {
    // DBG_TRC( "Created" );
-   OnOffEvent::Event::set_notification( true, this );
+   ServiceOnOff::OnOffEvent::Event::set_notification( true, this, eOnOff::RequestTriggerState );
 }
 
 Server::~Server( )
 {
    // DBG_TRC( "Destroyed" );
-   OnOffEvent::Event::set_notification( false, this );
+   ServiceOnOff::OnOffEvent::Event::set_notification( false, this, eOnOff::RequestTriggerState );
 }
 
 void Server::response_trigger_state( const bool result )
 {
    DBG_TRC( "result: %s", BOOL_TO_STRING( result ) );
 
-   OnOffEvent::Data data( std::make_shared< ResponseTriggerStateData >( result ) );
-   OnOffEvent::Event::create_send(
+   ServiceOnOff::OnOffEvent::Data data( std::make_shared< ResponseTriggerStateData >( result ) );
+   ServiceOnOff::OnOffEvent::Event::create_send(
            data
          , eOnOff::ResponseTriggerState
-         , base::eCommType::ITC
+         , base::eCommType::IPC
       );
 }
 
-void Server::process_event( const OnOffEvent::Event& event )
+void Server::process_event( const ServiceOnOff::OnOffEvent::Event& event )
 {
    DBG_TRC( "id = %s", to_string( event.id( ) ).c_str( ) );
    switch( event.id( ) )

@@ -10,8 +10,8 @@
 /****************************************************************************************************
  * 
  * Macro defines class enumeration without default values for items.
- * This macro also defines method to_string what converts enumeration to string value.
- * It is implemented as lambde to have a possibility to use this macro in functions, classes, headers.
+ * This macro also defines method 'to_string' what converts enumeration to string value.
+ * It is implemented as lambda to have a possibility to use this macro in functions, classes, headers.
  * !!! Default values for enumeration itemes should not be used !!!
  * link: http://qaru.site/questions/9343/is-there-a-simple-way-to-convert-c-enum-to-string
  * Examples:
@@ -19,6 +19,7 @@
  *    std::cout << to_string( eColors::_RED ) << std::endl;
  * 
  ***************************************************************************************************/
+// auto to_string = []( NAME value ) -> const std::string
 #define DEFINE_ENUM( NAME, TYPE, ... ) \
    enum class NAME : TYPE \
    { \
@@ -27,7 +28,7 @@
       _FIRST_ = __FIRST_ARG__( __VA_ARGS__ ), \
       _LAST_ = static_cast< TYPE >( __FIRST_ARG__( __VA_ARGS__ ) ) + _COUNT_ - 1 \
    }; \
-auto to_string = []( NAME value ) -> const std::string \
+inline const std::string to_string( const NAME value ) \
 { \
    static std::string enum_name = #NAME "::"; \
    static std::vector< std::string > strings; \
@@ -48,14 +49,17 @@ auto to_string = []( NAME value ) -> const std::string \
       } \
       strings.push_back( temp.str() ); \
    } \
-   return enum_name + strings[ static_cast< size_t >( value ) ]; \
+   if( strings.size( ) - 1 < static_cast< size_t >( value ) ) \
+      return enum_name + std::string( "Undefined" ); \
+   else \
+      return enum_name + strings[ static_cast< size_t >( value ) ]; \
 };
 
 /****************************************************************************************************
  * 
  * Macro defines class enumeration without default values for items.
- * This macro also defines method to_string what converts enumeration to string value.
- * It is implemented as lambde to have a possibility to use this macro in classes, headers.
+ * This macro also defines method 'to_string' what converts enumeration to string value.
+ * It is implemented as lambda to have a possibility to use this macro in classes, headers.
  * !!! Default values for enumeration itemes should not be used !!!
  * This macro also generates additional methods what allow to iterate by enumeration values in for.
  * !!! This macro should be used outside of any function !!!
@@ -67,8 +71,8 @@ auto to_string = []( NAME value ) -> const std::string \
  * 
  ***************************************************************************************************/
 #define DEFINE_ENUM_EX( NAME, TYPE, ... ) \
-DEFINE_ENUM( NAME, TYPE, __VA_ARGS__ ); \
-inline NAME operator++( NAME& x ) { return x = ( NAME )( static_cast< TYPE >(x) + 1 ); }; \
-inline NAME operator*( NAME c ) { return c; }; \
-inline NAME begin( NAME r ) { return NAME::_FIRST_; }; \
-inline NAME end( NAME r ) { NAME l = NAME::_LAST_; return ++l; };
+   DEFINE_ENUM( NAME, TYPE, __VA_ARGS__ ); \
+   inline NAME operator++( NAME& x ) { return x = ( NAME )( static_cast< TYPE >(x) + 1 ); }; \
+   inline NAME operator*( NAME c ) { return c; }; \
+   inline NAME begin( NAME r ) { return NAME::_FIRST_; }; \
+   inline NAME end( NAME r ) { NAME l = NAME::_LAST_; return ++l; };

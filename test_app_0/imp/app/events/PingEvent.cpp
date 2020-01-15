@@ -33,18 +33,12 @@ namespace application::events {
 
    bool PingEventData::to_buffer( base::ByteBufferT& buffer ) const
    {
-      if( false == buffer.push( info ) )
-         return false;
-
-      return true;
+      return buffer.push( info );
    }
 
    bool PingEventData::from_buffer( base::ByteBufferT&  buffer )
    {
-      if( false == buffer.pop( info ) )
-         return false;
-
-      return true;
+      return buffer.pop( info );
    }
 
 } // namespace application::events

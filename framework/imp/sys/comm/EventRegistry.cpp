@@ -59,7 +59,7 @@ EventPtr EventRegistry::create_event( const EventTypeID& event_type, ByteBufferT
       return nullptr;
 
    EventPtr p_event = iterator->second( eCommType::IPC );
-   p_event->data( buffer );
+   p_event->from_buffer( buffer );
    return p_event;
 }
 #endif
@@ -75,7 +75,7 @@ EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
       return nullptr;
 
    EventPtr p_event = iterator->second( eCommType::IPC );
-   if( false == p_event->data( buffer ) )
+   if( false == p_event->from_buffer( buffer ) )
       return nullptr;
 
    return p_event;

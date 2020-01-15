@@ -81,7 +81,7 @@ bool Service::start( )
 void Service::stop( )
 {
    SYS_INF( "'%s': stopping", m_name.c_str( ) );
-   // clear_all_notifications( );
+   clear_all_notifications( );
    m_started = false;
 }
 
@@ -141,7 +141,7 @@ EventPtr Service::get_event( )
 
 void Service::notify( const EventPtr p_event )
 {
-   const auto& iterator = m_event_consumers_map.find( p_event->type_id( ) );
+   const auto& iterator = m_event_consumers_map.find( std::make_pair( p_event->type_id( ), p_event->is_broadcast( ) ) );
    if( iterator == m_event_consumers_map.end( ) )
       return;
 
@@ -156,16 +156,17 @@ void Service::notify( const EventPtr p_event )
    m_process_started.reset( );
 }
 
-void Service::set_notification( const EventTypeID& event_id, IEventConsumer* p_consumer )
+void Service::set_notification( const EventTypeID& event_type_id, const OptEventInfoID event_info_id, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
-   SYS_INF( "'%s': event id (%s) / consumer (%p)", m_name.c_str( ), event_id.c_str( ), p_consumer );
-   const auto& iterator = m_event_consumers_map.find( event_id );
+   SYS_INF( "'%s': event id (%s) / consumer (%p)", m_name.c_str( ), event_type_id.c_str( ), p_consumer );
+   const auto& iterator = m_event_consumers_map.find( std::make_pair( event_type_id, event_info_id ) );
    if( iterator == m_event_consumers_map.end( ) )
    {
       m_event_consumers_map.emplace(
-            std::pair< EventTypeID, std::set< IEventConsumer* > >( event_id, { p_consumer } )
+            std::pair< std::pair< EventTypeID, OptEventInfoID >, std::set< IEventConsumer* > >
+               ( std::make_pair( event_type_id, event_info_id ), { p_consumer } )
          );
    }
    else
@@ -174,18 +175,36 @@ void Service::set_notification( const EventTypeID& event_id, IEventConsumer* p_c
    }
 }
 
-void Service::clear_notification( const EventTypeID& event_id, IEventConsumer* p_consumer )
+void Service::clear_notification( const EventTypeID& event_type_id, const OptEventInfoID event_info_id, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
-   const auto& iterator = m_event_consumers_map.find( event_id );
+   const auto& iterator = m_event_consumers_map.find( std::make_pair( event_type_id, event_info_id ) );
    if( iterator == m_event_consumers_map.end( ) )
       return;
 
    iterator->second.erase( p_consumer );
 
    if( true == iterator->second.empty( ) )
-      m_event_consumers_map.erase( event_id );
+      m_event_consumers_map.erase( std::make_pair( event_type_id, event_info_id ) );
+}
+
+void Service::clear_all_notifications( const EventTypeID& event_type_id, IEventConsumer* p_consumer )
+{
+   if( nullptr == p_consumer ) return;
+
+   for( auto pair: m_event_consumers_map )
+   {
+      if( event_type_id != pair.first.first )
+         continue;
+
+      auto consumers = pair.second;
+      auto iterator = consumers.find( p_consumer );
+      if( consumers.end( ) == iterator )
+         continue;
+
+      consumers.erase( iterator );
+   }
 }
 
 void Service::clear_all_notifications( )
@@ -193,9 +212,9 @@ void Service::clear_all_notifications( )
    m_event_consumers_map.clear( );
 }
 
-bool Service::is_subscribed( const EventTypeID& event_id )
+bool Service::is_subscribed( const EventTypeID& event_type_id, const OptEventInfoID event_info_id )
 {
-   const auto& iterator = m_event_consumers_map.find( event_id );
+   const auto& iterator = m_event_consumers_map.find( std::make_pair( event_type_id, event_info_id ) );
    if( iterator == m_event_consumers_map.end( ) )
       return false;
 
@@ -204,7 +223,7 @@ bool Service::is_subscribed( const EventTypeID& event_id )
 
 bool Service::is_subscribed( const EventPtr p_event )
 {
-   const auto& iterator = m_event_consumers_map.find( p_event->type_id( ) );
+   const auto& iterator = m_event_consumers_map.find( std::make_pair( p_event->type_id( ), p_event->is_broadcast( ) ) );
    if( iterator == m_event_consumers_map.end( ) )
       return false;
 

@@ -9,37 +9,31 @@
 
 
 
-namespace base::os::linux {
+namespace base::os::linux::timer {
 
+   enum class eTimerType : size_t { single = 0, continious };
 
+   using TimerID = timer_t;
+   using tEventHandler = void(*)( union sigval );
 
-enum class eTimerType : size_t
-{
-   single = 0, // single shot
-   continious
-};
+   bool create( TimerID& timer_id, int signal );
+   bool create( TimerID& timer_id, tEventHandler callback, void* p_attributes = nullptr );
+   bool remove( const TimerID& timer_id );
+   bool start( const TimerID& timer_id, long int freq_nanosecs, eTimerType type = eTimerType::single );
+   bool stop( const TimerID& timer_id );
 
-using TimerID = timer_t;
-using tSignalHandler = void(*)( int, siginfo_t*, void* );
-using tEventHandler = void(*)( union sigval );
-
-bool create_timer( timer_t& timer_id, int signal );
-bool create_timer( timer_t& timer_id, tEventHandler callback );
-bool delete_timer( const timer_t& timer_id );
-bool start_timer( const timer_t& timer_id, long int freq_nanosecs, eTimerType type = eTimerType::single );
-
-
-
-} // namespace base::os::linux
+} // namespace base::os::linux::timer
 
 
 
 #if 0 // Examples
 
+using tSignalHandler = void(*)( int, siginfo_t*, void* );
+
 void signal_handler( int sig, siginfo_t* si, void* uc )
 {
    DBG_TRC( "Signal %d", sig );
-   timer_t* timer_id = static_cast< timer_t* >( si->si_value.sival_ptr );
+   TimerID* timer_id = static_cast< TimerID* >( si->si_value.sival_ptr );
    DBG_MSG( "Elapsed timer with ID: %#lx", (long) *timer_id );
 
    // signal( sig, SIG_IGN );
@@ -48,7 +42,7 @@ void signal_handler( int sig, siginfo_t* si, void* uc )
 void event_handler( union sigval sv )
 {
    DBG_TRC( "Event" );
-   timer_t* timer_id = static_cast< timer_t* >( sv.sival_ptr );
+   TimerID* timer_id = static_cast< TimerID* >( sv.sival_ptr );
    DBG_MSG( "Elapsed timer with ID: %#lx", (long) *timer_id );
 }
 
@@ -74,32 +68,32 @@ void thread_loop_1( )
 {
    DBG_MSG( );
 
-   timer_t timer_id;
-   if( false == create_timer( timer_id, SIGRTMIN ) )
+   TimerID timer_id;
+   if( false == base::os::linux::timer::create( timer_id, SIGRTMIN ) )
       return;
    DBG_MSG( "Timer ID: %#lx", (long) timer_id );
-   if( false == start_timer( timer_id, 1000000000, eTimerType::continious ) )
+   if( false == base::os::linux::timer::start( timer_id, 1000000000, eTimerType::continious ) )
       return;
 
    while( true ) { }
 
-   delete_timer( timer_id );
+   base::os::linux::timer::remove( timer_id );
 }
 
 void thread_loop_2( )
 {
    DBG_MSG( );
 
-   timer_t timer_id;
-   if( false == create_timer( timer_id, event_handler ) )
+   TimerID timer_id;
+   if( false == base::os::linux::timer::create( timer_id, event_handler ) )
       return;
    DBG_MSG( "Timer ID: %#lx", (long) timer_id );
-   if( false == start_timer( timer_id, 1500000000, eTimerType::continious ) )
+   if( false == base::os::linux::timer::start( timer_id, 1500000000, eTimerType::continious ) )
       return;
 
    while( true ) { }
 
-   delete_timer( timer_id );
+   base::os::linux::timer::remove( timer_id );
 }
 
 

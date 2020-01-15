@@ -1,5 +1,6 @@
 // Application
 #include "imp/app/components/client/Client.hpp"
+#include "api/sys/helpers/macros/strings.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOffClient"

@@ -44,6 +44,7 @@ void boot( )
    memory::dump( );
 
    REGISTER_DSI_EVENT( ServiceDSI, PingEvent );
+   REGISTER_DSI_EVENT( ServiceOnOff, OnOffEvent );
    base::EventRegistry::instance( )->dump( );
 
    base::ServiceInfoVector services = { { "OnOff_Service", { application::onoff::creator }, 5 } };
@@ -52,6 +53,7 @@ void boot( )
    if( p_process->start( services ) )
    {
       DBG_MSG( "Booting..." );
+      sleep(1);
       p_process->boot( );
    }
 
@@ -68,8 +70,59 @@ void boot( )
 
 
 
+enum class eDummy: size_t { dummy };
+DEFINE_ENUM( eEvent, size_t, request, response );
+// enum class eEvent: size_t { request, response };
+
+template< typename TYPE >
+class Event
+{
+public:
+   template< typename T = TYPE >
+      typename std::enable_if_t< !std::is_same_v< T, eDummy >, TYPE >
+         id( )
+   {
+      return m_id;
+   }
+   template< typename T = TYPE >
+      typename std::enable_if_t< !std::is_same_v< T, eDummy >, void >
+         print( )
+   {
+      DBG_MSG( "%s", to_string( m_id ).c_str( ) );
+   }
+
+   template< typename T = TYPE >
+      static typename std::enable_if_t< !std::is_same_v< T, eDummy >, void >
+         print( const TYPE id )
+   {
+      DBG_MSG( "%s", to_string( id ).c_str( ) );
+   }
+
+protected:
+   TYPE m_id = static_cast< TYPE >( 0 );
+};
+
+
+
 int main( int argc, char *argv[] )
 {
+   DBG_MSG( "argc = %d", argc );
+   DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
+
+
+
+#if 0
+   Timer timer_1( new ITimerConsumer( 111 ) );
+   Timer timer_2( new ITimerConsumer( 222 ) );
+   Timer timer_3( new ITimerConsumer( 333 ) );
+
+   timer_1.start( 1 );
+   timer_2.start( 3 );
+   timer_3.start( 5 );
+#endif
+
+
+
    boot( );
    return 0;
 }
