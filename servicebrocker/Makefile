@@ -53,6 +53,11 @@ $(TARGET_BUILD): config $(PROJECT_NAME)
 clean_build: $(TARGET_CLEAN) $(TARGET_BUILD)
 
 $(TARGET_INFO):
+	@echo "###########################################################"
+	@echo "#"
+	@echo "# information:  '$(PROJECT_NAME)'"
+	@echo "#"
+	@echo "###########################################################"
 	@echo PWD: $(PWD)
 	@echo PROJECT_NAME: $(PROJECT_NAME)
 	@echo PROJECT_DIR: $(PROJECT_DIR)
@@ -70,7 +75,12 @@ $(TARGET_ARCHIVE):
 	@$(TAR) -cvf $(SOURCE_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(SOURCE_DIR)
 
 $(TARGET_EXECUTE):
+	reset
 	$(TARGET_DIR)/$(PROJECT_NAME)
+
+$(TARGET_DEBUG):
+	reset
+	$(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
 
 
 

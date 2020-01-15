@@ -132,7 +132,7 @@ bool ServiceProcess::start( const ServiceInfoVector& service_infos )
    // Watchdog timer
    if( false == os::linux::create_timer( m_timer_id, timer_handler ) )
       return false;
-   DBG_MSG( "Timer ID: %#lx", (long) m_timer_id );
+   SYS_MSG( "Timer ID: %#lx", (long) m_timer_id );
    if( false == os::linux::start_timer( m_timer_id, 1000000000, os::linux::eTimerType::continious ) )
       return false;
 
@@ -154,30 +154,24 @@ bool ServiceProcess::stop( )
 
 void ServiceProcess::boot( )
 {
-   SYS_MSG( );
+   SYS_INF( "booting..." );
 
    sleep(1);
 
-   // ServiceEvent::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
-
-   REGISTER_DSI_EVENT( DsiServiceEvent, DsiService );
-   EventRegistry::instance( )->dump( );
-   DsiService::DsiServiceEvent::send_event( { eServiceCommand::boot, "fuck" } );
-
-
+   ServiceEvent::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
 
    for( auto& p_service : m_service_list )
       p_service->wait( );
-   DBG_MSG( "All services are finished" );
-   DBG_MSG( "Stopping Service Brocker" );
+   SYS_MSG( "All services are finished" );
+   SYS_MSG( "Stopping Service Brocker" );
    ServiceEvent::send_event( { eServiceCommand::ping, "ping" }, eCommType::ITC );
    mp_service_brocker->stop( );
    mp_service_brocker->wait( );
-   DBG_MSG( "Service Brocker is finished" );
-   DBG_MSG( "Stopping Service Brocker DSI" );
+   SYS_MSG( "Service Brocker is finished" );
+   SYS_MSG( "Stopping Service Brocker DSI" );
    mp_service_brocker_dsi->stop( );
    mp_service_brocker_dsi->wait( );
-   DBG_MSG( "Service Brocker DSI is finished" );
+   SYS_MSG( "Service Brocker DSI is finished" );
 
    os::linux::delete_timer( m_timer_id );
 

@@ -39,7 +39,7 @@ bool OnOff::boot( const std::string& command )
 
 void OnOff::process_event( const events::PingDriverEvent& event )
 {
-   // DBG_TRC( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
+   DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
    switch( event.data( )->type )
    {
       case events::ePing::ping:
@@ -48,7 +48,6 @@ void OnOff::process_event( const events::PingDriverEvent& event )
       }
       case events::ePing::response:
       {
-         DBG_MSG( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
          DBG_MSG( "System status OK" );
          exit( );
          break;

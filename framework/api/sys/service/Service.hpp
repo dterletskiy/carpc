@@ -16,7 +16,6 @@ namespace base {
 class Service
    : public std::enable_shared_from_this< Service >
    , public IServiceEventConsumer
-   , public DsiService::IDsiServiceEventConsumer
 {
 public:
    Service( ServiceBrockerPtr, const ServiceInfo& );
@@ -73,7 +72,6 @@ private:
 
 protected:
    void process_event( const ServiceEvent& );
-   void process_event( const DsiService::DsiServiceEvent& );
 
 private:
    ComponentPtrList        m_components;

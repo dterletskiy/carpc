@@ -21,6 +21,9 @@
 
 
 MEMORY_HOOK := 0
+ACTIVE_TRACE := 1
+ACTIVE_SYS_TRACE := 1
+ACTIVE_DBG_TRACE := 1
 
 
 
@@ -58,6 +61,7 @@ TARGET_GENERATE         := generate
 TARGET_CLEAN            := clean
 TARGET_INFO             := info
 TARGET_ARCHIVE          := archive
+TARGET_DEBUG            := debug
 
 ###########################################
 #                                         #
@@ -83,6 +87,17 @@ PROJECT_HOOKS_NAME           := hooks
 PROJECT_HOOKS_DIR            := $(ROOT_DIR)/$(PROJECT_HOOKS_NAME)
 PRODUCT_HOOKS_DIR            := $(PROJECT_HOOKS_DIR)_product
 
+# @TDA: testing
+PROJECT_APP0_NAME            := test_app_0
+PROJECT_APP0_DIR             := $(ROOT_DIR)/$(PROJECT_APP0_NAME)
+PRODUCT_APP0_DIR             := $(PROJECT_APP0_DIR)_product
+PROJECT_APP1_NAME            := test_app_1
+PROJECT_APP1_DIR             := $(ROOT_DIR)/$(PROJECT_APP1_NAME)
+PRODUCT_APP1_DIR             := $(PROJECT_APP1_DIR)_product
+PROJECT_APP2_NAME            := test_app_2
+PROJECT_APP2_DIR             := $(ROOT_DIR)/$(PROJECT_APP2_NAME)
+PRODUCT_APP2_DIR             := $(PROJECT_APP2_DIR)_product
+
 
 
 
@@ -100,6 +115,17 @@ CONSTANTS    := -DLINUX=0 -DWINDOWS=1 -DSTD=2 -DOS=LINUX
 CCONFIG      := -DCOLORED_TRACE
 ifeq ($(MEMORY_HOOK),1)
 	CCONFIG += -DHOOK_MEMORY_ALLOCATOR
+endif
+ifeq ($(ACTIVE_TRACE),0)
+	CCONFIG += -DNO_TRACE
+	CCONFIG += -DNO_SYS_TRACE
+	CCONFIG += -DNO_DBG_TRACE
+endif
+ifeq ($(ACTIVE_SYS_TRACE),0)
+	CCONFIG += -DNO_SYS_TRACE
+endif
+ifeq ($(ACTIVE_DBG_TRACE),0)
+	CCONFIG += -DNO_DBG_TRACE
 endif
 
 CFLAGS       := -std=c++17 $(CONSTANTS) $(CCONFIG)

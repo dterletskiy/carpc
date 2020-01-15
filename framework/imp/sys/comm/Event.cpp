@@ -40,6 +40,16 @@ Event_ID::~Event_ID( )
 {
 }
 
+bool Event_ID::to_buffer( ByteBuffer& buffer ) const
+{
+   return buffer.push( m_id );
+}
+
+bool Event_ID::from_buffer( ByteBuffer& buffer )
+{
+   return buffer.pop( m_id );
+}
+
 const char* Event_ID::c_str( ) const
 {
    return m_id.c_str( );

@@ -21,7 +21,8 @@ bool create_timer( timer_t& timer_id, int signal )
    int result = timer_create( CLOCK_REALTIME, &sev, &timer_id );
    if( -1 == result )
    {
-      DBG_ERR( "error: %d", errno );
+      int last_errno = errno;
+      SYS_ERR( "error: %d", last_errno );
    }
 
    return 0 == result;
@@ -39,7 +40,8 @@ bool create_timer( timer_t& timer_id, tEventHandler callback )
    int result = timer_create( CLOCK_REALTIME, &sev, &timer_id );
    if( -1 == result )
    {
-      DBG_ERR( "error: %d", errno );
+      int last_errno = errno;
+      SYS_ERR( "error: %d", last_errno );
    }
 
    return 0 == result;
@@ -50,7 +52,8 @@ bool delete_timer( const timer_t& timer_id )
    int result = timer_delete( timer_id );
    if( -1 == result )
    {
-      DBG_ERR( "error: %d", errno );
+      int last_errno = errno;
+      SYS_ERR( "error: %d", last_errno );
    }
 
    return 0 == result;
@@ -72,7 +75,8 @@ bool start_timer( const timer_t& timer_id, long int freq_nanosecs, eTimerType ty
    int result = timer_settime( timer_id, 0, &its, nullptr );
    if( -1 == result )
    {
-      DBG_ERR( "error: %d", errno );
+      int last_errno = errno;
+      SYS_ERR( "error: %d", last_errno );
    }
 
    return 0 == result;

@@ -32,12 +32,11 @@ Slave::~Slave( )
 
 void Slave::process_event( const events::PingSlaveEvent& event )
 {
-   // DBG_TRC( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
+   DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
    switch( event.data( )->type )
    {
       case events::ePing::ping:
       {
-         DBG_MSG( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
          sleep( 15 );
          events::PingSlaveEvent::send_event( { events::ePing::response, "Master <- Slave" }, base::eCommType::ETC );
          break;

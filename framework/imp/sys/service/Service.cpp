@@ -1,7 +1,7 @@
 #include "api/sys/comm/Event.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/Service.hpp"
-#include "api/sys/events/SysEvent.hpp"
+#include "imp/sys/events/SysEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Srv"
@@ -52,7 +52,6 @@ void Service::thread_loop( )
       m_components.emplace_back( creator( shared_from_this( ) ) );
 
    ServiceEvent::set_notification( true, this );
-   DsiService::DsiServiceEvent::set_notification( true, this );
 
    while( started( ) )
    {
@@ -206,32 +205,6 @@ bool Service::is_subscribed( const Event_ID& event_id )
 }
 
 void Service::process_event( const ServiceEvent& event )
-{
-   SYS_INF( "'%s': command = %#zx, info = %s", m_name.c_str( ), static_cast< size_t >( event.data( )->command ), event.data( )->info.c_str( ) );
-   switch( event.data( )->command )
-   {
-      case eServiceCommand::boot:
-      {
-         SysEvent::send_event( { eSysCommand::boot, "request boot" }, eCommType::ETC );
-         break;
-      }
-      case eServiceCommand::shutdown:
-      {
-         stop( );
-         break;
-      }
-      case eServiceCommand::ping:
-      {
-         break;
-      }
-      default:
-      {
-         break;
-      }
-   }
-}
-
-void Service::process_event( const DsiService::DsiServiceEvent& event )
 {
    SYS_INF( "'%s': command = %#zx, info = %s", m_name.c_str( ), static_cast< size_t >( event.data( )->command ), event.data( )->info.c_str( ) );
    switch( event.data( )->command )

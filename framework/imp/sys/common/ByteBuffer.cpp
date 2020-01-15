@@ -191,7 +191,6 @@ bool ByteBuffer::pop( std::string& string )
    size_t size_backup = m_size;
 
    size_t size = 0;
-
    // Reading size of string content
    if( false == pop( size ) )
       return false;

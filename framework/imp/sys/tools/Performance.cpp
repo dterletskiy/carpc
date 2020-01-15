@@ -32,7 +32,7 @@ void Performance::stop( )
 
    if( std::nullopt == m_start )
    {
-      DBG_ERR( "%s: calculation was not started", m_name.c_str( ) );
+      SYS_ERR( "%s: calculation was not started", m_name.c_str( ) );
       m_finish.reset( );
       return;
    }

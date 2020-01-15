@@ -4,13 +4,13 @@
 #include <errno.h>
 #include <sys/types.h>
 
+#include "api/sys/configuration/DSI.hpp"
 #include "api/sys/comm/Event.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/service/ServiceBrockerDSI.hpp"
-#include "api/sys/service/Configuration.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvBrDsi"
@@ -50,35 +50,47 @@ ServiceBrockerDsiPtr ServiceBrockerDSI::instance( )
 
 bool ServiceBrockerDSI::setup_connection( )
 {
-   m_master_socket = socket( socket_family, socket_type, socket_protocole );
-
-   int result_connect = -1;
-   if( AF_UNIX == socket_family )
+   m_master_socket = socket( base::configuration::dsi::socket_family, base::configuration::dsi::socket_type, base::configuration::dsi::socket_protocole );
+   if( -1 == m_master_socket )
    {
-      struct sockaddr_un serv_addr_un;
-      memset( &serv_addr_un, 0, sizeof(serv_addr_un) );
-      serv_addr_un.sun_family = socket_family;
-      strncpy( serv_addr_un.sun_path, server_address, sizeof(serv_addr_un.sun_path) - 1 );
-      int serv_addr_un_size = sizeof(serv_addr_un.sun_family) + strlen(serv_addr_un.sun_path);
-
-      result_connect = connect( m_master_socket, (struct sockaddr*) &serv_addr_un, serv_addr_un_size );
+      m_last_errno = errno;
+      SYS_ERR( "socket(%d) error: %d", m_master_socket, m_last_errno );
+      return false;
    }
-   else if( AF_INET == socket_family )
-   {
-      struct sockaddr_in serv_addr_in;
-      memset( &serv_addr_in, 0, sizeof(serv_addr_in) );
-      serv_addr_in.sin_family = socket_family;
-      // serv_addr_in.sin_addr.s_addr = inet_addr(inet_address);
-      serv_addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
-      serv_addr_in.sin_port = htons(server_port);
-      int serv_addr_in_size = sizeof(serv_addr_in);
+   SYS_MSG( "socket(%d)", m_master_socket );
 
-      result_connect = connect( m_master_socket, (struct sockaddr*) &serv_addr_in, serv_addr_in_size );
+   sockaddr* p_sockaddr = nullptr;
+   size_t sockaddr_size = 0;
+   struct sockaddr_un serv_addr_un;
+   struct sockaddr_in serv_addr_in;
+   if( AF_UNIX == base::configuration::dsi::socket_family )
+   {
+      memset( &serv_addr_un, 0, sizeof( serv_addr_un ) );
+      serv_addr_un.sun_family = base::configuration::dsi::socket_family;
+      strncpy( serv_addr_un.sun_path, base::configuration::dsi::server_address, sizeof( serv_addr_un.sun_path ) - 1 );
+      // unlink( base::configuration::dsi::server_address );
+      sockaddr_size = sizeof( serv_addr_un.sun_family ) + strlen( serv_addr_un.sun_path );
+
+      p_sockaddr = reinterpret_cast< sockaddr* >( &serv_addr_un );
+   }
+   else if( AF_INET == base::configuration::dsi::socket_family )
+   {
+      memset( &serv_addr_in, 0, sizeof( serv_addr_in ) );
+      serv_addr_in.sin_family = base::configuration::dsi::socket_family;
+      serv_addr_in.sin_addr.s_addr = inet_addr( base::configuration::dsi::server_address );
+      // serv_addr_in.sin_addr.s_addr = htonl( INADDR_ANY );
+      // serv_addr_in.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
+      serv_addr_in.sin_port = htons( base::configuration::dsi::server_port );
+      sockaddr_size = sizeof( serv_addr_in );
+
+      p_sockaddr = reinterpret_cast< sockaddr* >( &serv_addr_in );
    }
 
-   if( 0 != result_connect )
+   int result_connect = connect( m_master_socket, p_sockaddr, sockaddr_size );
+   if( -1 == result_connect )
    {
-      SYS_ERR( "connect(%d): %d", m_master_socket, errno );
+      m_last_errno = errno;
+      SYS_ERR( "connect(%d): %d", m_master_socket, m_last_errno );
       return false;
    }
    SYS_MSG( "connect(%d)", m_master_socket );
@@ -109,21 +121,24 @@ void ServiceBrockerDSI::thread_loop_send( )
 {
    SYS_INF( "enter" );
    m_started_send = true;
-   int last_error = 0;
 
    while( started_send( ) )
    {
       EventPtr p_event = get_event( );
       SYS_INF( "processing event (%s)", p_event->type_id( ).c_str( ) );
       base::ByteBuffer buffer;
-      p_event->to_buffer( buffer );
-      buffer.dump( );
+      if( false == p_event->to_buffer( buffer ) )
+      {
+         SYS_ERR( "lost sent event" );
+         continue;
+      }
+      // buffer.dump( );
 
       size_t send_size = send( m_master_socket, buffer.buffer( ), buffer.size( ), 0 );
-      last_error = errno;
+      m_last_errno = errno;
       if( send_size != buffer.size( ) )
       {
-         SYS_ERR( "send(%d): %d", m_master_socket, last_error );
+         SYS_ERR( "send(%d): %d", m_master_socket, m_last_errno );
          continue;
       }
       SYS_MSG( "send(%d): %zu bytes", m_master_socket, send_size );
@@ -158,33 +173,37 @@ void ServiceBrockerDSI::thread_loop_receive( )
    if( InvalidServiceBrockerPtr == p_service_brocker )
       return;
 
-   const size_t buffer_size = 2048;
-   void* p_buffer = malloc( buffer_size );
+   void* p_buffer = malloc( base::configuration::dsi::buffer_size );
    if( nullptr == p_buffer )
       return;
 
    m_started_receive = true;
-   int last_error = 0;
 
    while( started_receive( ) )
    {
-      memset( p_buffer, 0, sizeof( buffer_size ) );
-      ssize_t recv_size = recv( m_master_socket, p_buffer, buffer_size, 0 );
-      last_error = errno;
+      memset( p_buffer, 0, sizeof( base::configuration::dsi::buffer_size ) );
+      ssize_t recv_size = recv( m_master_socket, p_buffer, base::configuration::dsi::buffer_size, 0 );
       if( 0 >= recv_size )
       {
-         SYS_ERR( "recv(%d): %d", m_master_socket, last_error );
+         m_last_errno = errno;
+         SYS_ERR( "recv(%d): %d", m_master_socket, m_last_errno );
          continue;
       }
       SYS_MSG( "recv(%d): %ld bytes", m_master_socket, recv_size );
 
       ByteBuffer byte_buffer( p_buffer, recv_size );
-      byte_buffer.dump( );
+      // byte_buffer.dump( );
 
       base::EventPtr p_event = base::EventRegistry::instance( )->create_event( byte_buffer );
+      if( nullptr == p_event )
+      {
+         SYS_ERR( "lost received event" );
+         continue;
+      }
       p_service_brocker->insert_event( p_event );
    }
 
+   free( p_buffer );
    SYS_INF( "exit" );
 }
 

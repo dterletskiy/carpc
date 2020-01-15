@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "api/sys/common/Helpers.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/tools/Tools.hpp"
@@ -27,6 +29,22 @@ const ID generate_id( const char* const name_space )
    }
 
    return id;
+}
+
+char* get_cmd_option( int argc, char ** begin, const std::string & option )
+{
+   char** end = begin + argc;
+   char** itr = std::find( begin, end, option );
+   if( itr != end && ++itr != end )
+      return *itr;
+
+   return nullptr;
+}
+
+bool is_cmd_option_exists( int argc, char** begin, const std::string& option )
+{
+   char** end = begin + argc;
+   return std::find( begin, end, option ) != end;
 }
 
 

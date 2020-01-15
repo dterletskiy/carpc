@@ -25,6 +25,9 @@ public:
    Event_ID( const std::string& );
    ~Event_ID( );
 
+   bool to_buffer( ByteBuffer& ) const;
+   bool from_buffer( ByteBuffer& );
+
 public:
    const char* c_str( ) const;
 
@@ -163,8 +166,15 @@ public:
    {
       if constexpr( IS_DSI_EVENT )
       {
+      #ifdef USE_STREAM
          buffer << *mp_data;
          buffer << s_type_id;
+      #else
+         if( false == buffer.push( *mp_data ) )
+            return false;
+         if( false == buffer.push( s_type_id ) )
+            return false;
+      #endif
          return true;
       }
       return false;
@@ -174,8 +184,12 @@ public:
       if constexpr( IS_DSI_EVENT )
       {
          mp_data = std::make_shared< _DataType >( );
+      #ifdef USE_STREAM
          buffer >> *mp_data;
          return true;
+      #else
+         return buffer.pop( *mp_data );
+      #endif
       }
       return false;
    }

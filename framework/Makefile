@@ -49,6 +49,11 @@ $(TARGET_BUILD): config $(OBJECT_FILES)
 clean_build: $(TARGET_CLEAN) $(TARGET_BUILD)
 
 $(TARGET_INFO):
+	@echo "###########################################################"
+	@echo "#"
+	@echo "# information:  '$(PROJECT_NAME)'"
+	@echo "#"
+	@echo "###########################################################"
 	@echo PWD: $(PWD)
 	@echo PROJECT_NAME: $(PROJECT_NAME)
 	@echo PROJECT_DIR: $(PROJECT_DIR)

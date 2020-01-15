@@ -65,13 +65,20 @@ EventPtr EventRegistry::create_event( const std::string& event_type, ByteBuffer&
 EventPtr EventRegistry::create_event( ByteBuffer& buffer ) const
 {
    std::string event_type;
+#ifdef USE_STREAM
    buffer >> event_type;
+#else
+   if( false == buffer.pop( event_type ) )
+      return nullptr;
+#endif
    auto iterator = m_registry.find( event_type );
    if( m_registry.end( ) == iterator )
       return nullptr;
 
    EventPtr p_event = iterator->second( eCommType::IPC );
-   p_event->data( buffer );
+   if( false == p_event->data( buffer ) )
+      return nullptr;
+
    return p_event;
 }
 

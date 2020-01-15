@@ -34,12 +34,11 @@ Driver::~Driver( )
 
 void Driver::process_event( const events::PingDriverEvent& event )
 {
-   // DBG_TRC( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
+   DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
    switch( event.data( )->type )
    {
       case events::ePing::ping:
       {
-         DBG_MSG( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
          events::PingMasterEvent::send_event( { events::ePing::ping, "Driver -> Master" }, base::eCommType::ITC );
          break;
       }
@@ -56,7 +55,7 @@ void Driver::process_event( const events::PingDriverEvent& event )
 
 void Driver::process_event( const events::PingMasterEvent& event )
 {
-   // DBG_TRC( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
+   DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
    switch( event.data( )->type )
    {
       case events::ePing::ping:
@@ -65,7 +64,6 @@ void Driver::process_event( const events::PingMasterEvent& event )
       }
       case events::ePing::response:
       {
-         DBG_MSG( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
          events::PingDriverEvent::send_event( { events::ePing::response, "OnOff <- Driver" }, base::eCommType::ITC );
          break;
       }

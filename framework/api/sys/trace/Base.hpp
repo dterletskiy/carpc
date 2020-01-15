@@ -8,11 +8,11 @@
 //                           |  +----------------------- Class Abbriviation
 //                           |  |  +-------------------- Function Name
 //                           |  |  |  +----------------- Line Number
-//                           |  |  |  |      +---------- Foreground Colore for user message
-//                           |  |  |  |      | +-------- Background Color for user message
-//                           |  |  |  |      | |
-//                           |  |  |  |      | |
-#define PREFIX_FORMAT_CODE "%s[%s:%s:%d] -> %s%s"
+//                           |  |  |  |
+//                           |  |  |  |
+//                           |  |  |  |
+//                           |  |  |  |
+#define PREFIX_FORMAT_CODE "%s[%s:%s:%d] -> "
 
 
 //                              +---------------------------- Foreground Colore for Delimiter

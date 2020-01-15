@@ -34,12 +34,11 @@ Master::~Master( )
 
 void Master::process_event( const events::PingMasterEvent& event )
 {
-   // DBG_TRC( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
+   DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
    switch( event.data( )->type )
    {
       case events::ePing::ping:
       {
-         DBG_MSG( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
          events::PingSlaveEvent::send_event( { events::ePing::ping, "Master -> Slave" }, base::eCommType::ETC );
          break;
       }
@@ -56,7 +55,7 @@ void Master::process_event( const events::PingMasterEvent& event )
 
 void Master::process_event( const events::PingSlaveEvent& event )
 {
-   // DBG_TRC( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
+   DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
    switch( event.data( )->type )
    {
       case events::ePing::ping:
@@ -68,13 +67,11 @@ void Master::process_event( const events::PingSlaveEvent& event )
          static size_t m_count = 0;
          if( 1 > ++m_count )
          {
-            DBG_MSG( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
             events::PingSlaveEvent::send_event( { events::ePing::ping, "Master -> Slave" }, base::eCommType::ETC );
          }
          else
          {
             m_count = 0;
-            DBG_MSG( "type = %#x, info = %s", event.data( )->type, event.data( )->info.c_str( ) );
             events::PingMasterEvent::send_event( { events::ePing::response, "Driver <- Master" }, base::eCommType::ITC );
          }
          break;
