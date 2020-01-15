@@ -14,7 +14,7 @@ GENERATED_DIR    := $(PRODUCT_DIR)/gen
 TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
-INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR) -I$(PROJECT_FRAMEWORK_DIR)/trace
+INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR)
 LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
 
 #---------------------------------------------------------------------------------
@@ -41,23 +41,18 @@ $(PROJECT_NAME): $(OBJECT_FILES)
 
 
 config:
-	reset
 	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR) $(TARGET_DIR))
 
 $(TARGET_CLEAN):
-	reset
 	$(call delete_directories,$(PRODUCT_DIR))
 
 $(TARGET_GENERATE): config $(GENERATED_FILES)
 
-# Compile framework libraries
 $(TARGET_BUILD): config $(PROJECT_NAME)
 
-# Clean build
-clean_build: clean build
+clean_build: $(TARGET_CLEAN) $(TARGET_BUILD)
 
 $(TARGET_INFO):
-	reset
 	@echo PWD: $(PWD)
 	@echo PROJECT_NAME: $(PROJECT_NAME)
 	@echo PROJECT_DIR: $(PROJECT_DIR)
@@ -75,7 +70,6 @@ $(TARGET_ARCHIVE):
 	@$(TAR) -cvf $(SOURCE_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(SOURCE_DIR)
 
 $(TARGET_EXECUTE):
-	reset
 	$(TARGET_DIR)/$(PROJECT_NAME)
 
 

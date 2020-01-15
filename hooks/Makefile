@@ -14,7 +14,8 @@ GENERATED_DIR    := $(PRODUCT_DIR)/gen
 TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
-INCLUDE          += -I$(SOURCE_DIR) -I$(SOURCE_DIR)/trace
+INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR)
+LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
@@ -36,7 +37,7 @@ $(OBJECT_DIR)/%.$(OBJ_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
 
 
 config:
-	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR))
+	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR) $(TARGET_DIR))
 
 $(TARGET_CLEAN):
 	$(call delete_directories,$(PRODUCT_DIR))

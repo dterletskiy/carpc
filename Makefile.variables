@@ -20,6 +20,8 @@
 # RM           Команда удаления файла; по умолчанию, `rm -f'. 
 
 
+MEMORY_HOOK := 0
+
 
 
 
@@ -33,25 +35,23 @@ DEBUGGER    := lldb
 # tar
 TAR         := tar
 
+
+###########################################
+#                                         #
+#           Project extentions            #
+#                                         #
+###########################################
 # File extentions
 SRC_EXT      := cpp
 DEP_EXT      := d
 OBJ_EXT      := o
 
-# Include directories
-INCLUDE      := -I/usr/local/include
 
-CONSTANTS    := -DLINUX=0 -DWINDOWS=1 -DSTD=2 -DOS=LINUX
-
-CCONFIG      := -DCOLORED_TRACE
-# CCONFIG      += -DHOOK_MEMORY_ALLOCATOR
-
-CFLAGS       := -fopenmp -g -std=c++17 $(CONSTANTS) $(CCONFIG)
-# CFLAGS       += -Wall -O3 -g
-
-LDFLAGS      := -fopenmp -lrt -ldl
-# LDFLAGS      += -lm -larmadillo
-
+###########################################
+#                                         #
+#          Project make targets           #
+#                                         #
+###########################################
 TARGET_BUILD            := build
 TARGET_EXECUTE          := execute
 TARGET_GENERATE         := generate
@@ -78,6 +78,43 @@ PRODUCT_APPLICATION_DIR      := $(PROJECT_APPLICATION_DIR)_product
 PROJECT_SERVICEBROCKER_NAME  := servicebrocker
 PROJECT_SERVICEBROCKER_DIR   := $(ROOT_DIR)/$(PROJECT_SERVICEBROCKER_NAME)
 PRODUCT_SERVICEBROCKER_DIR   := $(PROJECT_SERVICEBROCKER_DIR)_product
+
+PROJECT_HOOKS_NAME           := hooks
+PROJECT_HOOKS_DIR            := $(ROOT_DIR)/$(PROJECT_HOOKS_NAME)
+PRODUCT_HOOKS_DIR            := $(PROJECT_HOOKS_DIR)_product
+
+
+
+
+
+###########################################
+#                                         #
+#        Project buld configuration       #
+#                                         #
+###########################################
+# Include directories
+INCLUDE      := -I/usr/local/include
+
+CONSTANTS    := -DLINUX=0 -DWINDOWS=1 -DSTD=2 -DOS=LINUX
+
+CCONFIG      := -DCOLORED_TRACE
+ifeq ($(MEMORY_HOOK),1)
+	CCONFIG += -DHOOK_MEMORY_ALLOCATOR
+endif
+
+CFLAGS       := -std=c++17 $(CONSTANTS) $(CCONFIG)
+# CFLAGS       += -fopenmp
+CFLAGS       += -Wall
+# CFLAGS       += -Wextra
+# CFLAGS       += -O3
+CFLAGS       += -g3
+
+LDFLAGS      := -lrt -ldl
+LDFLAGS      += -fopenmp
+# LDFLAGS      += -lm -larmadillo
+ifeq ($(MEMORY_HOOK),1)
+	LDFLAGS += -L$(PRODUCT_HOOKS_DIR)/lib -lhooks
+endif
 
 
 
