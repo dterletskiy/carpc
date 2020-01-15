@@ -217,13 +217,13 @@ private:
  * TGenerator declaration
  *
  ***************************************/
-template< typename _DataType, typename _ServiceType = void >
+template< typename _DataType, typename _EventNamespace, typename _ServiceType = void >
 class TGenerator
 {
 private:
-   using Generator      = TGenerator< _DataType, _ServiceType >;
-   using _EventType     = TEvent< Generator >;
-   using _ConsumerType  = TEventConsumer< Generator >;
+   using _Generator     = TGenerator< _DataType, _EventNamespace, _ServiceType >;
+   using _EventType     = TEvent< _Generator >;
+   using _ConsumerType  = TEventConsumer< _Generator >;
 
 public:
    struct Config
@@ -255,6 +255,40 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
 
 
 
+#define DECLARE_EVENT( eventType, dataType ) \
+   namespace eventType { \
+      class eventType; \
+      using Event       = base::TGenerator< dataType, eventType >::Config::EventType; \
+      using Consumer    = Event::_ConsumerType; \
+      using Data        = dataType; \
+   }
+
+#define INIT_EVENT( eventType ) \
+   template< > base::Event_ID eventType::Event::s_type_id = { #eventType };
+
+#define REGISTER_EVENT( eventType ) \
+   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
+
+
+
+#define DECLARE_DSI_EVENT( serviceName, eventType, dataType ) \
+   namespace serviceName::eventType { \
+      class serviceName; \
+      class eventType; \
+      using Event       = base::TGenerator< dataType, eventType, serviceName >::Config::EventType; \
+      using Consumer    = Event::_ConsumerType; \
+      using Data        = dataType; \
+   }
+
+#define INIT_DSI_EVENT( serviceName, eventType ) \
+      template< > base::Event_ID serviceName::eventType::Event::s_type_id = { #eventType"."#serviceName };
+
+#define REGISTER_DSI_EVENT( serviceName, eventType ) \
+   base::EventRegistry::instance( )->register_event( #eventType"."#serviceName, base::create_event< serviceName::eventType::Event > );
+
+
+
+#if 0 // Depricated event macros
 #define DECLARE_EVENT( eventType, dataType, consumerType ) \
    using eventType      = base::TGenerator< dataType >::Config::EventType; \
    using consumerType   = eventType::_ConsumerType;
@@ -281,5 +315,6 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
 
 #define REGISTER_DSI_EVENT( eventType, serviceName ) \
    base::EventRegistry::instance( )->register_event( #eventType"."#serviceName, base::create_event< serviceName::eventType > );
+#endif
 
 

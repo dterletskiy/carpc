@@ -13,7 +13,7 @@ class RootComponent;
 
 
 class SysEventConsumer
-   : public ISysEventConsumer
+   : public SysEvent::Consumer
 {
 public:
    static SysEventConsumer* instance( RootComponent* );
@@ -28,7 +28,7 @@ private:
    RootComponent* mp_root_component;
 
 private:
-   void process_event( const SysEvent& );
+   void process_event( const SysEvent::Event& );
 };
 
 

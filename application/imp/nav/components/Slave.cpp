@@ -21,16 +21,16 @@ Slave::Slave( const base::ServicePtr p_service, const std::string& name )
    : base::Component( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   events::PingSlaveEvent::set_notification( true, this );
+   events::PingSlaveEvent::Event::set_notification( true, this );
 }
 
 Slave::~Slave( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   events::PingSlaveEvent::set_notification( false, this );
+   events::PingSlaveEvent::Event::set_notification( false, this );
 }
 
-void Slave::process_event( const events::PingSlaveEvent& event )
+void Slave::process_event( const events::PingSlaveEvent::Event& event )
 {
    DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
    switch( event.data( )->type )
@@ -38,7 +38,7 @@ void Slave::process_event( const events::PingSlaveEvent& event )
       case events::ePing::ping:
       {
          sleep( 15 );
-         events::PingSlaveEvent::send_event( { events::ePing::response, "Master <- Slave" }, base::eCommType::ETC );
+         events::PingSlaveEvent::Event::send_event( { events::ePing::response, "Master <- Slave" }, base::eCommType::ETC );
          break;
       }
       case events::ePing::response:

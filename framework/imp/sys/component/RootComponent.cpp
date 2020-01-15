@@ -1,6 +1,6 @@
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/events/ServiceEvent.hpp"
 #include "api/sys/component/RootComponent.hpp"
+#include "imp/sys/events/ServiceEvent.hpp"
 #include "imp/sys/component/SysEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -22,9 +22,9 @@ RootComponent::~RootComponent( )
 {
 }
 
-void RootComponent::exit( ) const
+void RootComponent::shutdown( const std::string& info ) const
 {
-   ServiceEvent::send_event( { eServiceCommand::shutdown, "shutdown" }, eCommType::ITC );
+   ServiceEvent::Event::send_event( { eServiceCommand::shutdown, "shutdown" }, eCommType::ITC );
 }
 
 

@@ -3,6 +3,7 @@
 #include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/Service.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
+#include "imp/sys/events/ServiceEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvcProc"
@@ -120,7 +121,10 @@ bool ServiceProcess::start( const ServiceInfoVector& service_infos )
 
    // Starting service brocker DSI thread
    if( false == mp_service_brocker_dsi->start( ) )
-      return false;
+   {
+      SYS_ERR( "DSI Service Brocker can't be started" );
+      // return false;
+   }
    // Starting service brocker thread
    if( false == mp_service_brocker->start( ) )
       return false;
@@ -158,13 +162,13 @@ void ServiceProcess::boot( )
 
    sleep(1);
 
-   ServiceEvent::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
+   ServiceEvent::Event::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
 
    for( auto& p_service : m_service_list )
       p_service->wait( );
    SYS_MSG( "All services are finished" );
    SYS_MSG( "Stopping Service Brocker" );
-   ServiceEvent::send_event( { eServiceCommand::ping, "ping" }, eCommType::ITC );
+   ServiceEvent::Event::send_event( { eServiceCommand::ping, "ping" }, eCommType::ITC );
    mp_service_brocker->stop( );
    mp_service_brocker->wait( );
    SYS_MSG( "Service Brocker is finished" );

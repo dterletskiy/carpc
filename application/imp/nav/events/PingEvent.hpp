@@ -26,9 +26,9 @@ struct PingSlaveEventData : public PingEventData { };
 
 
 
-DECLARE_EVENT( PingDriverEvent, PingDriverEventData, IPingDriverEventConsumer );
-DECLARE_EVENT( PingMasterEvent, PingMasterEventData, IPingMasterEventConsumer );
-DECLARE_EVENT( PingSlaveEvent, PingSlaveEventData, IPingSlaveEventConsumer );
+DECLARE_EVENT( PingDriverEvent, PingDriverEventData );
+DECLARE_EVENT( PingMasterEvent, PingMasterEventData );
+DECLARE_EVENT( PingSlaveEvent, PingSlaveEventData );
 
 
 

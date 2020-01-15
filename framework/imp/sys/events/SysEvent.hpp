@@ -20,7 +20,7 @@ struct SysEventData
    eSysCommand    command;
    std::string    info;
 };
-DECLARE_EVENT( SysEvent, SysEventData, ISysEventConsumer );
+DECLARE_EVENT( SysEvent, SysEventData );
 
 
 

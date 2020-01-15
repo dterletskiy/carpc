@@ -14,6 +14,8 @@
 
 class ConnectionProcessor
 {
+   enum class eRead : size_t { OK, ERROR, DISCONNECTED };
+
 public:
    ConnectionProcessor( );
    ~ConnectionProcessor( );
@@ -23,6 +25,9 @@ public:
    void connection_loop( );
    int execute( );
 
+private:
+   void process_slave_sockets( );
+   eRead read_slave_socket( const int );
 private:
    int m_master_socket = -1;
    std::set< int > m_slave_sockets_set;

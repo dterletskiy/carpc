@@ -33,7 +33,8 @@ public:
 
 
 
-DECLARE_EVENT( PingEvent, PingEventData, IPingEventConsumer );
+DECLARE_EVENT( PingEventETC, PingEventData );
+DECLARE_EVENT( PingEventITC, PingEventData );
 
 
 
@@ -41,7 +42,4 @@ DECLARE_EVENT( PingEvent, PingEventData, IPingEventConsumer );
 
 
 
-namespace x { using DsiPingEventData = application::events::PingEventData; }
-DECLARE_DSI_EVENT( xDsiPingEvent, x::DsiPingEventData, IxDsiPingEventConsumer, DsiService );
-namespace y { using DsiPingEventData = application::events::PingEventData; }
-DECLARE_DSI_EVENT( yDsiPingEvent, y::DsiPingEventData, IyDsiPingEventConsumer, DsiService );
+DECLARE_DSI_EVENT( ServiceDSI, PingEventDSI, application::events::PingEventData );

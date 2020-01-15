@@ -80,6 +80,7 @@ bool ServiceBrocker::insert_event( const EventPtr p_event )
       SYS_WRN( "ServiceBrocker is not started" );
       return false;
    }
+   SYS_INF( "inserting event (%s)", p_event->type_id( ).c_str( ) );
 
    m_buffer_cond_var.lock( );
    m_events.push_back( p_event );
@@ -93,10 +94,12 @@ EventPtr ServiceBrocker::get_event( )
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )
    {
+      SYS_INF( "ServiceBrocker is waiting for event..." );
       m_buffer_cond_var.wait( );
    }
    EventPtr p_event = m_events.front( );
    m_events.pop_front( );
+   SYS_INF( "received event (%s)", p_event->type_id( ).c_str( ) );
    m_buffer_cond_var.unlock( );
 
    return p_event;

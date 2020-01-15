@@ -17,8 +17,9 @@ base::ComponentPtr creator( base::ServicePtr );
 
 class OnOff
    : public base::RootComponent
-   , public events::IPingEventConsumer
-   , public DsiService::IxDsiPingEventConsumer
+   , public events::PingEventETC::Consumer
+   , public events::PingEventITC::Consumer
+   , public ServiceDSI::PingEventDSI::Consumer
 {
 public:
    OnOff( const base::ServicePtr, const std::string& );
@@ -26,8 +27,9 @@ public:
 
 private:
    bool boot( const std::string& ) override;
-   void process_event( const events::PingEvent& ) override;
-   void process_event( const DsiService::xDsiPingEvent& ) override;
+   void process_event( const events::PingEventETC::Event& ) override;
+   void process_event( const events::PingEventITC::Event& ) override;
+   void process_event( const ServiceDSI::PingEventDSI::Event& ) override;
 };
 
 

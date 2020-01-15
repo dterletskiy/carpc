@@ -27,8 +27,69 @@ namespace memory {
 
 
 
+
+template< typename T >
+void doSomething( T arg )
+{
+   std::cout << __PRETTY_FUNCTION__ << ": -> " << arg << std::endl;
+}
+
+template< typename... Args >
+void doSomethingForAll( Args const&... args )
+{
+   (void)std::initializer_list<int>{ ((void)doSomething(args),0)... };
+}
+
+
+
+class Base
+{
+public:
+   Base( const int _value ) : m_value( _value ) { DBG_INF( ); }
+   virtual ~Base( ) { DBG_INF( ); }
+
+   void ping( )
+   {
+      DBG_INF( "%d", m_value );
+      size_t* p_this = reinterpret_cast< size_t* >( this );
+      if( 0 != *p_this )
+      {
+         request( );
+      }
+      else
+      {
+         DBG_ERR( "this = %p / vptr = %#lx", p_this, *p_this );
+      }
+   }
+   virtual void request( ) = 0;
+
+private:
+   int m_value = 0;
+};
+
+class Derived : public Base
+{
+public:
+   Derived( const int _value ) : Base( _value ), m_value( 2*_value ) { DBG_INF( ); }
+   ~Derived( ) override { DBG_INF( ); }
+
+   void request( ) override { DBG_INF( "%d", m_value ); }
+
+private:
+   int m_value = 0;
+};
+
+
+
 int main( int argc, char *argv[] )
 {
+   // doSomethingForAll( "Hello", 123, 123.456 );
+
+   Base* p = new Derived( 100 );
+   p->ping( );
+   delete p;
+   p->ping( );
+
 
 #if 0
    base::ByteBufferT buffer;
@@ -81,10 +142,10 @@ int main( int argc, char *argv[] )
    DBG_MSG( "-----------------------------------------------------------------------" );
 #endif
 
-#if 1
+#if 0
    memory::dump( );
 
-   REGISTER_DSI_EVENT( xDsiPingEvent, DsiService );
+   REGISTER_DSI_EVENT( ServiceDSI, PingEventDSI );
    base::EventRegistry::instance( )->dump( );
 
    base::ServiceInfoVector services = { { "OnOff_Service", { application::onoff::creator }, 5 } };

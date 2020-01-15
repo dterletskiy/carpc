@@ -1,7 +1,7 @@
 #include "api/sys/comm/Event.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/Service.hpp"
-#include "imp/sys/events/SysEvent.hpp"
+#include "imp/sys/service/ServiceEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Srv"
@@ -51,7 +51,7 @@ void Service::thread_loop( )
    for( auto creator : m_component_creators )
       m_components.emplace_back( creator( shared_from_this( ) ) );
 
-   ServiceEvent::set_notification( true, this );
+   ServiceEventConsumer consumer( shared_from_this( ) );
 
    while( started( ) )
    {
@@ -59,8 +59,6 @@ void Service::thread_loop( )
       SYS_INF( "'%s': processing event (%s)", m_name.c_str( ), p_event->type_id( ).c_str( ) );
       notify( p_event );
    }
-
-   // ServiceEvent::set_notification( false, this );
 
    // Destroying components
    m_components.clear( );
@@ -202,32 +200,6 @@ bool Service::is_subscribed( const Event_ID& event_id )
       return false;
 
    return true;
-}
-
-void Service::process_event( const ServiceEvent& event )
-{
-   SYS_INF( "'%s': command = %#zx, info = %s", m_name.c_str( ), static_cast< size_t >( event.data( )->command ), event.data( )->info.c_str( ) );
-   switch( event.data( )->command )
-   {
-      case eServiceCommand::boot:
-      {
-         SysEvent::send_event( { eSysCommand::boot, "request boot" }, eCommType::ETC );
-         break;
-      }
-      case eServiceCommand::shutdown:
-      {
-         stop( );
-         break;
-      }
-      case eServiceCommand::ping:
-      {
-         break;
-      }
-      default:
-      {
-         break;
-      }
-   }
 }
 
 

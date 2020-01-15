@@ -64,6 +64,11 @@ int main( int argc, char* argv[] )
 {
    memory::dump( );
 
+
+
+
+#if 1
+
    base::ServiceInfoVector services =
    {
         { "OnOff_Service", { application::onoff::creator }, 5 }
@@ -78,7 +83,7 @@ int main( int argc, char* argv[] )
       p_process->boot( );
    }
 
-
+#endif
 
    DBG_TRC( "Main: program exiting." );
    DBG_INF( "Main: program exiting." );
@@ -87,5 +92,6 @@ int main( int argc, char* argv[] )
    DBG_ERR( "Main: program exiting." );
 
    memory::dump( );
+
    return 0;
 }

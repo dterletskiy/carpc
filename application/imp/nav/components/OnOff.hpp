@@ -17,7 +17,7 @@ base::ComponentPtr creator( base::ServicePtr );
 
 class OnOff
    : public base::RootComponent
-   , public events::IPingDriverEventConsumer
+   , public events::PingDriverEvent::Consumer
 {
 public:
    OnOff( const base::ServicePtr, const std::string& );
@@ -25,7 +25,7 @@ public:
 
 private:
    bool boot( const std::string& ) override;
-   void process_event( const events::PingDriverEvent& ) override;
+   void process_event( const events::PingDriverEvent::Event& ) override;
 };
 
 

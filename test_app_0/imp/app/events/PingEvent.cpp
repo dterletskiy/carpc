@@ -54,15 +54,11 @@ namespace application::events {
       return true;
    }
 
-   INIT_EVENT( PingEvent );
+   INIT_EVENT( PingEventETC );
+   INIT_EVENT( PingEventITC );
 
 } // namespace application::events
 
 
 
-INIT_DSI_EVENT( xDsiPingEvent, DsiService );
-// INIT_DSI_EVENT( yDsiPingEvent, DsiService );
-
-// REGISTER_DSI_EVENT( DsiPingEvent, DsiService );
-// EventRegistry::instance( )->dump( );
-// DsiService::DsiPingEvent::send_event( { eServiceCommand::boot, "fuck" } );
+INIT_DSI_EVENT( ServiceDSI, PingEventDSI );

@@ -16,9 +16,9 @@ public:
    ~RootComponent( ) override;
 
 public:
-   virtual bool boot( const std::string& ) = 0;
+   virtual bool boot( const std::string& info = "boot" ) = 0;
 protected:
-   virtual void exit( ) const final;
+   virtual void shutdown( const std::string& info = "shutdown" ) const final;
 };
 
 

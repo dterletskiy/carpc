@@ -4,7 +4,7 @@
 #include "api/sys/oswrappers/ConditionVariable.hpp"
 #include "api/sys/component/Types.hpp"
 #include "api/sys/comm/Types.hpp"
-#include "api/sys/events/ServiceEvent.hpp"
+#include "api/sys/comm/Event.hpp"
 #include "api/sys/service/Types.hpp"
 
 
@@ -15,7 +15,6 @@ namespace base {
 
 class Service
    : public std::enable_shared_from_this< Service >
-   , public IServiceEventConsumer
 {
 public:
    Service( ServiceBrockerPtr, const ServiceInfo& );
@@ -69,9 +68,6 @@ private:
    void notify( const EventPtr );
    std::map< Event_ID, std::set< IEventConsumer* > > m_event_consumers_map;
    std::optional< time_t > m_process_started = std::nullopt;
-
-protected:
-   void process_event( const ServiceEvent& );
 
 private:
    ComponentPtrList        m_components;

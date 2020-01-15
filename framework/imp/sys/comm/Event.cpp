@@ -95,11 +95,11 @@ bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const Eve
    // SYS_INF( "event id: %#x / service: %s", type_id, p_service->name( ).c_str( ) );
    if( true == is_set )
    {
-      p_service->set_notification( type_id, p_consumer);
+      p_service->set_notification( type_id, p_consumer );
    }
    else
    {
-      p_service->clear_notification( type_id, p_consumer);
+      p_service->clear_notification( type_id, p_consumer );
    }
 
    return true;

@@ -81,7 +81,6 @@ bool ConnectionProcessor::init( const int _socket_family, const int _socket_type
       socklen_t addrlen = sizeof( address );
       getpeername( m_master_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
       SYS_INF( "Connection created, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), m_master_socket );
-      DBG_INF( "Connection created, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), m_master_socket );
    }
 
    return true;
@@ -90,6 +89,13 @@ bool ConnectionProcessor::init( const int _socket_family, const int _socket_type
 bool ConnectionProcessor::shutdown( )
 {
    return true;
+}
+
+void ConnectionProcessor::fd_set_reset( )
+{
+   FD_ZERO( &m_fd_set_read );
+   FD_ZERO( &m_fd_set_write );
+   FD_ZERO( &m_fd_set_except );
 }
 
 void ConnectionProcessor::connection_loop( )
@@ -116,47 +122,7 @@ void ConnectionProcessor::connection_loop( )
       }
       SYS_MSG( "select(%d)", m_master_socket );
 
-      std::set< int > slave_sockets_to_remove_set;
-      for( const auto& slave_socket : m_slave_sockets_set )
-      {
-         if( !FD_ISSET( slave_socket, &m_fd_set_read ) ) continue;
-
-         ssize_t read_size = recv( slave_socket, mp_buffer, base::configuration::dsi::buffer_size, 0 );
-         if( 0 < read_size )
-         {
-            SYS_MSG( "recv(%d): %ld bytes", slave_socket, read_size );
-            ssize_t send_size = send( slave_socket, mp_buffer, read_size, 0 );
-            if( send_size != read_size )
-            {
-               m_last_errno = errno;
-               SYS_ERR( "send(%d): %d", slave_socket, m_last_errno );
-               continue;
-            }
-            SYS_MSG( "send(%d): %zu bytes", slave_socket, send_size );
-         }
-         else
-         {
-            m_last_errno = errno;
-            if( m_last_errno != EAGAIN )
-            {
-               struct sockaddr_in address;
-               socklen_t addrlen = sizeof( address );
-               getpeername( slave_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
-               SYS_INF( "Host disconnected, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
-
-               // connection closed
-               ::shutdown( slave_socket, SHUT_RDWR );
-               close( slave_socket );
-               slave_sockets_to_remove_set.insert( slave_socket );
-            }
-            else
-            {
-               SYS_ERR( "recv(%d): %ld bytes / error: %d", slave_socket, read_size, m_last_errno );
-            }
-         }
-      }
-      for( const auto& slave_socket : slave_sockets_to_remove_set )
-         m_slave_sockets_set.erase( slave_socket );
+      process_slave_sockets( );
 
       if( FD_ISSET( m_master_socket, &m_fd_set_read ) )
       {
@@ -172,9 +138,52 @@ void ConnectionProcessor::connection_loop( )
    }
 }
 
-void ConnectionProcessor::fd_set_reset( )
+void ConnectionProcessor::process_slave_sockets( )
 {
-   FD_ZERO( &m_fd_set_read );
-   FD_ZERO( &m_fd_set_write );
-   FD_ZERO( &m_fd_set_except );
+   std::set< int > slave_sockets_to_remove_set;
+   for( const auto& slave_socket : m_slave_sockets_set )
+   {
+      if( !FD_ISSET( slave_socket, &m_fd_set_read ) ) continue;
+      if( eRead::DISCONNECTED == read_slave_socket( slave_socket ) )
+      {
+         slave_sockets_to_remove_set.insert( slave_socket );
+         // connection closed
+         ::shutdown( slave_socket, SHUT_RDWR );
+         close( slave_socket );
+      }
+   }
+   for( const auto& slave_socket : slave_sockets_to_remove_set )
+      m_slave_sockets_set.erase( slave_socket );
+}
+
+ConnectionProcessor::eRead ConnectionProcessor::read_slave_socket( const int slave_socket )
+{
+   ssize_t read_size = recv( slave_socket, mp_buffer, base::configuration::dsi::buffer_size, 0 );
+   if( 0 >= read_size )
+   {
+      m_last_errno = errno;
+      if( m_last_errno != EAGAIN )
+      {
+         struct sockaddr_in address;
+         socklen_t addrlen = sizeof( address );
+         getpeername( slave_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
+         SYS_INF( "Host disconnected, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
+
+         return eRead::DISCONNECTED;
+      }
+
+      SYS_ERR( "recv(%d): %ld bytes / error: %d", slave_socket, read_size, m_last_errno );
+   }
+
+   SYS_MSG( "recv(%d): %ld bytes", slave_socket, read_size );
+   ssize_t send_size = send( slave_socket, mp_buffer, read_size, 0 );
+   if( send_size != read_size )
+   {
+      m_last_errno = errno;
+      SYS_ERR( "send(%d): %d", slave_socket, m_last_errno );
+      return eRead::ERROR;
+   }
+   SYS_MSG( "send(%d): %zu bytes", slave_socket, send_size );
+
+   return eRead::OK;
 }

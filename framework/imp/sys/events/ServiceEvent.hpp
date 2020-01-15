@@ -20,7 +20,7 @@ struct ServiceEventData
    eServiceCommand   command;
    std::string       info;
 };
-DECLARE_EVENT( ServiceEvent, ServiceEventData, IServiceEventConsumer );
+DECLARE_EVENT( ServiceEvent, ServiceEventData );
 
 
 

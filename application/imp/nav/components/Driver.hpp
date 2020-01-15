@@ -17,16 +17,16 @@ base::ComponentPtr creator( base::ServicePtr );
 
 class Driver
    : public base::Component
-   , public events::IPingDriverEventConsumer
-   , public events::IPingMasterEventConsumer
+   , public events::PingDriverEvent::Consumer
+   , public events::PingMasterEvent::Consumer
 {
 public:
    Driver( const base::ServicePtr, const std::string& );
    ~Driver( ) override;
 
 private:
-   void process_event( const events::PingDriverEvent& ) override;
-   void process_event( const events::PingMasterEvent& ) override;
+   void process_event( const events::PingDriverEvent::Event& ) override;
+   void process_event( const events::PingMasterEvent::Event& ) override;
 };
 
 

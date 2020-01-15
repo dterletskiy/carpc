@@ -17,16 +17,16 @@ base::ComponentPtr creator( base::ServicePtr );
 
 class Master
    : public base::Component
-   , public events::IPingMasterEventConsumer
-   , public events::IPingSlaveEventConsumer
+   , public events::PingMasterEvent::Consumer
+   , public events::PingSlaveEvent::Consumer
 {
 public:
    Master( const base::ServicePtr, const std::string& );
    ~Master( ) override;
 
 private:
-   void process_event( const events::PingMasterEvent& ) override;
-   void process_event( const events::PingSlaveEvent& ) override;
+   void process_event( const events::PingMasterEvent::Event& ) override;
+   void process_event( const events::PingSlaveEvent::Event& ) override;
 };
 
 

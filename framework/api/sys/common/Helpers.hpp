@@ -65,9 +65,21 @@ struct is_base_of< D, D >
 
 /****************************************************************************************************
  * 
+ * Copy buffer function (instead of memcpy)
+ * 
+ ***************************************************************************************************/
+void copy( void* _p_destination, void* _p_source, const size_t _size );
+
+
+
+/****************************************************************************************************
+ * 
  * Print std containers and types
  * 
  ***************************************************************************************************/
+void print( const void* p_buffer, const size_t size, const bool is_new_line = false );
+void print( const std::string& string, const bool is_new_line = false );
+
 template< typename TYPE >
 void print( const TYPE& value, const bool is_new_line = false )
 {
@@ -76,13 +88,6 @@ void print( const TYPE& value, const bool is_new_line = false )
    if( is_new_line ) std::cout << std::endl;
 }
 
-inline
-void print( const std::string& string, const bool is_new_line = false )
-{
-   std::cout << "\"" << string << "\"";
-
-   if( is_new_line ) std::cout << std::endl;
-}
 
 template< typename TYPE >
 void print( const std::list< TYPE >& list, const bool is_new_line = false )
