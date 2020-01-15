@@ -46,8 +46,6 @@ namespace base::trace::write {
 
 
 
-#ifndef NO_TRACE
-
 #define DBG_MESSAGE_CODE( USER_FORMAT, ... ) \
    base::trace::write::message( \
         PREFIX_FORMAT_CODE USER_FORMAT NEW_LINE \
@@ -104,18 +102,6 @@ namespace base::trace::write {
       ) \
    ); \
    base::trace::write::extended::dbg_unlock( );
-
-
-
-#else // #ifndef NO_TRACE
-
-
-
-#define DBG_WRITE_CODE( USER_FORMAT, ... )
-#define DBG_WRITE_MICROSECONDS_PID_TID_CODE( USER_FORMAT, ... )
-#define DBG_WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE( USER_FORMAT, ... )
-
-#endif // #ifndef NO_TRACE
 
 
 

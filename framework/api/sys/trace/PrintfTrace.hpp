@@ -38,8 +38,6 @@ namespace base::trace::printf
 
 
 
-#ifndef NO_TRACE
-
 #define DBG_PRINTF_CODE( USER_FORMAT, ... ) \
    base::trace::printf::simple::dbg_lock( ); \
    ::printf( \
@@ -72,16 +70,6 @@ namespace base::trace::printf
             , ##__VA_ARGS__ \
    ); \
    base::trace::printf::extended::dbg_unlock( );
-
-
-
-#else // #ifndef NO_TRACE
-
-#define DBG_PRINTF_CODE( USER_FORMAT, ... )
-#define DBG_PRINTF_MICROSECONDS_PID_TID_CODE( USER_FORMAT, ... )
-#define DBG_PRINTF_DATE_TIME_MILLISECONDS_PID_TID_CODE( USER_FORMAT, ... )
-
-#endif // #ifndef NO_TRACE
 
 
 
