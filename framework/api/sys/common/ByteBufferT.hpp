@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/ByteBuffer.hpp"
 
 
 
@@ -8,20 +8,33 @@ namespace base {
 
 
 
-class ByteBuffer
+class ByteBufferT
+   : public ByteBuffer
 {
-public:
-   template< typename TYPE >
-      ByteBuffer& operator << ( const TYPE& );
-   template< typename TYPE >
-      ByteBuffer& operator >> ( TYPE& );
+   class Transaction
+   {
+   public:
+      enum class eType : size_t { push, pop, undefined };
+
+      Transaction( size_t& );
+
+      bool start( const eType );
+      bool finish( );
+      bool error( );
+
+   private:
+      eType    m_type = eType::undefined;
+      size_t   m_recursive_count = 0;
+      size_t   m_size_backup = 0;
+      size_t&  m_size;
+   } m_transaction;
 
 public:
-   ByteBuffer( );
-   ByteBuffer( const void*, const size_t );
+   ByteBufferT( );
+   ByteBufferT( const void*, const size_t );
    template< typename TYPE >
-      ByteBuffer( const TYPE& );
-   ~ByteBuffer( );
+      ByteBufferT( const TYPE& );
+   ~ByteBufferT( );
 
    /*****************************************
     *
@@ -86,86 +99,15 @@ private:
       bool pop_stl_container( TYPE_CONTAINER& );
    template< typename TYPE_CONTAINER >
       bool pop_stl_associative_container( TYPE_CONTAINER& );
-
-   /*****************************************
-    *
-    * Read / Write buffer methods
-    *
-    ****************************************/
-protected:
-   bool write( const void*, const size_t, const bool is_reallocate = true );
-   bool read( const void*, const size_t );
-
-   /*****************************************
-    *
-    * Other methods and members
-    *
-    ****************************************/
-public:
-   bool allocate( const size_t );
-   bool reallocate( const size_t, const bool is_store = false );
-   bool trancate( );
-   void reset( );
-
-public:
-   const uint8_t* const buffer( ) const;
-protected:
-   uint8_t* mp_buffer = nullptr;
-
-public:
-   const size_t capacity( ) const;
-protected:
-   size_t   m_capacity = 0;
-
-public:
-   const size_t size( ) const;
-protected:
-   size_t   m_size = 0;
-
-public:
-   void dump( ) const;
-   void info( ) const;
 };
 
 
 
 template< typename TYPE >
-ByteBuffer::ByteBuffer( const TYPE& data )
+ByteBufferT::ByteBufferT( const TYPE& data )
+   : ByteBuffer( data )
+   , m_transaction( m_size )
 {
-   if( false == allocate( sizeof( data ) ) ) return;
-   *this << data;
-}
-
-inline
-const uint8_t* const ByteBuffer::buffer( ) const
-{
-   return mp_buffer;
-}
-
-inline
-const size_t ByteBuffer::size( ) const
-{
-   return m_size;
-}
-
-inline
-const size_t ByteBuffer::capacity( ) const
-{
-   return m_capacity;
-}
-
-template< typename TYPE >
-ByteBuffer& ByteBuffer::operator << ( const TYPE& value )
-{
-   push( value, true );
-   return *this;
-}
-
-template< typename TYPE >
-ByteBuffer& ByteBuffer::operator >> ( TYPE& value )
-{
-   pop( value );
-   return *this;
 }
 
 
@@ -176,67 +118,81 @@ ByteBuffer& ByteBuffer::operator >> ( TYPE& value )
  *
  ****************************************/
 template< typename TYPE >
-bool ByteBuffer::push( const std::vector< TYPE >& vector, const bool is_reallocate )
+bool ByteBufferT::push( const std::vector< TYPE >& vector, const bool is_reallocate )
 {
    return push_stl_container( vector, is_reallocate );
 }
 
 template< typename TYPE >
-bool ByteBuffer::push( const std::list< TYPE >& list, const bool is_reallocate )
+bool ByteBufferT::push( const std::list< TYPE >& list, const bool is_reallocate )
 {
    return push_stl_container( list, is_reallocate );
 }
 
 template< typename TYPE_FIRST, typename TYPE_SECOND >
-bool ByteBuffer::push( const std::pair< TYPE_FIRST, TYPE_SECOND >& pair, const bool is_reallocate )
+bool ByteBufferT::push( const std::pair< TYPE_FIRST, TYPE_SECOND >& pair, const bool is_reallocate )
 {
-   if( false == push( pair.first, is_reallocate ) )
-      return false;
-   if( false == push( pair.second, is_reallocate ) )
+   if( false == m_transaction.start( Transaction::eType::push ) )
       return false;
 
-   return true;
+   if( false == push( pair.first, is_reallocate ) )
+      return m_transaction.error( );
+   if( false == push( pair.second, is_reallocate ) )
+      return m_transaction.error( );
+
+   return m_transaction.finish( );
 }
 
 template< typename TYPE >
-bool ByteBuffer::push( const std::set< TYPE >& set, const bool is_reallocate )
+bool ByteBufferT::push( const std::set< TYPE >& set, const bool is_reallocate )
 {
    return push_stl_associative_container( set, is_reallocate );
 }
 
 template< typename TYPE_KEY, typename TYPE_VALUE >
-bool ByteBuffer::push( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool is_reallocate )
+bool ByteBufferT::push( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool is_reallocate )
 {
    return push_stl_associative_container( map, is_reallocate );
 }
 
 template< typename TYPE >
 typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
-ByteBuffer::push( const TYPE& value, const bool is_reallocate )
+ByteBufferT::push( const TYPE& value, const bool is_reallocate )
 {
    return push( static_cast< const void* >( &value ), sizeof( TYPE ), is_reallocate );
 }
 
 template< typename TYPE >
 typename std::enable_if_t< !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE >, bool >
-ByteBuffer::push( const TYPE& value, const bool is_reallocate )
+ByteBufferT::push( const TYPE& value, const bool is_reallocate )
 {
-   return value.to_buffer( *this );
+   if( false == m_transaction.start( Transaction::eType::push ) )
+      return false;
+
+   if( false == value.to_buffer( *this ) )
+      m_transaction.error( );
+   return m_transaction.finish( );
 }
 
 template< typename TYPE_CONTAINER >
-bool ByteBuffer::push_stl_container( const TYPE_CONTAINER& container, const bool is_reallocate )
+bool ByteBufferT::push_stl_container( const TYPE_CONTAINER& container, const bool is_reallocate )
 {
+   if( false == m_transaction.start( Transaction::eType::push ) )
+      return false;
+
    using TYPE_ITERATOR = typename TYPE_CONTAINER::const_reverse_iterator;
    for( TYPE_ITERATOR iterator = container.crbegin( ); iterator != container.crend( ); ++iterator )
       if( false == push( *iterator, is_reallocate ) )
-         return false;
+         return m_transaction.error( );
 
-   return push( container.size( ) );
+   if( false == push( container.size( ) ) )
+      return m_transaction.error( );
+
+   return m_transaction.finish( );
 }
 
 template< typename TYPE_CONTAINER >
-bool ByteBuffer::push_stl_associative_container( const TYPE_CONTAINER& container, const bool is_reallocate )
+bool ByteBufferT::push_stl_associative_container( const TYPE_CONTAINER& container, const bool is_reallocate )
 {
    return push_stl_container( container, is_reallocate );
 }
@@ -248,93 +204,107 @@ bool ByteBuffer::push_stl_associative_container( const TYPE_CONTAINER& container
  * Pop buffer methods
  *
  ****************************************/
+
 template< typename TYPE >
-bool ByteBuffer::pop( std::vector< TYPE >& vector )
+bool ByteBufferT::pop( std::vector< TYPE >& vector )
 {
    return pop_stl_container( vector );
 }
 
 template< typename TYPE >
-bool ByteBuffer::pop( std::list< TYPE >& list )
+bool ByteBufferT::pop( std::list< TYPE >& list )
 {
    return pop_stl_container( list );
 }
 
 template< typename TYPE_FIRST, typename TYPE_SECOND >
-bool ByteBuffer::pop( std::pair< TYPE_FIRST, TYPE_SECOND >& pair )
+bool ByteBufferT::pop( std::pair< TYPE_FIRST, TYPE_SECOND >& pair )
 {
-   if( false == pop( pair.second ) )
-      return false;
-   if( false == pop( pair.first ) )
+   if( false == m_transaction.start( Transaction::eType::pop ) )
       return false;
 
-   return true;
+   if( false == pop( pair.second ) )
+      return m_transaction.error( );
+   if( false == pop( pair.first ) )
+      return m_transaction.error( );
+
+   return m_transaction.finish( );
 }
 
 template< typename TYPE >
-bool ByteBuffer::pop( std::set< TYPE >& set )
+bool ByteBufferT::pop( std::set< TYPE >& set )
 {
    return pop_stl_associative_container( set );
 }
 
 template< typename TYPE_KEY, typename TYPE_VALUE >
-bool ByteBuffer::pop( std::map< TYPE_KEY, TYPE_VALUE >& map )
+bool ByteBufferT::pop( std::map< TYPE_KEY, TYPE_VALUE >& map )
 {
    return pop_stl_associative_container( map );
 }
 
 template< typename TYPE >
 typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
-ByteBuffer::pop( TYPE& value )
+ByteBufferT::pop( TYPE& value )
 {
    return pop( static_cast< const void* >( &value ), sizeof( TYPE ) );
 }
 
 template< typename TYPE >
 typename std::enable_if_t< !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE >, bool >
-ByteBuffer::pop( TYPE& value )
+ByteBufferT::pop( TYPE& value )
 {
-   return value.from_buffer( *this );
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
+   if( false == value.from_buffer( *this ) )
+      m_transaction.error( );
+   return m_transaction.finish( );
 }
 
 template< typename TYPE_CONTAINER >
-bool ByteBuffer::pop_stl_container( TYPE_CONTAINER& container )
+bool ByteBufferT::pop_stl_container( TYPE_CONTAINER& container )
 {
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
+
    size_t size = 0;
    // Reading size of string content
    if( false == pop( size ) )
-      return false;
+      return m_transaction.error( );
 
    for( size_t index = 0; index < size; ++index )
    {
       typename TYPE_CONTAINER::value_type value;
       if( false == pop( value ) )
-         return false;
+         return m_transaction.error( );
       container.emplace_back( value );
    }
 
-   return true;
+   return m_transaction.finish( );
 }
 
 template< typename TYPE_CONTAINER >
-bool ByteBuffer::pop_stl_associative_container( TYPE_CONTAINER& container )
+bool ByteBufferT::pop_stl_associative_container( TYPE_CONTAINER& container )
 {
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
+
    size_t size = 0;
    // Reading size of string content
    if( false == pop( size ) )
-      return false;
+      return m_transaction.error( );
 
    for( size_t index = 0; index < size; ++index )
    {
       // Here value is a pair in case of map and simple type in case of set
       typename TYPE_CONTAINER::value_type value;
       if( false == pop( value ) )
-         return false;
+         return m_transaction.error( );
 
       container.emplace( value );
    }
 
-   return true;
+   return m_transaction.finish( );
 }
 
 

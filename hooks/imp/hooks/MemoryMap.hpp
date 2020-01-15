@@ -28,7 +28,7 @@ class MemoryMap
 {
 private:
    static const size_t s_invalid_entry = SIZE_MAX;
-   static const size_t s_memory_map_size = 1042 * 1024 * 16;
+   static const size_t s_memory_map_size = 1042 * 1024;
 
    using tEntry = struct { void* address; };
 

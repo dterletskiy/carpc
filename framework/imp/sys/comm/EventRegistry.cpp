@@ -51,7 +51,7 @@ EventPtr EventRegistry::create_event( const std::string& event_type ) const
    return iterator->second( eCommType::IPC );
 }
 
-EventPtr EventRegistry::create_event( const std::string& event_type, ByteBuffer& buffer ) const
+EventPtr EventRegistry::create_event( const std::string& event_type, ByteBufferT& buffer ) const
 {
    auto iterator = m_registry.find( event_type );
    if( m_registry.end( ) == iterator )
@@ -62,15 +62,12 @@ EventPtr EventRegistry::create_event( const std::string& event_type, ByteBuffer&
    return p_event;
 }
 
-EventPtr EventRegistry::create_event( ByteBuffer& buffer ) const
+EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
 {
    std::string event_type;
-#ifdef USE_STREAM
-   buffer >> event_type;
-#else
    if( false == buffer.pop( event_type ) )
       return nullptr;
-#endif
+
    auto iterator = m_registry.find( event_type );
    if( m_registry.end( ) == iterator )
       return nullptr;

@@ -15,14 +15,15 @@ TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
 INCLUDE          += -I$(SOURCE_DIR) -I$(SOURCE_DIR)/trace
-# CFLAGS           += -fPIC
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
 #---------------------------------------------------------------------------------
-SOURCE_FILES     := $(shell find $(SOURCE_DIR) -type f -name *.$(SRC_EXT))
-OBJECT_FILES     := $(patsubst $(SOURCE_DIR)/%,$(OBJECT_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(OBJ_EXT)))
-GENERATED_FILES  := $(patsubst $(SOURCE_DIR)/%,$(GENERATED_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(SRC_EXT)))
+SOURCE_FILES         := $(shell find $(SOURCE_DIR) -type f -name *.$(SRC_EXT))
+OBJECT_FILES         := $(patsubst $(SOURCE_DIR)/%,$(OBJECT_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(OBJ_EXT)))
+OBJECT_PIC_FILES     := $(patsubst $(SOURCE_DIR)/%,$(OBJECT_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(OBJ_PIC_EXT)))
+GENERATED_FILES      := $(patsubst $(SOURCE_DIR)/%,$(GENERATED_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(SRC_EXT)))
+GENERATED_PIC_FILES  := $(patsubst $(SOURCE_DIR)/%,$(GENERATED_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(SRC_PIC_EXT)))
 
 
 
@@ -34,6 +35,22 @@ $(GENERATED_DIR)/%.$(SRC_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
 $(OBJECT_DIR)/%.$(OBJ_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
 	$(call compile,$(CXX),$(CFLAGS),$(INCLUDE),$@,$<)
 
+# Link
+$(PROJECT_NAME): $(OBJECT_FILES)
+	ar rcs $(LIBRARY_DIR)/lib$(PROJECT_NAME).a $(OBJECT_FILES)
+
+# Generate PIC
+$(GENERATED_DIR)/%.$(SRC_PIC_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
+	$(call generate,$(CXX),$(CFLAGS) -fPIC,$(INCLUDE),$@,$<)
+
+# Compile PIC
+$(OBJECT_DIR)/%.$(OBJ_PIC_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
+	$(call compile,$(CXX),$(CFLAGS) -fPIC,$(INCLUDE),$@,$<)
+
+#Link PIC
+$(PROJECT_NAME)_PIC: $(OBJECT_PIC_FILES)
+	$(call link,$(CXX),-g -shared,$(LIBRARY_DIR)/lib$(PROJECT_NAME).so,$^)
+
 
 
 config:
@@ -44,22 +61,15 @@ clean:
 
 generate: config $(GENERATED_FILES)
 
-build: config $(OBJECT_FILES)
-	ar rcs $(LIBRARY_DIR)/lib$(PROJECT_NAME).a $(OBJECT_FILES)
-# 	variant 1
-# gcc -g -shared -Wl,-soname,libhello.so.0 -o libhello.so.0.0 libhello.o -lc
-# 	variant 2
-# 	g++ -g -shared -Wl,-soname,lib$(PROJECT_NAME).so.0 -o $(LIBRARY_DIR)/lib$(PROJECT_NAME).so.0.0 $(OBJECT_FILES) $(LDFLAGS)
-# 	ldconfig -v -n $(LIBRARY_DIR)
-# 	ln -sf $(LIBRARY_DIR)/lib$(PROJECT_NAME).so.0 $(LIBRARY_DIR)/lib$(PROJECT_NAME).so
+build: config $(PROJECT_NAME) $(PROJECT_NAME)_PIC
 
 clean_build: clean build
 
 archive:
 	@$(TAR) -cvf $(SOURCE_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(SOURCE_DIR)
 
-infi:
-	$(call print_info,$(PROJECT_NAME),$(PROJECT_DIR),$(PRODUCT_DIR),$(SOURCE_FILES),$(GENERATED_FILES),$(OBJECT_FILES))
+info:
+	$(call print_info,$(PROJECT_NAME),$(PROJECT_DIR),$(PRODUCT_DIR),$(SOURCE_FILES),$(GENERATED_FILES),$(OBJECT_FILES),$(OBJECT_PIC_FILES))
 
 
 

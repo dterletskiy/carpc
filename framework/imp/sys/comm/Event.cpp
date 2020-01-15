@@ -19,18 +19,6 @@ namespace base {
  * Event_ID implementation
  *
  ************************/
-ByteBuffer& operator << ( ByteBuffer& buffer, const Event_ID& event_id )
-{
-   buffer << event_id.m_id;
-   return buffer;
-}
-
-ByteBuffer& operator >> ( ByteBuffer& buffer, Event_ID& event_id )
-{
-   buffer >> event_id.m_id;
-   return buffer;
-}
-
 Event_ID::Event_ID( const std::string& id )
    : m_id( id )
 {
@@ -40,12 +28,12 @@ Event_ID::~Event_ID( )
 {
 }
 
-bool Event_ID::to_buffer( ByteBuffer& buffer ) const
+bool Event_ID::to_buffer( ByteBufferT& buffer ) const
 {
    return buffer.push( m_id );
 }
 
-bool Event_ID::from_buffer( ByteBuffer& buffer )
+bool Event_ID::from_buffer( ByteBufferT& buffer )
 {
    return buffer.pop( m_id );
 }

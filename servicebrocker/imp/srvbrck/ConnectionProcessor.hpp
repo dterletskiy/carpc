@@ -7,7 +7,7 @@
 #include <set>
 
 #include "api/sys/common/Types.hpp"
-#include "api/sys/common/ByteBuffer.hpp"
+#include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/configuration/DSI.hpp"
 
 

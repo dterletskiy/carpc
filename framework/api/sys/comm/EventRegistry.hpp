@@ -9,7 +9,7 @@ namespace base {
 
 
 
-class ByteBuffer;
+class ByteBufferT;
 
 
 
@@ -20,7 +20,9 @@ class ByteBuffer;
  ***************************************/
 class EventRegistry
 {
+public:
    using EventCreator = EventPtr(*)( const eCommType );
+   using Registry = std::map< std::string, EventCreator >;
 
 public:
    ~EventRegistry( );
@@ -31,16 +33,26 @@ private:
    static EventRegistryPtr mp_instance;
 
 public:
-   bool register_event( const std::string&, EventCreator );
    EventPtr create_event( const std::string& ) const;
-   EventPtr create_event( const std::string&, ByteBuffer& ) const;
-   EventPtr create_event( ByteBuffer& ) const;
+   EventPtr create_event( const std::string&, ByteBufferT& ) const;
+   EventPtr create_event( ByteBufferT& ) const;
 
    void dump( ) const;
 
+public:
+   bool register_event( const std::string&, EventCreator );
+   const Registry& registry( ) const;
 private:
-   std::map< std::string, EventCreator > m_registry;
+   Registry m_registry;
 };
+
+
+
+inline
+const EventRegistry::Registry& EventRegistry::registry( ) const
+{
+   return m_registry;
+}
 
 
 

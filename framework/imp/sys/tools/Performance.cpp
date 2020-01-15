@@ -38,7 +38,16 @@ void Performance::stop( )
    }
 
    m_delta = std::chrono::duration_cast< std::chrono::microseconds >( m_finish.value( ) - m_start.value( ) );
-   DBG_INF( "%s: time delta: %ld", m_name.c_str( ), m_delta.value( ).count( ) );
+   DBG_INF( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
+}
+
+long int Performance::info( ) const
+{
+   if( std::nullopt == m_delta )
+      return 0;
+
+   DBG_INF( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
+   return m_delta.value( ).count( );
 }
 
 

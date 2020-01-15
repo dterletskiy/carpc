@@ -11,7 +11,9 @@
 #include <stdio.h>  /* puts() */
 #include <unistd.h> /* sleep() */
 
+#include <iostream>
 #include <sstream>
+#include <iomanip>
 #include <type_traits>
 
 #include <string>

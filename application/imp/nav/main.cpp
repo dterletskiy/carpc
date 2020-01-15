@@ -60,7 +60,7 @@ void __destructor__( )
 
 
 
-int main( int argc, char *argv[] )
+int main( int argc, char* argv[] )
 {
    memory::dump( );
 

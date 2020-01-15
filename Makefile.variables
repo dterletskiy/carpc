@@ -20,7 +20,7 @@
 # RM           Команда удаления файла; по умолчанию, `rm -f'. 
 
 
-MEMORY_HOOK := 1
+MEMORY_HOOK := 0
 ACTIVE_TRACE := 1
 ACTIVE_SYS_TRACE := 1
 ACTIVE_DBG_TRACE := 1
@@ -44,9 +44,12 @@ TAR            := tar
 #                                         #
 ###########################################
 # File extentions
-SRC_EXT      := cpp
-DEP_EXT      := d
-OBJ_EXT      := o
+SRC_EXT         := cpp
+SRC_PIC_EXT     := pic.cpp
+DEP_EXT         := d
+DEP_PIC_EXT     := pic.d
+OBJ_EXT         := o
+OBJ_PIC_EXT     := pic.o
 
 
 ###########################################
@@ -128,15 +131,18 @@ ifeq ($(ACTIVE_DBG_TRACE),0)
 endif
 
 CFLAGS       := -std=c++17 $(CONSTANTS) $(CCONFIG)
+CFLAGS       += -time
 CFLAGS       += -fopenmp
 CFLAGS       += -Wall
 # CFLAGS       += -Wextra
 # CFLAGS       += -O3
-CFLAGS       += -g3 -ggdb -rdynamic
+# CFLAGS       += -g3 -ggdb -rdynamic
 
 LDFLAGS      := -lrt -ldl
 LDFLAGS      += -fopenmp
-# LDFLAGS      += -lm -larmadillo
+# LDFLAGS      += -lm
+# LDFLAGS      += -larmadillo
+# LDFLAGS      += -lprotobuf
 ifeq ($(MEMORY_HOOK),1)
 	LDFLAGS += -L$(PRODUCT_HOOKS_DIR)/lib -lhooks
 endif
@@ -213,6 +219,8 @@ define print_info
 	@echo $(5)
 	@echo --------------- Object files ---------------
 	@echo $(6)
+	@echo ------------- Object PIC files -------------
+	@echo $(7)
 	@echo --------------------------------------------
 endef
 

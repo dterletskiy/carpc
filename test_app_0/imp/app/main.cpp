@@ -1,7 +1,11 @@
 // Framework
+#include "api/sys/common/Helpers.hpp"
 #include "api/sys/oswrappers/linux/kernel.hpp"
-#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/oswrappers/Mutex.hpp"
+#include "api/sys/oswrappers/Thread.hpp"
+#include "api/sys/tools/Performance.hpp"
 #include "api/sys/tools/Tools.hpp"
+#include "api/sys/service/ServiceProcess.hpp"
 // Application
 #include "imp/app/components/OnOff.hpp"
 
@@ -22,90 +26,65 @@ namespace memory {
 
 
 
-#if 0
-#include "oswrappers/Thread.hpp"
-
-void thread_loop( int index )
-{
-   int count = 0;
-   while( count < 10000 )
-   {
-      DBG_TRC( "Thread ID: %#x / index: %d", pthread_self( ), index );
-      ++count;
-   }
-}
-
-base::os::Thread thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { thread_loop, 45 };
-
-void __constructor__( ) __attribute__(( constructor(102) ));
-void __destructor__( ) __attribute__(( destructor(102) ));
-
-void __constructor__( )
-{
-   DBG_INF( );
-   // thread.run( );
-}
-
-void __destructor__( )
-{
-   DBG_INF( );
-   // thread.join( );
-}
-#endif
-
-
-
-
-
-
-// #include "api/sys/oswrappers/linux/timer.hpp"
-// void timer_handler( union sigval sv )
-// {
-//    timer_t* timer_id = static_cast< timer_t* >( sv.sival_ptr );
-//    SYS_INF( "WhatchDog timer: %#lx", (long) *timer_id );
-// }
-
-void call_malloc( size_t size )
-{
-   DBG_MSG( "--------------------------------------" );
-   void* p = malloc( size );
-   SYS_SIMPLE_TRC( "%p", p );
-   free( p );
-   DBG_MSG( "--------------------------------------" );
-}
-
-void call_realloc( void* address, size_t size )
-{
-   DBG_MSG( "--------------------------------------" );
-   void* p = realloc( address, size );
-   SYS_SIMPLE_TRC( "%p", p );
-   free( p );
-   DBG_MSG( "--------------------------------------" );
-}
-
-void call_calloc( size_t number, size_t size )
-{
-   DBG_MSG( "--------------------------------------" );
-   void* p = calloc( number, size );
-   SYS_SIMPLE_TRC( "%p", p );
-   free( p );
-   DBG_MSG( "--------------------------------------" );
-}
 
 int main( int argc, char *argv[] )
 {
-   base::os::linux::back_trace( 0 );
-   memory::dump( );
-
-   call_malloc( 123 );
-   call_malloc( 456 );
-   call_malloc( 123456789 );
 
 #if 0
+   base::ByteBufferT buffer;
+   bool result = false;
+
+   std::string string = "DSI RPC";
+   buffer.push( string );
+   buffer.dump( );
+   string = { };
+   buffer.pop( string );
+   buffer.dump( );
+   base::print( string, true );
+   buffer.push( string );
+   buffer.dump( );
+   string = { };
+
+   std::vector< std::string > vector { "One", "Two", "Three", "Four", "Five" };
+   // buffer.push( vector );
+   // buffer.dump( );
+   vector = { };
+   result = buffer.pop( vector );
+   buffer.dump( );
+   DBG_INF( "result: %s", BOOL_TO_STRING( result ) );
+   base::print( vector, true );
+
+   result = buffer.pop( string );
+   buffer.dump( );
+   DBG_INF( "result: %s", BOOL_TO_STRING( result ) );
+   base::print( string, true );
+
+   std::map< size_t, std::vector< std::string > > map {
+      { 1, { "1_One", "1_Two", "1_Three", "1_Four", "1_Five" } },
+      { 2, { "2_One", "2_Two", "2_Three", "2_Four", "2_Five" } },
+      { 3, { "3_One", "3_Two", "3_Three", "3_Four", "3_Five" } }
+   };
+   base::print( map, true );
+   buffer.push( map );
+   buffer.dump( );
+   map = { };
+
+   vector = { };
+   result = buffer.pop( vector );
+   buffer.dump( );
+   DBG_INF( "result: %s", BOOL_TO_STRING( result ) );
+   base::print( vector, true );
+
+   result = buffer.pop( map );
+   DBG_INF( "result: %s", BOOL_TO_STRING( result ) );
+   base::print( map, true );
+   DBG_MSG( "-----------------------------------------------------------------------" );
+#endif
+
+#if 1
    memory::dump( );
 
-   REGISTER_DSI_EVENT( DsiPingEvent, DsiService );
-   REGISTER_DSI_EVENT( xDsiPingEvent, xDsiService );
+   REGISTER_DSI_EVENT( xDsiPingEvent, DsiService );
    base::EventRegistry::instance( )->dump( );
 
    base::ServiceInfoVector services = { { "OnOff_Service", { application::onoff::creator }, 5 } };
@@ -130,6 +109,5 @@ int main( int argc, char *argv[] )
 
 
 
-   memory::dump( );
    return 0;
 }

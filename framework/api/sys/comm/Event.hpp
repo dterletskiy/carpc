@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/common/Types.hpp"
-#include "api/sys/common/ByteBuffer.hpp"
+#include "api/sys/common/ByteBufferT.hpp"
 #include "Types.hpp"
 #include "EventRegistry.hpp"
 
@@ -18,15 +18,12 @@ namespace base {
  ***************************************/
 class Event_ID
 {
-   friend ByteBuffer& operator << ( ByteBuffer&, const Event_ID& );
-   friend ByteBuffer& operator >> ( ByteBuffer&, Event_ID& );
-
 public:
    Event_ID( const std::string& );
    ~Event_ID( );
 
-   bool to_buffer( ByteBuffer& ) const;
-   bool from_buffer( ByteBuffer& );
+   bool to_buffer( ByteBufferT& ) const;
+   bool from_buffer( ByteBufferT& );
 
 public:
    const char* c_str( ) const;
@@ -87,9 +84,9 @@ public:
 
 public:
    virtual bool is_dsi( ) const = 0;
-   virtual bool to_buffer( ByteBuffer& ) const = 0;
-   // This function is used to set data from ByteBuffer only for DSI events
-   virtual bool data( ByteBuffer& ) = 0;
+   virtual bool to_buffer( ByteBufferT& ) const = 0;
+   // This function is used to set data from ByteBufferT only for DSI events
+   virtual bool data( ByteBufferT& ) = 0;
    virtual bool send( ) = 0;
    virtual void process( IEventConsumer* ) = 0;
 
@@ -162,34 +159,24 @@ public:
 
 public:
    bool is_dsi( ) const override { return IS_DSI_EVENT; }
-   bool to_buffer( ByteBuffer& buffer ) const override
+   bool to_buffer( ByteBufferT& buffer ) const override
    {
       if constexpr( IS_DSI_EVENT )
       {
-      #ifdef USE_STREAM
-         buffer << *mp_data;
-         buffer << s_type_id;
-      #else
          if( false == buffer.push( *mp_data ) )
             return false;
          if( false == buffer.push( s_type_id ) )
             return false;
-      #endif
          return true;
       }
       return false;
    }
-   bool data( ByteBuffer& buffer ) override
+   bool data( ByteBufferT& buffer ) override
    {
       if constexpr( IS_DSI_EVENT )
       {
          mp_data = std::make_shared< _DataType >( );
-      #ifdef USE_STREAM
-         buffer >> *mp_data;
-         return true;
-      #else
          return buffer.pop( *mp_data );
-      #endif
       }
       return false;
    }

@@ -7,7 +7,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 
-#include "MemoryMap.hpp"
+#include "imp/hooks/MemoryMap.hpp"
 
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/time.hpp"

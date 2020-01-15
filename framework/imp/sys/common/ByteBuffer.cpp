@@ -38,6 +38,12 @@ ByteBuffer::~ByteBuffer( )
 
 void ByteBuffer::dump( ) const
 {
+   // leads to core dump
+   // std::stringstream ss;
+   // for( size_t i = 0; i < m_size; ++i )
+   //    ss << std::setfill('0') << std::setw(2) << std::showbase << std::hex << static_cast< size_t >( mp_buffer[i] ) << " ";
+   // SYS_INF( "%s", ss.str( ).c_str( ) );
+
    for( size_t i = 0; i < m_size; ++i )
       printf( "%#x ", mp_buffer[i] );
    printf( "\n" );
@@ -118,7 +124,12 @@ void ByteBuffer::reset( )
    m_size = m_capacity = 0;   
 }
 
-bool ByteBuffer::push( const void* p_buffer, const size_t size, const bool is_reallocate )
+/*****************************************
+ *
+ * Read / Write buffer methods
+ *
+ ****************************************/
+bool ByteBuffer::write( const void* p_buffer, const size_t size, const bool is_reallocate )
 {
    // Nothing to push
    if( 0 == size ) return false;
@@ -135,8 +146,41 @@ bool ByteBuffer::push( const void* p_buffer, const size_t size, const bool is_re
          return false;
 
    memcpy( mp_buffer + m_size, p_buffer, size );
-   m_size += size;
 
+   return true;
+}
+
+bool ByteBuffer::read( const void* p_buffer, const size_t size )
+{
+   // Not enough data to pop
+   if( size > m_size ) return false;
+   // Nothing to pop
+   if( 0 == size ) return false;
+   // Buffer is not allocated
+   if( nullptr == p_buffer ) return false;
+   // Buffer is not allocated
+   if( nullptr == mp_buffer ) return false;
+
+   void* _p_buffer = const_cast< void* >( p_buffer );
+   memcpy( _p_buffer, mp_buffer + m_size - size, size );
+
+   return true;
+}
+
+
+
+/*****************************************
+ *
+ * Push buffer methods
+ *
+ ****************************************/
+bool ByteBuffer::push( const void* p_buffer, const size_t size, const bool is_reallocate )
+{
+   bool result = write( p_buffer, size, is_reallocate );
+   if( false == result )
+      return false;
+
+   m_size += size;
    return true;
 }
 
@@ -167,21 +211,20 @@ bool ByteBuffer::push( const std::string& string, const bool is_reallocate )
    return true;
 }
 
+
+
+/*****************************************
+ *
+ * Pop buffer methods
+ *
+ ****************************************/
 bool ByteBuffer::pop( const void* p_buffer, const size_t size )
 {
-   // Not enough data to pop
-   if( size > m_size ) return false;
-   // Nothing to pop
-   if( 0 == size ) return false;
-   // Buffer is not allocated
-   if( nullptr == p_buffer ) return false;
-   // Buffer is not allocated
-   if( nullptr == mp_buffer ) return false;
+   bool result = read( p_buffer, size );
+   if( false == result )
+      return false;
 
-   void* _p_buffer = const_cast< void* >( p_buffer );
-   memcpy( _p_buffer, mp_buffer + m_size - size, size );
    m_size -= size;
-
    return true;
 }
 

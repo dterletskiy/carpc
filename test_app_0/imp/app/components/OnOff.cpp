@@ -22,14 +22,14 @@ OnOff::OnOff( const base::ServicePtr p_service, const std::string& name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
    events::PingEvent::set_notification( true, this );
-   DsiService::DsiPingEvent::set_notification( true, this );
+   DsiService::xDsiPingEvent::set_notification( true, this );
 }
 
 OnOff::~OnOff( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
    events::PingEvent::set_notification( false, this );
-   DsiService::DsiPingEvent::set_notification( false, this );
+   DsiService::xDsiPingEvent::set_notification( false, this );
 }
 
 namespace {
@@ -42,7 +42,7 @@ bool OnOff::boot( const std::string& command )
    DBG_WRN( "Sending %ld ITC events...", events_count );
    start_performance( );
    // events::PingEvent::send_event( { events::ePing::ping, "OnOff -> Driver" }, base::eCommType::ITC );
-   DsiService::DsiPingEvent::send_event( { events::ePing::ping, "OnOff -> Driver (via DSI)" } );
+   // DsiService::DsiPingEvent::send_event( { events::ePing::ping, "OnOff -> Driver (via DSI)" } );
    return true;
 }
 
@@ -88,12 +88,12 @@ void OnOff::process_event( const events::PingEvent& event )
    // }
 }
 
-void OnOff::process_event( const DsiService::DsiPingEvent& event )
+void OnOff::process_event( const DsiService::xDsiPingEvent& event )
 {
    DBG_TRC( "type = %#zx, info = %s", static_cast< size_t >( event.data( )->type ), event.data( )->info.c_str( ) );
 
-   DsiService::DsiPingEvent::send_event( { events::ePing::ping, "OnOff -> Driver (via DSI)" } );
-   DsiService::DsiPingEvent::send_event( { events::ePing::ping, "OnOff -> Driver (via DSI)" } );
+   DsiService::xDsiPingEvent::send_event( { events::ePing::ping, "OnOff -> Driver (via DSI)" } );
+   DsiService::xDsiPingEvent::send_event( { events::ePing::ping, "OnOff -> Driver (via DSI)" } );
 
    // switch( event.data( )->type )
    // {
@@ -116,6 +116,7 @@ void OnOff::process_event( const DsiService::DsiPingEvent& event )
    //    default: break;
    // }
 }
+
 
 
 } // namespace application::onoff

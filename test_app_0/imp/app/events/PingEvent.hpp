@@ -15,20 +15,17 @@ enum class ePing : size_t
    response
 };
 
-class PingEventData
+struct PingEventData
 {
-   friend base::ByteBuffer& operator << ( base::ByteBuffer&, const PingEventData& );
-   friend base::ByteBuffer& operator >> ( base::ByteBuffer&, PingEventData& );
-
 public:
    PingEventData( );
    PingEventData( const ePing, const std::string& );
    PingEventData( const PingEventData& );
-   PingEventData( base::ByteBuffer& );
+   PingEventData( base::ByteBufferT& );
    ~PingEventData( );
 
-   bool to_buffer( base::ByteBuffer& ) const;
-   bool from_buffer( base::ByteBuffer& );
+   bool to_buffer( base::ByteBufferT& ) const;
+   bool from_buffer( base::ByteBufferT& );
 
    ePing          type;
    std::string    info;
@@ -44,7 +41,7 @@ DECLARE_EVENT( PingEvent, PingEventData, IPingEventConsumer );
 
 
 
-using DsiPingEventData = application::events::PingEventData;
-DECLARE_DSI_EVENT( DsiPingEvent, DsiPingEventData, IDsiPingEventConsumer, DsiService );
-using xDsiPingEventData = application::events::PingEventData;
-DECLARE_DSI_EVENT( xDsiPingEvent, xDsiPingEventData, IxDsiPingEventConsumer, xDsiService );
+namespace x { using DsiPingEventData = application::events::PingEventData; }
+DECLARE_DSI_EVENT( xDsiPingEvent, x::DsiPingEventData, IxDsiPingEventConsumer, DsiService );
+namespace y { using DsiPingEventData = application::events::PingEventData; }
+DECLARE_DSI_EVENT( yDsiPingEvent, y::DsiPingEventData, IyDsiPingEventConsumer, DsiService );

@@ -21,16 +21,16 @@ namespace application::events {
    {
    }
 
-   PingEventData::PingEventData( base::ByteBuffer& buffer )
+   PingEventData::PingEventData( base::ByteBufferT& buffer )
    {
-      buffer >> *this;
+      from_buffer( buffer );
    }
 
    PingEventData::~PingEventData( )
    {
    }
 
-   bool PingEventData::to_buffer( base::ByteBuffer& buffer ) const
+   bool PingEventData::to_buffer( base::ByteBufferT& buffer ) const
    {
       if( false == buffer.push( static_cast< size_t >( type ) ) )
          return false;
@@ -41,7 +41,7 @@ namespace application::events {
       return true;
    }
 
-   bool PingEventData::from_buffer( base::ByteBuffer&  buffer )
+   bool PingEventData::from_buffer( base::ByteBufferT&  buffer )
    {
       if( false == buffer.pop( info ) )
          return false;
@@ -54,30 +54,14 @@ namespace application::events {
       return true;
    }
 
-   base::ByteBuffer& operator << ( base::ByteBuffer& buffer, const PingEventData& data )
-   {
-      buffer << static_cast< size_t >( data.type );
-      buffer << data.info;
-      return buffer;
-   }
-
-   base::ByteBuffer& operator >> ( base::ByteBuffer& buffer, PingEventData& data )
-   {
-      buffer >> data.info;
-      size_t _type;
-      buffer >> _type;
-      data.type = static_cast< ePing >( _type );
-      return buffer;
-   }
-
    INIT_EVENT( PingEvent );
 
 } // namespace application::events
 
 
 
-INIT_DSI_EVENT( DsiPingEvent, DsiService );
-INIT_DSI_EVENT( xDsiPingEvent, xDsiService );
+INIT_DSI_EVENT( xDsiPingEvent, DsiService );
+// INIT_DSI_EVENT( yDsiPingEvent, DsiService );
 
 // REGISTER_DSI_EVENT( DsiPingEvent, DsiService );
 // EventRegistry::instance( )->dump( );

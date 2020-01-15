@@ -4,47 +4,40 @@
 
 
 
-//                           +-------------------------- Foreground Colore
-//                           |  +----------------------- Class Abbriviation
-//                           |  |  +-------------------- Function Name
-//                           |  |  |  +----------------- Line Number
-//                           |  |  |  |
-//                           |  |  |  |
-//                           |  |  |  |
-//                           |  |  |  |
-#define PREFIX_FORMAT_CODE "%s[%s:%s:%d] -> "
+//                                            +----------------------- Class Abbriviation
+//                                            |  +-------------------- Function Name
+//                                            |  |  +----------------- Line Number
+//                                            |  |  |
+//                                            |  |  |
+//                                            |  |  |
+//                                            |  |  |
+#define PREFIX_FORMAT_CODE FG_LIGHT_YELLOW "[%s:%s:%d] -> "
 
 
-//                              +---------------------------- Foreground Colore for Delimiter
-//                              | +-------------------------- Delimiter sign
-//                              | |  +----------------------- Foreground Colore for PID
-//                              | |  |  +-------------------- PID
-//                              | |  |  |   +---------------- Foreground Colore for TID
-//                              | |  |  |   |   +------------ TID
-//                              | |  |  |   |   |   +-------- Foreground Colore for Delimiter
-//                              | |  |  |   |   |   | +------ Delimiter sign
-//                              | |  |  |   |   |   | |
-//                              | |  |  |   |   |   | |
-#define PREFIX_FORMAT_PID_TID "%s%s %s%#5x %s%#10lx %s%s"
+#define PID_TID_DELIMITER "|"
+//                                                                     +--------------------------- PID
+//                                                                     |                 +--------- TID
+//                                                                     |                 |   
+//                                                                     |                 |   
+#define PREFIX_FORMAT_PID_TID FG_YELLOW PID_TID_DELIMITER " " FG_RED "%#5x " FG_GREEN "%#10lx " FG_YELLOW PID_TID_DELIMITER
 
-//                                   +----------------------- Foreground Colore
-//                                   |   +------------------- Microseconds
-//                                   |   |
-//                                   |   |
-#define PREFIX_FORMAT_MICROSECONDS "%s%20lu"
+//                                        +-------------------------------- Foreground Colore
+//                                        |            +------------------- Microseconds
+//                                        |            |
+//                                        |            |
+#define PREFIX_FORMAT_MICROSECONDS FG_LIGHT_MAGENTA "%20lu"
 
-//                                             +------------------------------------------------ Foreground Colore
-//                                             |  +--------------------------------------------- Year
-//                                             |  |    +---------------------------------------- Month
-//                                             |  |    |    +----------------------------------- Day
-//                                             |  |    |    |   +------------------------------- Foreground Colore
-//                                             |  |    |    |   |  +---------------------------- Hours
-//                                             |  |    |    |   |  |    +----------------------- Minutes
-//                                             |  |    |    |   |  |    |    +------------------ Seconds
-//                                             |  |    |    |   |  |    |    |    +------------- Milliseconds
-//                                             |  |    |    |   |  |    |    |    |
-//                                             |  |    |    |   |  |    |    |    |
-#define PREFIX_FORMAT_DATE_TIME_MILLISECONDS "%s%04d-%02d-%02d %s%02d:%02d:%02d:%06d"
+//                                                               +------------------------------------------------------------ Year
+//                                                               |    +------------------------------------------------------- Month
+//                                                               |    |    +-------------------------------------------------- Day
+//                                                               |    |    | 
+//                                                               |    |    |                     +---------------------------- Hours
+//                                                               |    |    |                     |    +----------------------- Minutes
+//                                                               |    |    |                     |    |    +------------------ Seconds
+//                                                               |    |    |                     |    |    |    +------------- Milliseconds
+//                                                               |    |    |                     |    |    |    |
+//                                                               |    |    |                     |    |    |    |
+#define PREFIX_FORMAT_DATE_TIME_MILLISECONDS FG_LIGHT_MAGENTA "%04d-%02d-%02d " FG_LIGHT_CYAN "%02d:%02d:%02d:%06zu"
 
 #define PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE PREFIX_FORMAT_MICROSECONDS " " PREFIX_FORMAT_PID_TID "   " PREFIX_FORMAT_CODE
 #define PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE PREFIX_FORMAT_DATE_TIME_MILLISECONDS " " PREFIX_FORMAT_PID_TID "   " PREFIX_FORMAT_CODE

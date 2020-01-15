@@ -18,6 +18,7 @@ public:
 
    void start( );
    void stop( );
+   long int info( ) const;
 
 private:
    std::string                                                             m_name;

@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#define USE_STREAM
-
 
 
 namespace base {

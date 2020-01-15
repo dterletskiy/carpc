@@ -143,7 +143,6 @@ void ConnectionProcessor::connection_loop( )
                socklen_t addrlen = sizeof( address );
                getpeername( slave_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
                SYS_INF( "Host disconnected, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
-               DBG_INF( "Host disconnected, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
 
                // connection closed
                ::shutdown( slave_socket, SHUT_RDWR );
@@ -169,7 +168,6 @@ void ConnectionProcessor::connection_loop( )
          socklen_t addrlen = sizeof( address );
          getpeername( slave_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
          SYS_INF( "Host connected, ip:port/socket - %s:%d/%d", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
-         DBG_INF( "Host connected, ip:port/socket - %s:%d/%d", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
       }
    }
 }

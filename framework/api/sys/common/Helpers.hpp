@@ -6,6 +6,14 @@
 
 #define DEAD *((unsigned int*)0) = 0xDEAD;
 
+#define BOOL_TO_STRING( value ) ( value ? "true" : "false" )
+
+#define CONCAT_STRINGS_2( STRING1, STRING2                                                ) STRING1 STRING2
+#define CONCAT_STRINGS_3( STRING1, STRING2, STRING3                                       ) STRING1 STRING2 STRING3
+#define CONCAT_STRINGS_4( STRING1, STRING2, STRING3, STRING4                              ) STRING1 STRING2 STRING3 STRING4
+#define CONCAT_STRINGS_5( STRING1, STRING2, STRING3, STRING4, STRING5                     ) STRING1 STRING2 STRING3 STRING4 STRING5
+#define CONCAT_STRINGS_6( STRING1, STRING2, STRING3, STRING4, STRING5, STRING6            ) STRING1 STRING2 STRING3 STRING4 STRING5 STRING6
+#define CONCAT_STRINGS_7( STRING1, STRING2, STRING3, STRING4, STRING5, STRING6, STRING7   ) STRING1 STRING2 STRING3 STRING4 STRING5 STRING6 STRING7
 
 
 namespace base {
@@ -33,8 +41,10 @@ namespace base {
  * 
  ***************************************************************************************************/
 
-using YES = char;
-struct NO { YES m[2]; };
+namespace {
+   using YES = char;
+   struct NO { YES m[2]; };
+}
 
 template< typename B, typename D >
 struct is_base_of
@@ -58,15 +68,24 @@ struct is_base_of< D, D >
  * Print std containers and types
  * 
  ***************************************************************************************************/
-
 template< typename TYPE >
-void print( const TYPE& value )
+void print( const TYPE& value, const bool is_new_line = false )
 {
    std::cout << value;
+
+   if( is_new_line ) std::cout << std::endl;
+}
+
+inline
+void print( const std::string& string, const bool is_new_line = false )
+{
+   std::cout << "\"" << string << "\"";
+
+   if( is_new_line ) std::cout << std::endl;
 }
 
 template< typename TYPE >
-void print( const std::list< TYPE >& list )
+void print( const std::list< TYPE >& list, const bool is_new_line = false )
 {
    std::cout << "{ " ;
    for ( const auto& value : list )
@@ -75,10 +94,12 @@ void print( const std::list< TYPE >& list )
       std::cout << " ";
    }
    std::cout << "}";
+
+   if( is_new_line ) std::cout << std::endl;
 }
 
 template< typename TYPE >
-void print( const std::vector< TYPE >& vector )
+void print( const std::vector< TYPE >& vector, const bool is_new_line = false )
 {
    std::cout << "{ " ;
    for ( const auto& value : vector )
@@ -87,10 +108,12 @@ void print( const std::vector< TYPE >& vector )
       std::cout << " ";
    }
    std::cout << "}";
+
+   if( is_new_line ) std::cout << std::endl;
 }
 
 template< typename TYPE >
-void print( const std::set< TYPE >& set )
+void print( const std::set< TYPE >& set, const bool is_new_line = false )
 {
    std::cout << "{ " ;
    for ( const auto& value : set )
@@ -99,20 +122,24 @@ void print( const std::set< TYPE >& set )
       std::cout << " ";
    }
    std::cout << "}";
+
+   if( is_new_line ) std::cout << std::endl;
 }
 
 template< typename TYPE_KEY, typename TYPE_VALUE >
-void print( const std::pair< TYPE_KEY, TYPE_VALUE >& pair )
+void print( const std::pair< TYPE_KEY, TYPE_VALUE >& pair, const bool is_new_line = false )
 {
    std::cout << "{ " ;
    print( pair.first );
    std::cout << " => ";
    print( pair.second );
    std::cout << " }";
+
+   if( is_new_line ) std::cout << std::endl;
 }
 
 template< typename TYPE_KEY, typename TYPE_VALUE >
-void print( const std::map< TYPE_KEY, TYPE_VALUE >& map )
+void print( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool is_new_line = false )
 {
    std::cout << "{ " ;
    for ( const auto& pair : map )
@@ -121,6 +148,8 @@ void print( const std::map< TYPE_KEY, TYPE_VALUE >& map )
       std::cout << " ";
    }
    std::cout << " }";
+
+   if( is_new_line ) std::cout << std::endl;
 }
 
 

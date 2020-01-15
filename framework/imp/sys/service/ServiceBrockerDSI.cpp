@@ -122,11 +122,30 @@ void ServiceBrockerDSI::thread_loop_send( )
    SYS_INF( "enter" );
    m_started_send = true;
 
+   ByteBufferT register_buffer;
+   for( const auto& pair : EventRegistry::instance( )->registry( ) )
+   {
+      if( false == register_buffer.push( pair.first ) )
+      {
+         SYS_ERR( "registration error" );
+         return;
+      }
+   }
+   size_t send_size = send( m_master_socket, register_buffer.buffer( ), register_buffer.size( ), 0 );
+   m_last_errno = errno;
+   if( send_size != register_buffer.size( ) )
+   {
+      SYS_ERR( "send(%d): %d", m_master_socket, m_last_errno );
+      SYS_ERR( "registration error" );
+      return;
+   }
+   SYS_MSG( "send(%d): %zu bytes", m_master_socket, send_size );
+
    while( started_send( ) )
    {
       EventPtr p_event = get_event( );
       SYS_INF( "processing event (%s)", p_event->type_id( ).c_str( ) );
-      base::ByteBuffer buffer;
+      base::ByteBufferT buffer;
       if( false == p_event->to_buffer( buffer ) )
       {
          SYS_ERR( "lost sent event" );
@@ -191,7 +210,7 @@ void ServiceBrockerDSI::thread_loop_receive( )
       }
       SYS_MSG( "recv(%d): %ld bytes", m_master_socket, recv_size );
 
-      ByteBuffer byte_buffer( p_buffer, recv_size );
+      ByteBufferT byte_buffer( p_buffer, recv_size );
       // byte_buffer.dump( );
 
       base::EventPtr p_event = base::EventRegistry::instance( )->create_event( byte_buffer );

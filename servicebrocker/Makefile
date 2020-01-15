@@ -57,7 +57,7 @@ archive:
 
 execute:
 	reset
-	$(TARGET_DIR)/$(PROJECT_NAME)
+	export LD_LIBRARY_PATH=$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib ; $(TARGET_DIR)/$(PROJECT_NAME)
 
 debug:
 	reset

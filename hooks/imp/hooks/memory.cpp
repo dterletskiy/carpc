@@ -6,7 +6,7 @@
 #include <malloc.h>
 #include <cstddef>
 
-#include "MemoryMap.hpp"
+#include "imp/hooks/MemoryMap.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "MEMORY"

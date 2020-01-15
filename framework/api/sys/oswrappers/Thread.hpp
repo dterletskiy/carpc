@@ -4,6 +4,9 @@
 
 
 
+#include "api/sys/trace/Trace.hpp"
+#define CLASS_ABBR "OS_THREAD"
+
 namespace base::os {
 
 
@@ -50,6 +53,7 @@ Thread::Thread( _Fn&& p_function, _Args&&... args )
    , m_thread{ }
 #endif
 {
+   SYS_INF( );
    #if OS == LINUX
       pthread_attr_init( &m_attr );
       pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
@@ -69,3 +73,5 @@ const TID& Thread::id( ) const
 
 
 } // namespace base::os
+
+#undef CLASS_ABBR
