@@ -3,10 +3,6 @@
 
 
 
-namespace application::events {
-
-   INIT_EVENT( PingDriverEvent );
-   INIT_EVENT( PingMasterEvent );
-   INIT_EVENT( PingSlaveEvent );
-
-} // namespace application::events
+INIT_EVENT( application::events::PingDriverEvent );
+INIT_EVENT( application::events::PingMasterEvent );
+INIT_EVENT( application::events::PingSlaveEvent );

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/un.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>

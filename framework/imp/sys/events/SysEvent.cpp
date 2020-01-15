@@ -5,8 +5,4 @@
 
 
 
-namespace base {
-
-   INIT_EVENT( SysEvent );
-
-} // namespace base
+INIT_EVENT( base::SysEvent );

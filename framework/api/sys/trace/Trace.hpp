@@ -40,6 +40,7 @@
 #define DBG_MSG( USER_FORMAT, ... )  DBG_TYPE( FG_LIGHT_GREEN   DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
 #define DBG_WRN( USER_FORMAT, ... )  DBG_TYPE( FG_LIGHT_BLUE    DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
 #define DBG_ERR( USER_FORMAT, ... )  DBG_TYPE( FG_LIGHT_RED     DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
+#define DBG_MSG_SIZEOF( TYPE ) DBG_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
 
 
 

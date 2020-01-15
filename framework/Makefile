@@ -14,7 +14,7 @@ GENERATED_DIR    := $(PRODUCT_DIR)/gen
 TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
-INCLUDE          += -I$(SOURCE_DIR) -I$(SOURCE_DIR)/trace
+INCLUDE          += -I$(SOURCE_DIR)
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE

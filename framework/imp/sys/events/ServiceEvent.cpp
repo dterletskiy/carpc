@@ -5,8 +5,4 @@
 
 
 
-namespace base {
-
-   INIT_EVENT( ServiceEvent );
-
-} // namespace base
+INIT_EVENT( base::ServiceEvent );

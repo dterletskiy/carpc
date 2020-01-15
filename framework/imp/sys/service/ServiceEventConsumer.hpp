@@ -23,7 +23,7 @@ private:
    ServicePtrW mp_service;
 
 private:
-   void process_event( const ServiceEvent::Event& );
+   void process_event( const ServiceEvent::Event& ) override;
 };
 
 

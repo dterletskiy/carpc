@@ -1,10 +1,5 @@
 // Framework
-#include "api/sys/helpers/macros/enum.hpp"
 #include "api/sys/oswrappers/linux/kernel.hpp"
-#include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/tools/Performance.hpp"
-#include "api/sys/tools/Tools.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 // Application
 #include "imp/app/components/OnOff.hpp"
@@ -24,15 +19,8 @@ namespace memory {
    #endif
 }
 
-#define DBG_MSG_SIZEOF( TYPE ) DBG_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
-
-
-
-
-
-int main( int argc, char *argv[] )
+void boot( )
 {
-#if 1
    memory::dump( );
 
    REGISTER_DSI_EVENT( ServiceDSI, PingEvent );
@@ -56,9 +44,12 @@ int main( int argc, char *argv[] )
    DBG_ERR( "Main: program exiting." );
 
    memory::dump( );
-#endif
+}
 
 
 
+int main( int argc, char *argv[] )
+{
+   boot( );
    return 0;
 }

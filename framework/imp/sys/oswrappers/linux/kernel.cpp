@@ -29,6 +29,7 @@ int set_nonblock( int fd )
 const char* wrn_duffer_size = "not enough buffer size\n";
 void back_trace( int _fd )
 {
+#if 1
    static const size_t buffer_size = 256;
    void* buffer[ buffer_size ];
 
@@ -62,6 +63,7 @@ void back_trace( int _fd )
       }
       free( strings );
    }
+#endif
 }
 
 

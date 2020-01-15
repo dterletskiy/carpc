@@ -28,7 +28,7 @@ private:
    RootComponent* mp_root_component;
 
 private:
-   void process_event( const SysEvent::Event& );
+   void process_event( const SysEvent::Event& ) override;
 };
 
 

@@ -32,7 +32,10 @@ MemoryHeader* MemoryHeader::cast( void* p )
 void MemoryHeader::dump( void* _address )
 {
    MemoryHeader* p_header = cast( _address );
-   SYS_SIMPLE_INF( "address (user address) = %p (%p) / caller = %p / size = %zu / time = %lu", _address, _address + sizeof( MemoryHeader ), p_header->caller, p_header->size, p_header->time );
+   SYS_SIMPLE_INF(
+      "address (user address) = %p (%p) / caller = %p / size = %zu / time = %lu"
+      , _address, static_cast< char* >( _address ) + sizeof( MemoryHeader ), p_header->caller, p_header->size, p_header->time
+   );
 }
 
 void MemoryHeader::write( void* _address, void* _caller, const size_t _size, const uint64_t _time )
@@ -43,8 +46,8 @@ void MemoryHeader::write( void* _address, void* _caller, const size_t _size, con
 
 
 MemoryMap::MemoryMap( const char* _path, const size_t _size )
-   : m_path( _path )
-   , m_min_track_size( _size )
+   : m_min_track_size( _size )
+   , m_path( _path )
 {
    if( nullptr == strchr( m_path, '/' ) )
       m_fd = shm_open( m_path, O_RDWR | O_CREAT, AccessPerms );

@@ -283,7 +283,8 @@ EventPtr create_event( const typename TYPE::_DataType data, const eCommType comm
 
 
 
-enum class eDummyEventID : size_t { dummy };
+#include <stdint.h>
+enum class eDummyEventID : size_t { dummy = SIZE_MAX };
 
 
 

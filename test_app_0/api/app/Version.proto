@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "com.harman.statereplication.common.messages.v1_0";
+
+/* This is the defination of the interface version for destination sync
+   The version has to be decoded and checked first
+   in case conflict navigation should stop further communication
+*/
+
+message Version
+{
+    uint32 Major = 1;
+    uint32 Minor = 2;
+}
