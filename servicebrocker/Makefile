@@ -82,6 +82,9 @@ $(TARGET_DEBUG):
 	reset
 	$(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
 
+$(TARGET_DISASSM):
+	$(DISASSEMBLER) -S --disassemble $(TARGET_DIR)/$(PROJECT_NAME) > $(TARGET_DIR)/$(PROJECT_NAME).s
+
 
 
 # Non-File Targets

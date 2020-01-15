@@ -31,7 +31,7 @@ const ID generate_id( const char* const name_space )
    return id;
 }
 
-char* get_cmd_option( int argc, char ** begin, const std::string & option )
+char* get_cmd_option( int argc, char** begin, const std::string & option )
 {
    char** end = begin + argc;
    char** itr = std::find( begin, end, option );

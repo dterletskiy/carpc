@@ -15,6 +15,7 @@ TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
 INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR)
+# CFLAGS           += -fPIC
 LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
 
 #---------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
 SOURCE_FILES     := $(shell find $(SOURCE_DIR) -type f -name *.$(SRC_EXT))
 OBJECT_FILES     := $(patsubst $(SOURCE_DIR)/%,$(OBJECT_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(OBJ_EXT)))
 GENERATED_FILES  := $(patsubst $(SOURCE_DIR)/%,$(GENERATED_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(SRC_EXT)))
+
 
 
 
@@ -45,6 +47,7 @@ $(TARGET_CLEAN):
 $(TARGET_GENERATE): config $(GENERATED_FILES)
 
 $(TARGET_BUILD): config $(OBJECT_FILES)
+# 	g++ -shared -o $(LIBRARY_DIR)/lib$(PROJECT_NAME).so $(OBJECT_FILES) $(LDFLAGS)
 	ar rcs $(LIBRARY_DIR)/lib$(PROJECT_NAME).a $(OBJECT_FILES)
 
 clean_build: $(TARGET_CLEAN) $(TARGET_BUILD)

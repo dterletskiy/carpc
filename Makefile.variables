@@ -20,7 +20,7 @@
 # RM           Команда удаления файла; по умолчанию, `rm -f'. 
 
 
-MEMORY_HOOK := 0
+MEMORY_HOOK := 1
 ACTIVE_TRACE := 1
 ACTIVE_SYS_TRACE := 1
 ACTIVE_DBG_TRACE := 1
@@ -33,10 +33,9 @@ ACTIVE_DBG_TRACE := 1
 TIME := $(shell date +"%H-%M-%S")
 DATE := $(shell date +"%Y-%m-%d")
 
-# Debugger
-DEBUGGER    := lldb
-# tar
-TAR         := tar
+DEBUGGER       := lldb
+DISASSEMBLER   := objdump
+TAR            := tar
 
 
 ###########################################
@@ -62,6 +61,7 @@ TARGET_CLEAN            := clean
 TARGET_INFO             := info
 TARGET_ARCHIVE          := archive
 TARGET_DEBUG            := debug
+TARGET_DISASSM          := disassm
 
 ###########################################
 #                                         #
@@ -129,7 +129,7 @@ ifeq ($(ACTIVE_DBG_TRACE),0)
 endif
 
 CFLAGS       := -std=c++17 $(CONSTANTS) $(CCONFIG)
-# CFLAGS       += -fopenmp
+CFLAGS       += -fopenmp
 CFLAGS       += -Wall
 # CFLAGS       += -Wextra
 # CFLAGS       += -O3
@@ -183,4 +183,18 @@ define generate
 	$(call create_directories,$(dir $(4)))
 	$(1) $(2) $(3) -E -o $(4) $(5)
 	@echo "---------------------------------------------------------"
+endef
+
+define link
+	@echo "---------------------------------------------------------"
+	@echo "Linkin..."
+	@echo "   Compiler:   " $(1)
+	@echo "   Flags:      " $(2)
+	@echo "   Executeble: " $(3)
+	@echo "   Objects:    " $(4)
+	$(1) -o $(3) $(4) $(2)
+	@echo "---------------------------------------------------------"
+endef
+
+define build_source_list
 endef

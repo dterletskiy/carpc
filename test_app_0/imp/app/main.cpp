@@ -52,172 +52,38 @@ void __destructor__( )
 
 
 
-
-
-#include "api/sys/common/ByteBuffer.hpp"
-
-template< typename TYPE >
-void print( const TYPE& value )
-{
-   std::cout << value;
-}
-
-template< typename TYPE >
-void print( const std::list< TYPE >& list )
-{
-   std::cout << "{ " ;
-   for ( const auto& value : list )
-   {
-      print( value );
-      std::cout << " ";
-   }
-   std::cout << "}";
-}
-
-template< typename TYPE >
-void print( const std::vector< TYPE >& vector )
-{
-   std::cout << "{ " ;
-   for ( const auto& value : vector )
-   {
-      print( value );
-      std::cout << " ";
-   }
-   std::cout << "}";
-}
-
-template< typename TYPE >
-void print( const std::set< TYPE >& set )
-{
-   std::cout << "{ " ;
-   for ( const auto& value : set )
-   {
-      print( value );
-      std::cout << " ";
-   }
-   std::cout << "}";
-}
-
-template< typename TYPE_KEY, typename TYPE_VALUE >
-void print( const std::pair< TYPE_KEY, TYPE_VALUE >& pair )
-{
-   std::cout << "{ " ;
-   print( pair.first );
-   std::cout << " => ";
-   print( pair.second );
-   std::cout << " }";
-}
-
-template< typename TYPE_KEY, typename TYPE_VALUE >
-void print( const std::map< TYPE_KEY, TYPE_VALUE >& map )
-{
-   std::cout << "{ " ;
-   for ( const auto& pair : map )
-   {
-      print( pair );
-      std::cout << " ";
-   }
-   std::cout << " }";
-}
-
-
 int main( int argc, char *argv[] )
 {
-   {
-      std::cout << "std::vector< int >:" << std::endl;
-      std::vector< int > vector = { 111, 222, 333, 444, 555 };
-      base::ByteBuffer buffer;
-      buffer.push( vector );
-      buffer.dump( );
+   memory::dump( );
 
-      std::vector< int > vector_new = { 0, 0, 0, 0, 0 };
-      buffer.pop( vector_new );
-      print( vector_new );
-      std::cout << std::endl << std::endl;
+   {
+      DBG_MSG( "--------------------------------------" );
+      void* p = malloc( 12345 );
+      SYS_SIMPLE_TRC( "%p", p );
+      free( p );
+      DBG_MSG( "--------------------------------------" );
    }
    {
-      std::cout << "std::list< int >:" << std::endl;
-      std::list< int > list = { 111, 222, 333, 444, 555 };
-      base::ByteBuffer buffer;
-      buffer.push( list );
-      buffer.dump( );
-
-      std::list< int > list_new = { 0, 0, 0, 0, 0 };
-      buffer.pop( list_new );
-      print( list_new );
-      std::cout << std::endl << std::endl;
+      DBG_MSG( "--------------------------------------" );
+      void* p = calloc( 12, 10 );
+      SYS_SIMPLE_TRC( "%p", p );
+      free( p );
+      DBG_MSG( "--------------------------------------" );
    }
    {
-      std::cout << "std::set< int >:" << std::endl;
-      std::set< int > set = { 111, 222, 333, 444, 555 };
-      base::ByteBuffer buffer;
-      buffer.push( set );
-      buffer.dump( );
-
-      std::set< int > set_new = { 0, 1, 2, 3, 4 };
-      buffer.pop( set_new );
-      print( set_new );
-      std::cout << std::endl << std::endl;
+      DBG_MSG( "--------------------------------------" );
+      size_t* p = new size_t;
+      SYS_SIMPLE_TRC( "%p", p );
+      delete p;
+      DBG_MSG( "--------------------------------------" );
    }
    {
-      std::cout << "std::pair< int, int >:" << std::endl;
-      std::pair< int, int > pair = { 123,456 };
-      base::ByteBuffer buffer;
-      buffer.push( pair );
-      buffer.dump( );
-
-      std::pair< int, int > pair_new = { 0, 0 };
-      buffer.pop( pair_new );
-      print( pair_new );
-      std::cout << std::endl << std::endl;
+      DBG_MSG( "--------------------------------------" );
+      size_t* p = new size_t[5];
+      SYS_SIMPLE_TRC( "%p", p );
+      delete[] p;
+      DBG_MSG( "--------------------------------------" );
    }
-   {
-      std::cout << "std::map< int, int >:" << std::endl;
-      std::map< int, int > map = { {111,222}, {333,444}, {555,666} };
-      base::ByteBuffer buffer;
-      buffer.push( map );
-      buffer.dump( );
-
-      std::map< int, int > map_new = { {0,0}, {1,1}, {2,2} };
-      buffer.pop( map_new );
-      print( map_new );
-      std::cout << std::endl << std::endl;
-   }
-   {
-      std::cout << "std::map< int, std::string >:" << std::endl;
-      std::map< int, std::string > map = { {111,"222"}, {333,"444"}, {555,"666"} };
-      base::ByteBuffer buffer;
-      buffer.push( map );
-      buffer.dump( );
-
-      std::map< int, std::string > map_new = { {0,"0"}, {1,"1"}, {2,"2"} };
-      buffer.pop( map_new );
-      print( map_new );
-      std::cout << std::endl << std::endl;
-   }
-   {
-      std::cout << "std::map< int, std::vector< std::string > >:" << std::endl;
-      std::map< int, std::vector< std::string > > map =
-      {
-         { 111, { "One", "Two", "Three" } },
-         { 222, { "Four", "Five", "Six" } }
-      };
-      base::ByteBuffer buffer;
-      buffer.push( map );
-      buffer.dump( );
-
-      std::map< int, std::vector< std::string > > map_new;
-      buffer.pop( map_new );
-      print( map_new );
-      std::cout << std::endl << std::endl;
-   }
-   
-
-
-
-
-
-
 
 #if 0
    memory::dump( );
@@ -245,5 +111,9 @@ int main( int argc, char *argv[] )
 
    memory::dump( );
 #endif
+
+
+
+   memory::dump( );
    return 0;
 }
