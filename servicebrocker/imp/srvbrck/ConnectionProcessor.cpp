@@ -176,6 +176,7 @@ ConnectionProcessor::eRead ConnectionProcessor::read_slave_socket( const int sla
    }
 
    SYS_MSG( "recv(%d): %ld bytes", slave_socket, read_size );
+   // DBG_INF( "recv(%d): %ld bytes", slave_socket, read_size );
    ssize_t send_size = send( slave_socket, mp_buffer, read_size, 0 );
    if( send_size != read_size )
    {

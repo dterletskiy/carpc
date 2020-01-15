@@ -1,4 +1,3 @@
-#include "api/sys/common/Helpers.hpp"
 // Application
 #include "imp/app/events/PingEvent.hpp"
 

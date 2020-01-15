@@ -4,6 +4,8 @@
 #include "api/sys/component/RootComponent.hpp"
 // Application
 #include "imp/app/events/PingEvent.hpp"
+#include "imp/app/components/server/Server.hpp"
+#include "imp/app/components/client/Client.hpp"
 
 
 
@@ -25,7 +27,13 @@ public:
 
 private:
    bool boot( const std::string& ) override;
+
+private:
    void process_event( const ServiceDSI::PingEvent::Event& ) override;
+
+private:
+   Server m_server;
+   Client m_client;
 };
 
 

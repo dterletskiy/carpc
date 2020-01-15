@@ -35,12 +35,12 @@ Event::~Event( )
 
 bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const Event_ID& type_id )
 {
-   // SYS_INF( "event id: %#x / consumer: %p / is_set: %s", type_id, p_consumer, is_set ? "true" : "false" );
+   SYS_INF( "event id: %s / consumer: %p / is_set: %s", type_id.c_str( ), p_consumer, BOOL_TO_STRING( is_set ) );
    ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
    if( InvalidServicePtr == p_service )
       return false;
 
-   // SYS_INF( "event id: %#x / service: %s", type_id, p_service->name( ).c_str( ) );
+   SYS_INF( "event id: %s / service: %s", type_id.c_str( ), p_service->name( ).c_str( ) );
    if( true == is_set )
    {
       p_service->set_notification( type_id, p_consumer );

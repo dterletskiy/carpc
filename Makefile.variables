@@ -130,15 +130,16 @@ ifeq ($(ACTIVE_DBG_TRACE),0)
 	CCONFIG += -DNO_DBG_TRACE
 endif
 
-CFLAGS       := -std=c++17 $(CONSTANTS) $(CCONFIG)
+CFLAGS       += CXXFLAGS
+CFLAGS       += -std=c++17 $(CONSTANTS) $(CCONFIG)
 CFLAGS       += -time
 CFLAGS       += -fopenmp
 CFLAGS       += -Wall
 # CFLAGS       += -Wextra
-CFLAGS       += -O3
+# CFLAGS       += -O3
 # CFLAGS       += -g3 -ggdb -rdynamic
 
-LDFLAGS      := -lrt -ldl
+LDFLAGS      += -lrt -ldl
 LDFLAGS      += -fopenmp
 # LDFLAGS      += -lm
 # LDFLAGS      += -larmadillo

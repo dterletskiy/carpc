@@ -11,4 +11,4 @@ namespace api::onoff {
 
 
 
-INIT_DSI_EVENT( OnOffService, OnOffEvent );
+INIT_EVENT( api::onoff::OnOffEvent );

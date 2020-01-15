@@ -2,7 +2,6 @@ include ./Makefile.variables
 
 
 
-
 all: 
 	reset
 	@echo "Common target is not defined."

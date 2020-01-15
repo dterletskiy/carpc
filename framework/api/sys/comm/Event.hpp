@@ -5,6 +5,8 @@
 #include "api/sys/comm/Types.hpp"
 #include "api/sys/comm/Event_ID.hpp"
 #include "api/sys/comm/EventRegistry.hpp"
+#include "api/sys/helpers/macros/enum.hpp"
+#include "api/sys/helpers/macros/strings.hpp"
 
 
 

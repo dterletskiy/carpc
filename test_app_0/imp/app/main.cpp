@@ -1,5 +1,5 @@
 // Framework
-#include "api/sys/common/Helpers.hpp"
+#include "api/sys/helpers/macros/enum.hpp"
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/oswrappers/Thread.hpp"
@@ -24,40 +24,15 @@ namespace memory {
    #endif
 }
 
+#define DBG_MSG_SIZEOF( TYPE ) DBG_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
 
 
 
 
-template< typename T >
-void doSomething( T arg )
-{
-   std::cout << __PRETTY_FUNCTION__ << ": -> " << arg << std::endl;
-}
-
-template< typename... Args >
-void doSomethingForAll( Args const&... args )
-{
-   (void)std::initializer_list<int>{ ((void)doSomething(args),0)... };
-}
-
-
-
-
-
-
-
-DEFINE_ENUM_EX( eColors, size_t, _RED, _GREEN, _BLUE );
 
 int main( int argc, char *argv[] )
 {
-   for( const auto& item : eColors() )
-   {
-      std::cout << to_string( item ) << std::endl;
-   }
-
-
-
-#if 0
+#if 1
    memory::dump( );
 
    REGISTER_DSI_EVENT( ServiceDSI, PingEvent );
