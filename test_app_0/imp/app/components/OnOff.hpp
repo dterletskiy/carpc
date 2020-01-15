@@ -20,6 +20,7 @@ class OnOff
    , public events::PingEventETC::Consumer
    , public events::PingEventITC::Consumer
    , public ServiceDSI::PingEventDSI::Consumer
+   , public events::EventEx::Consumer
 {
 public:
    OnOff( const base::ServicePtr, const std::string& );
@@ -30,6 +31,7 @@ private:
    void process_event( const events::PingEventETC::Event& ) override;
    void process_event( const events::PingEventITC::Event& ) override;
    void process_event( const ServiceDSI::PingEventDSI::Event& ) override;
+   void process_event( const events::EventEx::Event& ) override;
 };
 
 

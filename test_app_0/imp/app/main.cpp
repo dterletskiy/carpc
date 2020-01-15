@@ -42,8 +42,49 @@ void doSomethingForAll( Args const&... args )
 
 
 
+// #define DEFINE_ENUM(  )
+
+
+
+enum class COLOR : size_t { Red = 100, Green, Yellow, Blue, Purple, White, Black, First = Red, Last = Black };
+
+COLOR operator++( COLOR& x )
+{
+   return x = ( COLOR )( static_cast< std::underlying_type< COLOR >::type >(x) + 1 ); 
+}
+
+COLOR operator*( COLOR c )
+{
+   return c;
+}
+
+COLOR begin( COLOR r )
+{
+   return COLOR::First;
+}
+
+COLOR end( COLOR r )
+{
+   COLOR l = COLOR::Last;
+   return ++l;
+}
+
+
+
+
+
+
 int main( int argc, char *argv[] )
 {
+   // for( const auto& c : COLOR() )
+   // {
+   //    std::cout << static_cast< size_t >( c ) << std::endl;
+   // }
+
+
+
+
+
 #if 1
    memory::dump( );
 

@@ -6,7 +6,7 @@
 
 namespace base {
 
-   enum class eCommType : size_t { IPC, ITC, ETC };
+   enum class eCommType : size_t { IPC, ITC, ETC, NONE };
 
    class IEventConsumer;
 

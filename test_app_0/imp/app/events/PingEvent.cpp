@@ -9,15 +9,13 @@ namespace application::events {
    {
    }
 
-   PingEventData::PingEventData( const ePing _type, const std::string& _info )
-      : type( _type )
-      , info( _info )
+   PingEventData::PingEventData( const std::string& _info )
+      : info( _info )
    {
    }
 
    PingEventData::PingEventData( const PingEventData& data )
-      : type( data.type )
-      , info( data.info )
+      : info( data.info )
    {
    }
 
@@ -32,8 +30,8 @@ namespace application::events {
 
    bool PingEventData::to_buffer( base::ByteBufferT& buffer ) const
    {
-      if( false == buffer.push( static_cast< size_t >( type ) ) )
-         return false;
+      // if( false == buffer.push( static_cast< size_t >( type ) ) )
+      //    return false;
 
       if( false == buffer.push( info ) )
          return false;
@@ -46,10 +44,10 @@ namespace application::events {
       if( false == buffer.pop( info ) )
          return false;
 
-      size_t _type;
-      if( false == buffer.pop( _type ) )
-         return false;
-      type = static_cast< ePing >( _type );
+      // size_t _type;
+      // if( false == buffer.pop( _type ) )
+      //    return false;
+      // type = static_cast< ePing >( _type );
 
       return true;
    }
@@ -57,8 +55,12 @@ namespace application::events {
    INIT_EVENT( PingEventETC );
    INIT_EVENT( PingEventITC );
 
+
+
+   INIT_EVENT( EventEx );
+
 } // namespace application::events
 
 
 
-INIT_DSI_EVENT( ServiceDSI, PingEventDSI );
+INIT_DSI_EVENT_EX( ServiceDSI, PingEventDSI );

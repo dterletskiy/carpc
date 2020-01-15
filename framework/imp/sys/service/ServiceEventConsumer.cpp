@@ -34,7 +34,7 @@ void ServiceEventConsumer::process_event( const ServiceEvent::Event& event )
    {
       case eServiceCommand::boot:
       {
-         SysEvent::Event::send_event( { eSysCommand::boot, "request boot" }, eCommType::ETC );
+         SysEvent::Event::create_send( { eSysCommand::boot, "request boot" }, eCommType::ETC );
          break;
       }
       case eServiceCommand::shutdown:

@@ -39,7 +39,7 @@ void Master::process_event( const events::PingMasterEvent::Event& event )
    {
       case events::ePing::ping:
       {
-         events::PingSlaveEvent::Event::send_event( { events::ePing::ping, "Master -> Slave" }, base::eCommType::ETC );
+         events::PingSlaveEvent::Event::create_send( { events::ePing::ping, "Master -> Slave" }, base::eCommType::ETC );
          break;
       }
       case events::ePing::response:
@@ -67,12 +67,12 @@ void Master::process_event( const events::PingSlaveEvent::Event& event )
          static size_t m_count = 0;
          if( 1 > ++m_count )
          {
-            events::PingSlaveEvent::Event::send_event( { events::ePing::ping, "Master -> Slave" }, base::eCommType::ETC );
+            events::PingSlaveEvent::Event::create_send( { events::ePing::ping, "Master -> Slave" }, base::eCommType::ETC );
          }
          else
          {
             m_count = 0;
-            events::PingMasterEvent::Event::send_event( { events::ePing::response, "Driver <- Master" }, base::eCommType::ITC );
+            events::PingMasterEvent::Event::create_send( { events::ePing::response, "Driver <- Master" }, base::eCommType::ITC );
          }
          break;
       }

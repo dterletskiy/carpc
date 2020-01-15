@@ -39,7 +39,7 @@ void Driver::process_event( const events::PingDriverEvent::Event& event )
    {
       case events::ePing::ping:
       {
-         events::PingMasterEvent::Event::send_event( { events::ePing::ping, "Driver -> Master" }, base::eCommType::ITC );
+         events::PingMasterEvent::Event::create_send( { events::ePing::ping, "Driver -> Master" }, base::eCommType::ITC );
          break;
       }
       case events::ePing::response:
@@ -64,7 +64,7 @@ void Driver::process_event( const events::PingMasterEvent::Event& event )
       }
       case events::ePing::response:
       {
-         events::PingDriverEvent::Event::send_event( { events::ePing::response, "OnOff <- Driver" }, base::eCommType::ITC );
+         events::PingDriverEvent::Event::create_send( { events::ePing::response, "OnOff <- Driver" }, base::eCommType::ITC );
          break;
       }
       default:

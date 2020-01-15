@@ -38,7 +38,7 @@ void Slave::process_event( const events::PingSlaveEvent::Event& event )
       case events::ePing::ping:
       {
          sleep( 15 );
-         events::PingSlaveEvent::Event::send_event( { events::ePing::response, "Master <- Slave" }, base::eCommType::ETC );
+         events::PingSlaveEvent::Event::create_send( { events::ePing::response, "Master <- Slave" }, base::eCommType::ETC );
          break;
       }
       case events::ePing::response:

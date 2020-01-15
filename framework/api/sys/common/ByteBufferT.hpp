@@ -1,10 +1,18 @@
 #pragma once
 
+#include <type_traits>
 #include "api/sys/common/ByteBuffer.hpp"
 
 
 
 namespace base {
+
+
+
+#define __INTEGRAL_TYPE__( TYPE )         std::is_integral_v< TYPE >
+#define __FLOATING_POINT_TYPE__( TYPE )   std::is_floating_point_v< TYPE >
+#define __ENUM_TYPE__( TYPE )             std::is_enum_v< TYPE >
+#define __REST_TYPES__( TYPE )            !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE > && !std::is_enum_v< TYPE >
 
 
 
@@ -54,13 +62,26 @@ public:
       bool push( const std::set< TYPE >&, const bool is_reallocate = true );
    template< typename TYPE_KEY, typename TYPE_VALUE >
       bool push( const std::map< TYPE_KEY, TYPE_VALUE >&, const bool is_reallocate = true );
+   // This method is for integral types and types with floating poing
    template< typename TYPE >
-      typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+      typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
+         push( const TYPE&, const bool is_reallocate = true );
+   // This method is for enumerations.
+   template< typename TYPE >
+      typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
          push( const TYPE&, const bool is_reallocate = true );
    // This method is for user defined types. It calles "to_buffer" method of this type, so it should be implemented in it.
    template< typename TYPE >
-      typename std::enable_if_t< !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE >, bool >
+      typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
          push( const TYPE&, const bool is_reallocate = true );
+   // This method for multipl push
+   template< typename ... TYPES >
+      bool push( const TYPES& ... values )
+         {
+            bool result = true;
+            (void)std::initializer_list< int >{ ( result &= push( values ), 0 )... };
+            return result;
+         }
 
 private:
    template< typename TYPE_CONTAINER >
@@ -86,13 +107,26 @@ public:
       bool pop( std::set< TYPE >& );
    template< typename TYPE_KEY, typename TYPE_VALUE >
       bool pop( std::map< TYPE_KEY, TYPE_VALUE >& );
+   // This method is for integral types and types with floating poing
    template< typename TYPE >
-      typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+      typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
+         pop( TYPE& );
+   // This method is for enumerations.
+   template< typename TYPE >
+      typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
          pop( TYPE& );
    // This method is for user defined types. It calles "from_buffer" method of this type, so it should be implemented in it.
    template< typename TYPE >
-      typename std::enable_if_t< !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE >, bool >
+      typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
          pop( TYPE& );
+   // This method for multipl push
+   template< typename ... TYPES >
+      bool pop( TYPES& ... values )
+         {
+            bool result = true;
+            (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
+            return result;
+         }
 
 private:
    template< typename TYPE_CONTAINER >
@@ -156,14 +190,14 @@ bool ByteBufferT::push( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool 
 }
 
 template< typename TYPE >
-typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
 ByteBufferT::push( const TYPE& value, const bool is_reallocate )
 {
    return push( static_cast< const void* >( &value ), sizeof( TYPE ), is_reallocate );
 }
 
 template< typename TYPE >
-typename std::enable_if_t< !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE >, bool >
+typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
 ByteBufferT::push( const TYPE& value, const bool is_reallocate )
 {
    if( false == m_transaction.start( Transaction::eType::push ) )
@@ -172,6 +206,14 @@ ByteBufferT::push( const TYPE& value, const bool is_reallocate )
    if( false == value.to_buffer( *this ) )
       m_transaction.error( );
    return m_transaction.finish( );
+}
+
+template< typename TYPE >
+typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
+ByteBufferT::push( const TYPE& value, const bool is_reallocate )
+{
+   using ENUM_TYPE = std::underlying_type_t< TYPE >;
+   return push( static_cast< ENUM_TYPE >( value ), is_reallocate );
 }
 
 template< typename TYPE_CONTAINER >
@@ -244,14 +286,14 @@ bool ByteBufferT::pop( std::map< TYPE_KEY, TYPE_VALUE >& map )
 }
 
 template< typename TYPE >
-typename std::enable_if_t< std::is_integral_v< TYPE > || std::is_floating_point_v< TYPE >, bool >
+typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
 ByteBufferT::pop( TYPE& value )
 {
    return pop( static_cast< const void* >( &value ), sizeof( TYPE ) );
 }
 
 template< typename TYPE >
-typename std::enable_if_t< !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE >, bool >
+typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
 ByteBufferT::pop( TYPE& value )
 {
    if( false == m_transaction.start( Transaction::eType::pop ) )
@@ -259,6 +301,18 @@ ByteBufferT::pop( TYPE& value )
    if( false == value.from_buffer( *this ) )
       m_transaction.error( );
    return m_transaction.finish( );
+}
+
+template< typename TYPE >
+typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
+ByteBufferT::pop( TYPE& value )
+{
+   using ENUM_TYPE = std::underlying_type_t< TYPE >;
+   ENUM_TYPE _value;
+   if( false == pop( _value ) )
+      return false;
+   value = static_cast< TYPE >( _value );
+   return true;
 }
 
 template< typename TYPE_CONTAINER >

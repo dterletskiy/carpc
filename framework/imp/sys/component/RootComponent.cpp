@@ -24,7 +24,7 @@ RootComponent::~RootComponent( )
 
 void RootComponent::shutdown( const std::string& info ) const
 {
-   ServiceEvent::Event::send_event( { eServiceCommand::shutdown, "shutdown" }, eCommType::ITC );
+   ServiceEvent::Event::create_send( { eServiceCommand::shutdown, "shutdown" }, eCommType::ITC );
 }
 
 

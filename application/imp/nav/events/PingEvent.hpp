@@ -20,15 +20,12 @@ struct PingEventData
    ePing          type;
    std::string    info;
 };
-struct PingDriverEventData : public PingEventData { };
-struct PingMasterEventData : public PingEventData { };
-struct PingSlaveEventData : public PingEventData { };
 
 
 
-DECLARE_EVENT( PingDriverEvent, PingDriverEventData );
-DECLARE_EVENT( PingMasterEvent, PingMasterEventData );
-DECLARE_EVENT( PingSlaveEvent, PingSlaveEventData );
+DECLARE_EVENT( PingDriverEvent, PingEventData );
+DECLARE_EVENT( PingMasterEvent, PingEventData );
+DECLARE_EVENT( PingSlaveEvent, PingEventData );
 
 
 

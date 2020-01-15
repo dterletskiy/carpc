@@ -162,13 +162,13 @@ void ServiceProcess::boot( )
 
    sleep(1);
 
-   ServiceEvent::Event::send_event( { eServiceCommand::boot, "boot" }, eCommType::ITC );
+   ServiceEvent::Event::create_send( { eServiceCommand::boot, "boot" }, eCommType::ITC );
 
    for( auto& p_service : m_service_list )
       p_service->wait( );
    SYS_MSG( "All services are finished" );
    SYS_MSG( "Stopping Service Brocker" );
-   ServiceEvent::Event::send_event( { eServiceCommand::ping, "ping" }, eCommType::ITC );
+   ServiceEvent::Event::create_send( { eServiceCommand::ping, "ping" }, eCommType::ITC );
    mp_service_brocker->stop( );
    mp_service_brocker->wait( );
    SYS_MSG( "Service Brocker is finished" );

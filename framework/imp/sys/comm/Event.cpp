@@ -16,58 +16,6 @@ namespace base {
 
 /*************************
  *
- * Event_ID implementation
- *
- ************************/
-Event_ID::Event_ID( const std::string& id )
-   : m_id( id )
-{
-}
-
-Event_ID::~Event_ID( )
-{
-}
-
-bool Event_ID::to_buffer( ByteBufferT& buffer ) const
-{
-   return buffer.push( m_id );
-}
-
-bool Event_ID::from_buffer( ByteBufferT& buffer )
-{
-   return buffer.pop( m_id );
-}
-
-const char* Event_ID::c_str( ) const
-{
-   return m_id.c_str( );
-}
-
-const bool Event_ID::operator==( const Event_ID& id ) const
-{
-   return m_id == id.m_id;
-}
-
-const bool Event_ID::operator!=( const Event_ID& id ) const
-{
-   return m_id != id.m_id;
-}
-
-const bool Event_ID::operator>( const Event_ID& id ) const 
-{
-   return m_id > id.m_id;
-}
-
-const bool Event_ID::operator<( const Event_ID& id ) const 
-{
-   return m_id < id.m_id;
-}
-
-
-
-
-/*************************
- *
  * Event implementation
  *
  ************************/
@@ -105,9 +53,10 @@ bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const Eve
    return true;
 }
 
-bool Event::send( EventPtr p_event )
+bool Event::send( EventPtr p_event, const eCommType comm_type )
 {
-   switch( p_event->m_comm_type )
+   const eCommType type = comm_type == eCommType::NONE ? p_event->comm_type( ) : comm_type;
+   switch( type )
    {
       case eCommType::ETC:
       {

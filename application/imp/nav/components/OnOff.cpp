@@ -33,7 +33,7 @@ OnOff::~OnOff( )
 bool OnOff::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
-   events::PingDriverEvent::Event::send_event( { events::ePing::ping, "OnOff -> Driver" }, base::eCommType::ITC );
+   events::PingDriverEvent::Event::create_send( { events::ePing::ping, "OnOff -> Driver" }, base::eCommType::ITC );
    return true;
 }
 
