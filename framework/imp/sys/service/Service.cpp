@@ -122,7 +122,7 @@ void Service::notify( const EventPtr p_event )
    if( iterator == m_event_consumers_map.end( ) )
       return;
 
-   auto& consumers_set = iterator->second; // @TDA: this copy is needed to avoid modifying consumers set during iterating it.
+   auto consumers_set = iterator->second; // @TDA: this copy is needed to avoid modifying consumers set during iterating it.
    SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
    for( IEventConsumer* p_consumer : consumers_set )
    {

@@ -67,10 +67,8 @@ ServiceBrockerPtr ServiceProcess::service_brocker( ) const
 
 ServicePtr ServiceProcess::service( const TID& id ) const
 {
-   SYS_TRC( "Service TID: %#lx", id );
    for( auto& p_service : m_service_list )
    {
-      SYS_TRC( "Processing service TID: %#lx", p_service->id( ) );
       if( id == p_service->id( ) )
          return p_service;
    }
@@ -144,7 +142,7 @@ void ServiceProcess::boot( )
 {
    SYS_MSG( "booting..." );
 
-   sleep(1);
+   // sleep(1);
 
    ServiceEvent::Event::create_send( { eServiceCommand::boot, "boot" }, eCommType::ITC );
 

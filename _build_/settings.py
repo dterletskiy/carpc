@@ -175,12 +175,12 @@ def init( config_file_list ):
       process_config_file( config_file, project_info, project_configuration, project_settings )
 
    apply_configuration( project_configuration, project_settings )
-   # print( "---------------------------- configuration ---------------------------" )
-   # print( base.to_string( project_configuration ) )
-   # print( "----------------------------------------------------------------------" )
-   # print( "------------------------------ settings ------------------------------" )
-   # print( base.to_string( project_settings ) )
-   # print( "----------------------------------------------------------------------" )
+   print( "---------------------------- configuration ---------------------------" )
+   print( base.to_string( project_configuration ) )
+   print( "----------------------------------------------------------------------" )
+   print( "------------------------------ settings ------------------------------" )
+   print( base.to_string( project_settings ) )
+   print( "----------------------------------------------------------------------" )
 
 
    compile_params: str = ""

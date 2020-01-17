@@ -6,6 +6,18 @@
 
 
 
+namespace {
+   void print_socket( const int _socket, const char* _message )
+   {
+      struct sockaddr_in address;
+      socklen_t addrlen = sizeof( address );
+      getpeername( _socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
+      SYS_INF( "%s, ip:port/socket - %s:%d/%d ", _message, inet_ntoa(address.sin_addr), ntohs(address.sin_port), _socket );
+   }
+}
+
+
+
 ConnectionProcessor::ConnectionProcessor( )
 {
    mp_buffer = malloc( base::configuration::dsi::buffer_size );
@@ -76,12 +88,7 @@ bool ConnectionProcessor::init( const int _socket_family, const int _socket_type
    }
    SYS_MSG( "listen(%d)", m_master_socket );
 
-   {
-      struct sockaddr_in address;
-      socklen_t addrlen = sizeof( address );
-      getpeername( m_master_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
-      SYS_INF( "Connection created, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), m_master_socket );
-   }
+   print_socket( m_master_socket, "Connection created" );
 
    return true;
 }
@@ -130,10 +137,7 @@ void ConnectionProcessor::connection_loop( )
          base::os::linux::set_nonblock( slave_socket );
          m_slave_sockets_set.insert( slave_socket );
 
-         struct sockaddr_in address;
-         socklen_t addrlen = sizeof( address );
-         getpeername( slave_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
-         SYS_INF( "Host connected, ip:port/socket - %s:%d/%d", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
+         print_socket( slave_socket, "Host connected" );
       }
    }
 }
@@ -164,11 +168,7 @@ ConnectionProcessor::eRead ConnectionProcessor::read_slave_socket( const int sla
       m_last_errno = errno;
       if( m_last_errno != EAGAIN )
       {
-         struct sockaddr_in address;
-         socklen_t addrlen = sizeof( address );
-         getpeername( slave_socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
-         SYS_INF( "Host disconnected, ip:port/socket - %s:%d/%d ", inet_ntoa(address.sin_addr), ntohs(address.sin_port), slave_socket );
-
+         print_socket( slave_socket, "Host disconnected" );
          return eRead::DISCONNECTED;
       }
 

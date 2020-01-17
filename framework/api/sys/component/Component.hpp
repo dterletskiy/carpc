@@ -18,11 +18,15 @@ public:
 
 public:
    const std::string& name( ) const;
-   const ID& id( ) const;
-   ServicePtr service( ) const;
 private:
    std::string    m_name;
+
+public:
+   const ID& id( ) const;
+private:
    ID             m_id;
+
+private:
    ServicePtrW    mp_service;
 
 protected:

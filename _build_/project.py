@@ -87,7 +87,7 @@ class ProjectSettings:
             for ext in ExtentionsMap['source']:
                if file.endswith( "." + ext ):
                   source = os.path.join( root, file )
-                  object = source.replace( self.__path['project'], self.__path['obj'] ).replace( ext, ExtentionsMap['object'][0] )
+                  object = source.replace( self.__path['project'], self.__path['obj'] ).replace( "." + ext, "." + ExtentionsMap['object'][0] )
                   self.__target_list.append( Target( source, object ) )
       # Building congiguration
       self.__settings = { }

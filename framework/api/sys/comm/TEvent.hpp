@@ -27,8 +27,8 @@ public:
    using _EventType           = typename _Generator::Config::EventType;
    using _ConsumerType        = typename _Generator::Config::ConsumerType;
    using _DataType            = typename _Generator::Config::DataType;
-   using _IdType              = typename _Generator::Config::IdType;
    using _DataTypePtr         = typename std::shared_ptr< _DataType >;
+   using _IdType              = typename _Generator::Config::IdType;
    using _ServiceType         = typename _Generator::Config::ServiceType;
    using _EventProcessorPtr   = void ( _ConsumerType::* )( const _EventType& );
 
@@ -128,8 +128,8 @@ public:
    using _EventType           = typename _Generator::Config::EventType;
    using _ConsumerType        = typename _Generator::Config::ConsumerType;
    using _DataType            = typename _Generator::Config::DataType;
-   using _IdType              = typename _Generator::Config::IdType;
    using _DataTypePtr         = typename std::shared_ptr< _DataType >;
+   using _IdType              = typename _Generator::Config::IdType;
    using _ServiceType         = typename _Generator::Config::ServiceType;
    using _EventProcessorPtr   = void ( _ConsumerType::* )( const _EventType& );
 
