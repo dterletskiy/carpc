@@ -150,10 +150,10 @@ void ServiceProcess::boot( )
       p_service->wait( );
    SYS_MSG( "All services are finished" );
 
-   SYS_MSG( "Stopping Service Brocker" );
+   SYS_MSG( "Stopping ServiceBrocker" );
    mp_service_brocker->stop( );
    mp_service_brocker->wait( );
-   SYS_MSG( "Service Brocker is finished" );
+   SYS_MSG( "ServiceBrocker is finished" );
 
    os::linux::timer::remove( m_timer_id );
 

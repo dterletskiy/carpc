@@ -77,10 +77,13 @@ int main( int argc, char *argv[] )
    DBG_MSG( "argc = %d", argc );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
+   DBG_MSG( "%lld", __rdtsc( ) );
 
 
 
 
-   boot( );
+
+
+   // boot( );
    return 0;
 }

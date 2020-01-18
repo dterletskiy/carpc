@@ -2,8 +2,8 @@
 
 #include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/service/Types.hpp"
-#include "api/sys/comm/Types.hpp"
-#include "api/sys/comm/EventConsumer.hpp"
+#include "api/sys/comm/event/Types.hpp"
+#include "api/sys/comm/event/EventConsumer.hpp"
 
 
 
@@ -14,8 +14,8 @@ namespace base {
 class Event
 {
 public:
-   Event( );
-   virtual ~Event( );
+   Event( ) = default;
+   virtual ~Event( ) = default;
 
 public:
    static const bool set_notification( bool, IEventConsumer*, const EventTypeID&, const OptEventInfoID );

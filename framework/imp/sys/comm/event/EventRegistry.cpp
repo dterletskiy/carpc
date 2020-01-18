@@ -1,6 +1,6 @@
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/comm/Event.hpp"
-#include "api/sys/comm/EventRegistry.hpp"
+#include "api/sys/comm/event/Event.hpp"
+#include "api/sys/comm/event/EventRegistry.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "EventRegistry"
@@ -12,19 +12,6 @@ namespace base {
 
 
 EventRegistryPtr EventRegistry::mp_instance;
-
-
-
-EventRegistry::EventRegistry( )
-{
-   SYS_TRC( "created" );
-}
-
-EventRegistry::~EventRegistry( )
-{
-   SYS_TRC( "destroyed" );
-}
-
 
 EventRegistryPtr EventRegistry::instance( )
 {

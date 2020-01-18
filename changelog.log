@@ -31,6 +31,10 @@ version 1.1.2 (2019-12-29_16-01-21)
  - Mothods "to_buffer" and "from_buffer" now work identically
  - Implemented DSI and non DSI request/response examples
 
-version 1.1.2 (2019-12-29_16-01-21)
+version 1.1.2 (2020-01-17_17-51-45)
  - Created git repository
  - Initial implementation of base parts for "Server", "Client" and "Registry"
+
+version 1.1.2a
+ - Move "Event" implementation to subfolder "event" in "comm"
+ - Rename "/framework/*/sys/Timer" to "/framework/*/sys/timer"

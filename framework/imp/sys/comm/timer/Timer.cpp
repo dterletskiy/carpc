@@ -4,10 +4,11 @@
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/service/Service.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
-#include "api/sys/comm/Timer/Timer.hpp"
+#include "api/sys/comm/timer/Timer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Timer"
+
 
 
 namespace base {

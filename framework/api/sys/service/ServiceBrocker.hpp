@@ -2,7 +2,7 @@
 
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/oswrappers/ConditionVariable.hpp"
-#include "api/sys/comm/Types.hpp"
+#include "api/sys/comm/event/Types.hpp"
 #include "api/sys/service/Types.hpp"
 
 

@@ -2,7 +2,7 @@
 #include "api/sys/service/Service.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
-#include "api/sys/comm/IEvent.hpp"
+#include "api/sys/comm/event/IEvent.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -12,14 +12,6 @@
 namespace base {
 
 
-
-Event::Event( )
-{
-}
-
-Event::~Event( )
-{
-}
 
 const bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const EventTypeID& type_id, const OptEventInfoID info_id )
 {

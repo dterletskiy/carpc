@@ -1,7 +1,7 @@
 #pragma once
 
 // Framework
-#include "api/sys/comm/Timer/Timer.hpp"
+#include "api/sys/comm/timer/Timer.hpp"
 #include "api/sys/component/RootComponent.hpp"
 // Application
 #include "imp/app/events/PingEvent.hpp"

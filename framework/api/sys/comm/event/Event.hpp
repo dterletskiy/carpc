@@ -1,7 +1,7 @@
 #pragma once
 
-#include "api/sys/comm/TGenerator.hpp"
-#include "api/sys/comm/EventRegistry.hpp"
+#include "api/sys/comm/event/TGenerator.hpp"
+#include "api/sys/comm/event/EventRegistry.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 
 

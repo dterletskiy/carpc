@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 #include "api/sys/configuration/DSI.hpp"
-#include "api/sys/comm/Event.hpp"
+#include "api/sys/comm/event/Event.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"

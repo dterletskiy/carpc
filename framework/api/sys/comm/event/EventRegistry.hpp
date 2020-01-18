@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/comm/Types.hpp"
+#include "api/sys/comm/event/Types.hpp"
 
 
 
@@ -24,11 +24,11 @@ public:
    using Registry = std::map< EventTypeID, EventCreator >;
 
 public:
-   ~EventRegistry( );
+   ~EventRegistry( ) = default;
    static EventRegistryPtr instance( );
 
 private:
-   EventRegistry( );
+   EventRegistry( ) = default;
    static EventRegistryPtr mp_instance;
 
 public:
