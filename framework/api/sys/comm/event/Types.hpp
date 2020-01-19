@@ -29,8 +29,10 @@ namespace base {
    enum class eCommType : size_t { IPC, ITC, ETC, NONE };
    const char* c_str( const eCommType );
 
-   class Event;
-   using EventPtr = std::shared_ptr< Event >;
+   class IEventConsumer;
+
+   class IEvent;
+   using EventPtr = std::shared_ptr< IEvent >;
 
    class EventRegistry;
    using EventRegistryPtr = std::shared_ptr< EventRegistry >;

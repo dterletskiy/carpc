@@ -42,18 +42,18 @@ public:
       : _TEventBase( data, comm_type )
    {
    }
-   ~TEvent( ) override { }
+   ~TEvent( ) override = default;
 
 // static functions
 public:
    static const bool set_notification( bool is_set, _ConsumerType* p_consumer )
    {
-      return Event::set_notification( is_set, p_consumer, _TEventBase::s_type_id, std::nullopt );
+      return IEvent::set_notification( is_set, p_consumer, _TEventBase::s_type_id, std::nullopt );
    }
 
    static const bool clear_all_notifications( _ConsumerType* p_consumer )
    {
-      return Event::clear_all_notifications( p_consumer, _TEventBase::s_type_id );
+      return IEvent::clear_all_notifications( p_consumer, _TEventBase::s_type_id );
    }
 
    static std::shared_ptr< _EventType > create( const eCommType comm_type = eCommType::ETC )
@@ -149,18 +149,18 @@ public:
       , m_id( id )
    {
    }
-   ~TEvent( ) override { }
+   ~TEvent( ) override = default;
 
 // static functions
 public:
    static const bool set_notification( bool is_set, _ConsumerType* p_consumer, const _IdType id )
    {
-      return Event::set_notification( is_set, p_consumer, _TEventBase::s_type_id, static_cast< EventInfoID >( id ) );
+      return IEvent::set_notification( is_set, p_consumer, _TEventBase::s_type_id, static_cast< EventInfoID >( id ) );
    }
 
    static const bool clear_all_notifications( _ConsumerType* p_consumer )
    {
-      return Event::clear_all_notifications( p_consumer, _TEventBase::s_type_id );
+      return IEvent::clear_all_notifications( p_consumer, _TEventBase::s_type_id );
    }
 
    static std::shared_ptr< _EventType > create( const _IdType id, const eCommType comm_type = eCommType::ETC )

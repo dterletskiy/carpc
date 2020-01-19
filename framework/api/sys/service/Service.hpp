@@ -4,7 +4,6 @@
 #include "api/sys/oswrappers/ConditionVariable.hpp"
 #include "api/sys/component/Types.hpp"
 #include "api/sys/comm/event/Types.hpp"
-#include "api/sys/comm/event/Event.hpp"
 #include "api/sys/service/Types.hpp"
 
 

@@ -6,14 +6,14 @@
 #include "api/sys/helpers/macros/strings.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "Event"
+#define CLASS_ABBR "IEvent"
 
 
 namespace base {
 
 
 
-const bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, const EventTypeID& type_id, const OptEventInfoID info_id )
+const bool IEvent::set_notification( bool is_set, IEventConsumer* p_consumer, const EventTypeID& type_id, const OptEventInfoID info_id )
 {
    SYS_INF( "event id: %s / consumer: %p / is_set: %s", type_id.c_str( ), p_consumer, BOOL_TO_STRING( is_set ) );
    ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
@@ -33,7 +33,7 @@ const bool Event::set_notification( bool is_set, IEventConsumer* p_consumer, con
    return true;
 }
 
-const bool Event::clear_all_notifications( IEventConsumer* p_consumer, const EventTypeID& type_id )
+const bool IEvent::clear_all_notifications( IEventConsumer* p_consumer, const EventTypeID& type_id )
 {
    SYS_INF( "event id: %s / consumer: %p", type_id.c_str( ), p_consumer );
    ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
@@ -46,7 +46,7 @@ const bool Event::clear_all_notifications( IEventConsumer* p_consumer, const Eve
    return true;
 }
 
-const bool Event::send( EventPtr p_event, const eCommType comm_type )
+const bool IEvent::send( EventPtr p_event, const eCommType comm_type )
 {
    const eCommType type = comm_type == eCommType::NONE ? p_event->comm_type( ) : comm_type;
    switch( type )
@@ -87,7 +87,7 @@ const bool Event::send( EventPtr p_event, const eCommType comm_type )
    return true;
 }
 
-const bool Event::send_to_context( EventPtr p_event, ServicePtrW pw_service  )
+const bool IEvent::send_to_context( EventPtr p_event, ServicePtrW pw_service  )
 {
    ServicePtr p_service = pw_service.lock( );
    if( InvalidServicePtr == p_service )

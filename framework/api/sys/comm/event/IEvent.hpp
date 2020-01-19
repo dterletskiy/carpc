@@ -11,11 +11,11 @@ namespace base {
 
 
 
-class Event
+class IEvent
 {
 public:
-   Event( ) = default;
-   virtual ~Event( ) = default;
+   IEvent( ) = default;
+   virtual ~IEvent( ) = default;
 
 public:
    static const bool set_notification( bool, IEventConsumer*, const EventTypeID&, const OptEventInfoID );

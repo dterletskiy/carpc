@@ -12,7 +12,7 @@ namespace base {
 
 template< typename _Generator >
 class TEventBase
-   : public Event
+   : public IEvent
    , public std::enable_shared_from_this< TEventBase< _Generator > >
 {
 // using
@@ -27,17 +27,17 @@ public:
 // constructors
 public:
    TEventBase( const eCommType comm_type )
-      : Event( )
+      : IEvent( )
       , m_comm_type( comm_type )
    {
    }
    TEventBase( const _DataType& data, const eCommType comm_type )
-      : Event( )
+      : IEvent( )
       , m_comm_type( comm_type )
    {
       mp_data = std::make_shared< _DataType >( data );
    }
-   ~TEventBase( ) override { }
+   ~TEventBase( ) override = default;
 
 // virual function
 public:
@@ -45,11 +45,11 @@ public:
 
    const bool send( const eCommType comm_type = eCommType::NONE ) override
    {
-      return Event::send( TEventBase< _Generator >::shared_from_this( ), comm_type );
+      return IEvent::send( TEventBase< _Generator >::shared_from_this( ), comm_type );
    }
    const bool send_to_context( ServicePtrW pw_service ) override
    {
-      return Event::send_to_context( TEventBase< _Generator >::shared_from_this( ), pw_service );
+      return IEvent::send_to_context( TEventBase< _Generator >::shared_from_this( ), pw_service );
    }
 
 // s_type_id

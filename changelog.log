@@ -38,3 +38,6 @@ version 1.1.2 (2020-01-17_17-51-45)
 version 1.1.2a
  - Move "Event" implementation to subfolder "event" in "comm"
  - Rename "/framework/*/sys/Timer" to "/framework/*/sys/timer"
+
+version 1.1.2b
+ - Renaming class "Event" to class "IEvent"

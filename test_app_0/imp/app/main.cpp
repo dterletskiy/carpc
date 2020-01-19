@@ -72,13 +72,109 @@ void boot( )
 
 
 
+enum class eType : size_t { A, B, C, Undefined };
+class Base
+{
+public:
+   Base( const eType type ) : m_type( type ) { }
+   virtual ~Base( ) = default;
+
+   eType type( ) const { return m_type; }
+
+private:
+   eType m_type = eType::Undefined;
+};
+
+class A : public Base
+{
+public:
+   A( ) : Base( eType::A ) { }
+   ~A( ) override = default;
+
+   void execute( )
+   {
+      // DBG_MSG( "class A" );
+      ++m_count;
+   }
+
+private:
+   size_t m_count = 0;
+};
+
+long long int test_no_cast( A* pA, const size_t count )
+{
+   long long int start = __rdtsc( );
+   for( size_t i = 0; i < count; ++i )
+   {
+      pA->execute( );
+   }
+   long long int finish = __rdtsc( );
+   long long int delta = finish - start;
+   DBG_MSG( "%lld", delta );
+   return delta;
+}
+
+long long int test_static_cast( Base* pBase, const size_t count )
+{
+   long long int start = __rdtsc( );
+   for( size_t i = 0; i < count; ++i )
+   {
+      static_cast< A* >( pBase )->execute( );
+   }
+   long long int finish = __rdtsc( );
+   long long int delta = finish - start;
+   DBG_MSG( "%lld", delta );
+   return delta;
+}
+
+long long int test_dynamic_cast( Base* pBase, const size_t count )
+{
+   long long int start = __rdtsc( );
+   for( size_t i = 0; i < count; ++i )
+   {
+      dynamic_cast< A* >( pBase )->execute( );
+   }
+   long long int finish = __rdtsc( );
+   long long int delta = finish - start;
+   DBG_MSG( "%lld", delta );
+   return delta;
+}
+
+struct Result
+{
+   float _no_cast = 0;
+   float _static_cast = 0;
+   float _dynamic_cast = 0;
+};
+
+Result test( const size_t count )
+{
+   DBG_MSG( "count = %zu", count );
+   Base* pA = new A;
+   float _no_cast = static_cast< float >( test_no_cast( static_cast< A* >( pA ), count ) );
+   float _static_cast = static_cast< float >( test_static_cast( pA, count ) );
+   float _dynamic_cast = static_cast< float >( test_dynamic_cast( pA, count ) );
+   return { _no_cast / _no_cast, _static_cast / _no_cast, _dynamic_cast / _no_cast };
+}
+
 int main( int argc, char *argv[] )
 {
    DBG_MSG( "argc = %d", argc );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
-   DBG_MSG( "%lld", __rdtsc( ) );
 
+
+   std::vector< size_t > test_counts = { 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
+   std::vector< Result > results;
+   for( size_t count : test_counts )
+   {
+      results.push_back( test( count ) );
+   }
+
+   for( Result result : results )
+   {
+      DBG_MSG( "%f / %f / %f", result._no_cast, result._static_cast, result._dynamic_cast );
+   }
 
 
 
