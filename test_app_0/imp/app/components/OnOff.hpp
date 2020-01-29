@@ -21,7 +21,9 @@ base::ComponentPtr creator( base::ServicePtr );
 class OnOff
    : public base::RootComponent
    , public base::ITimerConsumer
-   , public ServiceDSI::PingEvent::Consumer
+   , public events::NoID::PingEvent::Consumer
+   , public events::ID::PingEvent::Consumer
+   , public events::IPC::PingEvent::Consumer
 {
 public:
    OnOff( const base::ServicePtr, const std::string& );
@@ -31,11 +33,16 @@ private:
    bool boot( const std::string& ) override;
 
 private:
-   void process_event( const ServiceDSI::PingEvent::Event& ) override;
+   void process_event( const events::NoID::PingEvent::Event& ) override;
+   void process_event( const events::ID::PingEvent::Event& ) override;
+   void process_event( const events::IPC::PingEvent::Event& ) override;
 
 private:
-   Server m_server;
-   Client m_client;
+   Server m_server_onoff_xxx;
+   Client m_client_onoff_xxx;
+private:
+   Server m_server_onoff_yyy;
+   Client m_client_onoff_yyy;
 
 // Timer
 private:

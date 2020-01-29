@@ -14,12 +14,12 @@ namespace base {
 ServiceEventConsumer::ServiceEventConsumer( ServicePtr p_service )
    : mp_service( p_service )
 {
-   ServiceEvent::Event::set_notification( true, this );
+   ServiceEvent::Event::set_notification( this );
 }
 
 ServiceEventConsumer::~ServiceEventConsumer( )
 {
-   ServiceEvent::Event::set_notification( false, this );
+   ServiceEvent::Event::clear_notification( this );
 }
 
 void ServiceEventConsumer::process_event( const ServiceEvent::Event& event )

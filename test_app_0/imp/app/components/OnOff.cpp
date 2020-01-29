@@ -22,18 +22,24 @@ base::ComponentPtr creator( base::ServicePtr p_service )
 
 OnOff::OnOff( const base::ServicePtr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
-   , m_server( )
-   , m_client( )
+   , m_server_onoff_xxx( "xxx" )
+   , m_client_onoff_xxx( "xxx" )
+   , m_server_onoff_yyy( "yyy" )
+   , m_client_onoff_yyy( "xxx" )
    , m_timer( this )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   ServiceDSI::PingEvent::Event::set_notification( true, this );
+   events::NoID::PingEvent::Event::set_notification( this );
+   events::ID::PingEvent::Event::set_notification( this, events::eEventID::request );
+   events::IPC::PingEvent::Event::set_notification( this, events::eEventID::request );
 }
 
 OnOff::~OnOff( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   ServiceDSI::PingEvent::Event::set_notification( false, this );
+   events::NoID::PingEvent::Event::clear_notification( this );
+   events::ID::PingEvent::Event::clear_notification( this, events::eEventID::request );
+   events::IPC::PingEvent::Event::clear_notification( this, events::eEventID::request );
 }
 
 
@@ -107,9 +113,9 @@ namespace {
       base::tools::Performance   m_performance;
    };
    static size_t s_count = 1000000;
-   auto send_event = [ ]( const base::eCommType _type ) { ServiceDSI::PingEvent::Event::create_send( { base::c_str( _type ) }, _type ); };
-   Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC }, s_count );
-   // Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC }, s_count );
+   auto send_event = [ ]( const base::eCommType _type ) { events::IPC::PingEvent::Event::create_send( events::eEventID::request, { base::c_str( _type ) }, _type ); };
+   // Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC }, s_count );
+   Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC }, s_count );
 
 }
 
@@ -117,19 +123,45 @@ bool OnOff::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
    // sleep(5);
-   // m_client.request_trigger_state( "Unloaded" );
-   s_event_test.execute( );
+
+   // s_event_test.execute( );
+
+   m_client_onoff_xxx.request_trigger_state( "Unloaded", 5000000000 );
+   m_client_onoff_yyy.request_trigger_state( "BasicOperable", 10000000000 );
+
    // m_timer.start( 1000000000 );
+
+   // events::NoID::PingEvent::Event::create_send( { "WTF!!!" } );
+   // events::ID::PingEvent::Event::create_send( events::eEventID::request, { "WTF!!!" } );
+   // events::IPC::PingEvent::Event::create_send( events::eEventID::request, { "WTF!!!" }, base::eCommType::IPC );
 
    return true;
 }
 
-void OnOff::process_event( const ServiceDSI::PingEvent::Event& event )
+void OnOff::process_event( const events::NoID::PingEvent::Event& event )
 {
-   // DBG_TRC( "info = %s", event.data( )->info.c_str( ) );
+   DBG_ERR( "info = %s", event.data( )->info.c_str( ) );
+   // events::NoID::PingEvent::Event::clear_notification( this );
+   // events::NoID::PingEvent::Event::set_notification( this );
+   // events::NoID::PingEvent::Event::create_send( { "WTF!!!" } );
+}
 
-   if( false == s_event_test.execute( ) )
-         shutdown( );
+void OnOff::process_event( const events::ID::PingEvent::Event& event )
+{
+   DBG_ERR( "info = %s", event.data( )->info.c_str( ) );
+   // events::ID::PingEvent::Event::clear_notification( this, events::eEventID::request );
+   // events::ID::PingEvent::Event::set_notification( this, events::eEventID::request );
+   // events::ID::PingEvent::Event::create_send( events::eEventID::request, { "WTF!!!" } );
+}
+
+void OnOff::process_event( const events::IPC::PingEvent::Event& event )
+{
+   // DBG_ERR( "info = %s", event.data( )->info.c_str( ) );
+   // events::IPC::PingEvent::Event::clear_notification( this, events::eEventID::request );
+   // events::IPC::PingEvent::Event::set_notification( this, events::eEventID::request );
+   // events::IPC::PingEvent::Event::create_send( events::eEventID::request, { "WTF!!!" } );
+
+   if( false == s_event_test.execute( ) ) shutdown( );
 }
 
 void OnOff::process_timer( const base::TimerID id )
@@ -141,7 +173,7 @@ void OnOff::process_timer( const base::TimerID id )
    if( 10 < count )
    {
       m_timer.stop( );
-      m_timer.start( 5000000000 );
+      m_timer.start( 1000000000 );
    }
 }
 

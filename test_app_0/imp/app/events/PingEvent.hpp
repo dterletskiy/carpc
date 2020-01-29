@@ -9,29 +9,37 @@ namespace application::events {
 
 
 
-struct PingEventData
-{
-public:
-   PingEventData( );
-   PingEventData( const std::string& );
-   PingEventData( const PingEventData& );
-   PingEventData( base::ByteBufferT& );
-   ~PingEventData( );
+   struct PingEventData
+   {
+   public:
+      PingEventData( );
+      PingEventData( const std::string& );
+      PingEventData( const PingEventData& );
+      PingEventData( base::ByteBufferT& );
+      ~PingEventData( );
 
-   bool to_buffer( base::ByteBufferT& ) const;
-   bool from_buffer( base::ByteBufferT& );
+      bool to_buffer( base::ByteBufferT& ) const;
+      bool from_buffer( base::ByteBufferT& );
 
-   std::string    info = "";
-};
+      std::string    info = "";
+   };
 
 
 
-enum class eEventID : size_t { request, response };
+   enum class eEventID : size_t { request, response };
+
+
+
+   namespace NoID {
+      DECLARE_EVENT( PingEvent, PingEventData );
+   }
+   namespace ID {
+      DECLARE_EVENT( PingEvent, PingEventData, eEventID );
+   }
+   namespace IPC {
+      DECLARE_IPC_EVENT( PingEvent, PingEventData, eEventID );
+   }
 
 
 
 } // namespace application::events
-
-
-
-DECLARE_DSI_EVENT( ServiceDSI, PingEvent, application::events::PingEventData );

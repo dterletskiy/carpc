@@ -18,7 +18,7 @@ namespace base {
  * 
  ***************************************************************************************************/
 template< typename ... TYPES >
-const std::string format_string( const TYPES ... args )
+const std::string format_string( const TYPES& ... args )
 {
    std::ostringstream ss;
    (void)std::initializer_list< int >{ ( ss << args, 0 )... };

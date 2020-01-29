@@ -15,12 +15,12 @@ SysEventConsumer* SysEventConsumer::mp_instance;
 SysEventConsumer::SysEventConsumer( RootComponent* p_root_component )
    : mp_root_component( p_root_component )
 {
-   SysEvent::Event::set_notification( true, this );
+   SysEvent::Event::set_notification( this );
 }
 
 SysEventConsumer::~SysEventConsumer( )
 {
-   SysEvent::Event::set_notification( false, this );
+   SysEvent::Event::clear_notification( this );
 }
 
 SysEventConsumer* SysEventConsumer::instance( RootComponent* p_root_component )

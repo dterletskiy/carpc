@@ -1,12 +1,10 @@
 // Framework
-#include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
-#include "api/sys/tools/Tools.hpp"
 // Application
-#include "imp/nav/components/OnOff.hpp"
-#include "imp/nav/components/Driver.hpp"
-#include "imp/nav/components/Master.hpp"
-#include "imp/nav/components/Slave.hpp"
+#include "imp/nav/components/OnOff/OnOff.hpp"
+#include "imp/nav/components/Driver/Driver.hpp"
+#include "imp/nav/components/Master/Master.hpp"
+#include "imp/nav/components/Slave/Slave.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "MAIN"
@@ -66,6 +64,7 @@ void boot( )
 #elif OS == ANDROID
 
    #include <jni.h>
+   #include "api/sys/oswrappers/Thread.hpp"
 
    base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot };
 

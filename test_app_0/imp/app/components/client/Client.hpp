@@ -1,7 +1,7 @@
 #pragma once
 
 // Interface
-#include "imp/app/api/onoff/dsi/Client.hpp"
+#include "imp/app/api/onoff/no_dsi/Client.hpp"
 
 
 
@@ -10,10 +10,10 @@ namespace application::onoff {
 
 
 class Client
-   : public api::onoff::dsi::Client
+   : public api::onoff::no_dsi::Client
 {
 public:
-   Client( );
+   Client( const std::string& );
    ~Client( );
 
 public:

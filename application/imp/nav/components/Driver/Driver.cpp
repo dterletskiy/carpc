@@ -1,5 +1,5 @@
 // Application
-#include "imp/nav/components/Driver.hpp"
+#include "imp/nav/components/Driver/Driver.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Driver"
@@ -21,15 +21,15 @@ Driver::Driver( const base::ServicePtr p_service, const std::string& name )
    : base::Component( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   events::PingDriverEvent::Event::set_notification( true, this );
-   events::PingMasterEvent::Event::set_notification( true, this );
+   events::PingDriverEvent::Event::set_notification( this );
+   events::PingMasterEvent::Event::set_notification( this );
 }
 
 Driver::~Driver( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   events::PingDriverEvent::Event::set_notification( false, this );
-   events::PingMasterEvent::Event::set_notification( false, this );
+   events::PingDriverEvent::Event::clear_notification( this );
+   events::PingMasterEvent::Event::clear_notification( this );
 }
 
 void Driver::process_event( const events::PingDriverEvent::Event& event )

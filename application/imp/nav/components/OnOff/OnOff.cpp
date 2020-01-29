@@ -1,5 +1,5 @@
 // Application
-#include "imp/nav/components/OnOff.hpp"
+#include "imp/nav/components/OnOff/OnOff.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOff"
@@ -21,13 +21,13 @@ OnOff::OnOff( const base::ServicePtr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   events::PingDriverEvent::Event::set_notification( true, this );
+   events::PingDriverEvent::Event::set_notification( this );
 }
 
 OnOff::~OnOff( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   events::PingDriverEvent::Event::set_notification( false, this );
+   events::PingDriverEvent::Event::clear_notification( this );
 }
 
 bool OnOff::boot( const std::string& command )

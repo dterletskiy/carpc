@@ -1,7 +1,9 @@
 #pragma once
 
+// Framework
+#include "api/sys/comm/timer/Timer.hpp"
 // Interface
-#include "imp/app/api/onoff/dsi/Server.hpp"
+#include "imp/app/api/onoff/no_dsi/Server.hpp"
 
 
 
@@ -10,14 +12,20 @@ namespace application::onoff {
 
 
 class Server
-   : public api::onoff::dsi::Server
+   : public api::onoff::no_dsi::Server
+   , public base::ITimerConsumer
 {
 public:
-   Server( );
+   Server( const std::string& );
    ~Server( );
 
 public:
-   void request_trigger_state( const std::string& ) override;
+   void request_trigger_state( const std::string&, const size_t ) override;
+
+// Timer
+private:
+   void process_timer( const base::TimerID ) override;
+   base::Timer m_timer;
 };
 
 

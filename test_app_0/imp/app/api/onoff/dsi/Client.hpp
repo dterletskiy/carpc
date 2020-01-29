@@ -2,7 +2,6 @@
 
 // Application
 #include "Data.hpp"
-// Framework
 
 
 
@@ -11,18 +10,21 @@ namespace api::onoff::dsi {
 
 
 class Client
-   : public ServiceOnOff::OnOffEvent::Consumer
+   : public OnOffEvent::Consumer
 {
 public:
-   Client( );
+   Client( const base::ServiceName& );
    virtual ~Client( );
 
 public:
-   void request_trigger_state( const std::string& );
+   void request_trigger_state( const std::string&, const size_t );
    virtual void response_trigger_state( const bool ) = 0;
 
 private:
-   void process_event( const ServiceOnOff::OnOffEvent::Event& ) override;
+   void process_event( const OnOffEvent::Event& ) override;
+
+private:
+   base::ServiceName m_service_name;
 };
 
 

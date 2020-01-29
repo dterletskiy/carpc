@@ -7,27 +7,17 @@
 namespace base {
 
    using EventTypeID = std::string;
-   using EventInfoID = size_t;
-   using OptEventInfoID = std::optional< EventInfoID >;
+   using ServiceName = std::string;
    using NoServiceType = void;
    using NoIdInfoType = void;
 
-   struct EventSignature
-   {
-      EventSignature( const EventTypeID&, const OptEventInfoID& );
-      EventSignature( const EventSignature& );
-
-      bool operator==( const EventSignature& ) const;
-      bool operator!=( const EventSignature& ) const;
-      bool operator<( const EventSignature& ) const;
-      bool operator>( const EventSignature& ) const;
-
-      EventTypeID    m_type_id;
-      OptEventInfoID m_info_id;
-   };
-
    enum class eCommType : size_t { IPC, ITC, ETC, NONE };
    const char* c_str( const eCommType );
+
+   enum class eEventType : size_t { SIMPLE, SIMPLE_ID, RR, UNDEFINED };
+   const char* c_str( const eEventType );
+
+   class IEventSignature;
 
    class IEventConsumer;
 

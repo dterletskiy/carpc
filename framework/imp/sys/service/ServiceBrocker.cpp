@@ -11,7 +11,7 @@
 #include "api/sys/service/ServiceBrocker.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "SrvBrDsi"
+#define CLASS_ABBR "SrvBr"
 
 
 
@@ -142,7 +142,7 @@ void ServiceBrocker::thread_loop_send( )
    while( started_send( ) )
    {
       EventPtr p_event = get_event( );
-      SYS_TRC( "sending event (%s)", p_event->type_id( ).c_str( ) );
+      SYS_TRC( "sending event (%s)", p_event->signature( )->name( ).c_str( ) );
       ByteBufferT byte_buffer;
       if( false == EventRegistry::instance( )->create_buffer( byte_buffer, p_event ) )
       {
@@ -213,6 +213,7 @@ void ServiceBrocker::thread_loop_receive( )
          SYS_ERR( "lost received event" );
          continue;
       }
+      SYS_TRC( "received event (%s)", p_event->signature( )->name( ).c_str( ) );
       p_event->send( eCommType::ITC );
    }
 

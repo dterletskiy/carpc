@@ -2,8 +2,8 @@
 #include "api/sys/service/Service.hpp"
 #include "api/sys/service/ServiceBrocker.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/comm/event/IEventSignature.hpp"
 #include "api/sys/comm/event/IEvent.hpp"
-#include "api/sys/helpers/macros/strings.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "IEvent"
@@ -13,35 +13,41 @@ namespace base {
 
 
 
-const bool IEvent::set_notification( bool is_set, IEventConsumer* p_consumer, const EventTypeID& type_id, const OptEventInfoID info_id )
+const bool IEvent::set_notification( IEventConsumer* p_consumer, const IEventSignature& signature )
 {
-   SYS_INF( "event id: %s / consumer: %p / is_set: %s", type_id.c_str( ), p_consumer, BOOL_TO_STRING( is_set ) );
-   ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
+   SYS_INF( "event: %s / consumer: %p", signature.name( ).c_str( ), p_consumer );
+   ServicePtr p_service = ServiceProcess::instance( )->current_service( );
    if( InvalidServicePtr == p_service )
       return false;
 
-   SYS_INF( "event id: %s / service: %s", type_id.c_str( ), p_service->name( ).c_str( ) );
-   if( true == is_set )
-   {
-      p_service->set_notification( type_id, info_id, p_consumer );
-   }
-   else
-   {
-      p_service->clear_notification( type_id, info_id, p_consumer );
-   }
+   SYS_INF( "event: %s / service: %s", signature.name( ).c_str( ), p_service->name( ).c_str( ) );
+   p_service->set_notification( signature, p_consumer );
 
    return true;
 }
 
-const bool IEvent::clear_all_notifications( IEventConsumer* p_consumer, const EventTypeID& type_id )
+const bool IEvent::clear_notification( IEventConsumer* p_consumer, const IEventSignature& signature )
 {
-   SYS_INF( "event id: %s / consumer: %p", type_id.c_str( ), p_consumer );
-   ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
+   SYS_INF( "event: %s / consumer: %p", signature.name( ).c_str( ), p_consumer );
+   ServicePtr p_service = ServiceProcess::instance( )->current_service( );
    if( InvalidServicePtr == p_service )
       return false;
 
-   SYS_INF( "event id: %s / service: %s", type_id.c_str( ), p_service->name( ).c_str( ) );
-   p_service->clear_all_notifications( type_id, p_consumer );
+   SYS_INF( "event: %s / service: %s", signature.name( ).c_str( ), p_service->name( ).c_str( ) );
+   p_service->clear_notification( signature, p_consumer );
+
+   return true;
+}
+
+const bool IEvent::clear_all_notifications( IEventConsumer* p_consumer, const IEventSignature& signature )
+{
+   SYS_INF( "event: %s / consumer: %p", signature.name( ).c_str( ), p_consumer );
+   ServicePtr p_service = ServiceProcess::instance( )->current_service( );
+   if( InvalidServicePtr == p_service )
+      return false;
+
+   SYS_INF( "event: %s / service: %s", signature.name( ).c_str( ), p_service->name( ).c_str( ) );
+   p_service->clear_all_notifications( signature, p_consumer );
 
    return true;
 }
@@ -53,7 +59,7 @@ const bool IEvent::send( EventPtr p_event, const eCommType comm_type )
    {
       case eCommType::ETC:
       {
-         ServicePtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
+         ServicePtr p_service = ServiceProcess::instance( )->current_service( );
          if( InvalidServicePtr == p_service )
          {
             SYS_ERR( "sending ETC event not from service thread" );

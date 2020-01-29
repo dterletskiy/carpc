@@ -1,5 +1,5 @@
 // Application
-#include "imp/nav/components/Slave.hpp"
+#include "imp/nav/components/Slave/Slave.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Slave"
@@ -21,13 +21,13 @@ Slave::Slave( const base::ServicePtr p_service, const std::string& name )
    : base::Component( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   events::PingSlaveEvent::Event::set_notification( true, this );
+   events::PingSlaveEvent::Event::set_notification( this );
 }
 
 Slave::~Slave( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   events::PingSlaveEvent::Event::set_notification( false, this );
+   events::PingSlaveEvent::Event::clear_notification( this );
 }
 
 void Slave::process_event( const events::PingSlaveEvent::Event& event )

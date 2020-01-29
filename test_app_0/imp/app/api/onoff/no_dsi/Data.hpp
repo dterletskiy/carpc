@@ -24,9 +24,10 @@ using tBaseDataPtr = std::shared_ptr< BaseData >;
 
 struct RequestTriggerStateData : public BaseData
 {
-   RequestTriggerStateData( const std::string& );
+   RequestTriggerStateData( const std::string&, const size_t );
 
    std::string state = "";
+   size_t delay = 0;
 };
 
 
@@ -58,7 +59,7 @@ struct OnOffEventData
 
 
 
-DECLARE_EVENT( OnOffEvent, OnOffEventData, eOnOff );
+DECLARE_EVENT_RR( OnOffEvent, OnOffEventData, eOnOff );
 
 
 

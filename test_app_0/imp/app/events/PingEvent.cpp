@@ -44,5 +44,6 @@ namespace application::events {
 } // namespace application::events
 
 
-
-INIT_DSI_EVENT( ServiceDSI, PingEvent );
+INIT_EVENT( application::events::NoID::PingEvent );
+INIT_EVENT( application::events::ID::PingEvent );
+INIT_IPC_EVENT( application::events::IPC::PingEvent );

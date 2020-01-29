@@ -41,3 +41,14 @@ version 1.1.2a
 
 version 1.1.2b
  - Renaming class "Event" to class "IEvent"
+
+version 1.2.0
+ - "Signature" polymorphic class introduced for events
+ - "Siganture" class is used for key in subscriptions map in "Service"
+ - Communication type moved from "TBaseEvent" to "IEvent"
+ - Splitted sfinae class "TEvent" and "TGenerator" to different classes ("TEventSimple", "TEventSimpleID" and so on)
+ - Removed DSI event concept created by macros "DECLARE_DSI_EVENT", "INIT_DSI_EVENT" and "REGISTER_DSI_EVENT". Corresponding macros also removed.
+ - Implemented IPC concept create by macros "DECLARE_IPC_EVENT", "INIT_IPC_EVENT" and "REGISTER_IPC_EVENT". Service type is used only to identify if event supports IPC of not and is not set by user.
+ - Removed memory leaks detected by valgrind.
+ - New event type "TEventRR"
+ - Changed implementation for test request/response to new event type.

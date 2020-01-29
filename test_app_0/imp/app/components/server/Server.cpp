@@ -10,7 +10,9 @@ namespace application::onoff {
 
 
 
-Server::Server( )
+Server::Server( const std::string& service_name )
+   : api::onoff::no_dsi::Server( service_name )
+   , m_timer( this )
 {
    // DBG_MSG( "Created" );
 }
@@ -20,10 +22,22 @@ Server::~Server( )
    // DBG_MSG( "Destroyed" );
 }
 
-void Server::request_trigger_state( const std::string& state )
+void Server::request_trigger_state( const std::string& state, const size_t delay )
 {
-   DBG_TRC( "state: %s", state.c_str( ) );
-   response_trigger_state( true );
+   DBG_MSG( "state: %s / delay: %zu", state.c_str( ), delay );
+   m_timer.start( delay );
+   
+}
+
+void Server::process_timer( const base::TimerID id )
+{
+   DBG_MSG( "Timer '%#lx' expired", (long)id );
+
+   if( id == m_timer.id( ) )
+   {
+      response_trigger_state( true );
+      m_timer.stop( );
+   }
 }
 
 

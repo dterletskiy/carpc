@@ -8,9 +8,10 @@ namespace api::onoff::no_dsi {
 
 
 
-RequestTriggerStateData::RequestTriggerStateData( const std::string& _state )
+RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay  )
    : BaseData( )
    , state( _state )
+   , delay( _delay )
 {
 }
 
@@ -37,4 +38,4 @@ OnOffEventData::OnOffEventData( tBaseDataPtr _ptr )
 
 
 
-INIT_EVENT( api::onoff::no_dsi::OnOffEvent );
+INIT_EVENT_RR( api::onoff::no_dsi::OnOffEvent );

@@ -48,20 +48,21 @@ RequestTriggerStateData::RequestTriggerStateData( )
 {
 }
 
-RequestTriggerStateData::RequestTriggerStateData( const std::string& _state )
+RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay )
    : BaseData( eOnOff::RequestTriggerState )
    , state( _state )
+   , delay( _delay )
 {
 }
 
 bool RequestTriggerStateData::to_buffer( base::ByteBufferT& buffer )
 {
-   return buffer.push( state );
+   return buffer.push( state, delay );
 }
 
 bool RequestTriggerStateData::from_buffer( base::ByteBufferT& buffer )
 {
-   return buffer.pop( state );
+   return buffer.pop( delay, state );
 }
 
 
@@ -143,4 +144,4 @@ bool OnOffEventData::from_buffer( base::ByteBufferT& buffer )
 
 
 
-INIT_DSI_EVENT( ServiceOnOff, OnOffEvent );
+INIT_IPC_EVENT_RR( api::onoff::dsi::OnOffEvent );

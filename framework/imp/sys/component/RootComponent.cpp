@@ -15,7 +15,7 @@ RootComponent::RootComponent( const ServicePtr p_service, const std::string& nam
    : Component( p_service, name )
 {
    SYS_INF( "%p", this );
-   SysEventConsumer::instance( this );
+   mp_consumer = std::shared_ptr< SysEventConsumer >( SysEventConsumer::instance( this ) );
 }
 
 RootComponent::~RootComponent( )

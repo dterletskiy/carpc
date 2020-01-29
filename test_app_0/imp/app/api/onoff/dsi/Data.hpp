@@ -39,7 +39,7 @@ class RequestTriggerStateData : public BaseData
 {
 public:
    RequestTriggerStateData( );
-   RequestTriggerStateData( const std::string& );
+   RequestTriggerStateData( const std::string&, const size_t );
 
 public:
    bool to_buffer( base::ByteBufferT& ) override;
@@ -47,6 +47,7 @@ public:
 
 public:
    std::string state = "";
+   size_t delay = 0;
 };
 
 
@@ -99,8 +100,8 @@ public:
 
 
 
+DECLARE_IPC_EVENT_RR( OnOffEvent, api::onoff::dsi::OnOffEventData, api::onoff::dsi::eOnOff );
+
+
+
 } // namespace api::onoff::dsi
-
-
-
-DECLARE_DSI_EVENT( ServiceOnOff, OnOffEvent, api::onoff::dsi::OnOffEventData, api::onoff::dsi::eOnOff );

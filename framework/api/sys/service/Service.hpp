@@ -54,14 +54,18 @@ private:
    uint64_t                m_processed_events = 0;
 
 public:
-   void set_notification( const EventTypeID&, const OptEventInfoID, IEventConsumer* );
-   void clear_notification( const EventTypeID&, const OptEventInfoID, IEventConsumer* );
-   void clear_all_notifications( const EventTypeID&, IEventConsumer* );
+   void set_notification( const IEventSignature&, IEventConsumer* );
+   void clear_notification( const IEventSignature&, IEventConsumer* );
+   void clear_all_notifications( const IEventSignature&, IEventConsumer* );
    bool is_subscribed( const EventPtr );
    const std::optional< time_t > process_started( ) const;
 private:
    void notify( const EventPtr );
-   std::map< std::pair< EventTypeID, OptEventInfoID >, std::set< IEventConsumer* > > m_event_consumers_map;
+   struct Comparator
+   {
+      bool operator( )( const IEventSignature*, const IEventSignature* ) const;
+   };
+   std::map< const IEventSignature*, std::set< IEventConsumer* >, Comparator > m_event_consumers_map;
    std::optional< time_t > m_process_started = std::nullopt;
 
 private:

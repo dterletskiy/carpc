@@ -11,7 +11,8 @@ namespace application::onoff {
 
 
 
-Client::Client( )
+Client::Client( const std::string& service_name )
+   : api::onoff::no_dsi::Client( service_name )
 {
    // DBG_TRC( "Created" );
 }
@@ -23,7 +24,7 @@ Client::~Client( )
 
 void Client::response_trigger_state( const bool result )
 {
-   DBG_TRC( "result: %s", BOOL_TO_STRING( result ) );
+   DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
 }
 
 

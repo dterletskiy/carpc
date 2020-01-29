@@ -35,7 +35,10 @@ EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
 {
    EventTypeID event_type;
    if( false == buffer.pop( event_type ) )
+   {
+      SYS_ERR( "meta data deserrialization error" );
       return nullptr;
+   }
 
    auto iterator = m_registry.find( event_type );
    if( m_registry.end( ) == iterator )
@@ -46,24 +49,33 @@ EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
 
    EventPtr p_event = iterator->second( );
    if( false == p_event->from_buffer( buffer ) )
+   {
+      SYS_ERR( "event '%s' deserrialization error", event_type.c_str( ) )
       return nullptr;
+   }
 
    return p_event;
 }
 
 bool EventRegistry::create_buffer( ByteBufferT& buffer, EventPtr p_event ) const
 {
-   if( m_registry.end( ) == m_registry.find( p_event->type_id( ) ) )
+   if( m_registry.end( ) == m_registry.find( p_event->signature( )->type_id( ) ) )
    {
-      SYS_ERR( "event '%s' is not registered", p_event->type_id( ).c_str( ) )
+      SYS_ERR( "event '%s' is not registered", p_event->signature( )->name( ).c_str( ) )
       return false;
    }
 
    if( false == p_event->to_buffer( buffer ) )
+   {
+      SYS_ERR( "event '%s' serrialization error", p_event->signature( )->name( ).c_str( ) )
       return false;
+   }
 
-   if( false == buffer.push( p_event->type_id( ) ) )
+   if( false == buffer.push( p_event->signature( )->type_id( ) ) )
+   {
+      SYS_ERR( "event '%s' meta data serrialization error", p_event->signature( )->name( ).c_str( ) )
       return false;
+   }
 
    return true;
 }

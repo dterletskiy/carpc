@@ -11,6 +11,12 @@ namespace base {
 
 
 
+bool Service::Comparator::operator( )( const IEventSignature* p_es1, const IEventSignature* p_es2 ) const
+{
+   return *p_es1 < *p_es2;
+}
+
+
 
 Service::Service( const ServiceInfo& info )
    : m_name( info.m_name )
@@ -34,7 +40,7 @@ Service::~Service( )
 const TID Service::id( ) const
 {
    TID id = 0;
-   if( mp_thread && m_started )
+   if( mp_thread )
       id = mp_thread->id( );
 
    return id;
@@ -54,7 +60,7 @@ void Service::thread_loop( )
    while( started( ) )
    {
       EventPtr p_event = get_event( );
-      SYS_TRC( "'%s': processing event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
+      SYS_TRC( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       notify( p_event );
    }
 
@@ -90,7 +96,7 @@ bool Service::insert_event( const EventPtr p_event )
       return false;
    }
 
-   SYS_TRC( "'%s': inserting event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
+   SYS_TRC( "'%s': inserting event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
    m_buffer_cond_var.lock( );
    m_events.push_back( p_event );
    m_buffer_cond_var.notify( );
@@ -110,7 +116,7 @@ EventPtr Service::get_event( )
    EventPtr p_event = m_events.front( );
    m_events.pop_front( );
    ++m_processed_events;
-   SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
+   SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
    m_buffer_cond_var.unlock( );
 
    return p_event;
@@ -118,34 +124,37 @@ EventPtr Service::get_event( )
 
 void Service::notify( const EventPtr p_event )
 {
-   const auto& iterator = m_event_consumers_map.find( std::make_pair( p_event->type_id( ), p_event->is_broadcast( ) ) );
+   const auto& iterator = m_event_consumers_map.find( p_event->signature( ) );
    if( iterator == m_event_consumers_map.end( ) )
       return;
 
-   auto consumers_set = iterator->second; // @TDA: this copy is needed to avoid modifying consumers set during iterating it.
+   // Here we create a copy of consumers set to avoid modifying consumers set during iterating it,
+   // for example, during calling "clear_notification" from "process_event".
+   auto consumers_set = iterator->second;
    SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
    for( IEventConsumer* p_consumer : consumers_set )
    {
       m_process_started = time( nullptr );
-      SYS_TRC( "'%s': start processing at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->name( ).c_str( ) );
+      SYS_TRC( "'%s': start processing at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
       p_event->process( p_consumer );
-      SYS_TRC( "'%s': finished processing started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->name( ).c_str( ) );
+      SYS_TRC( "'%s': finished processing started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
    }
    m_process_started.reset( );
 }
 
-void Service::set_notification( const EventTypeID& event_type_id, const OptEventInfoID event_info_id, IEventConsumer* p_consumer )
+void Service::set_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
-   SYS_INF( "'%s': event id (%s) / consumer (%p)", m_name.c_str( ), event_type_id.c_str( ), p_consumer );
-   const auto& iterator = m_event_consumers_map.find( std::make_pair( event_type_id, event_info_id ) );
+   SYS_INF( "'%s': event id (%s) / consumer (%p)", m_name.c_str( ), signature.name( ).c_str( ), p_consumer );
+   const auto& iterator = m_event_consumers_map.find( &signature );
    if( iterator == m_event_consumers_map.end( ) )
    {
-      m_event_consumers_map.emplace(
-            std::pair< std::pair< EventTypeID, OptEventInfoID >, std::set< IEventConsumer* > >
-               ( std::make_pair( event_type_id, event_info_id ), { p_consumer } )
-         );
+      // Here signature is a temporary object created on a stack in concrete event static function.
+      // So we should create a copy of this signature in a heap and store its pointer to consumers map.
+      // Later on when number of consumers for this signature becase zero we must delete object by this pointer and remove poinetr from this map.
+      auto p_signature = signature.create_copy( );
+      m_event_consumers_map.emplace( std::pair< const IEventSignature*, std::set< IEventConsumer* > >( p_signature, { p_consumer } ) );
    }
    else
    {
@@ -153,44 +162,59 @@ void Service::set_notification( const EventTypeID& event_type_id, const OptEvent
    }
 }
 
-void Service::clear_notification( const EventTypeID& event_type_id, const OptEventInfoID event_info_id, IEventConsumer* p_consumer )
+void Service::clear_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
-   const auto& iterator = m_event_consumers_map.find( std::make_pair( event_type_id, event_info_id ) );
+   const auto& iterator = m_event_consumers_map.find( &signature );
    if( iterator == m_event_consumers_map.end( ) )
       return;
 
    iterator->second.erase( p_consumer );
 
    if( true == iterator->second.empty( ) )
-      m_event_consumers_map.erase( std::make_pair( event_type_id, event_info_id ) );
+   {
+      // Number of events for this event signature is zero (last one has just deleted), so we should remove pointer to this signature from the map
+      // and must delete dynamicly created object (in function "set_notification")
+      delete iterator->first;
+      m_event_consumers_map.erase( iterator );
+   }
 }
 
-void Service::clear_all_notifications( const EventTypeID& event_type_id, IEventConsumer* p_consumer )
+void Service::clear_all_notifications( const IEventSignature& signature, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
-   for( auto pair: m_event_consumers_map )
+   for( auto iterator_map = m_event_consumers_map.begin( ); iterator_map != m_event_consumers_map.end( ); ++iterator_map )
    {
-      if( event_type_id != pair.first.first )
+      if( signature.type_id( ) != iterator_map->first->type_id( ) )
          continue;
 
-      auto& consumers_set = pair.second;
-      auto iterator = consumers_set.find( p_consumer );
-      if( consumers_set.end( ) == iterator )
+      auto& consumers_set = iterator_map->second;
+      auto iterator_set = consumers_set.find( p_consumer );
+      if( consumers_set.end( ) == iterator_set )
          continue;
 
-      consumers_set.erase( iterator );
+      consumers_set.erase( iterator_set );
+
+      if( true == consumers_set.empty( ) )
+      {
+         // Number of events for this event signature is zero (last one has just deleted), so we should remove pointer to this signature from the map
+         // and must delete dynamicly created object (in function "set_notification")
+         delete iterator_map->first;
+         m_event_consumers_map.erase( iterator_map );
+      }
+
+      break;
    }
 }
 
 bool Service::is_subscribed( const EventPtr p_event )
 {
-   const auto& iterator = m_event_consumers_map.find( std::make_pair( p_event->type_id( ), p_event->is_broadcast( ) ) );
+   const auto& iterator = m_event_consumers_map.find( p_event->signature( ) );
    if( iterator == m_event_consumers_map.end( ) )
    {
-      SYS_TRC( "'%s': is not subscribed on event (%s)", m_name.c_str( ), p_event->name( ).c_str( ) );
+      SYS_TRC( "'%s': is not subscribed on event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       return false;
    }
 
