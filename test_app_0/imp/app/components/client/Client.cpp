@@ -11,8 +11,8 @@ namespace application::onoff {
 
 
 
-Client::Client( const std::string& service_name )
-   : api::onoff::no_dsi::Client( service_name )
+Client::Client( const std::string& role_name )
+   : api::onoff::Client( role_name )
 {
    // DBG_TRC( "Created" );
 }

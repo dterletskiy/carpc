@@ -3,7 +3,7 @@
 // Framework
 #include "api/sys/comm/timer/Timer.hpp"
 // Interface
-#include "imp/app/api/onoff/no_dsi/Server.hpp"
+#include "imp/app/api/onoff/Server.hpp"
 
 
 
@@ -12,7 +12,7 @@ namespace application::onoff {
 
 
 class Server
-   : public api::onoff::no_dsi::Server
+   : public api::onoff::Server
    , public base::ITimerConsumer
 {
 public:

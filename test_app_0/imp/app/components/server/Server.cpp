@@ -10,8 +10,8 @@ namespace application::onoff {
 
 
 
-Server::Server( const std::string& service_name )
-   : api::onoff::no_dsi::Server( service_name )
+Server::Server( const std::string& role_name )
+   : api::onoff::Server( role_name )
    , m_timer( this )
 {
    // DBG_MSG( "Created" );

@@ -46,7 +46,7 @@ void boot( )
    memory::dump( );
 
    REGISTER_IPC_EVENT( application::events::IPC::PingEvent );
-   // REGISTER_IPC_EVENT( api::onoff::dsi::OnOffEvent );
+   REGISTER_IPC_EVENT( api::onoff::ipc::OnOffEvent );
    base::EventRegistry::instance( )->dump( );
 
    base::ServiceInfoVector services = { { "OnOff_Service", { application::onoff::creator }, 5 } };
