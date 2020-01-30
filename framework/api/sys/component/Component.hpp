@@ -13,7 +13,7 @@ namespace base {
 class Component
 {
 public:
-   Component( const ServicePtr, const std::string& );
+   Component( const ServiceThreadPtr, const std::string& );
    virtual ~Component( );
 
 public:
@@ -27,7 +27,7 @@ private:
    ID             m_id;
 
 private:
-   ServicePtrW    mp_service;
+   ServiceThreadPtrW    mp_service;
 
 protected:
    void start_performance( const std::string& message = "" );

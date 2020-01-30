@@ -16,7 +16,7 @@ class RootComponent
    : public Component
 {
 public:
-   RootComponent( const ServicePtr, const std::string& );
+   RootComponent( const ServiceThreadPtr, const std::string& );
    ~RootComponent( ) override;
 
 public:

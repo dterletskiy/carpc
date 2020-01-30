@@ -11,7 +11,7 @@ namespace application::onoff {
 
 
 
-base::ComponentPtr creator( base::ServicePtr );
+base::ComponentPtr creator( base::ServiceThreadPtr );
 
 
 
@@ -20,7 +20,7 @@ class OnOff
    , public events::PingDriverEvent::Consumer
 {
 public:
-   OnOff( const base::ServicePtr, const std::string& );
+   OnOff( const base::ServiceThreadPtr, const std::string& );
    ~OnOff( ) override;
 
 private:

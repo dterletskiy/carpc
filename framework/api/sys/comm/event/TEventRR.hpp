@@ -145,12 +145,12 @@ public:
       return create( service_name, id, data, comm_type )->send( comm_type );
    }
 
-   static const bool create_send_to_context( const ServiceName& service_name, const _IdType& id, ServicePtrW pw_service )
+   static const bool create_send_to_context( const ServiceName& service_name, const _IdType& id, ServiceThreadPtrW pw_service )
    {
       return create( service_name, id )->send_to_context( pw_service );
    }
 
-   static const bool create_send_to_context( const ServiceName& service_name, const _IdType& id, const _DataType& data, ServicePtrW pw_service )
+   static const bool create_send_to_context( const ServiceName& service_name, const _IdType& id, const _DataType& data, ServiceThreadPtrW pw_service )
    {
       return create( service_name, id, data )->send_to_context( pw_service );
    }

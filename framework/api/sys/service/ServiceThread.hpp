@@ -12,14 +12,14 @@ namespace base {
 
 
 
-class Service
-   : public std::enable_shared_from_this< Service >
+class ServiceThread
+   : public std::enable_shared_from_this< ServiceThread >
 {
 public:
-   Service( const ServiceInfo& );
-   ~Service( );
-   Service( const Service& ) = delete;
-   Service& operator=( const Service& ) = delete;
+   ServiceThread( const ServiceInfo& );
+   ~ServiceThread( );
+   ServiceThread( const ServiceThread& ) = delete;
+   ServiceThread& operator=( const ServiceThread& ) = delete;
 
 public:
    const TID id( ) const;
@@ -76,37 +76,37 @@ private:
 
 
 inline
-const std::string& Service::name( ) const
+const std::string& ServiceThread::name( ) const
 {
    return m_name;
 }
 
 inline
-const size_t Service::wd_timeout( ) const
+const size_t ServiceThread::wd_timeout( ) const
 {
    return m_wd_timeout;
 }
 
 inline
-const uint64_t Service::processed_events( ) const
+const uint64_t ServiceThread::processed_events( ) const
 {
    return m_processed_events;
 }
 
 inline
-const std::optional< time_t > Service::process_started( ) const
+const std::optional< time_t > ServiceThread::process_started( ) const
 {
    return m_process_started;
 }
 
 inline
-bool Service::started( ) const
+bool ServiceThread::started( ) const
 {
    return m_started;
 }
 
 inline
-bool Service::wait( )
+bool ServiceThread::wait( )
 {
    m_started = mp_thread->join( );
    return !m_started;

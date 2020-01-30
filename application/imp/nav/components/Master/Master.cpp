@@ -10,14 +10,14 @@ namespace application::master {
 
 
 
-base::ComponentPtr creator( base::ServicePtr p_service )
+base::ComponentPtr creator( base::ServiceThreadPtr p_service )
 {
    return std::make_shared< Master >( p_service, "Master" );
 }
 
 
 
-Master::Master( const base::ServicePtr p_service, const std::string& name )
+Master::Master( const base::ServiceThreadPtr p_service, const std::string& name )
    : base::Component( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );

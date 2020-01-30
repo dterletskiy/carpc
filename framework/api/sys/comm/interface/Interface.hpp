@@ -42,9 +42,9 @@ private:
    eType m_type = eType::undefined;
 
 public:
-   ServicePtrW service( ) const;
+   ServiceThreadPtrW service( ) const;
 private:
-   ServicePtrW mp_service;
+   ServiceThreadPtrW mp_service;
 };
 
 

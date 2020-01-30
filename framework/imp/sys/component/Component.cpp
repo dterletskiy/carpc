@@ -1,4 +1,4 @@
-#include "api/sys/service/Service.hpp"
+#include "api/sys/service/ServiceThread.hpp"
 #include "api/sys/tools/Tools.hpp"
 #include "api/sys/component/Component.hpp"
 
@@ -10,7 +10,7 @@ namespace base {
 
 
 
-Component::Component( const ServicePtr p_service, const std::string& name )
+Component::Component( const ServiceThreadPtr p_service, const std::string& name )
    : m_name( name )
    , m_id( tools::generate_id( "Component" ) )
    , mp_service( p_service )

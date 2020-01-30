@@ -11,7 +11,7 @@ namespace application::slave {
 
 
 
-base::ComponentPtr creator( base::ServicePtr );
+base::ComponentPtr creator( base::ServiceThreadPtr );
 
 
 
@@ -20,7 +20,7 @@ class Slave
    , public events::PingSlaveEvent::Consumer
 {
 public:
-   Slave( const base::ServicePtr, const std::string& );
+   Slave( const base::ServiceThreadPtr, const std::string& );
    ~Slave( ) override;
 
 private:

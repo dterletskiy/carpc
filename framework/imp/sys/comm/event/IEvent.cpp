@@ -1,6 +1,6 @@
 #include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/service/Service.hpp"
-#include "api/sys/service/ServiceBrocker.hpp"
+#include "api/sys/service/ServiceThread.hpp"
+#include "api/sys/service/ServiceBrockerThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/comm/event/IEventSignature.hpp"
 #include "api/sys/comm/event/IEvent.hpp"
@@ -16,8 +16,8 @@ namespace base {
 const bool IEvent::set_notification( IEventConsumer* p_consumer, const IEventSignature& signature )
 {
    SYS_INF( "event: %s / consumer: %p", signature.name( ).c_str( ), p_consumer );
-   ServicePtr p_service = ServiceProcess::instance( )->current_service( );
-   if( InvalidServicePtr == p_service )
+   ServiceThreadPtr p_service = ServiceProcess::instance( )->current_service( );
+   if( InvalidServiceThreadPtr == p_service )
       return false;
 
    SYS_INF( "event: %s / service: %s", signature.name( ).c_str( ), p_service->name( ).c_str( ) );
@@ -29,8 +29,8 @@ const bool IEvent::set_notification( IEventConsumer* p_consumer, const IEventSig
 const bool IEvent::clear_notification( IEventConsumer* p_consumer, const IEventSignature& signature )
 {
    SYS_INF( "event: %s / consumer: %p", signature.name( ).c_str( ), p_consumer );
-   ServicePtr p_service = ServiceProcess::instance( )->current_service( );
-   if( InvalidServicePtr == p_service )
+   ServiceThreadPtr p_service = ServiceProcess::instance( )->current_service( );
+   if( InvalidServiceThreadPtr == p_service )
       return false;
 
    SYS_INF( "event: %s / service: %s", signature.name( ).c_str( ), p_service->name( ).c_str( ) );
@@ -42,8 +42,8 @@ const bool IEvent::clear_notification( IEventConsumer* p_consumer, const IEventS
 const bool IEvent::clear_all_notifications( IEventConsumer* p_consumer, const IEventSignature& signature )
 {
    SYS_INF( "event: %s / consumer: %p", signature.name( ).c_str( ), p_consumer );
-   ServicePtr p_service = ServiceProcess::instance( )->current_service( );
-   if( InvalidServicePtr == p_service )
+   ServiceThreadPtr p_service = ServiceProcess::instance( )->current_service( );
+   if( InvalidServiceThreadPtr == p_service )
       return false;
 
    SYS_INF( "event: %s / service: %s", signature.name( ).c_str( ), p_service->name( ).c_str( ) );
@@ -59,8 +59,8 @@ const bool IEvent::send( EventPtr p_event, const eCommType comm_type )
    {
       case eCommType::ETC:
       {
-         ServicePtr p_service = ServiceProcess::instance( )->current_service( );
-         if( InvalidServicePtr == p_service )
+         ServiceThreadPtr p_service = ServiceProcess::instance( )->current_service( );
+         if( InvalidServiceThreadPtr == p_service )
          {
             SYS_ERR( "sending ETC event not from service thread" );
             return false;
@@ -71,17 +71,17 @@ const bool IEvent::send( EventPtr p_event, const eCommType comm_type )
       case eCommType::ITC:
       {
          bool result = true;
-         ServicePtrList service_list = base::ServiceProcess::instance( )->service_list( );
+         ServiceThreadPtrList service_list = base::ServiceProcess::instance( )->service_list( );
          for( auto p_service : service_list )
             result &= p_service->insert_event( p_event );
          return result;
       }
       case eCommType::IPC:
       {
-         ServiceBrockerPtr p_service_brocker = ServiceProcess::instance( )->service_brocker( );
-         if( InvalidServiceBrockerPtr == p_service_brocker )
+         ServiceBrockerThreadPtr p_service_brocker = ServiceProcess::instance( )->service_brocker( );
+         if( InvalidServiceBrockerThreadPtr == p_service_brocker )
          {
-            SYS_ERR( "ServiceBrocker is not started" );
+            SYS_ERR( "ServiceBrockerThread is not started" );
             return false;
          }
 
@@ -93,10 +93,10 @@ const bool IEvent::send( EventPtr p_event, const eCommType comm_type )
    return true;
 }
 
-const bool IEvent::send_to_context( EventPtr p_event, ServicePtrW pw_service  )
+const bool IEvent::send_to_context( EventPtr p_event, ServiceThreadPtrW pw_service  )
 {
-   ServicePtr p_service = pw_service.lock( );
-   if( InvalidServicePtr == p_service )
+   ServiceThreadPtr p_service = pw_service.lock( );
+   if( InvalidServiceThreadPtr == p_service )
    {
       SYS_ERR( "sending ETC event to not valid service thread" );
       return false;

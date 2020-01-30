@@ -1,5 +1,5 @@
 #include "api/sys/comm/event/Event.hpp"
-#include "api/sys/service/Service.hpp"
+#include "api/sys/service/ServiceThread.hpp"
 #include "imp/sys/service/ServiceEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -11,14 +11,14 @@ namespace base {
 
 
 
-bool Service::Comparator::operator( )( const IEventSignature* p_es1, const IEventSignature* p_es2 ) const
+bool ServiceThread::Comparator::operator( )( const IEventSignature* p_es1, const IEventSignature* p_es2 ) const
 {
    return *p_es1 < *p_es2;
 }
 
 
 
-Service::Service( const ServiceInfo& info )
+ServiceThread::ServiceThread( const ServiceInfo& info )
    : m_name( info.m_name )
    , m_wd_timeout( info.m_wd_timeout )
    , m_events( )
@@ -27,17 +27,17 @@ Service::Service( const ServiceInfo& info )
    , m_components( )
    , m_component_creators( info.m_component_creators )
 {
-   mp_thread = std::make_shared< base::os::Thread >( std::bind( &Service::thread_loop, this ) );
+   mp_thread = std::make_shared< base::os::Thread >( std::bind( &ServiceThread::thread_loop, this ) );
 
    SYS_TRC( "'%s': created", m_name.c_str( ) );
 }
 
-Service::~Service( )
+ServiceThread::~ServiceThread( )
 {
    SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
 }
 
-const TID Service::id( ) const
+const TID ServiceThread::id( ) const
 {
    TID id = 0;
    if( mp_thread )
@@ -46,7 +46,7 @@ const TID Service::id( ) const
    return id;
 }
 
-void Service::thread_loop( )
+void ServiceThread::thread_loop( )
 {
    SYS_INF( "'%s': enter", m_name.c_str( ) );
    m_started = true;
@@ -70,25 +70,25 @@ void Service::thread_loop( )
    SYS_INF( "'%s': exit", m_name.c_str( ) );
 }
 
-bool Service::start( )
+bool ServiceThread::start( )
 {
    SYS_INF( "Starting service '%s'", m_name.c_str( ) );
    bool result = mp_thread->run( );
    if( false == result )
    {
-      SYS_ERR( "Service '%s' can't be started", m_name.c_str( ) );
+      SYS_ERR( "ServiceThread '%s' can't be started", m_name.c_str( ) );
    }
 
    return result;
 }
 
-void Service::stop( )
+void ServiceThread::stop( )
 {
    SYS_INF( "'%s': stopping", m_name.c_str( ) );
    m_started = false;
 }
 
-bool Service::insert_event( const EventPtr p_event )
+bool ServiceThread::insert_event( const EventPtr p_event )
 {
    if( false == started( ) )
    {
@@ -105,7 +105,7 @@ bool Service::insert_event( const EventPtr p_event )
    return true;
 }
 
-EventPtr Service::get_event( )
+EventPtr ServiceThread::get_event( )
 {
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )
@@ -122,7 +122,7 @@ EventPtr Service::get_event( )
    return p_event;
 }
 
-void Service::notify( const EventPtr p_event )
+void ServiceThread::notify( const EventPtr p_event )
 {
    const auto& iterator = m_event_consumers_map.find( p_event->signature( ) );
    if( iterator == m_event_consumers_map.end( ) )
@@ -142,7 +142,7 @@ void Service::notify( const EventPtr p_event )
    m_process_started.reset( );
 }
 
-void Service::set_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
+void ServiceThread::set_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -162,7 +162,7 @@ void Service::set_notification( const IEventSignature& signature, IEventConsumer
    }
 }
 
-void Service::clear_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
+void ServiceThread::clear_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -181,7 +181,7 @@ void Service::clear_notification( const IEventSignature& signature, IEventConsum
    }
 }
 
-void Service::clear_all_notifications( const IEventSignature& signature, IEventConsumer* p_consumer )
+void ServiceThread::clear_all_notifications( const IEventSignature& signature, IEventConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -209,7 +209,7 @@ void Service::clear_all_notifications( const IEventSignature& signature, IEventC
    }
 }
 
-bool Service::is_subscribed( const EventPtr p_event )
+bool ServiceThread::is_subscribed( const EventPtr p_event )
 {
    const auto& iterator = m_event_consumers_map.find( p_event->signature( ) );
    if( iterator == m_event_consumers_map.end( ) )

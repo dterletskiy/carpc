@@ -1,6 +1,6 @@
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/service/ServiceBrocker.hpp"
-#include "api/sys/service/Service.hpp"
+#include "api/sys/service/ServiceBrockerThread.hpp"
+#include "api/sys/service/ServiceThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "imp/sys/events/ServiceEvent.hpp"
 
@@ -60,12 +60,12 @@ ServiceProcessPtr ServiceProcess::instance( )
    return mp_instance;
 }
 
-ServiceBrockerPtr ServiceProcess::service_brocker( ) const
+ServiceBrockerThreadPtr ServiceProcess::service_brocker( ) const
 {
    return mp_service_brocker;
 }
 
-ServicePtr ServiceProcess::service( const TID& id ) const
+ServiceThreadPtr ServiceProcess::service( const TID& id ) const
 {
    for( auto& p_service : m_service_list )
    {
@@ -73,10 +73,10 @@ ServicePtr ServiceProcess::service( const TID& id ) const
          return p_service;
    }
 
-   return InvalidServicePtr;
+   return InvalidServiceThreadPtr;
 }
 
-ServicePtr ServiceProcess::current_service( ) const
+ServiceThreadPtr ServiceProcess::current_service( ) const
 {
    for( auto& p_service : m_service_list )
    {
@@ -84,10 +84,10 @@ ServicePtr ServiceProcess::current_service( ) const
          return p_service;
    }
 
-   return InvalidServicePtr;
+   return InvalidServiceThreadPtr;
 }
 
-ServicePtrList ServiceProcess::service_list( ) const
+ServiceThreadPtrList ServiceProcess::service_list( ) const
 {
    return m_service_list;
 }
@@ -95,13 +95,13 @@ ServicePtrList ServiceProcess::service_list( ) const
 bool ServiceProcess::start( const ServiceInfoVector& service_infos )
 {
    // Creating service brocker thread
-   mp_service_brocker = ServiceBrocker::instance( );
+   mp_service_brocker = ServiceBrockerThread::instance( );
    if( nullptr == mp_service_brocker )
       return false;
    // Creating service threads
    for( const auto& service_info : service_infos )
    {
-      ServicePtr p_service = std::make_shared< Service >( service_info );
+      ServiceThreadPtr p_service = std::make_shared< ServiceThread >( service_info );
       if( nullptr == p_service )
          return false;
       m_service_list.emplace_back( p_service );
@@ -150,10 +150,10 @@ void ServiceProcess::boot( )
       p_service->wait( );
    SYS_MSG( "All services are finished" );
 
-   SYS_MSG( "Stopping ServiceBrocker" );
+   SYS_MSG( "Stopping ServiceBrockerThread" );
    mp_service_brocker->stop( );
    mp_service_brocker->wait( );
-   SYS_MSG( "ServiceBrocker is finished" );
+   SYS_MSG( "ServiceBrockerThread is finished" );
 
    os::linux::timer::remove( m_timer_id );
 

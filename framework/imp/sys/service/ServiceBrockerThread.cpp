@@ -8,7 +8,7 @@
 #include "api/sys/comm/event/Event.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
-#include "api/sys/service/ServiceBrocker.hpp"
+#include "api/sys/service/ServiceBrockerThread.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvBr"
@@ -19,34 +19,34 @@ namespace base {
 
 
 
-ServiceBrockerPtr ServiceBrocker::mp_instance;
+ServiceBrockerThreadPtr ServiceBrockerThread::mp_instance;
 
-ServiceBrocker::ServiceBrocker( )
+ServiceBrockerThread::ServiceBrockerThread( )
    : m_events( )
 {
-   mp_thread_send = std::make_shared< os::Thread >( std::bind( &ServiceBrocker::thread_loop_send, this ) );
-   mp_thread_receive = std::make_shared< os::Thread >( std::bind( &ServiceBrocker::thread_loop_receive, this ) );
+   mp_thread_send = std::make_shared< os::Thread >( std::bind( &ServiceBrockerThread::thread_loop_send, this ) );
+   mp_thread_receive = std::make_shared< os::Thread >( std::bind( &ServiceBrockerThread::thread_loop_receive, this ) );
 
    SYS_TRC( "created" );
 }
 
-ServiceBrocker::~ServiceBrocker( )
+ServiceBrockerThread::~ServiceBrockerThread( )
 {
    SYS_TRC( "destroyed" );
 }
 
-ServiceBrockerPtr ServiceBrocker::instance( )
+ServiceBrockerThreadPtr ServiceBrockerThread::instance( )
 {
    os::Mutex mutex( true );
    if( !mp_instance )
    {
-      mp_instance.reset( new ServiceBrocker( ) );
+      mp_instance.reset( new ServiceBrockerThread( ) );
    }
 
    return mp_instance;
 }
 
-bool ServiceBrocker::setup_connection( )
+bool ServiceBrockerThread::setup_connection( )
 {
    m_master_socket = socket( configuration::dsi::socket_family, configuration::dsi::socket_type, configuration::dsi::socket_protocole );
    if( -1 == m_master_socket )
@@ -96,26 +96,26 @@ bool ServiceBrocker::setup_connection( )
    return true;
 }
 
-bool ServiceBrocker::start( )
+bool ServiceBrockerThread::start( )
 {
    if( false == setup_connection( ) )
       return false;
 
-   SYS_INF( "Starting ServiceBrocker" );
+   SYS_INF( "Starting ServiceBrockerThread" );
    bool result_send = start_send( );
    bool result_receive = start_receive( );
 
    return result_send && result_receive;
 }
 
-void ServiceBrocker::stop( )
+void ServiceBrockerThread::stop( )
 {
-   SYS_INF( "Stopping ServiceBrocker" );
+   SYS_INF( "Stopping ServiceBrockerThread" );
    stop_send( );
    stop_receive( );
 }
 
-void ServiceBrocker::thread_loop_send( )
+void ServiceBrockerThread::thread_loop_send( )
 {
    SYS_INF( "enter" );
    m_started_send = true;
@@ -164,25 +164,25 @@ void ServiceBrocker::thread_loop_send( )
    SYS_INF( "exit" );
 }
 
-bool ServiceBrocker::start_send( )
+bool ServiceBrockerThread::start_send( )
 {
-   SYS_INF( "Starting ServiceBrocker send thread" );
+   SYS_INF( "Starting ServiceBrockerThread send thread" );
    bool result = mp_thread_send->run( );
    if( false == result )
    {
-      SYS_ERR( "ServiceBrocker can't start send thread" );
+      SYS_ERR( "ServiceBrockerThread can't start send thread" );
    }
 
    return result;
 }
 
-void ServiceBrocker::stop_send( )
+void ServiceBrockerThread::stop_send( )
 {
-   SYS_INF( "Stopping ServiceBrocker send thread" );
+   SYS_INF( "Stopping ServiceBrockerThread send thread" );
    m_started_send = false;
 }
 
-void ServiceBrocker::thread_loop_receive( )
+void ServiceBrockerThread::thread_loop_receive( )
 {
    SYS_INF( "enter" );
 
@@ -221,29 +221,29 @@ void ServiceBrocker::thread_loop_receive( )
    SYS_INF( "exit" );
 }
 
-bool ServiceBrocker::start_receive( )
+bool ServiceBrockerThread::start_receive( )
 {
-   SYS_INF( "Starting ServiceBrocker receive thread" );
+   SYS_INF( "Starting ServiceBrockerThread receive thread" );
    bool result = mp_thread_receive->run( );
    if( false == result )
    {
-      SYS_ERR( "ServiceBrocker can't start receive thread" );
+      SYS_ERR( "ServiceBrockerThread can't start receive thread" );
    }
 
    return result;
 }
 
-void ServiceBrocker::stop_receive( )
+void ServiceBrockerThread::stop_receive( )
 {
-   SYS_INF( "Stopping ServiceBrocker receive thread" );
+   SYS_INF( "Stopping ServiceBrockerThread receive thread" );
    m_started_receive = false;
 }
 
-bool ServiceBrocker::insert_event( const EventPtr p_event )
+bool ServiceBrockerThread::insert_event( const EventPtr p_event )
 {
    if( false == m_started_send )
    {
-      SYS_WRN( "ServiceBrocker send thread is not started" );
+      SYS_WRN( "ServiceBrockerThread send thread is not started" );
       return false;
    }
 
@@ -254,7 +254,7 @@ bool ServiceBrocker::insert_event( const EventPtr p_event )
    return true;
 }
 
-EventPtr ServiceBrocker::get_event( )
+EventPtr ServiceBrockerThread::get_event( )
 {
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )

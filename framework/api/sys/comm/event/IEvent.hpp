@@ -23,11 +23,11 @@ public:
    static const bool clear_notification( IEventConsumer*, const IEventSignature& );
    static const bool clear_all_notifications( IEventConsumer*, const IEventSignature& );
    static const bool send( EventPtr, const eCommType comm_type = eCommType::NONE );
-   static const bool send_to_context( EventPtr, ServicePtrW  );
+   static const bool send_to_context( EventPtr, ServiceThreadPtrW  );
 
 public:
    virtual const bool send( const eCommType comm_type = eCommType::NONE ) = 0;
-   virtual const bool send_to_context( ServicePtrW ) = 0;
+   virtual const bool send_to_context( ServiceThreadPtrW ) = 0;
    virtual void process( IEventConsumer* ) = 0;
 
 public:

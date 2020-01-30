@@ -11,7 +11,7 @@ namespace application::driver {
 
 
 
-base::ComponentPtr creator( base::ServicePtr );
+base::ComponentPtr creator( base::ServiceThreadPtr );
 
 
 
@@ -21,7 +21,7 @@ class Driver
    , public events::PingMasterEvent::Consumer
 {
 public:
-   Driver( const base::ServicePtr, const std::string& );
+   Driver( const base::ServiceThreadPtr, const std::string& );
    ~Driver( ) override;
 
 private:

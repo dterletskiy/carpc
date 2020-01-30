@@ -5,7 +5,7 @@
 namespace base {
 
    const ServiceProcessPtr       InvalidServicePtrPtr;
-   const ServiceBrockerPtr       InvalidServiceBrockerPtr;
-   const ServicePtr              InvalidServicePtr;
+   const ServiceBrockerThreadPtr       InvalidServiceBrockerThreadPtr;
+   const ServiceThreadPtr        InvalidServiceThreadPtr;
 
 } // namespace base

@@ -11,7 +11,7 @@ namespace application::master {
 
 
 
-base::ComponentPtr creator( base::ServicePtr );
+base::ComponentPtr creator( base::ServiceThreadPtr );
 
 
 
@@ -21,7 +21,7 @@ class Master
    , public events::PingSlaveEvent::Consumer
 {
 public:
-   Master( const base::ServicePtr, const std::string& );
+   Master( const base::ServiceThreadPtr, const std::string& );
    ~Master( ) override;
 
 private:

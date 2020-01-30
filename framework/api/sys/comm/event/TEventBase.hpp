@@ -68,7 +68,7 @@ public:
    {
       return IEvent::send( TEventBase< _Generator >::shared_from_this( ), comm_type );
    }
-   const bool send_to_context( ServicePtrW pw_service ) override
+   const bool send_to_context( ServiceThreadPtrW pw_service ) override
    {
       return IEvent::send_to_context( TEventBase< _Generator >::shared_from_this( ), pw_service );
    }

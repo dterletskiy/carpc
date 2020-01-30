@@ -10,14 +10,14 @@ namespace application::onoff {
 
 
 
-base::ComponentPtr creator( base::ServicePtr p_service )
+base::ComponentPtr creator( base::ServiceThreadPtr p_service )
 {
    return std::make_shared< OnOff >( p_service, "OnOff" );
 }
 
 
 
-OnOff::OnOff( const base::ServicePtr p_service, const std::string& name )
+OnOff::OnOff( const base::ServiceThreadPtr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );

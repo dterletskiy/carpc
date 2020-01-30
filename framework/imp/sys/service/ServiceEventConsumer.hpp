@@ -13,14 +13,14 @@ class ServiceEventConsumer
    : public ServiceEvent::Consumer
 {
 public:
-   ServiceEventConsumer( ServicePtr );
+   ServiceEventConsumer( ServiceThreadPtr );
    ~ServiceEventConsumer( ) override;
 private:
    ServiceEventConsumer( const ServiceEventConsumer& ) = delete;
    ServiceEventConsumer& operator=( const ServiceEventConsumer& ) = delete;
 
 private:
-   ServicePtrW mp_service;
+   ServiceThreadPtrW mp_service;
 
 private:
    void process_event( const ServiceEvent::Event& ) override;

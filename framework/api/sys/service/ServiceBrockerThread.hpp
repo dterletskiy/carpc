@@ -11,17 +11,17 @@ namespace base {
 
 
 
-class ServiceBrocker
-   : public std::enable_shared_from_this< ServiceBrocker >
+class ServiceBrockerThread
+   : public std::enable_shared_from_this< ServiceBrockerThread >
 {
 public:
-   ~ServiceBrocker( );
-   static ServiceBrockerPtr instance( );
+   ~ServiceBrockerThread( );
+   static ServiceBrockerThreadPtr instance( );
 private:
-   ServiceBrocker( );
-   ServiceBrocker( const ServiceBrocker& ) = delete;
-   ServiceBrocker& operator=( const ServiceBrocker& ) = delete;
-   static ServiceBrockerPtr      mp_instance;
+   ServiceBrockerThread( );
+   ServiceBrockerThread( const ServiceBrockerThread& ) = delete;
+   ServiceBrockerThread& operator=( const ServiceBrockerThread& ) = delete;
+   static ServiceBrockerThreadPtr      mp_instance;
 
 public:
    bool start( );
@@ -67,38 +67,38 @@ private:
 
 
 inline
-bool ServiceBrocker::started( ) const
+bool ServiceBrockerThread::started( ) const
 {
    return started_send( ) && started_receive( );
 }
 
 inline
-bool ServiceBrocker::wait( )
+bool ServiceBrockerThread::wait( )
 {
    return wait_send( ) && wait_receive( );
 }
 
 inline
-bool ServiceBrocker::started_send( ) const
+bool ServiceBrockerThread::started_send( ) const
 {
    return m_started_send;
 }
 
 inline
-bool ServiceBrocker::wait_send( )
+bool ServiceBrockerThread::wait_send( )
 {
    m_started_send = mp_thread_send->join( );
    return !m_started_send;
 }
 
 inline
-bool ServiceBrocker::started_receive( ) const
+bool ServiceBrockerThread::started_receive( ) const
 {
    return m_started_receive;
 }
 
 inline
-bool ServiceBrocker::wait_receive( )
+bool ServiceBrockerThread::wait_receive( )
 {
    m_started_receive = mp_thread_receive->join( );
    return !m_started_receive;
