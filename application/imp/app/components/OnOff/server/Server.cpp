@@ -1,12 +1,12 @@
 // Application
-#include "imp/app/components/server/Server.hpp"
+#include "Server.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOffServer"
 
 
 
-namespace application::onoff {
+namespace application::components {
 
 
 
@@ -42,4 +42,4 @@ void Server::process_timer( const base::TimerID id )
 
 
 
-} // namespace application::onoff
+} // namespace application::components

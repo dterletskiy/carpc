@@ -63,3 +63,7 @@ version 1.2.2
 version 1.2.3
  - Base interface implementation. Register/unregister server/client logic implemented.
  - "MutexAutoLocker" implemented.
+
+version 1.2.4
+ - Removed "test_app_0" prject
+ - Extended "application" project by content from "test_app_0"

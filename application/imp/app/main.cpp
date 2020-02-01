@@ -1,10 +1,10 @@
 // Framework
 #include "api/sys/service/ServiceProcess.hpp"
 // Application
-#include "imp/nav/components/OnOff/OnOff.hpp"
-#include "imp/nav/components/Driver/Driver.hpp"
-#include "imp/nav/components/Master/Master.hpp"
-#include "imp/nav/components/Slave/Slave.hpp"
+#include "imp/app/components/OnOff/OnOff.hpp"
+#include "imp/app/components/Driver/Driver.hpp"
+#include "imp/app/components/Master/Master.hpp"
+#include "imp/app/components/Slave/Slave.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "MAIN"
@@ -14,10 +14,30 @@
 namespace memory {
    #ifdef HOOK_MEMORY_ALLOCATOR
       extern void dump( );
+      extern void set_track_size( const size_t );
    #else
       inline void dump( ) { }
+      inline void set_track_size( const size_t ) { }
    #endif
 }
+
+
+
+#if 0
+extern "C" {
+   void __cyg_profile_func_enter( void* this_fn, void* call_site ) __attribute__(( no_instrument_function ));
+   void __cyg_profile_func_exit( void *this_fn, void *call_site ) __attribute__(( no_instrument_function ));
+
+   void __cyg_profile_func_enter( void* this_fn, void* call_site )
+   {
+      printf( "ENTER: %p, <-- %p: %lld\n", this_fn, call_site, __rdtsc( ) );
+   }
+   void __cyg_profile_func_exit( void *this_fn, void *call_site )
+   {
+      printf( "EXIT:  %p, --> %p: %lld\n", this_fn, call_site, __rdtsc( ) );
+   }
+}
+#endif
 
 
 
@@ -28,11 +48,14 @@ namespace memory {
 
 void boot( )
 {
+   memory::dump( );
+   DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
+
    base::ServiceInfoVector services =
    {
-        { "OnOff_Service", { application::onoff::creator }, 5 }
-      , { "Driver_Service", { application::driver::creator }, 10 }
-      , { "Device_Service", { application::master::creator, application::slave::creator }, 10 }
+        { "OnOff_Service", { application::components::OnOff::creator }, 5 }
+      , { "Driver_Service", { application::components::Driver::creator }, 10 }
+      , { "Device_Service", { application::components::Master::creator, application::components::Slave::creator }, 10 }
    };
 
    base::ServiceProcessPtr p_process = base::ServiceProcess::instance( );
@@ -47,16 +70,17 @@ void boot( )
    DBG_MSG( "Main: program exiting." );
    DBG_WRN( "Main: program exiting." );
    DBG_ERR( "Main: program exiting." );
+
+   memory::dump( );
 }
 
 #if OS == LINUX
 
-
    int main( int argc, char* argv[] )
    {
-      memory::dump( );
+      DBG_MSG( "argc = %d", argc );
+
       boot( );
-      memory::dump( );
 
       return 0;
    }

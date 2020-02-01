@@ -3,11 +3,11 @@
 // Framework
 #include "api/sys/comm/timer/Timer.hpp"
 // Interface
-#include "imp/app/api/onoff/Server.hpp"
+#include "api/app/onoff/Server.hpp"
 
 
 
-namespace application::onoff {
+namespace application::components {
 
 
 
@@ -30,4 +30,4 @@ private:
 
 
 
-} // namespace application::onoff
+} // namespace application::components

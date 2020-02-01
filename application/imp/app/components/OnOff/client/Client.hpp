@@ -1,11 +1,11 @@
 #pragma once
 
 // Interface
-#include "imp/app/api/onoff/Client.hpp"
+#include "api/app/onoff/Client.hpp"
 
 
 
-namespace application::onoff {
+namespace application::components {
 
 
 
@@ -22,4 +22,4 @@ public:
 
 
 
-} // namespace application::onoff
+} // namespace application::components

@@ -59,9 +59,14 @@ execute:
 	reset
 	export LD_LIBRARY_PATH=$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib ; $(TARGET_DIR)/$(PROJECT_NAME)
 
+pexecute:
+	reset
+	export LD_LIBRARY_PATH=$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib ; valgrind --tool=callgrind $(TARGET_DIR)/$(PROJECT_NAME)
+# 	export LD_LIBRARY_PATH=$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib ; valgrind --leak-check=yes $(TARGET_DIR)/$(PROJECT_NAME)
+
 debug:
 	reset
-	$(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
+	export LD_LIBRARY_PATH=$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib ; $(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
 
 disassm:
 	$(DISASSEMBLER) -S --disassemble $(TARGET_DIR)/$(PROJECT_NAME) > $(TARGET_DIR)/$(PROJECT_NAME).s

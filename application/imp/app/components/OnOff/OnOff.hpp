@@ -1,32 +1,30 @@
 #pragma once
 
 // Framework
-#include "api/sys/comm/timer/Timer.hpp"
 #include "api/sys/component/RootComponent.hpp"
 // Application
 #include "imp/app/events/PingEvent.hpp"
-#include "imp/app/components/server/Server.hpp"
-#include "imp/app/components/client/Client.hpp"
+#include "imp/app/components/OnOff/server/Server.hpp"
+#include "imp/app/components/OnOff/client/Client.hpp"
 
 
 
-namespace application::onoff {
-
-
-
-base::ComponentPtr creator( base::ServiceThreadPtr );
+namespace application::components {
 
 
 
 class OnOff
    : public base::RootComponent
-   , public base::ITimerConsumer
    , public events::NoID::PingEvent::Consumer
    , public events::ID::PingEvent::Consumer
    , public events::IPC::PingEvent::Consumer
 {
 public:
+   static base::ComponentPtr creator( base::ServiceThreadPtr );
+
+private:
    OnOff( const base::ServiceThreadPtr, const std::string& );
+public:
    ~OnOff( ) override;
 
 private:
@@ -43,13 +41,8 @@ private:
 private:
    Server m_server_onoff_yyy;
    Client m_client_onoff_yyy;
-
-// Timer
-private:
-   void process_timer( const base::TimerID ) override;
-   base::Timer m_timer;
 };
 
 
 
-} // namespace application::onoff
+} // namespace application::components
