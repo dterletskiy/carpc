@@ -1,5 +1,7 @@
 #pragma once
 
+// Framework
+#include "api/sys/comm/interface/Client.hpp"
 // Application
 #include "Data.hpp"
 
@@ -14,11 +16,16 @@ namespace data = api::onoff::ipc;
 
 
 class Client
-   : public data::OnOffEvent::Consumer
+   : public base::Client
+   , public data::OnOffEvent::Consumer
 {
 public:
-   Client( const base::ServiceName&, const bool exported = true );
+   Client( const std::string&, const bool exported = true );
    virtual ~Client( );
+
+private:
+   void connected( const base::Interface* const ) const override;
+   void disconnected( const base::Interface* const ) const override;
 
 public:
    void request_trigger_state( const std::string&, const size_t );
@@ -28,7 +35,6 @@ private:
    void process_event( const data::OnOffEvent::Event& ) override;
 
 private:
-   base::ServiceName m_role_name;
    bool m_exported = false;
    base::eCommType m_comm_type = base::eCommType::ITC;
 
@@ -45,7 +51,7 @@ template< typename tResponseData, typename... Args >
 void Client::create_send_event( const eOnOff event_id, const Args&... args )
 {
    data::OnOffEvent::Data data( std::make_shared< tResponseData >( args... ) );
-   data::OnOffEvent::Event::create_send( m_role_name, event_id, data, m_comm_type );
+   data::OnOffEvent::Event::create_send( role( ), event_id, data, m_comm_type );
 }
 
 template< typename tRequestData >

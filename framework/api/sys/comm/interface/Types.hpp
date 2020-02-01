@@ -10,8 +10,12 @@ namespace base {
 
    class Client;
 
-   class Registry;
-   using RegistryPtr = std::shared_ptr< Registry >;
-   extern const RegistryPtr InvalidRegistryPtr;
+   class InterfaceRegistry;
+   using InterfaceRegistryPtr = std::shared_ptr< InterfaceRegistry >;
+   extern const InterfaceRegistryPtr InvalidInterfaceRegistryPtr;
+
+   class InterfaceStatusHandler;
+   using InterfaceStatusHandlerPtr = std::shared_ptr< InterfaceStatusHandler >;
+   extern const InterfaceStatusHandlerPtr InvalidInterfaceStatusHandlerPtr;
 
 } // namespace base

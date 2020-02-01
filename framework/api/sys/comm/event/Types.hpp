@@ -7,7 +7,6 @@
 namespace base {
 
    using EventTypeID = std::string;
-   using ServiceName = std::string;
    using NoServiceType = void;
    using NoIdInfoType = void;
 

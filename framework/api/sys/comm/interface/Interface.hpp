@@ -10,6 +10,11 @@ namespace base {
 
 
 
+class Server;
+class Client;
+
+
+
 class Interface
 {
 public:
@@ -21,18 +26,17 @@ public:
 
 public:
    const std::string& name( ) const;
+   const std::string& role( ) const;
+   const std::string service_name( ) const;
+   const bool cmp_names( const Interface* const ) const;
 private:
    std::string m_name = "";
-
-public:
-   const std::string& role( ) const;
-private:
    std::string m_role = "";
 
 public:
    bool is_connected( ) const;
-   virtual void connected( ) const = 0;
-   virtual void disconnected( ) const = 0;
+   virtual void connected( const Interface* const ) const = 0;
+   virtual void disconnected( const Interface* const ) const = 0;
 private:
    bool m_is_connected = false;
 
@@ -41,10 +45,16 @@ public:
 private:
    eType m_type = eType::undefined;
 
+protected:
+   const bool register_server( const Server* const );
+   const bool register_client( const Client* const );
+   const bool unregister_server( const Server* const );
+   const bool unregister_client( const Client* const );
+
 public:
-   ServiceThreadPtrW service( ) const;
+   ServiceThreadPtrW context( ) const;
 private:
-   ServiceThreadPtrW mp_service;
+   ServiceThreadPtrW mp_service_thread;
 };
 
 
@@ -62,6 +72,18 @@ const std::string& Interface::role( ) const
 }
 
 inline
+const std::string Interface::service_name( ) const
+{
+   return m_role + std::string{"."} + m_name;
+}
+
+inline
+const bool Interface::cmp_names( const Interface* const p_interface ) const
+{
+   return ( p_interface->name( ) == m_name ) && ( p_interface->role( ) == m_role );
+}
+
+inline
 bool Interface::is_connected( ) const
 {
    return m_is_connected;
@@ -71,6 +93,12 @@ inline
 Interface::eType Interface::type( ) const
 {
    return m_type;
+}
+
+inline
+ServiceThreadPtrW Interface::context( ) const
+{
+   return mp_service_thread;
 }
 
 

@@ -4,6 +4,7 @@
 
 namespace base {
 
-   const RegistryPtr InvalidRegistryPtr;
+   const InterfaceRegistryPtr InvalidInterfaceRegistryPtr = nullptr;
+   const InterfaceStatusHandlerPtr InvalidInterfaceStatusHandlerPtr = nullptr;
 
 } // namespace base

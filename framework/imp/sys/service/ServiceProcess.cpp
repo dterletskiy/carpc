@@ -1,4 +1,5 @@
 #include "api/sys/oswrappers/Mutex.hpp"
+#include "api/sys/comm/interface/InterfaceRegistry.hpp"
 #include "api/sys/service/ServiceBrockerThread.hpp"
 #include "api/sys/service/ServiceThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
@@ -36,7 +37,7 @@ namespace base {
 
 
 
-ServiceProcessPtr ServiceProcess::mp_instance;
+ServiceProcessPtr ServiceProcess::mp_instance = nullptr;
 
 ServiceProcess::ServiceProcess( )
    : m_service_list( )
@@ -58,6 +59,11 @@ ServiceProcessPtr ServiceProcess::instance( )
    }
 
    return mp_instance;
+}
+
+InterfaceRegistryPtr ServiceProcess::interface_registry( ) const
+{
+   return mp_interface_registry;
 }
 
 ServiceBrockerThreadPtr ServiceProcess::service_brocker( ) const
@@ -94,6 +100,10 @@ ServiceThreadPtrList ServiceProcess::service_list( ) const
 
 bool ServiceProcess::start( const ServiceInfoVector& service_infos )
 {
+   // Creating interface registry
+   mp_interface_registry = InterfaceRegistry::instance( );
+   if( nullptr == mp_interface_registry )
+      return false;
    // Creating service brocker thread
    mp_service_brocker = ServiceBrockerThread::instance( );
    if( nullptr == mp_service_brocker )

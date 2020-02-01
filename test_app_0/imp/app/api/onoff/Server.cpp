@@ -10,19 +10,29 @@ namespace api::onoff {
 
 
 
-Server::Server( const base::ServiceName& role_name, const bool exported )
-   : m_role_name( role_name )
+Server::Server( const std::string& role_name, const bool exported )
+   : base::Server( interface_name, role_name )
    , m_exported( exported )
    , m_comm_type( m_exported ? base::eCommType::IPC : base::eCommType::ITC )
 {
    // DBG_TRC( "Created" );
-   data::OnOffEvent::Event::set_notification( this, m_role_name, eOnOff::RequestTriggerState );
+   data::OnOffEvent::Event::set_notification( this, role( ), eOnOff::RequestTriggerState );
 }
 
 Server::~Server( )
 {
    // DBG_TRC( "Destroyed" );
    data::OnOffEvent::Event::clear_all_notifications( this );
+}
+
+void Server::connected( const base::Interface* const p_client ) const
+{
+   DBG_MSG( "client connected: %p", p_client );
+}
+
+void Server::disconnected( const base::Interface* const p_client ) const
+{
+   DBG_MSG( "client disconnected: %p", p_client );
 }
 
 void Server::response_trigger_state( const bool result )

@@ -1,8 +1,10 @@
-#include "api/sys/comm/interface/Registry.hpp"
+#include "api/sys/service/ServiceThread.hpp"
+#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/comm/interface/InterfaceRegistry.hpp"
 #include "api/sys/comm/interface/Server.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "Server"
+#define CLASS_ABBR "BaseServer"
 
 
 
@@ -14,13 +16,13 @@ Server::Server( const std::string& name, const std::string& role )
    : Interface( name, role, Interface::eType::server )
 {
    SYS_TRC( "created" );
-   Registry::instance( )->register_server( this );
+   register_server( this );
 }
 
 Server::~Server( )
 {
    SYS_TRC( "destroyed" );
-   Registry::instance( )->unregister_server( this );
+   unregister_server( this );
 }
 
 

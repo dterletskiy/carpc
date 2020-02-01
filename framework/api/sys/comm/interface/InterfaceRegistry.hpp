@@ -10,14 +10,16 @@ namespace base {
 
 
 
-class Registry
+class InterfaceRegistry
 {
 public:
-   ~Registry( );
-   static RegistryPtr instance( );
+   ~InterfaceRegistry( );
+   static InterfaceRegistryPtr instance( );
 private:
-   Registry( );
-   static RegistryPtr mp_instance;
+   InterfaceRegistry( );
+   InterfaceRegistry( const InterfaceRegistry& ) = delete;
+   InterfaceRegistry& operator=( const InterfaceRegistry& ) = delete;
+   static InterfaceRegistryPtr mp_instance;
 
 public:
    bool register_server( const Server* const );
@@ -25,10 +27,6 @@ public:
 public:
    bool unregister_server( const Server* const );
    bool unregister_client( const Client* const );
-
-private:
-   std::set< const Server* > m_server_registry;
-   std::set< const Client* > m_client_registry;
 };
 
 

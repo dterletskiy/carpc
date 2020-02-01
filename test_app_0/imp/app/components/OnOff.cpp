@@ -126,8 +126,8 @@ bool OnOff::boot( const std::string& command )
 
    // s_event_test.execute( );
 
-   m_client_onoff_xxx.request_trigger_state( "Unloaded", 5000000000 );
-   m_client_onoff_yyy.request_trigger_state( "BasicOperable", 10000000000 );
+   // m_client_onoff_xxx.request_trigger_state( "Unloaded", 5000000000 );
+   // m_client_onoff_yyy.request_trigger_state( "BasicOperable", 10000000000 );
 
    // m_timer.start( 1000000000 );
 

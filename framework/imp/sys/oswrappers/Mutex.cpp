@@ -16,7 +16,7 @@ Mutex::Mutex( const bool auto_lock, const char* const name )
 Mutex::~Mutex( )
 {
    // printf( "%d: destroyed", m_id );
-   if( m_auto_lock && m_locked ) unlock( );
+   if( m_locked ) unlock( );
 }
 
 void Mutex::lock( )
@@ -33,6 +33,19 @@ void Mutex::unlock( )
 
    m_locked = false;
    // printf( "%d: unlocked", m_id );
+}
+
+
+
+MutexAutoLocker::MutexAutoLocker( Mutex& mutex )
+   : m_mutex( mutex )
+{
+   m_mutex.lock( );
+}
+
+MutexAutoLocker::~MutexAutoLocker( )
+{
+   m_mutex.unlock( );
 }
 
 

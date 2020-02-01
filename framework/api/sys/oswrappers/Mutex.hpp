@@ -49,4 +49,16 @@ pthread_mutex_t& Mutex::mutex( )
 
 
 
+class MutexAutoLocker
+{
+public:
+   MutexAutoLocker( Mutex& );
+   ~MutexAutoLocker( );
+
+private:
+   Mutex& m_mutex;
+};
+
+
+
 } // namespace base::os
