@@ -25,8 +25,6 @@
 #define _DECLARE_(  TYPE, EVENT, DATA, ... )    __DECLARE__( TYPE, EVENT, DATA, ##__VA_ARGS__ )
 #define DECLARE_EVENT( EVENT, DATA, ... )       _DECLARE_( _DETECT_TYPE_( DUMMY, ##__VA_ARGS__ ), EVENT, DATA, ##__VA_ARGS__ )
 
-
-
 #define DECLARE_EVENT_SIMPLE( eventType, dataType ) \
    namespace eventType { \
       class eventType; \
@@ -41,14 +39,8 @@
       using Event       = base::TGeneratorSimpleID< base::NoServiceType, eventType, dataType, idType >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
+      using ID          = idType; \
    }
-
-#define INIT_EVENT( eventType ) \
-   template< > const base::EventTypeID eventType::Event::_TEventBase::Signature::s_type_id = { #eventType }; \
-   template< > const base::eEventType eventType::Event::_TEventBase::Signature::s_type_event = eventType::Event::Signature::build_type( );
-
-#define REGISTER_EVENT( eventType ) \
-   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
 
 
 
@@ -82,24 +74,8 @@
       using Event       = base::TGeneratorSimpleID< ServiceType, eventType, dataType, idType >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
+      using ID          = idType; \
    }
-
-#define INIT_IPC_EVENT( eventType ) \
-   template< > const base::EventTypeID eventType::Event::_TEventBase::Signature::s_type_id = { #eventType }; \
-   template< > const base::eEventType eventType::Event::_TEventBase::Signature::s_type_event = eventType::Event::Signature::build_type( );
-
-#define REGISTER_IPC_EVENT( eventType ) \
-   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -119,14 +95,8 @@
       using Event       = base::TGeneratorRR< base::NoServiceType, eventType, dataType, idType >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
+      using ID          = idType; \
    }
-
-#define INIT_EVENT_RR( eventType ) \
-   template< > const base::EventTypeID eventType::Event::_TEventBase::Signature::s_type_id = { #eventType }; \
-   template< > const base::eEventType eventType::Event::_TEventBase::Signature::s_type_event = eventType::Event::Signature::build_type( );
-
-#define REGISTER_EVENT_RR( eventType ) \
-   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
 
 
 
@@ -147,11 +117,24 @@
       using Event       = base::TGeneratorRR< ServiceType, eventType, dataType, idType >::Config::EventType; \
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
+      using ID          = idType; \
    }
 
-#define INIT_IPC_EVENT_RR( eventType ) \
+
+
+/**********************************************************************************
+ *
+ * This INIT_EVENT macro initializes all event types.
+ *
+ *********************************************************************************/
+#define INIT_EVENT( eventType ) \
    template< > const base::EventTypeID eventType::Event::_TEventBase::Signature::s_type_id = { #eventType }; \
    template< > const base::eEventType eventType::Event::_TEventBase::Signature::s_type_event = eventType::Event::Signature::build_type( );
 
-#define REGISTER_IPC_EVENT_RR( eventType ) \
+/**********************************************************************************
+ *
+ * This REGISTER_EVENT macro registers all event types.
+ *
+ *********************************************************************************/
+#define REGISTER_EVENT( eventType ) \
    base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );

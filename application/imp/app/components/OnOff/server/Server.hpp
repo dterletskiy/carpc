@@ -7,7 +7,7 @@
 
 
 
-namespace application::components {
+namespace application::components::onoff {
 
 
 
@@ -30,4 +30,4 @@ private:
 
 
 
-} // namespace application::components
+} // namespace application::components::onoff

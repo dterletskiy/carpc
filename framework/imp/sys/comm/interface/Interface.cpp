@@ -14,9 +14,10 @@ namespace base {
 
 
 
-Interface::Interface( const std::string& name, const std::string& role, const eType type )
+Interface::Interface( const std::string& name, const std::string& role, const bool is_ipc, const eType type )
    : m_name( name )
    , m_role( role )
+   , m_is_ipc( is_ipc )
    , m_type( type )
 {
    SYS_TRC( "created" );

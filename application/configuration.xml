@@ -12,7 +12,6 @@
    <settings type="compilation">
       <setting type="include" value="/home/scorpion/Source/RPC/application" status="active"/>
       <setting type="include" value="/home/scorpion/Source/RPC/framework" status="active"/>
-      <setting type="flag" value="-finstrument-functions" status="inactive"/>
    </settings>
 
    <settings type="link">

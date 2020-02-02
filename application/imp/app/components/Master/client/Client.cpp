@@ -7,7 +7,7 @@
 
 
 
-namespace application::components::onoff {
+namespace application::components::master {
 
 
 
@@ -29,4 +29,4 @@ void Client::response_trigger_state( const bool result )
 
 
 
-} // namespace application::components::onoff
+} // namespace application::components::master

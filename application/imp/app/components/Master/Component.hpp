@@ -6,22 +6,22 @@
 
 
 
-namespace application::components {
+namespace application::components::master {
 
 
 
-class Master
+class Component
    : public base::Component
 {
 public:
    static base::ComponentPtr creator( base::ServiceThreadPtr );
 
 private:
-   Master( const base::ServiceThreadPtr, const std::string& );
+   Component( const base::ServiceThreadPtr, const std::string& );
 public:
-   ~Master( ) override;
+   ~Component( ) override;
 };
 
 
 
-} // namespace application::components
+} // namespace application::components::master

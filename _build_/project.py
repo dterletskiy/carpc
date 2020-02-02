@@ -6,6 +6,8 @@ import shutil
 import stat
 import subprocess
 import time
+# import datetime
+from datetime import datetime
 import enum
 
 import base
@@ -125,14 +127,21 @@ class ProjectSettings:
    # def info
 
    def compile( self ) -> bool:
+      start_compile: int = int( round(time.time() * 1000) )
+
       for target in self.__target_list:
          if False == self.compile_target( target ):
             return False
+
+      finish_compile: int = int( round(time.time() * 1000) )
+      console.debug.question( "Total compile time: %d ms" %(finish_compile - start_compile) )
 
       return True
    # def compile
 
    def compile_target( self, target ) -> bool:
+      start_compile: int = int( round(time.time() * 1000) )
+
       console.debug.header( self.__delimeter )
       console.debug.info( "Processing:", target.source( ) )
       source_time = base.file_time( target.source( ) )
@@ -153,11 +162,17 @@ class ProjectSettings:
       os.makedirs( os.path.dirname( target.object( ) ), exist_ok = True )
       console.debug.trace( code )
       result: bool = 0 == os.system( code )
+
+      finish_compile: int = int( round(time.time() * 1000) )
+      console.debug.question( "compile time: %d ms" %(finish_compile - start_compile) )
+
       console.debug.header( self.__delimeter )
       return result
    # def compile_target
 
    def link( self ) -> bool:
+      start_compile: int = int( round(time.time() * 1000) )
+
       console.debug.header( self.__delimeter )
       console.debug.info( "Linking..." )
       object_list: str = ""
@@ -173,10 +188,16 @@ class ProjectSettings:
       console.debug.trace( code )
       result: bool = 0 == os.system( code )
       console.debug.header( self.__delimeter )
+
+      finish_compile: int = int( round(time.time() * 1000) )
+      console.debug.question( "Total link time: %d ms" %(finish_compile - start_compile) )
+
       return result
    # def link
 
    def build( self ) -> bool:
+      start_compile: int = int( round(time.time() * 1000) )
+
       if False == self.compile( ):
          console.debug.error( "compilation error" )
          return False
@@ -186,6 +207,10 @@ class ProjectSettings:
          return False
 
       console.debug.ok( "Build SUCCESS" )
+
+      finish_compile: int = int( round(time.time() * 1000) )
+      console.debug.question( "Total build time: %d ms" %(finish_compile - start_compile) )
+
       return True
    # def build
 

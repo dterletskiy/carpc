@@ -46,4 +46,4 @@ namespace application::events {
 
 INIT_EVENT( application::events::NoID::PingEvent );
 INIT_EVENT( application::events::ID::PingEvent );
-INIT_IPC_EVENT( application::events::IPC::PingEvent );
+INIT_EVENT( application::events::IPC::PingEvent );

@@ -6,22 +6,22 @@
 
 
 
-namespace application::components {
+namespace application::components::slave {
 
 
 
-class Slave
+class Component
    : public base::Component
 {
 public:
    static base::ComponentPtr creator( base::ServiceThreadPtr );
 
 private:
-   Slave( const base::ServiceThreadPtr, const std::string& );
+   Component( const base::ServiceThreadPtr, const std::string& );
 public:
-   ~Slave( ) override;
+   ~Component( ) override;
 };
 
 
 
-} // namespace application::components
+} // namespace application::components::slave

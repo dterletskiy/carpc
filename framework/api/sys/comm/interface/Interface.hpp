@@ -3,6 +3,7 @@
 #include <string>
 
 #include "api/sys/service/Types.hpp"
+#include "api/sys/comm/event/Event.hpp"
 
 
 
@@ -21,7 +22,7 @@ public:
    enum class eType { server, client, undefined };
 
 public:
-   Interface( const std::string&, const std::string&, const eType );
+   Interface( const std::string&, const std::string&, const bool, const eType );
    virtual ~Interface( );
 
 public:
@@ -32,6 +33,11 @@ public:
 private:
    std::string m_name = "";
    std::string m_role = "";
+
+public:
+   const bool is_ipc( ) const;
+private:
+   bool m_is_ipc = false;
 
 public:
    bool is_connected( ) const;
@@ -55,6 +61,19 @@ public:
    ServiceThreadPtrW context( ) const;
 private:
    ServiceThreadPtrW mp_service_thread;
+
+protected:
+   template< typename tDataRR, typename... Args >
+   void create_send_event( const typename tDataRR::tEventID event_id, const Args&... args )
+   {
+      typename tDataRR::tEventData data( std::make_shared< tDataRR >( args... ) );
+      tDataRR::tEvent::create_send( role( ), event_id, data, is_ipc( ) ? base::eCommType::IPC : base::eCommType::ITC );
+   }
+   template< typename tDataRR >
+   const tDataRR* get_event_data( const typename tDataRR::tEvent& event )
+   {
+      return static_cast< tDataRR* >( event.data( )->ptr.get( ) );
+   }
 };
 
 
@@ -75,6 +94,12 @@ inline
 const std::string Interface::service_name( ) const
 {
    return m_role + std::string{"."} + m_name;
+}
+
+inline
+const bool Interface::is_ipc( ) const
+{
+   return m_is_ipc;
 }
 
 inline

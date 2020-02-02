@@ -1,10 +1,10 @@
 // Framework
 #include "api/sys/service/ServiceProcess.hpp"
 // Application
-#include "imp/app/components/OnOff/OnOff.hpp"
-#include "imp/app/components/Driver/Driver.hpp"
-#include "imp/app/components/Master/Master.hpp"
-#include "imp/app/components/Slave/Slave.hpp"
+#include "imp/app/components/OnOff/Component.hpp"
+#include "imp/app/components/Driver/Component.hpp"
+#include "imp/app/components/Master/Component.hpp"
+#include "imp/app/components/Slave/Component.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "MAIN"
@@ -23,27 +23,41 @@ namespace memory {
 
 
 
-#if 0
-extern "C" {
-   void __cyg_profile_func_enter( void* this_fn, void* call_site ) __attribute__(( no_instrument_function ));
-   void __cyg_profile_func_exit( void *this_fn, void *call_site ) __attribute__(( no_instrument_function ));
+#ifdef USE_INSTRUMENTAL
+   #include "api/sys/asm/cpu.hpp"
+   extern "C" {
+      void __cyg_profile_func_enter( void* this_fn, void* call_site ) __attribute__(( no_instrument_function ));
+      void __cyg_profile_func_exit( void* this_fn, void* call_site ) __attribute__(( no_instrument_function ));
 
-   void __cyg_profile_func_enter( void* this_fn, void* call_site )
-   {
-      printf( "ENTER: %p, <-- %p: %lld\n", this_fn, call_site, __rdtsc( ) );
+      void __cyg_profile_func_enter( void* this_fn, void* call_site )
+      {
+         printf( "ENTER: %p, <-- %p: %lld\n", this_fn, call_site, __rdtsc( ) );
+      }
+      void __cyg_profile_func_exit( void* this_fn, void* call_site )
+      {
+         printf( "EXIT:  %p, --> %p: %lld\n", this_fn, call_site, __rdtsc( ) );
+      }
    }
-   void __cyg_profile_func_exit( void *this_fn, void *call_site )
-   {
-      printf( "EXIT:  %p, --> %p: %lld\n", this_fn, call_site, __rdtsc( ) );
-   }
-}
 #endif
 
 
 
 
 
+struct Base
+{
+   using INT = size_t;
+};
 
+struct Derived : public Base
+{
+};
+
+void test( )
+{
+   Derived::INT a = 123;
+   DBG_MSG( "%zu", a );
+}
 
 
 void boot( )
@@ -51,11 +65,14 @@ void boot( )
    memory::dump( );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
+   REGISTER_EVENT( api::onoff::ipc::OnOffEvent );
+   base::EventRegistry::instance( )->dump( );
+
    base::ServiceInfoVector services =
    {
-        { "OnOff_Service", { application::components::OnOff::creator }, 5 }
-      , { "Driver_Service", { application::components::Driver::creator }, 10 }
-      , { "Device_Service", { application::components::Master::creator, application::components::Slave::creator }, 10 }
+        { "OnOff_Service", { application::components::onoff::Component::creator }, 5 }
+      , { "Driver_Service", { application::components::driver::Component::creator }, 10 }
+      , { "Device_Service", { application::components::master::Component::creator, application::components::slave::Component::creator }, 10 }
    };
 
    base::ServiceProcessPtr p_process = base::ServiceProcess::instance( );
@@ -80,6 +97,7 @@ void boot( )
    {
       DBG_MSG( "argc = %d", argc );
 
+      test( );
       boot( );
 
       return 0;

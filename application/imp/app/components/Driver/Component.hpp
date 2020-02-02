@@ -6,22 +6,22 @@
 
 
 
-namespace application::components {
+namespace application::components::driver {
 
 
 
-class Driver
+class Component
    : public base::Component
 {
 public:
    static base::ComponentPtr creator( base::ServiceThreadPtr );
 
 private:
-   Driver( const base::ServiceThreadPtr, const std::string& );
+   Component( const base::ServiceThreadPtr, const std::string& );
 public:
-   ~Driver( ) override;
+   ~Component( ) override;
 };
 
 
 
-} // namespace application::components
+} // namespace application::components::driver

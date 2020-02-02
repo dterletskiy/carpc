@@ -6,12 +6,15 @@
 namespace api::onoff {
 
    const std::string interface_name = "OnOff";
+   const bool is_ipc = data::is_ipc;
 
-}
+} // namespace api::onoff
 
 
 
 namespace api::onoff::ipc {
+
+   const bool is_ipc = true;
 
    BaseData::BaseData( const eOnOff _id )
       : m_id( _id )
@@ -146,11 +149,13 @@ namespace api::onoff::ipc {
 
 } // namespace api::onoff::ipc
 
-INIT_IPC_EVENT_RR( api::onoff::ipc::OnOffEvent );
+INIT_EVENT( api::onoff::ipc::OnOffEvent );
 
 
 
 namespace api::onoff::no_ipc {
+
+   const bool is_ipc = false;
 
    RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay  )
       : BaseData( )
@@ -178,4 +183,4 @@ namespace api::onoff::no_ipc {
 
 } // namespace api::onoff::no_ipc
 
-INIT_EVENT_RR( api::onoff::no_ipc::OnOffEvent );
+INIT_EVENT( api::onoff::no_ipc::OnOffEvent );

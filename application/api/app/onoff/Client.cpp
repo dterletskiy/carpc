@@ -10,10 +10,8 @@ namespace api::onoff {
 
 
 
-Client::Client( const std::string& role_name, const bool exported )
-   : base::Client( interface_name, role_name )
-   , m_exported( exported )
-   , m_comm_type( m_exported ? base::eCommType::IPC : base::eCommType::ITC )
+Client::Client( const std::string& role_name )
+   : base::Client( api::onoff::interface_name, role_name, api::onoff::is_ipc )
 {
    // DBG_TRC( "Created" );
 }

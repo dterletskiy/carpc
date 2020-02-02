@@ -1,12 +1,12 @@
 // Application
-#include "imp/app/components/OnOff/OnOff.hpp"
+#include "imp/app/components/OnOff/Component.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOff"
 
 
 
-namespace application::components {
+namespace application::components::onoff {
 
 
 
@@ -86,12 +86,12 @@ namespace {
 
 
 
-base::ComponentPtr OnOff::creator( base::ServiceThreadPtr p_service )
+base::ComponentPtr Component::creator( base::ServiceThreadPtr p_service )
 {
-   return std::shared_ptr< OnOff >( new OnOff( p_service, "OnOff" ) );
+   return std::shared_ptr< Component >( new Component( p_service, "OnOff" ) );
 }
 
-OnOff::OnOff( const base::ServiceThreadPtr p_service, const std::string& name )
+Component::Component( const base::ServiceThreadPtr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
    , m_server_onoff_xxx( "xxx" )
    , m_client_onoff_xxx( "xxx" )
@@ -104,7 +104,7 @@ OnOff::OnOff( const base::ServiceThreadPtr p_service, const std::string& name )
    events::IPC::PingEvent::Event::set_notification( this, events::eEventID::request );
 }
 
-OnOff::~OnOff( )
+Component::~Component( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
    events::NoID::PingEvent::Event::clear_notification( this );
@@ -112,14 +112,14 @@ OnOff::~OnOff( )
    events::IPC::PingEvent::Event::clear_notification( this, events::eEventID::request );
 }
 
-bool OnOff::boot( const std::string& command )
+bool Component::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
 
    // s_event_test.execute( );
 
-   // m_client_onoff_xxx.request_trigger_state( "Unloaded", 5000000000 );
-   // m_client_onoff_yyy.request_trigger_state( "BasicOperable", 10000000000 );
+   m_client_onoff_xxx.request_trigger_state( "Unloaded", 5000000000 );
+   m_client_onoff_yyy.request_trigger_state( "BasicOperable", 10000000000 );
 
    // events::NoID::PingEvent::Event::create_send( { "WTF!!!" } );
    // events::ID::PingEvent::Event::create_send( events::eEventID::request, { "WTF!!!" } );
@@ -128,7 +128,7 @@ bool OnOff::boot( const std::string& command )
    return true;
 }
 
-void OnOff::process_event( const events::NoID::PingEvent::Event& event )
+void Component::process_event( const events::NoID::PingEvent::Event& event )
 {
    DBG_ERR( "info = %s", event.data( )->info.c_str( ) );
    // events::NoID::PingEvent::Event::clear_notification( this );
@@ -136,7 +136,7 @@ void OnOff::process_event( const events::NoID::PingEvent::Event& event )
    // events::NoID::PingEvent::Event::create_send( { "WTF!!!" } );
 }
 
-void OnOff::process_event( const events::ID::PingEvent::Event& event )
+void Component::process_event( const events::ID::PingEvent::Event& event )
 {
    DBG_ERR( "info = %s", event.data( )->info.c_str( ) );
    // events::ID::PingEvent::Event::clear_notification( this, events::eEventID::request );
@@ -144,7 +144,7 @@ void OnOff::process_event( const events::ID::PingEvent::Event& event )
    // events::ID::PingEvent::Event::create_send( events::eEventID::request, { "WTF!!!" } );
 }
 
-void OnOff::process_event( const events::IPC::PingEvent::Event& event )
+void Component::process_event( const events::IPC::PingEvent::Event& event )
 {
    // DBG_ERR( "info = %s", event.data( )->info.c_str( ) );
    // events::IPC::PingEvent::Event::clear_notification( this, events::eEventID::request );
@@ -156,4 +156,4 @@ void OnOff::process_event( const events::IPC::PingEvent::Event& event )
 
 
 
-} // namespace application::components
+} // namespace application::components::onoff

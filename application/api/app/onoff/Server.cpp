@@ -10,10 +10,8 @@ namespace api::onoff {
 
 
 
-Server::Server( const std::string& role_name, const bool exported )
-   : base::Server( interface_name, role_name )
-   , m_exported( exported )
-   , m_comm_type( m_exported ? base::eCommType::IPC : base::eCommType::ITC )
+Server::Server( const std::string& role_name )
+   : base::Server( api::onoff::interface_name, role_name, api::onoff::is_ipc )
 {
    // DBG_TRC( "Created" );
    data::OnOffEvent::Event::set_notification( this, role( ), eOnOff::RequestTriggerState );

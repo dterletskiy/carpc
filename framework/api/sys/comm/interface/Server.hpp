@@ -11,7 +11,7 @@ namespace base {
 class Server : public Interface
 {
 public:
-   Server( const std::string&, const std::string& );
+   Server( const std::string&, const std::string&, const bool );
    ~Server( ) override;
 };
 

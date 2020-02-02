@@ -6,7 +6,7 @@
 
 
 
-namespace application::components {
+namespace application::components::onoff {
 
 
 
@@ -42,4 +42,4 @@ void Server::process_timer( const base::TimerID id )
 
 
 
-} // namespace application::components
+} // namespace application::components::onoff

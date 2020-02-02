@@ -12,8 +12,8 @@ namespace base {
 
 
 
-Client::Client( const std::string& name, const std::string& role )
-   : Interface( name, role, Interface::eType::client )
+Client::Client( const std::string& name, const std::string& role, const bool is_ipc )
+   : Interface( name, role, is_ipc, Interface::eType::client )
 {
    SYS_TRC( "created" );
    register_client( this );

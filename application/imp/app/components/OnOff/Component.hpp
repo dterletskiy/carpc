@@ -9,11 +9,11 @@
 
 
 
-namespace application::components {
+namespace application::components::onoff {
 
 
 
-class OnOff
+class Component
    : public base::RootComponent
    , public events::NoID::PingEvent::Consumer
    , public events::ID::PingEvent::Consumer
@@ -23,9 +23,9 @@ public:
    static base::ComponentPtr creator( base::ServiceThreadPtr );
 
 private:
-   OnOff( const base::ServiceThreadPtr, const std::string& );
+   Component( const base::ServiceThreadPtr, const std::string& );
 public:
-   ~OnOff( ) override;
+   ~Component( ) override;
 
 private:
    bool boot( const std::string& ) override;
@@ -45,4 +45,4 @@ private:
 
 
 
-} // namespace application::components
+} // namespace application::components::onoff

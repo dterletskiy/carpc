@@ -9,6 +9,7 @@
       <config name="DBG_TRACE" status="active"/>
       <config name="COLORED_TRACE" status="active"/>
       <config name="MEMORY_HOOK" status="inactive"/>
+      <config name="USE_INSTRUMENTAL" status="inactive"/>
    </configuration>
 
    <settings type="compilation">
@@ -35,6 +36,10 @@
          <condition type="config" name="MEMORY_HOOK" status="active"/>
       </setting>
 
+      <setting type="define" name="USE_INSTRUMENTAL" status="conditions">
+         <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
+      </setting>
+
       <setting type="flag" value="-fPIC" status="conditions">
          <condition type="config" name="type" status="shared"/>
       </setting>
@@ -48,6 +53,9 @@
       <setting type="flag" value="-rdynamic" status="inactive"/>
       <setting type="flag" value="-fopenmp" status="inactive"/>
       <setting type="flag" value="-time" status="inactive"/>
+      <setting type="flag" value="-finstrument-functions" status="conditions">
+         <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
+      </setting>
 
    </settings>
 

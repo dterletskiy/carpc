@@ -12,8 +12,8 @@ namespace base {
 
 
 
-Server::Server( const std::string& name, const std::string& role )
-   : Interface( name, role, Interface::eType::server )
+Server::Server( const std::string& name, const std::string& role, const bool is_ipc )
+   : Interface( name, role, is_ipc, Interface::eType::server )
 {
    SYS_TRC( "created" );
    register_server( this );

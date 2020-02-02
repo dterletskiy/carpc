@@ -5,7 +5,7 @@
 
 
 
-namespace application::components::onoff {
+namespace application::components::master {
 
 
 
@@ -22,4 +22,4 @@ public:
 
 
 
-} // namespace application::components::onoff
+} // namespace application::components::master

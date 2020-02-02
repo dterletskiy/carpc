@@ -7,22 +7,44 @@
 
 
 namespace api::onoff {
-
-   extern const std::string interface_name;
-
    DEFINE_ENUM( eOnOff, size_t, RequestTriggerState, ResponseTriggerState, NotificationCurrentState, Undefined );
+} // namespace api::onoff
 
-}
+
 
 namespace api::onoff::ipc {
+
+   extern const bool is_ipc;
 
    class BaseData;
    using tBaseDataPtr = std::shared_ptr< BaseData >;
 
 
 
+   class OnOffEventData
+   {
+   public:
+      OnOffEventData( );
+      OnOffEventData( tBaseDataPtr );
+
+   public:
+      bool to_buffer( base::ByteBufferT& ) const;
+      bool from_buffer( base::ByteBufferT& );
+
+   public:
+      tBaseDataPtr ptr = nullptr;
+   };
+   DECLARE_IPC_EVENT_RR( OnOffEvent, OnOffEventData, api::onoff::eOnOff );
+
+
+
    class BaseData
    {
+   public:
+      using tEvent = OnOffEvent::Event;
+      using tEventData = OnOffEvent::Data;
+      using tEventID = OnOffEvent::ID;
+
    public:
       BaseData( const eOnOff );
       static tBaseDataPtr create( base::ByteBufferT& );
@@ -86,39 +108,34 @@ namespace api::onoff::ipc {
       std::string state = "";
    };
 
-
-
-   class OnOffEventData
-   {
-   public:
-      OnOffEventData( );
-      OnOffEventData( tBaseDataPtr );
-
-   public:
-      bool to_buffer( base::ByteBufferT& ) const;
-      bool from_buffer( base::ByteBufferT& );
-
-   public:
-      tBaseDataPtr ptr = nullptr;
-   };
-
-
-
-   DECLARE_IPC_EVENT_RR( OnOffEvent, OnOffEventData, api::onoff::eOnOff );
-
 } // namespace api::onoff::ipc
 
 
 
 namespace api::onoff::no_ipc {
 
+   extern const bool is_ipc;
+
    struct BaseData;
    using tBaseDataPtr = std::shared_ptr< BaseData >;
 
 
 
+   struct OnOffEventData
+   {
+      OnOffEventData( tBaseDataPtr );
+
+      tBaseDataPtr ptr = nullptr;
+   };
+   DECLARE_EVENT_RR( OnOffEvent, OnOffEventData, api::onoff::eOnOff );
+
+
+
    struct BaseData
    {
+      using tEvent = OnOffEvent::Event;
+      using tEventData = OnOffEvent::Data;
+      using tEventID = OnOffEvent::ID;
    };
 
 
@@ -149,17 +166,15 @@ namespace api::onoff::no_ipc {
       std::string state = "";
    };
 
-
-
-   struct OnOffEventData
-   {
-      OnOffEventData( tBaseDataPtr );
-
-      tBaseDataPtr ptr = nullptr;
-   };
-
-
-
-   DECLARE_EVENT_RR( OnOffEvent, OnOffEventData, api::onoff::eOnOff );
-
 } // namespace api::onoff::no_ipc
+
+
+
+namespace api::onoff {
+
+   namespace data = api::onoff::ipc;
+
+   extern const std::string interface_name;
+   extern const bool is_ipc;
+
+} // namespace api::onoff

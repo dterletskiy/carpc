@@ -11,7 +11,7 @@ namespace base {
 class Client : public Interface
 {
 public:
-   Client( const std::string&, const std::string& );
+   Client( const std::string&, const std::string&, const bool );
    ~Client( ) override;
 };
 
