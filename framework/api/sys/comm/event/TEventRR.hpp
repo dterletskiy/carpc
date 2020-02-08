@@ -97,27 +97,27 @@ public:
 
 // constructors
 private:
-   TEventRR( const std::string& service_name, const _IdType& id, const eCommType comm_type )
+   TEventRR( const Signature& signature, const eCommType comm_type )
       : _TEventBase( comm_type )
-      , m_signature( service_name, id )
+      , m_signature( signature )
    { }
-   TEventRR( const std::string& service_name, const _IdType& id, const _DataType& data, const eCommType comm_type )
+   TEventRR( const Signature& signature, const _DataType& data, const eCommType comm_type )
       : _TEventBase( data, comm_type )
-      , m_signature( service_name, id )
+      , m_signature( signature )
    { }
 public:
    ~TEventRR( ) override = default;
 
 // static functions
 public:
-   static const bool set_notification( _ConsumerType* p_consumer, const std::string& service_name, const _IdType& id )
+   static const bool set_notification( _ConsumerType* p_consumer, const Signature& signature )
    {
-      return IEvent::set_notification( p_consumer, Signature( service_name, id ) );
+      return IEvent::set_notification( p_consumer, signature );
    }
 
-   static const bool clear_notification( _ConsumerType* p_consumer, const std::string& service_name, const _IdType& id )
+   static const bool clear_notification( _ConsumerType* p_consumer, const Signature& signature )
    {
-      return IEvent::clear_notification( p_consumer, Signature( service_name, id ) );
+      return IEvent::clear_notification( p_consumer, signature );
    }
 
    static const bool clear_all_notifications( _ConsumerType* p_consumer )
@@ -125,34 +125,34 @@ public:
       return IEvent::clear_all_notifications( p_consumer, Signature( std::string{ }, _IdType{ } ) );
    }
 
-   static std::shared_ptr< _EventType > create( const std::string& service_name, const _IdType& id, const eCommType comm_type = eCommType::NONE )
+   static std::shared_ptr< _EventType > create( const Signature& signature, const eCommType comm_type = eCommType::NONE )
    {
-      return std::shared_ptr< _EventType >( new _EventType( service_name, id, comm_type ) );
+      return std::shared_ptr< _EventType >( new _EventType( signature, comm_type ) );
    }
 
-   static std::shared_ptr< _EventType > create( const std::string& service_name, const _IdType& id, const _DataType& data, const eCommType comm_type = eCommType::NONE )
+   static std::shared_ptr< _EventType > create( const Signature& signature, const _DataType& data, const eCommType comm_type = eCommType::NONE )
    {
-      return std::shared_ptr< _EventType >( new _EventType( service_name, id, data, comm_type ) );
+      return std::shared_ptr< _EventType >( new _EventType( signature, data, comm_type ) );
    }
 
-   static const bool create_send( const std::string& service_name, const _IdType& id, const eCommType comm_type = eCommType::NONE )
+   static const bool create_send( const Signature& signature, const eCommType comm_type = eCommType::NONE )
    {
-      return create( service_name, id, comm_type )->send( comm_type );
+      return create( signature, comm_type )->send( comm_type );
    }
 
-   static const bool create_send( const std::string& service_name, const _IdType& id, const _DataType& data, const eCommType comm_type = eCommType::NONE )
+   static const bool create_send( const Signature& signature, const _DataType& data, const eCommType comm_type = eCommType::NONE )
    {
-      return create( service_name, id, data, comm_type )->send( comm_type );
+      return create( signature, data, comm_type )->send( comm_type );
    }
 
-   static const bool create_send_to_context( const std::string& service_name, const _IdType& id, ServiceThreadPtrW pw_service )
+   static const bool create_send_to_context( const Signature& signature, ServiceThreadPtrW pw_service )
    {
-      return create( service_name, id )->send_to_context( pw_service );
+      return create( signature )->send_to_context( pw_service );
    }
 
-   static const bool create_send_to_context( const std::string& service_name, const _IdType& id, const _DataType& data, ServiceThreadPtrW pw_service )
+   static const bool create_send_to_context( const Signature& signature, const _DataType& data, ServiceThreadPtrW pw_service )
    {
-      return create( service_name, id, data )->send_to_context( pw_service );
+      return create( signature, data )->send_to_context( pw_service );
    }
 
 private:
@@ -161,7 +161,7 @@ private:
    template< typename T > friend EventPtr create_event( );
    static std::shared_ptr< _EventType > create( const eCommType comm_type = eCommType::NONE )
    {
-      return std::shared_ptr< _EventType >( new _EventType( std::string{ }, _IdType{ }, comm_type ) );
+      return std::shared_ptr< _EventType >( new _EventType( Signature( std::string{ }, _IdType{ } ), comm_type ) );
    }
 
 // serrialization / deserrialization

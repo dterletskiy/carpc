@@ -42,6 +42,7 @@ namespace api::onoff::ipc {
    {
    public:
       using tEvent = OnOffEvent::Event;
+      using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
 
@@ -66,6 +67,8 @@ namespace api::onoff::ipc {
    public:
       RequestTriggerStateData( );
       RequestTriggerStateData( const std::string&, const size_t );
+   public:
+      static const eOnOff id;
 
    public:
       bool to_buffer( base::ByteBufferT& ) override;
@@ -83,6 +86,8 @@ namespace api::onoff::ipc {
    public:
       ResponseTriggerStateData( );
       ResponseTriggerStateData( const bool );
+   public:
+      static const eOnOff id;
 
    public:
       bool to_buffer( base::ByteBufferT& ) override;
@@ -99,6 +104,8 @@ namespace api::onoff::ipc {
    public:
       NotificationCurrentStateData( );
       NotificationCurrentStateData( const std::string& );
+   public:
+      static const eOnOff id;
 
    public:
       bool to_buffer( base::ByteBufferT& ) override;
@@ -134,6 +141,7 @@ namespace api::onoff::no_ipc {
    struct BaseData
    {
       using tEvent = OnOffEvent::Event;
+      using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
    };
@@ -143,6 +151,7 @@ namespace api::onoff::no_ipc {
    struct RequestTriggerStateData : public BaseData
    {
       RequestTriggerStateData( const std::string&, const size_t );
+      static const eOnOff id;
 
       std::string state = "";
       size_t delay = 0;
@@ -153,6 +162,7 @@ namespace api::onoff::no_ipc {
    struct ResponseTriggerStateData : public BaseData
    {
       ResponseTriggerStateData( const bool );
+      static const eOnOff id;
 
       bool result = false;
    };
@@ -162,6 +172,7 @@ namespace api::onoff::no_ipc {
    struct NotificationCurrentStateData : public BaseData
    {
       NotificationCurrentStateData( const std::string& );
+      static const eOnOff id;
 
       std::string state = "";
    };

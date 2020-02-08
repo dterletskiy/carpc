@@ -75,3 +75,7 @@ version 1.2.5
  - Macros "INIT_EVENT" and "REGISTER_EVENT" was made universal and single.
  - "Generated" classes from idl redesigned.
  - "Interface" class in framewrok extended by next template methods: create_send_event, get_event_data. This leads to some additional rules for generated stuff from idl files.
+
+version 1.2.6
+ - Request/Response implementation updated.
+ - Template events' static functions signature changed (now in is similar for all of them and has "Signature" instead of a lot of other parameters).

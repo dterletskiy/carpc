@@ -52,7 +52,7 @@ void InterfaceStatusHandler::process_event( const InterfaceRegistryEvent::Event&
       }
       case eInterfaceRegistry::ClientDisconnected:
       {
-         p_server->connected( p_client );
+         p_server->disconnected( p_client );
          break;
       }
       default: break;

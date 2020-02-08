@@ -25,6 +25,16 @@ Server::~Server( )
    unregister_server( this );
 }
 
+void Server::connected( const Client* const p_client ) const
+{
+   mp_client = p_client;
+}
+
+void Server::disconnected( const Client* const p_client ) const
+{
+   mp_client = nullptr;
+}
+
 
 
 } // namespace base

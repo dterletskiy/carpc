@@ -96,6 +96,7 @@
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
       using ID          = idType; \
+      using Signature   = Event::Signature; \
    }
 
 
@@ -118,6 +119,7 @@
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
       using ID          = idType; \
+      using Signature   = Event::Signature; \
    }
 
 

@@ -207,14 +207,18 @@ void ServiceBrockerThread::thread_loop_receive( )
       ByteBufferT byte_buffer( p_buffer, recv_size );
       // byte_buffer.dump( );
 
-      EventPtr p_event = EventRegistry::instance( )->create_event( byte_buffer );
-      if( nullptr == p_event )
+      while( 0 < byte_buffer.size( ) )
       {
-         SYS_ERR( "lost received event" );
-         continue;
+         // @TDA: issue: in case of receiving several event all of them will be processed in reverce sequence
+         EventPtr p_event = EventRegistry::instance( )->create_event( byte_buffer );
+         if( nullptr == p_event )
+         {
+            SYS_ERR( "lost received event" );
+            continue;
+         }
+         SYS_TRC( "received event (%s)", p_event->signature( )->name( ).c_str( ) );
+         p_event->send( eCommType::ITC );
       }
-      SYS_TRC( "received event (%s)", p_event->signature( )->name( ).c_str( ) );
-      p_event->send( eCommType::ITC );
    }
 
    free( p_buffer );

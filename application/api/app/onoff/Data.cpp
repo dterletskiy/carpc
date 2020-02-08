@@ -52,6 +52,8 @@ namespace api::onoff::ipc {
 
 
 
+   const eOnOff RequestTriggerStateData::id = eOnOff::RequestTriggerState;
+
    RequestTriggerStateData::RequestTriggerStateData( )
       : BaseData( eOnOff::RequestTriggerState )
    {
@@ -76,6 +78,8 @@ namespace api::onoff::ipc {
 
 
 
+   const eOnOff ResponseTriggerStateData::id = eOnOff::ResponseTriggerState;
+
    ResponseTriggerStateData::ResponseTriggerStateData( )
       : BaseData( eOnOff::ResponseTriggerState )
    {
@@ -98,6 +102,8 @@ namespace api::onoff::ipc {
    }
 
 
+
+   const eOnOff NotificationCurrentStateData::id = eOnOff::NotificationCurrentState;
 
    NotificationCurrentStateData::NotificationCurrentStateData( )
       : BaseData( eOnOff::NotificationCurrentState )
@@ -157,6 +163,8 @@ namespace api::onoff::no_ipc {
 
    const bool is_ipc = false;
 
+   const eOnOff RequestTriggerStateData::id = eOnOff::RequestTriggerState;
+
    RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay  )
       : BaseData( )
       , state( _state )
@@ -164,11 +172,15 @@ namespace api::onoff::no_ipc {
    {
    }
 
+   const eOnOff ResponseTriggerStateData::id = eOnOff::ResponseTriggerState;
+
    ResponseTriggerStateData::ResponseTriggerStateData( const bool _result )
       : BaseData( )
       , result( _result )
    {
    }
+
+   const eOnOff NotificationCurrentStateData::id = eOnOff::NotificationCurrentState;
 
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
       : BaseData( )

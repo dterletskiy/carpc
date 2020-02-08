@@ -36,13 +36,14 @@ private:
 
 public:
    const bool is_ipc( ) const;
+   const eCommType comm_type( ) const;
 private:
    bool m_is_ipc = false;
 
 public:
    bool is_connected( ) const;
-   virtual void connected( const Interface* const ) const = 0;
-   virtual void disconnected( const Interface* const ) const = 0;
+   virtual void connected( ) const = 0;
+   virtual void disconnected( ) const = 0;
 private:
    bool m_is_connected = false;
 
@@ -63,11 +64,32 @@ private:
    ServiceThreadPtrW mp_service_thread;
 
 protected:
+   template< typename tDataRR >
+   void set_notification( typename tDataRR::tEventConsumer* p_consumer )
+   {
+      tDataRR::tEvent::set_notification( p_consumer, typename tDataRR::tEvent::Signature( role( ), tDataRR::id ) );
+   }
+   template< typename tDataRR >
+   void clear_notification( typename tDataRR::tEventConsumer* p_consumer )
+   {
+      tDataRR::tEvent::clear_notification( p_consumer, typename tDataRR::tEvent::Signature( role( ), tDataRR::id ) );
+   }
+   template< typename tDataRR >
+   void clear_all_notifications( typename tDataRR::tEventConsumer* p_consumer )
+   {
+      tDataRR::tEvent::clear_all_notifications( p_consumer );
+   }
+   template< typename tDataRR >
+   void create_send( std::shared_ptr< tDataRR > p_data )
+   {
+      typename tDataRR::tEventData data( p_data );
+      tDataRR::tEvent::create_send( typename tDataRR::tEvent::Signature( role( ), tDataRR::id ), data, comm_type( ) );
+   }
    template< typename tDataRR, typename... Args >
-   void create_send_event( const typename tDataRR::tEventID event_id, const Args&... args )
+   void create_send( const Args&... args )
    {
       typename tDataRR::tEventData data( std::make_shared< tDataRR >( args... ) );
-      tDataRR::tEvent::create_send( role( ), event_id, data, is_ipc( ) ? base::eCommType::IPC : base::eCommType::ITC );
+      tDataRR::tEvent::create_send( typename tDataRR::tEvent::Signature( role( ), tDataRR::id ), data, comm_type( ) );
    }
    template< typename tDataRR >
    const tDataRR* get_event_data( const typename tDataRR::tEvent& event )
@@ -100,6 +122,12 @@ inline
 const bool Interface::is_ipc( ) const
 {
    return m_is_ipc;
+}
+
+inline
+const eCommType Interface::comm_type( ) const
+{
+   return m_is_ipc ? base::eCommType::IPC : base::eCommType::ITC;
 }
 
 inline

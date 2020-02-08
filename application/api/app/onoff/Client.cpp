@@ -19,26 +19,26 @@ Client::Client( const std::string& role_name )
 Client::~Client( )
 {
    // DBG_TRC( "Destroyed" );
-   data::OnOffEvent::Event::clear_all_notifications( this );
+   clear_all_notifications< data::BaseData >( this );
 }
 
-void Client::connected( const base::Interface* const p_server ) const
+void Client::connected( ) const
 {
-   DBG_MSG( "server connected: %p", p_server );
+   DBG_MSG( );
 }
 
-void Client::disconnected( const base::Interface* const p_server ) const
+void Client::disconnected( ) const
 {
-   DBG_MSG( "server disconnected: %p", p_server );
+   DBG_MSG( );
 }
 
 void Client::request_trigger_state( const std::string& state, const size_t delay )
 {
    DBG_TRC( "state: %s", state.c_str( ) );
 
-   data::OnOffEvent::Event::set_notification( this, role( ), eOnOff::ResponseTriggerState );
+   set_notification< data::ResponseTriggerStateData >( this );
 
-   create_send_event< data::RequestTriggerStateData >( eOnOff::RequestTriggerState, state, delay );
+   create_send< data::RequestTriggerStateData >( state, delay );
 }
 
 void Client::process_event( const data::OnOffEvent::Event& event )
@@ -48,7 +48,7 @@ void Client::process_event( const data::OnOffEvent::Event& event )
    {
       case eOnOff::ResponseTriggerState:
       {
-         data::OnOffEvent::Event::clear_notification( this, role( ), eOnOff::ResponseTriggerState );
+         clear_notification< data::ResponseTriggerStateData >( this );
 
          const data::ResponseTriggerStateData* data = get_event_data< data::ResponseTriggerStateData >( event );
          response_trigger_state( data->result );

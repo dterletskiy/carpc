@@ -14,39 +14,46 @@ Server::Server( const std::string& role_name )
    : base::Server( api::onoff::interface_name, role_name, api::onoff::is_ipc )
 {
    // DBG_TRC( "Created" );
-   data::OnOffEvent::Event::set_notification( this, role( ), eOnOff::RequestTriggerState );
+   set_notification< data::RequestTriggerStateData >( this );
 }
 
 Server::~Server( )
 {
    // DBG_TRC( "Destroyed" );
-   data::OnOffEvent::Event::clear_all_notifications( this );
+   clear_all_notifications< data::BaseData >( this );
 }
 
-void Server::connected( const base::Interface* const p_client ) const
+void Server::connected( ) const
 {
-   DBG_MSG( "client connected: %p", p_client );
+   DBG_MSG( );
 }
 
-void Server::disconnected( const base::Interface* const p_client ) const
+void Server::disconnected( ) const
 {
-   DBG_MSG( "client disconnected: %p", p_client );
+   DBG_MSG( );
 }
 
 void Server::response_trigger_state( const bool result )
 {
    DBG_TRC( "result: %s", BOOL_TO_STRING( result ) );
 
-   create_send_event< data::ResponseTriggerStateData >( eOnOff::ResponseTriggerState, result );
+   create_send< data::ResponseTriggerStateData >( result );
+   busy( false );
 }
 
 void Server::process_event( const data::OnOffEvent::Event& event )
 {
    DBG_TRC( "id = %s", to_string( event.info( ).id( ) ).c_str( ) );
+
    switch( event.info( ).id( ) )
    {
       case eOnOff::RequestTriggerState:
       {
+         if( busy( true ) )
+         {
+            DBG_WRN( "request busy" );
+            return;
+         }
          const data::RequestTriggerStateData* data = get_event_data< data::RequestTriggerStateData >( event );
          request_trigger_state( data->state, data->delay );
          break;

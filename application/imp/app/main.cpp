@@ -43,22 +43,44 @@ namespace memory {
 
 
 
-
-struct Base
+class Inner
 {
-   using INT = size_t;
+public:
+   Inner( const size_t id ) : m_id( id ) { DBG_MSG( "parameter" ); }
+   Inner( const Inner& inner ) : m_id( inner.m_id ) { DBG_MSG( "copy" ); }
+   Inner( const Inner&& inner ) : m_id( inner.m_id ) { DBG_MSG( "move" ); }
+   ~Inner( ) { DBG_MSG( ); }
+
+public:
+   const size_t id( ) const { return m_id; }
+private:
+   size_t m_id = 0;
 };
 
-struct Derived : public Base
+
+
+class Base
 {
+public:
+
+public:
+   Base( const Inner& inner ) : m_inner( inner ) { DBG_MSG( "parameter" ); }
+   Base( const Inner&& inner ) : m_inner( std::move( inner ) ) { DBG_MSG( "parameter move" ); }
+   ~Base( ) { DBG_MSG( ); }
+
+private:
+   Inner m_inner;
 };
+
+
 
 void test( )
 {
-   Derived::INT a = 123;
-   DBG_MSG( "%zu", a );
+   DBG_TRC( "--------------- 1" );
+   DBG_TRC( "--------------- 2" );
+   Base base( Inner( 123 ) );
+   DBG_TRC( "--------------- 3" );
 }
-
 
 void boot( )
 {
@@ -97,7 +119,7 @@ void boot( )
    {
       DBG_MSG( "argc = %d", argc );
 
-      test( );
+      // test( );
       boot( );
 
       return 0;

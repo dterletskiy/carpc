@@ -20,8 +20,8 @@ public:
    virtual ~Client( );
 
 private:
-   void connected( const base::Interface* const ) const override;
-   void disconnected( const base::Interface* const ) const override;
+   void connected( ) const override;
+   void disconnected( ) const override;
 
 public:
    void request_trigger_state( const std::string&, const size_t );
