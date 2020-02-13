@@ -6,16 +6,12 @@
 
 namespace base {
 
-   class Server;
-
-   class Client;
-
-   class InterfaceRegistry;
-   using InterfaceRegistryPtr = std::shared_ptr< InterfaceRegistry >;
-   extern const InterfaceRegistryPtr InvalidInterfaceRegistryPtr;
-
-   class InterfaceStatusHandler;
-   using InterfaceStatusHandlerPtr = std::shared_ptr< InterfaceStatusHandler >;
-   extern const InterfaceStatusHandlerPtr InvalidInterfaceStatusHandlerPtr;
+   template< typename tID >
+   struct RequestResponse
+   {
+      tID request;
+      tID busy;
+      tID response = tID::Undefined;
+   };
 
 } // namespace base

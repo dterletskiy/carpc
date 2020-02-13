@@ -11,7 +11,7 @@ namespace api::onoff {
 
 
 Client::Client( const std::string& role_name )
-   : base::Client( api::onoff::interface_name, role_name, api::onoff::is_ipc )
+   : base::TClient< data::Types >( api::onoff::interface_name, role_name )
 {
    // DBG_TRC( "Created" );
 }
@@ -19,40 +19,38 @@ Client::Client( const std::string& role_name )
 Client::~Client( )
 {
    // DBG_TRC( "Destroyed" );
-   clear_all_notifications< data::BaseData >( this );
 }
 
-void Client::connected( ) const
+void Client::connected( )
 {
    DBG_MSG( );
 }
 
-void Client::disconnected( ) const
+void Client::disconnected( )
 {
    DBG_MSG( );
 }
 
-void Client::request_trigger_state( const std::string& state, const size_t delay )
+const size_t Client::request_trigger_state( const std::string& state, const size_t delay )
 {
-   DBG_TRC( "state: %s", state.c_str( ) );
+   DBG_TRC( "state: %s / delay: %zu", state.c_str( ), delay );
 
-   set_notification< data::ResponseTriggerStateData >( this );
-
-   create_send< data::RequestTriggerStateData >( state, delay );
+   return create_send_request< data::RequestTriggerStateData >( state, delay );
 }
 
-void Client::process_event( const data::OnOffEvent::Event& event )
+void Client::process_response_event( const data::OnOffEvent::Event& event )
 {
-   DBG_TRC( "id = %s", to_string( event.info( ).id( ) ).c_str( ) );
    switch( event.info( ).id( ) )
    {
       case eOnOff::ResponseTriggerState:
       {
-         clear_notification< data::ResponseTriggerStateData >( this );
-
          const data::ResponseTriggerStateData* data = get_event_data< data::ResponseTriggerStateData >( event );
          response_trigger_state( data->result );
          break;
+      }
+      case eOnOff::RequestTriggerStateBusy:
+      {
+         request_trigger_state_failed( );
       }
       default: break;
    }

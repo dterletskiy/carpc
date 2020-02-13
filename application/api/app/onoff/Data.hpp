@@ -2,19 +2,22 @@
 
 // Framework
 #include "api/sys/comm/event/Event.hpp"
+#include "api/sys/comm/interface/Types.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
 
 
 
 namespace api::onoff {
-   DEFINE_ENUM( eOnOff, size_t, RequestTriggerState, ResponseTriggerState, NotificationCurrentState, Undefined );
+
+   DEFINE_ENUM( eOnOff, size_t, RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState, NotificationCurrentState, Undefined );
+
+   extern const std::vector< base::RequestResponse< eOnOff > > s_rr;
+
 } // namespace api::onoff
 
 
 
 namespace api::onoff::ipc {
-
-   extern const bool is_ipc;
 
    class BaseData;
    using tBaseDataPtr = std::shared_ptr< BaseData >;
@@ -38,14 +41,21 @@ namespace api::onoff::ipc {
 
 
 
-   class BaseData
+   struct Types
    {
-   public:
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
 
+      static const base::eCommType COMM_TYPE;
+      static const std::vector< base::RequestResponse< tEventID > >& RR;
+   };
+
+
+
+   class BaseData : public Types
+   {
    public:
       BaseData( const eOnOff );
       static tBaseDataPtr create( base::ByteBufferT& );
@@ -84,6 +94,9 @@ namespace api::onoff::ipc {
    class ResponseTriggerStateData : public BaseData
    {
    public:
+      using RequestData = RequestTriggerStateData;
+
+   public:
       ResponseTriggerStateData( );
       ResponseTriggerStateData( const bool );
    public:
@@ -121,8 +134,6 @@ namespace api::onoff::ipc {
 
 namespace api::onoff::no_ipc {
 
-   extern const bool is_ipc;
-
    struct BaseData;
    using tBaseDataPtr = std::shared_ptr< BaseData >;
 
@@ -138,12 +149,21 @@ namespace api::onoff::no_ipc {
 
 
 
-   struct BaseData
+   struct Types
    {
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
+
+      static const base::eCommType COMM_TYPE;
+      static const std::vector< base::RequestResponse< tEventID > >& RR;
+   };
+
+
+
+   struct BaseData : public Types
+   {
    };
 
 
@@ -161,6 +181,8 @@ namespace api::onoff::no_ipc {
 
    struct ResponseTriggerStateData : public BaseData
    {
+      using RequestData = RequestTriggerStateData;
+
       ResponseTriggerStateData( const bool );
       static const eOnOff id;
 
@@ -186,6 +208,5 @@ namespace api::onoff {
    namespace data = api::onoff::ipc;
 
    extern const std::string interface_name;
-   extern const bool is_ipc;
 
 } // namespace api::onoff

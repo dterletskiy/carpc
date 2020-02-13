@@ -40,15 +40,24 @@ public:
       static const eEventType build_type( ) { return eEventType::RR; }
 
    public:
-      Signature( const std::string& service_name, const _IdType& id )
+      Signature( )
+         : _TEventBase::Signature( )
+      { }
+      Signature( const std::string& service_name, const _IdType& id, const void* from_addr, const void* to_addr, const SequenceID seq_id )
          : _TEventBase::Signature( )
          , m_service_name( service_name )
          , m_id( id )
+         , mp_from_addr( from_addr )
+         , mp_to_addr( to_addr )
+         , m_seq_id( seq_id )
       { }
       Signature( const Signature& other )
          : _TEventBase::Signature( other )
          , m_service_name( other.m_service_name )
          , m_id( other.m_id )
+         , mp_from_addr( other.mp_from_addr )
+         , mp_to_addr( other.mp_to_addr )
+         , m_seq_id( other.m_seq_id )
       { }
       ~Signature( ) override { }
       const IEventSignature* const create_copy( ) const { return new Signature( *this ); }
@@ -56,7 +65,14 @@ public:
    public:
       const std::string name( ) const override
       {
-         return base::format_string( _TEventBase::Signature::name( ), ", service: ", m_service_name, ", id: ", (size_t)m_id );
+         return base::format_string(
+               _TEventBase::Signature::name( )
+               , ", service: ", m_service_name
+               , ", id: ", (size_t)m_id
+               , ", from_addr: ", mp_from_addr
+               , ", to_addr: ", mp_to_addr
+               , ", seq_id: ", m_seq_id
+            );
       }
 
    public:
@@ -84,15 +100,38 @@ public:
          if( static_cast< const Signature& >( signature ).m_service_name != m_service_name )
             return m_service_name < static_cast< const Signature& >( signature ).m_service_name;
 
-         return m_id < static_cast< const Signature& >( signature ).m_id;
+         if( static_cast< const Signature& >( signature ).m_id != m_id )
+            return m_id < static_cast< const Signature& >( signature ).m_id;
+
+         return mp_to_addr < static_cast< const Signature& >( signature ).mp_to_addr;
+      }
+
+   public:
+      const bool to_buffer( ByteBufferT& buffer ) const override
+      {
+         if constexpr( IS_IPC_EVENT )
+            return buffer.push( m_service_name, m_id, mp_from_addr, mp_to_addr, m_seq_id );
+         return false;
+      }
+      const bool from_buffer( ByteBufferT& buffer ) override
+      {
+         if constexpr( IS_IPC_EVENT )
+            return buffer.pop( m_seq_id, mp_to_addr, mp_from_addr, m_id, m_service_name );
+         return false;
       }
 
    public:
       const std::string& service_name( ) const { return m_service_name; }
       const _IdType& id( ) const { return m_id; }
+      const void* from_addr( ) const { return mp_from_addr; }
+      const void* to_addr( ) const { return mp_to_addr; }
+      const SequenceID seq_id( ) const { return m_seq_id; }
    // private:
-      std::string    m_service_name;
-      _IdType        m_id;
+      std::string    m_service_name = { };
+      _IdType        m_id = { };
+      const void*    mp_from_addr = nullptr;
+      const void*    mp_to_addr = nullptr;
+      SequenceID     m_seq_id = 0;
    };
 
 // constructors
@@ -122,7 +161,7 @@ public:
 
    static const bool clear_all_notifications( _ConsumerType* p_consumer )
    {
-      return IEvent::clear_all_notifications( p_consumer, Signature( std::string{ }, _IdType{ } ) );
+      return IEvent::clear_all_notifications( p_consumer, Signature( ) );
    }
 
    static std::shared_ptr< _EventType > create( const Signature& signature, const eCommType comm_type = eCommType::NONE )
@@ -161,25 +200,24 @@ private:
    template< typename T > friend EventPtr create_event( );
    static std::shared_ptr< _EventType > create( const eCommType comm_type = eCommType::NONE )
    {
-      return std::shared_ptr< _EventType >( new _EventType( Signature( std::string{ }, _IdType{ } ), comm_type ) );
+      return std::shared_ptr< _EventType >( new _EventType( Signature( ), comm_type ) );
    }
 
-// serrialization / deserrialization
-public:
-   const bool to_buffer( ByteBufferT& buffer ) const override
+// serialization / deserialization
+private:
+   const bool serialize( ByteBufferT& buffer ) const override
    {
       if constexpr( IS_IPC_EVENT )
       {
-         return buffer.push( *_TEventBase::mp_data, m_signature.m_id, m_signature.m_service_name );
+         return buffer.push( m_signature );
       }
       return false;
    }
-   const bool from_buffer( ByteBufferT& buffer ) override
+   const bool deserialize( ByteBufferT& buffer ) override
    {
       if constexpr( IS_IPC_EVENT )
       {
-         _TEventBase::mp_data = std::make_shared< _DataType >( );
-         return buffer.pop( m_signature.m_service_name, m_signature.m_id, *_TEventBase::mp_data );
+         return buffer.pop( m_signature );
       }
       return false;
    }

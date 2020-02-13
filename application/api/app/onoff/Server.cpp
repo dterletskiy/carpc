@@ -11,24 +11,22 @@ namespace api::onoff {
 
 
 Server::Server( const std::string& role_name )
-   : base::Server( api::onoff::interface_name, role_name, api::onoff::is_ipc )
+   : base::TServer< data::Types >( api::onoff::interface_name, role_name )
 {
    // DBG_TRC( "Created" );
-   set_notification< data::RequestTriggerStateData >( this );
 }
 
 Server::~Server( )
 {
    // DBG_TRC( "Destroyed" );
-   clear_all_notifications< data::BaseData >( this );
 }
 
-void Server::connected( ) const
+void Server::connected( )
 {
    DBG_MSG( );
 }
 
-void Server::disconnected( ) const
+void Server::disconnected( )
 {
    DBG_MSG( );
 }
@@ -37,25 +35,17 @@ void Server::response_trigger_state( const bool result )
 {
    DBG_TRC( "result: %s", BOOL_TO_STRING( result ) );
 
-   create_send< data::ResponseTriggerStateData >( result );
-   busy( false );
+   create_send_response< data::ResponseTriggerStateData >( result );
 }
 
-void Server::process_event( const data::OnOffEvent::Event& event )
+void Server::process_request_event( const data::OnOffEvent::Event& event )
 {
-   DBG_TRC( "id = %s", to_string( event.info( ).id( ) ).c_str( ) );
-
    switch( event.info( ).id( ) )
    {
       case eOnOff::RequestTriggerState:
       {
-         if( busy( true ) )
-         {
-            DBG_WRN( "request busy" );
-            return;
-         }
-         const data::RequestTriggerStateData* data = get_event_data< data::RequestTriggerStateData >( event );
-         request_trigger_state( data->state, data->delay );
+         const data::RequestTriggerStateData* request_data = get_event_data< data::RequestTriggerStateData >( event );
+         request_trigger_state( request_data->state, request_data->delay );
          break;
       }
       default: break;

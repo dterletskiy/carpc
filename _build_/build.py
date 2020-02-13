@@ -83,10 +83,13 @@ PROJECTS: dict = { }
 project_names: list = choose_projects( projects )
 action_name: str = choose_action( list( actions.keys( ) ) )
 
+start_action: int = int( round(time.time() * 1000) )
 project.init( project_names, PROJECTS, ROOT, SESSION, COMPILER )
 for processor in actions.get( action_name ):
    if archive == processor:
       archive( ROOT )
    else:
       processor( PROJECTS )
+finish_action: int = int( round(time.time() * 1000) )
+console.debug.question( "Total action time: %d ms" %(finish_action - start_action) )
 

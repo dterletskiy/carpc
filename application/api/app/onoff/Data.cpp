@@ -6,7 +6,10 @@
 namespace api::onoff {
 
    const std::string interface_name = "OnOff";
-   const bool is_ipc = data::is_ipc;
+
+   const std::vector< base::RequestResponse< eOnOff > > s_rr = {
+      { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState }
+   };
 
 } // namespace api::onoff
 
@@ -14,7 +17,10 @@ namespace api::onoff {
 
 namespace api::onoff::ipc {
 
-   const bool is_ipc = true;
+   const base::eCommType Types::COMM_TYPE = base::eCommType::IPC;
+   const std::vector< base::RequestResponse< Types::tEventID > >& Types::RR = s_rr;
+
+
 
    BaseData::BaseData( const eOnOff _id )
       : m_id( _id )
@@ -161,7 +167,10 @@ INIT_EVENT( api::onoff::ipc::OnOffEvent );
 
 namespace api::onoff::no_ipc {
 
-   const bool is_ipc = false;
+   const base::eCommType Types::COMM_TYPE = base::eCommType::ITC;
+   const std::vector< base::RequestResponse< Types::tEventID > >& Types::RR = s_rr;
+
+
 
    const eOnOff RequestTriggerStateData::id = eOnOff::RequestTriggerState;
 
@@ -172,6 +181,8 @@ namespace api::onoff::no_ipc {
    {
    }
 
+
+
    const eOnOff ResponseTriggerStateData::id = eOnOff::ResponseTriggerState;
 
    ResponseTriggerStateData::ResponseTriggerStateData( const bool _result )
@@ -180,6 +191,8 @@ namespace api::onoff::no_ipc {
    {
    }
 
+
+
    const eOnOff NotificationCurrentStateData::id = eOnOff::NotificationCurrentState;
 
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
@@ -187,6 +200,8 @@ namespace api::onoff::no_ipc {
       , state( _state )
    {
    }
+
+
 
    OnOffEventData::OnOffEventData( tBaseDataPtr _ptr )
       : ptr( _ptr )

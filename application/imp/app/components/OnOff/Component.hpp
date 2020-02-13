@@ -39,7 +39,7 @@ private:
    Server m_server_onoff_xxx;
    Client m_client_onoff_xxx;
 private:
-   Server m_server_onoff_yyy;
+   // Server m_server_onoff_yyy;
    Client m_client_onoff_yyy;
 };
 

@@ -38,7 +38,6 @@ public:
          static const std::string s_name = base::format_string( s_type_id, "/", base::c_str( s_type_event ) );
          return s_name;
       }
-      const char* const c_str( ) const override { return s_type_id.c_str( ); }
 
    public:
       const EventTypeID& type_id( ) const override final { return s_type_id; }
@@ -71,6 +70,45 @@ public:
    const bool send_to_context( ServiceThreadPtrW pw_service ) override
    {
       return IEvent::send_to_context( TEventBase< _Generator >::shared_from_this( ), pw_service );
+   }
+
+// serialization / deserialization
+public:
+   virtual const bool serialize( ByteBufferT& ) const = 0;
+   virtual const bool deserialize( ByteBufferT& ) = 0;
+   const bool to_buffer( ByteBufferT& buffer ) const override final
+   {
+      if constexpr( IS_IPC_EVENT )
+      {
+         if( mp_data )
+         {
+            if( false == buffer.push( *mp_data ) )
+               return false;
+         }
+
+         if( false == buffer.push( ( nullptr != mp_data ) ) )
+            return false;
+
+         return serialize( buffer );
+      }
+      return false;
+   }
+   const bool from_buffer( ByteBufferT& buffer ) override final
+   {
+      if constexpr( IS_IPC_EVENT )
+      {
+         if( false == deserialize( buffer ) )
+            return false;
+
+         bool is_data = false;
+         if( false == buffer.pop( is_data ) )
+            return false;
+         if( false == is_data )
+            return true;
+         mp_data = std::make_shared< _DataType >( );
+         return buffer.pop( *mp_data );
+      }
+      return false;
    }
 
 public:

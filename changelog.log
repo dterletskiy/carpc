@@ -79,3 +79,8 @@ version 1.2.5
 version 1.2.6
  - Request/Response implementation updated.
  - Template events' static functions signature changed (now in is similar for all of them and has "Signature" instead of a lot of other parameters).
+
+version 1.3.0
+ - Request/Response concept completely reimplemented.
+ - Event with no data serialization/deserialization logic implemented to avoid crash in case of data in event is nullptr.
+ - Request busy notification implemented.

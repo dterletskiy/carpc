@@ -61,6 +61,20 @@ public:
 
          return _TEventBase::Signature::s_type_event < signature.type( );
       }
+
+   public:
+      const bool to_buffer( ByteBufferT& buffer ) const override
+      {
+         if constexpr( IS_IPC_EVENT )
+            return true;
+         return false;
+      }
+      const bool from_buffer( ByteBufferT& buffer ) override
+      {
+         if constexpr( IS_IPC_EVENT )
+            return true;
+         return false;
+      }
    };
 
 // constructors
@@ -125,22 +139,21 @@ private:
       return std::shared_ptr< _EventType >( new _EventType( comm_type ) );
    }
 
-// serrialization / deserrialization
-public:
-   const bool to_buffer( ByteBufferT& buffer ) const override
+// serialization / deserialization
+private:
+   const bool serialize( ByteBufferT& buffer ) const override
    {
       if constexpr( IS_IPC_EVENT )
       {
-         return buffer.push( *_TEventBase::mp_data );
+         return buffer.push( m_signature );
       }
       return false;
    }
-   const bool from_buffer( ByteBufferT& buffer ) override
+   const bool deserialize( ByteBufferT& buffer ) override
    {
       if constexpr( IS_IPC_EVENT )
       {
-         _TEventBase::mp_data = std::make_shared< _DataType >( );
-         return buffer.pop( *_TEventBase::mp_data );
+         return buffer.pop( m_signature );
       }
       return false;
    }

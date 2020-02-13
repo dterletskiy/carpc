@@ -2,7 +2,6 @@
 
 #include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/timer.hpp"
-#include "api/sys/comm/interface/Types.hpp"
 #include "api/sys/service/Types.hpp"
 
 
@@ -27,11 +26,6 @@ public:
    bool start( const ServiceInfoVector& );
    bool stop( );
    void boot( );
-
-public:
-   InterfaceRegistryPtr interface_registry( ) const;
-private:
-   InterfaceRegistryPtr          mp_interface_registry;
 
 public:
    ServiceBrockerThreadPtr service_brocker( ) const;

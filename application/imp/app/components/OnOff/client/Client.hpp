@@ -13,11 +13,18 @@ class Client
    : public api::onoff::Client
 {
 public:
-   Client( const std::string& );
+   Client( const std::string&, const std::string& name = { } );
    ~Client( );
 
-public:
+private:
+   const std::string m_name = { };
+
+private:
    void response_trigger_state( const bool ) override;
+   void request_trigger_state_failed( ) override;
+
+public:
+   void request_trigger_state( const std::string&, const size_t );
 };
 
 

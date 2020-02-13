@@ -1,6 +1,5 @@
 #include "api/sys/comm/event/Event.hpp"
 #include "api/sys/service/ServiceThread.hpp"
-#include "imp/sys/comm/interface/InterfaceStatusHandler.hpp"
 #include "imp/sys/service/ServiceEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -52,8 +51,6 @@ void ServiceThread::thread_loop( )
    SYS_INF( "'%s': enter", m_name.c_str( ) );
    m_started = true;
 
-   // Creating interface registry
-   InterfaceStatusHandler interface_status_handler;
    // Creating components
    for( auto creator : m_component_creators )
       m_components.emplace_back( creator( shared_from_this( ) ) );

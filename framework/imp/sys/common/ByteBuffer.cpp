@@ -176,11 +176,19 @@ bool ByteBuffer::read( const void* p_buffer, const size_t size )
  ****************************************/
 bool ByteBuffer::push( const void* p_buffer, const size_t size, const bool is_reallocate )
 {
-   bool result = write( p_buffer, size, is_reallocate );
-   if( false == result )
+   if( false == write( p_buffer, size, is_reallocate ) )
       return false;
 
    m_size += size;
+   return true;
+}
+
+bool ByteBuffer::push( const void* const p_buffer, const bool is_reallocate )
+{
+   if( false == write( &p_buffer, sizeof( void* ), is_reallocate ) )
+      return false;
+
+   m_size += sizeof( void* );
    return true;
 }
 
@@ -220,11 +228,19 @@ bool ByteBuffer::push( const std::string& string, const bool is_reallocate )
  ****************************************/
 bool ByteBuffer::pop( const void* p_buffer, const size_t size )
 {
-   bool result = read( p_buffer, size );
-   if( false == result )
+   if( false == read( p_buffer, size ) )
       return false;
 
    m_size -= size;
+   return true;
+}
+
+bool ByteBuffer::pop( const void*& p_buffer )
+{
+   if( false == read( &p_buffer, sizeof( void* ) ) )
+      return false;
+
+   m_size -= sizeof( void* );
    return true;
 }
 

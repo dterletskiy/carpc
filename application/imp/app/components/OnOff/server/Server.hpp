@@ -16,16 +16,24 @@ class Server
    , public base::ITimerConsumer
 {
 public:
-   Server( const std::string& );
+   Server( const std::string&, const std::string& name = { } );
    ~Server( );
 
 public:
    void request_trigger_state( const std::string&, const size_t ) override;
 
+private:
+   const std::string m_name = { };
+
 // Timer
 private:
    void process_timer( const base::TimerID ) override;
-   base::Timer m_timer;
+   struct TimerSeqID
+   {
+      std::shared_ptr< base::Timer > timer;
+      size_t seq_id;
+   };
+   std::list< TimerSeqID > m_timers;
 };
 
 

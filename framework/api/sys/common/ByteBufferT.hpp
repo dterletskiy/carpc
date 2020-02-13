@@ -51,6 +51,7 @@ public:
     ****************************************/
 public:
    bool push( const void*, const size_t, const bool is_reallocate = true );
+   bool push( const void* const, const bool is_reallocate = true );
    bool push( const std::string&, const bool is_reallocate = true );
    template< typename TYPE >
       bool push( const std::optional< TYPE >&, const bool is_reallocate = true );
@@ -98,6 +99,7 @@ private:
     ****************************************/
 public:
    bool pop( const void*, const size_t );
+   bool pop( const void*& );
    bool pop( std::string& );
    template< typename TYPE >
       bool pop( std::optional< TYPE >& );

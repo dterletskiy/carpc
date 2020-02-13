@@ -124,6 +124,11 @@ Timer::~Timer( )
    }
 }
 
+const bool Timer::operator<( const Timer& timer ) const
+{
+   return m_id < timer.m_id;
+}
+
 bool Timer::start( const long int microseconds )
 {
    if( true == m_is_running )

@@ -103,6 +103,18 @@ bool ByteBufferT::push( const void* p_buffer, const size_t size, const bool is_r
    return m_transaction.finish( );
 }
 
+bool ByteBufferT::push( const void* const p_buffer, const bool is_reallocate )
+{
+   if( false == m_transaction.start( Transaction::eType::push ) )
+      return false;
+
+   if( false == write( &p_buffer, sizeof( void* ), is_reallocate ) )
+      return m_transaction.error( );
+
+   m_size += sizeof( void* );
+   return m_transaction.finish( );
+}
+
 bool ByteBufferT::push( const std::string& string, const bool is_reallocate )
 {
    if( false == m_transaction.start( Transaction::eType::push ) )
@@ -149,6 +161,18 @@ bool ByteBufferT::pop( const void* p_buffer, const size_t size )
       return m_transaction.error( );
 
    m_size -= size;
+   return m_transaction.finish( );
+}
+
+bool ByteBufferT::pop( const void*& p_buffer )
+{
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
+
+   if( false == read( &p_buffer, sizeof( void* ) ) )
+      return m_transaction.error( );
+
+   m_size -= sizeof( void* );
    return m_transaction.finish( );
 }
 

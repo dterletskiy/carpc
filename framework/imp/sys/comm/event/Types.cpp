@@ -5,6 +5,8 @@ namespace base {
 
 
 
+const SequenceID InvalidSequenceID = 0;
+
 const char* c_str( const eCommType comm_type )
 {
    switch( comm_type )

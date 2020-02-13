@@ -40,6 +40,7 @@ public:
       static const eEventType build_type( ) { return eEventType::SIMPLE_ID; }
 
    public:
+      Signature( ) : _TEventBase::Signature( ) { }
       Signature( const _IdType& id ) : _TEventBase::Signature( ), m_id( id ) { }
       Signature( const Signature& other ) : _TEventBase::Signature( other ), m_id( other.m_id ) { }
       ~Signature( ) override { }
@@ -75,6 +76,20 @@ public:
       }
 
    public:
+      const bool to_buffer( ByteBufferT& buffer ) const override
+      {
+         if constexpr( IS_IPC_EVENT )
+            return buffer.push( m_id );
+         return false;
+      }
+      const bool from_buffer( ByteBufferT& buffer ) override
+      {
+         if constexpr( IS_IPC_EVENT )
+            return buffer.pop( m_id );
+         return false;
+      }
+
+   public:
       const _IdType& id( ) const { return m_id; }
    // private:
       _IdType m_id;
@@ -82,62 +97,62 @@ public:
 
 // constructors
 private:
-   TEventSimpleID( const _IdType& id, const eCommType comm_type )
+   TEventSimpleID( const Signature& signature, const eCommType comm_type )
       : _TEventBase( comm_type )
-      , m_signature( id )
+      , m_signature( signature )
    { }
-   TEventSimpleID( const _IdType& id, const _DataType& data, const eCommType comm_type )
+   TEventSimpleID( const Signature& signature, const _DataType& data, const eCommType comm_type )
       : _TEventBase( data, comm_type )
-      , m_signature( id )
+      , m_signature( signature )
    { }
 public:
    ~TEventSimpleID( ) override = default;
 
 // static functions
 public:
-   static const bool set_notification( _ConsumerType* p_consumer, const _IdType& id )
+   static const bool set_notification( _ConsumerType* p_consumer, const Signature& signature )
    {
-      return IEvent::set_notification( p_consumer, Signature( id ) );
+      return IEvent::set_notification( p_consumer, signature );
    }
 
-   static const bool clear_notification( _ConsumerType* p_consumer, const _IdType& id )
+   static const bool clear_notification( _ConsumerType* p_consumer, const Signature& signature )
    {
-      return IEvent::clear_notification( p_consumer, Signature( id ) );
+      return IEvent::clear_notification( p_consumer, signature );
    }
 
    static const bool clear_all_notifications( _ConsumerType* p_consumer )
    {
-      return IEvent::clear_all_notifications( p_consumer, Signature( _IdType{ } ) );
+      return IEvent::clear_all_notifications( p_consumer, Signature( ) );
    }
 
-   static std::shared_ptr< _EventType > create( const _IdType& id, const eCommType comm_type = eCommType::NONE )
+   static std::shared_ptr< _EventType > create( const Signature& signature, const eCommType comm_type = eCommType::NONE )
    {
-      return std::shared_ptr< _EventType >( new _EventType( id, comm_type ) );
+      return std::shared_ptr< _EventType >( new _EventType( signature, comm_type ) );
    }
 
-   static std::shared_ptr< _EventType > create( const _IdType& id, const _DataType& data, const eCommType comm_type = eCommType::NONE )
+   static std::shared_ptr< _EventType > create( const Signature& signature, const _DataType& data, const eCommType comm_type = eCommType::NONE )
    {
-      return std::shared_ptr< _EventType >( new _EventType( id, data, comm_type ) );
+      return std::shared_ptr< _EventType >( new _EventType( signature, data, comm_type ) );
    }
 
-   static const bool create_send( const _IdType& id, const eCommType comm_type = eCommType::NONE )
+   static const bool create_send( const Signature& signature, const eCommType comm_type = eCommType::NONE )
    {
-      return create( id, comm_type )->send( comm_type );
+      return create( signature, comm_type )->send( comm_type );
    }
 
-   static const bool create_send( const _IdType& id, const _DataType& data, const eCommType comm_type = eCommType::NONE )
+   static const bool create_send( const Signature& signature, const _DataType& data, const eCommType comm_type = eCommType::NONE )
    {
-      return create( id, data, comm_type )->send( comm_type );
+      return create( signature, data, comm_type )->send( comm_type );
    }
 
-   static const bool create_send_to_context( const _IdType& id, ServiceThreadPtrW pw_service )
+   static const bool create_send_to_context( const Signature& signature, ServiceThreadPtrW pw_service )
    {
-      return create( id )->send_to_context( pw_service );
+      return create( signature )->send_to_context( pw_service );
    }
 
-   static const bool create_send_to_context( const _IdType& id, const _DataType& data, ServiceThreadPtrW pw_service )
+   static const bool create_send_to_context( const Signature& signature, const _DataType& data, ServiceThreadPtrW pw_service )
    {
-      return create( id, data )->send_to_context( pw_service );
+      return create( signature, data )->send_to_context( pw_service );
    }
 
 private:
@@ -146,25 +161,24 @@ private:
    template< typename T > friend EventPtr create_event( );
    static std::shared_ptr< _EventType > create( const eCommType comm_type = eCommType::NONE )
    {
-      return std::shared_ptr< _EventType >( new _EventType( _IdType{ }, comm_type ) );
+      return std::shared_ptr< _EventType >( new _EventType( Signature( ), comm_type ) );
    }
 
-// serrialization / deserrialization
-public:
-   const bool to_buffer( ByteBufferT& buffer ) const override
+// serialization / deserialization
+private:
+   const bool serialize( ByteBufferT& buffer ) const override
    {
       if constexpr( IS_IPC_EVENT )
       {
-         return buffer.push( *_TEventBase::mp_data, m_signature.m_id );
+         return buffer.push( m_signature );
       }
       return false;
    }
-   const bool from_buffer( ByteBufferT& buffer ) override
+   const bool deserialize( ByteBufferT& buffer ) override
    {
       if constexpr( IS_IPC_EVENT )
       {
-         _TEventBase::mp_data = std::make_shared< _DataType >( );
-         return buffer.pop( m_signature.m_id, *_TEventBase::mp_data );
+         return buffer.pop( m_signature );
       }
       return false;
    }

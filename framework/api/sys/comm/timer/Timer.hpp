@@ -18,6 +18,8 @@ public:
    Timer( ITimerConsumer* );
    ~Timer( );
 
+   const bool operator<( const Timer& ) const;
+
    bool start( const long int microseconds );
    bool stop( );
 

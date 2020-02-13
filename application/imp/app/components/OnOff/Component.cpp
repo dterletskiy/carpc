@@ -93,10 +93,10 @@ base::ComponentPtr Component::creator( base::ServiceThreadPtr p_service )
 
 Component::Component( const base::ServiceThreadPtr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
-   , m_server_onoff_xxx( "xxx" )
-   , m_client_onoff_xxx( "xxx" )
-   , m_server_onoff_yyy( "yyy" )
-   , m_client_onoff_yyy( "xxx" )
+   , m_server_onoff_xxx( "xxx", "Server / xxx" )
+   , m_client_onoff_xxx( "xxx", "Client / xxx / 1" )
+   // , m_server_onoff_yyy( "yyy", "Server / yyy" )
+   , m_client_onoff_yyy( "xxx", "Client / xxx / 2" )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
    events::NoID::PingEvent::Event::set_notification( this );
@@ -118,8 +118,8 @@ bool Component::boot( const std::string& command )
 
    // s_event_test.execute( );
 
-   m_client_onoff_xxx.request_trigger_state( "Unloaded", 5000000000 );
-   m_client_onoff_yyy.request_trigger_state( "BasicOperable", 10000000000 );
+   m_client_onoff_xxx.request_trigger_state( "Unloaded", 10000000000 );
+   m_client_onoff_yyy.request_trigger_state( "BasicOperable", 5000000000 );
 
    // events::NoID::PingEvent::Event::create_send( { "WTF!!!" } );
    // events::ID::PingEvent::Event::create_send( events::eEventID::request, { "WTF!!!" } );
