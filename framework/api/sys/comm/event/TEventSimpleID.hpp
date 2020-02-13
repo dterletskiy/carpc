@@ -91,7 +91,7 @@ public:
 
    public:
       const _IdType& id( ) const { return m_id; }
-   // private:
+   private:
       _IdType m_id;
    };
 

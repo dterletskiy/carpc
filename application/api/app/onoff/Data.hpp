@@ -205,7 +205,7 @@ namespace api::onoff::no_ipc {
 
 namespace api::onoff {
 
-   namespace data = api::onoff::ipc;
+   namespace data = api::onoff::no_ipc;
 
    extern const std::string interface_name;
 

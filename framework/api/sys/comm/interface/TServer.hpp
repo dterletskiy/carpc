@@ -43,7 +43,7 @@ namespace base {
 
 
 template< typename TYPES >
-class TClient;
+   class TProxy;
 
 
 
@@ -53,7 +53,7 @@ class TServer
    , public TYPES::tEventConsumer
 {
 protected:
-   using tClient = TClient< TYPES >;
+   using tProxy = TProxy< TYPES >;
    using tRequestInfoSet = std::set< RequestInfo >;
    using tRequestStatusMap = std::map< typename TYPES::tEventID, RequestStatus >;
    using tRequestInfoMap = std::map< typename TYPES::tEventID, tRequestInfoSet >;
@@ -70,7 +70,7 @@ private:
    virtual void disconnected( ) = 0;
 
 private:
-   std::set< const tClient* > mp_client_set;
+   std::set< const tProxy* > mp_proxy_set;
 
 protected:
    template< typename tResponseData, typename... Args >
@@ -108,7 +108,7 @@ TServer< TYPES >::TServer( const std::string& name, const std::string& role_name
    {
       m_request_status_map.emplace( std::make_pair( rr_item.request, RequestStatus{ } ) );
       m_request_info_map.emplace( std::make_pair( rr_item.request, tRequestInfoSet{ } ) );
-      TYPES::tEvent::set_notification( this, typename TYPES::tEvent::Signature( role( ), rr_item.request, nullptr, this, 0 ) );
+      TYPES::tEvent::set_notification( this, typename TYPES::tEvent::Signature( role( ), rr_item.request, nullptr, nullptr, 0 ) );
    }
 
    InterfaceEvent::Event::set_notification( this, { eInterface::ClientConnected } );
@@ -125,16 +125,16 @@ TServer< TYPES >::~TServer( )
 }
 
 template< typename TYPES >
-void TServer< TYPES >::connected( const void* const p_client )
+void TServer< TYPES >::connected( const void* const p_proxy )
 {
-   mp_client_set.emplace( reinterpret_cast< const tClient* >( p_client ) );
+   mp_proxy_set.emplace( reinterpret_cast< const tProxy* >( p_proxy ) );
    connected( );
 }
 
 template< typename TYPES >
-void TServer< TYPES >::disconnected( const void* const p_client )
+void TServer< TYPES >::disconnected( const void* const p_proxy )
 {
-   mp_client_set.erase( reinterpret_cast< const tClient* >( p_client ) );
+   mp_proxy_set.erase( reinterpret_cast< const tProxy* >( p_proxy ) );
    disconnected( );
 }
 
@@ -176,18 +176,16 @@ bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
    if( eRequestStatus::BUSY == request_status.status )
    {
       SYS_WRN( "request busy: %s", to_string( event_id ).c_str( ) );
+      // Searching for request busy event id related to current request id
       for( auto item : TYPES::RR )
       {
-         if( event_id == item.request )
-         {
-            TYPES::tEvent::create_send(
-               typename TYPES::tEvent::Signature( role( ), item.busy, this, p_from_addr, seq_id )
-               , TYPES::COMM_TYPE
-            );
-            break;
-         }
-         SYS_WRN( "request busy event id has not been found" );
+         if( event_id != item.request ) continue;
+
+         // Sending event with request busy id
+         TYPES::tEvent::create_send( typename TYPES::tEvent::Signature( role( ), item.busy, this, p_from_addr, seq_id ), TYPES::COMM_TYPE );
+         return false;
       }
+      SYS_WRN( "request busy event id has not been found" );
       return false;
    }
 

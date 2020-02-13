@@ -35,13 +35,12 @@ ServiceBrockerThread::~ServiceBrockerThread( )
    SYS_TRC( "destroyed" );
 }
 
+namespace { os::Mutex s_mutex; }
 ServiceBrockerThreadPtr ServiceBrockerThread::instance( )
 {
-   os::Mutex mutex( true );
-   if( !mp_instance )
-   {
+   base::os::MutexAutoLocker locker( s_mutex );
+   if( nullptr == mp_instance )
       mp_instance.reset( new ServiceBrockerThread( ) );
-   }
 
    return mp_instance;
 }

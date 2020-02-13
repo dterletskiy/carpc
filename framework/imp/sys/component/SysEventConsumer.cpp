@@ -23,9 +23,10 @@ SysEventConsumer::~SysEventConsumer( )
    SysEvent::Event::clear_notification( this );
 }
 
+namespace { os::Mutex s_mutex; }
 SysEventConsumer* SysEventConsumer::instance( RootComponent* p_root_component )
 {
-   os::Mutex mutex( true );
+   base::os::MutexAutoLocker locker( s_mutex );
    if( !mp_instance )
    {
       mp_instance = new SysEventConsumer( p_root_component );

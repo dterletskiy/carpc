@@ -100,10 +100,7 @@ public:
          if( static_cast< const Signature& >( signature ).m_service_name != m_service_name )
             return m_service_name < static_cast< const Signature& >( signature ).m_service_name;
 
-         if( static_cast< const Signature& >( signature ).m_id != m_id )
-            return m_id < static_cast< const Signature& >( signature ).m_id;
-
-         return mp_to_addr < static_cast< const Signature& >( signature ).mp_to_addr;
+         return m_id < static_cast< const Signature& >( signature ).m_id;
       }
 
    public:
@@ -126,7 +123,7 @@ public:
       const void* from_addr( ) const { return mp_from_addr; }
       const void* to_addr( ) const { return mp_to_addr; }
       const SequenceID seq_id( ) const { return m_seq_id; }
-   // private:
+   private:
       std::string    m_service_name = { };
       _IdType        m_id = { };
       const void*    mp_from_addr = nullptr;

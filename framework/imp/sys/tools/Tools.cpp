@@ -11,9 +11,10 @@
 namespace base::tools {
 
 
+namespace { os::Mutex s_mutex; }
 const ID generate_id( const char* const name_space )
 {
-   os::Mutex mutex( true );
+   base::os::MutexAutoLocker locker( s_mutex );
 
    static std::map< std::string, ID > id_map;
    ID id = 1;

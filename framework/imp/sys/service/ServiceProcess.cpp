@@ -50,13 +50,12 @@ ServiceProcess::~ServiceProcess( )
    SYS_TRC( "destroyed" );
 }
 
+namespace { os::Mutex s_mutex; }
 ServiceProcessPtr ServiceProcess::instance( )
 {
-   os::Mutex mutex( true );
-   if( !mp_instance )
-   {
+   base::os::MutexAutoLocker locker( s_mutex );
+   if( nullptr == mp_instance )
       mp_instance.reset( new ServiceProcess( ) );
-   }
 
    return mp_instance;
 }

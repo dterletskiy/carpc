@@ -13,9 +13,10 @@ namespace base {
 
 EventRegistryPtr EventRegistry::mp_instance;
 
+namespace { os::Mutex s_mutex; }
 EventRegistryPtr EventRegistry::instance( )
 {
-   os::Mutex mutex( true );
+   base::os::MutexAutoLocker locker( s_mutex );
    if( nullptr == mp_instance )
       mp_instance.reset( new EventRegistry( ) );
 
