@@ -30,6 +30,7 @@ private:
    void process_timer( const base::TimerID ) override;
    struct TimerSeqID
    {
+      std::string current_state;
       std::shared_ptr< base::Timer > timer;
       size_t seq_id;
    };

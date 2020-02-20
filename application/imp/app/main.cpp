@@ -44,37 +44,8 @@ namespace memory {
 
 
 
-#include "api/sys/oswrappers/Mutex.hpp"
-base::os::Mutex mutex( false );
-
-void foo( const size_t timeout )
-{
-   DBG_MSG( "enter foo: %zu", timeout );
-
-   base::os::MutexAutoLocker locker( mutex );
-   DBG_MSG( "foo mutex locked: %zu", timeout );
-   sleep( timeout );
-
-   DBG_MSG( "exit foo: %zu", timeout );
-}
-
-void loop( const size_t timeout )
-{
-   DBG_MSG( "enter thread: %zu", timeout );
-   foo( timeout );
-   DBG_MSG( "exit thread: %zu", timeout );
-}
-
 void test( )
 {
-   base::os::Thread t1( loop, 10 );
-   base::os::Thread t2( loop, 20 );
-
-   t1.run( );
-   t2.run( );
-
-   t1.join( );
-   t2.join( );
 }
 
 void boot( )

@@ -23,19 +23,19 @@ Server::~Server( )
 
 void Server::connected( )
 {
-   DBG_MSG( );
+   DBG_TRC( );
 }
 
 void Server::disconnected( )
 {
-   DBG_MSG( );
+   DBG_TRC( );
 }
 
 void Server::response_trigger_state( const bool result )
 {
-   DBG_TRC( "result: %s", BOOL_TO_STRING( result ) );
+   DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
 
-   create_send_response< data::ResponseTriggerStateData >( result );
+   response< data::ResponseTriggerStateData >( result );
 }
 
 void Server::process_request_event( const data::OnOffEvent::Event& event )
@@ -50,6 +50,19 @@ void Server::process_request_event( const data::OnOffEvent::Event& event )
       }
       default: break;
    }
+}
+
+void Server::current_state( const std::string& _current_state )
+{
+   DBG_MSG( );
+   m_current_state = _current_state;
+   notify< data::NotificationCurrentStateData >( m_current_state );
+}
+
+const std::string& Server::current_state( ) const
+{
+   DBG_MSG( );
+   return m_current_state;
 }
 
 

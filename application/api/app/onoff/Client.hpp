@@ -25,11 +25,16 @@ private:
 
 private:
    void process_response_event( const data::OnOffEvent::Event& ) override;
+   void process_notification_event( const data::OnOffEvent::Event& ) override;
 
 public:
    const size_t request_trigger_state( const std::string&, const size_t );
+   void subscribe_current_state( );
+   void unsubscribe_current_state( );
+private:
    virtual void request_trigger_state_failed( ) = 0;
    virtual void response_trigger_state( const bool ) = 0;
+   virtual void on_current_state( const std::string& ) = 0;
 
 private:
    base::TProxy< data::Types >* mp_proxy = nullptr;

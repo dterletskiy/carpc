@@ -11,6 +11,10 @@ namespace api::onoff {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState }
    };
 
+   const std::vector< base::Notification< eOnOff > > s_n = {
+      { eOnOff::SubscribeCurrentState, eOnOff::UnsubscribeCurrentState, eOnOff::NotificationCurrentState }
+   };
+
 } // namespace api::onoff
 
 
@@ -19,20 +23,14 @@ namespace api::onoff::ipc {
 
    const base::eCommType Types::COMM_TYPE = base::eCommType::IPC;
    const std::vector< base::RequestResponse< Types::tEventID > >& Types::RR = s_rr;
+   const std::vector< base::Notification< Types::tEventID > >& Types::N = s_n;
 
 
-
-   BaseData::BaseData( const eOnOff _id )
-      : m_id( _id )
-   {
-   }
 
    tBaseDataPtr BaseData::create( base::ByteBufferT& buffer )
    {
       eOnOff id = eOnOff::Undefined;
       if( false == buffer.pop( id ) )
-         return nullptr;
-      else if( eOnOff::Undefined == id )
          return nullptr;
 
       tBaseDataPtr ptr = nullptr;
@@ -41,7 +39,6 @@ namespace api::onoff::ipc {
          case eOnOff::RequestTriggerState:         ptr = std::make_shared< RequestTriggerStateData >( );       break;
          case eOnOff::ResponseTriggerState:        ptr = std::make_shared< ResponseTriggerStateData >( );      break;
          case eOnOff::NotificationCurrentState:    ptr = std::make_shared< NotificationCurrentStateData >( );  break;
-         case eOnOff::Undefined:
          default:                                                                                              break;
       }
 
@@ -51,25 +48,31 @@ namespace api::onoff::ipc {
       return  ptr;
    }
 
-   const eOnOff BaseData::id( ) const
+   bool BaseData::serrialize( base::ByteBufferT& buffer )
    {
-      return m_id;
+      if( false == to_buffer( buffer ) )
+         return false;
+
+      return buffer.push( id( ) );
    }
 
 
 
-   const eOnOff RequestTriggerStateData::id = eOnOff::RequestTriggerState;
-
-   RequestTriggerStateData::RequestTriggerStateData( )
-      : BaseData( eOnOff::RequestTriggerState )
-   {
-   }
+   const eOnOff RequestTriggerStateData::REQUEST = eOnOff::RequestTriggerState;
+   const eOnOff RequestTriggerStateData::RESPONSE = eOnOff::ResponseTriggerState;
+   const eOnOff RequestTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
    RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay )
-      : BaseData( eOnOff::RequestTriggerState )
+      : BaseData( )
       , state( _state )
       , delay( _delay )
    {
+   }
+
+   const eOnOff RequestTriggerStateData::ID = eOnOff::RequestTriggerState;
+   const eOnOff RequestTriggerStateData::id( ) const
+   {
+      return ID;
    }
 
    bool RequestTriggerStateData::to_buffer( base::ByteBufferT& buffer )
@@ -84,17 +87,20 @@ namespace api::onoff::ipc {
 
 
 
-   const eOnOff ResponseTriggerStateData::id = eOnOff::ResponseTriggerState;
+   const eOnOff ResponseTriggerStateData::REQUEST = eOnOff::RequestTriggerState;
+   const eOnOff ResponseTriggerStateData::RESPONSE = eOnOff::ResponseTriggerState;
+   const eOnOff ResponseTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
-   ResponseTriggerStateData::ResponseTriggerStateData( )
-      : BaseData( eOnOff::ResponseTriggerState )
+   ResponseTriggerStateData::ResponseTriggerStateData( const bool _result )
+      : BaseData( )
+      , result( _result )
    {
    }
 
-   ResponseTriggerStateData::ResponseTriggerStateData( const bool _result )
-      : BaseData( eOnOff::ResponseTriggerState )
-      , result( _result )
+   const eOnOff ResponseTriggerStateData::ID = eOnOff::ResponseTriggerState;
+   const eOnOff ResponseTriggerStateData::id( ) const
    {
+      return ID;
    }
 
    bool ResponseTriggerStateData::to_buffer( base::ByteBufferT& buffer )
@@ -109,17 +115,20 @@ namespace api::onoff::ipc {
 
 
 
-   const eOnOff NotificationCurrentStateData::id = eOnOff::NotificationCurrentState;
+   const eOnOff NotificationCurrentStateData::SUBSCRIBE = eOnOff::SubscribeCurrentState;
+   const eOnOff NotificationCurrentStateData::UNSUBSCRIBE = eOnOff::UnsubscribeCurrentState;
+   const eOnOff NotificationCurrentStateData::NOTIFICATION = eOnOff::NotificationCurrentState;
 
-   NotificationCurrentStateData::NotificationCurrentStateData( )
-      : BaseData( eOnOff::NotificationCurrentState )
+   NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
+      : BaseData( )
+      , state( _state )
    {
    }
 
-   NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
-      : BaseData( eOnOff::NotificationCurrentState )
-      , state( _state )
+   const eOnOff NotificationCurrentStateData::ID = eOnOff::NotificationCurrentState;
+   const eOnOff NotificationCurrentStateData::id( ) const
    {
+      return ID;
    }
 
    bool NotificationCurrentStateData::to_buffer( base::ByteBufferT& buffer )
@@ -134,10 +143,6 @@ namespace api::onoff::ipc {
 
 
 
-   OnOffEventData::OnOffEventData( )
-   {
-   }
-
    OnOffEventData::OnOffEventData( tBaseDataPtr _ptr )
       : ptr( _ptr )
    {
@@ -148,9 +153,7 @@ namespace api::onoff::ipc {
       if( nullptr == ptr )
          return true;
 
-      if( false == ptr->to_buffer( buffer ) )
-         return false;
-      return buffer.push( ptr->id( ) );
+      return ptr->serrialize( buffer );
    }
 
    bool OnOffEventData::from_buffer( base::ByteBufferT& buffer )
@@ -169,10 +172,13 @@ namespace api::onoff::no_ipc {
 
    const base::eCommType Types::COMM_TYPE = base::eCommType::ITC;
    const std::vector< base::RequestResponse< Types::tEventID > >& Types::RR = s_rr;
+   const std::vector< base::Notification< Types::tEventID > >& Types::N = s_n;
 
 
 
-   const eOnOff RequestTriggerStateData::id = eOnOff::RequestTriggerState;
+   const eOnOff RequestTriggerStateData::REQUEST = eOnOff::RequestTriggerState;
+   const eOnOff RequestTriggerStateData::RESPONSE = eOnOff::ResponseTriggerState;
+   const eOnOff RequestTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
    RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay  )
       : BaseData( )
@@ -183,7 +189,9 @@ namespace api::onoff::no_ipc {
 
 
 
-   const eOnOff ResponseTriggerStateData::id = eOnOff::ResponseTriggerState;
+   const eOnOff ResponseTriggerStateData::REQUEST = eOnOff::RequestTriggerState;
+   const eOnOff ResponseTriggerStateData::RESPONSE = eOnOff::ResponseTriggerState;
+   const eOnOff ResponseTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
    ResponseTriggerStateData::ResponseTriggerStateData( const bool _result )
       : BaseData( )
@@ -193,7 +201,9 @@ namespace api::onoff::no_ipc {
 
 
 
-   const eOnOff NotificationCurrentStateData::id = eOnOff::NotificationCurrentState;
+   const eOnOff NotificationCurrentStateData::SUBSCRIBE = eOnOff::SubscribeCurrentState;
+   const eOnOff NotificationCurrentStateData::UNSUBSCRIBE = eOnOff::UnsubscribeCurrentState;
+   const eOnOff NotificationCurrentStateData::NOTIFICATION = eOnOff::NotificationCurrentState;
 
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
       : BaseData( )

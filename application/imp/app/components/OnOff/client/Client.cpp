@@ -15,12 +15,14 @@ Client::Client( const std::string& role_name, const std::string& name )
    : api::onoff::Client( role_name )
    , m_name( name )
 {
-   DBG_MSG( "%s: created", m_name.c_str( ) );
+   DBG_TRC( "%s: created", m_name.c_str( ) );
+   subscribe_current_state( );
 }
 
 Client::~Client( )
 {
-   DBG_MSG( "%s: destroyed", m_name.c_str( ) );
+   DBG_TRC( "%s: destroyed", m_name.c_str( ) );
+   unsubscribe_current_state( );
 }
 
 void Client::response_trigger_state( const bool result )
@@ -37,6 +39,11 @@ void Client::request_trigger_state( const std::string& state, const size_t delay
 void Client::request_trigger_state_failed( )
 {
    DBG_ERR( "%s: request failed", m_name.c_str( ) );
+}
+
+void Client::on_current_state( const std::string& state )
+{
+   DBG_MSG( "%s: current state changed to '%s'", m_name.c_str( ), state.c_str( ) );
 }
 
 

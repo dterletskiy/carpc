@@ -9,7 +9,7 @@
 
 
 #define _ARG_2_( _0, _1, _2, ... )  _2
-#define _DETECT_TYPE_( ... )        _ARG_2_( __VA_ARGS__, WITH_ID, SIMPLE )
+#define _DETECT_TYPE_( ... )        _ARG_2_( __VA_ARGS__, SIMPLE_ID, SIMPLE )
 
 /**********************************************************************************
  *
@@ -18,31 +18,12 @@
  * If third parameter is empty will be defined event with default 'base::NoIdInfoType'
  * using DECLARE_EVENT_SIMPLE macro.
  * If third parameter is not empty will be defined event with user defined type
- * mentioned in third parameter using DECLARE_EVENT_WITH_ID macro.
+ * mentioned in third parameter using DECLARE_EVENT_SIMPLE_ID macro.
  *
  *********************************************************************************/
 #define __DECLARE__(  TYPE, EVENT, DATA, ... )  DECLARE_EVENT_ ## TYPE ( EVENT, DATA, ##__VA_ARGS__ )
 #define _DECLARE_(  TYPE, EVENT, DATA, ... )    __DECLARE__( TYPE, EVENT, DATA, ##__VA_ARGS__ )
 #define DECLARE_EVENT( EVENT, DATA, ... )       _DECLARE_( _DETECT_TYPE_( DUMMY, ##__VA_ARGS__ ), EVENT, DATA, ##__VA_ARGS__ )
-
-#define DECLARE_EVENT_SIMPLE( eventType, dataType ) \
-   namespace eventType { \
-      class eventType; \
-      using Event       = base::TGeneratorSimple< base::NoServiceType, eventType, dataType >::Config::EventType; \
-      using Consumer    = Event::_ConsumerType; \
-      using Data        = dataType; \
-   }
-
-#define DECLARE_EVENT_WITH_ID( eventType, dataType, idType ) \
-   namespace eventType { \
-      class eventType; \
-      using Event       = base::TGeneratorSimpleID< base::NoServiceType, eventType, dataType, idType >::Config::EventType; \
-      using Consumer    = Event::_ConsumerType; \
-      using Data        = dataType; \
-      using ID          = idType; \
-   }
-
-
 
 /**********************************************************************************
  *
@@ -51,12 +32,27 @@
  * If third parameter is empty will be defined event with default 'base::NoIdInfoType'
  * using DECLARE_IPC_EVENT_SIMPLE macro.
  * If third parameter is not empty will be defined event with user defined type
- * mentioned in third parameter using DECLARE_IPC_EVENT_WITH_ID macro.
+ * mentioned in third parameter using DECLARE_IPC_EVENT_SIMPLE_ID macro.
  *
  *********************************************************************************/
 #define __DECLARE_IPC__(  TYPE, EVENT, DATA, ... )  DECLARE_IPC_EVENT_ ## TYPE ( EVENT, DATA, ##__VA_ARGS__ )
 #define _DECLARE_IPC_(  TYPE, EVENT, DATA, ... )   __DECLARE_IPC__( TYPE, EVENT, DATA, ##__VA_ARGS__ )
 #define DECLARE_IPC_EVENT( EVENT, DATA, ... )      _DECLARE_IPC_( _DETECT_TYPE_( DUMMY, ##__VA_ARGS__ ), EVENT, DATA, ##__VA_ARGS__ )
+
+
+
+/**********************************************************************************
+ *
+ * Declare simple event
+ *
+ *********************************************************************************/
+#define DECLARE_EVENT_SIMPLE( eventType, dataType ) \
+   namespace eventType { \
+      class eventType; \
+      using Event       = base::TGeneratorSimple< base::NoServiceType, eventType, dataType >::Config::EventType; \
+      using Consumer    = Event::_ConsumerType; \
+      using Data        = dataType; \
+   }
 
 #define DECLARE_IPC_EVENT_SIMPLE( eventType, dataType ) \
    namespace eventType { \
@@ -67,7 +63,21 @@
       using Data        = dataType; \
    }
 
-#define DECLARE_IPC_EVENT_WITH_ID( eventType, dataType, idType ) \
+/**********************************************************************************
+ *
+ * Declare simple event with ID
+ *
+ *********************************************************************************/
+#define DECLARE_EVENT_SIMPLE_ID( eventType, dataType, idType ) \
+   namespace eventType { \
+      class eventType; \
+      using Event       = base::TGeneratorSimpleID< base::NoServiceType, eventType, dataType, idType >::Config::EventType; \
+      using Consumer    = Event::_ConsumerType; \
+      using Data        = dataType; \
+      using ID          = idType; \
+   }
+
+#define DECLARE_IPC_EVENT_SIMPLE_ID( eventType, dataType, idType ) \
    namespace eventType { \
       class ServiceType; \
       class eventType; \
@@ -77,16 +87,9 @@
       using ID          = idType; \
    }
 
-
-
 /**********************************************************************************
  *
- * This DECLARE_EVENT macro allowes to declare event with user defined id type
- * or with default id type depending on third parameter.
- * If third parameter is empty will be defined event with default 'base::NoIdInfoType'
- * using DECLARE_EVENT_SIMPLE macro.
- * If third parameter is not empty will be defined event with user defined type
- * mentioned in third parameter using DECLARE_EVENT_WITH_ID macro.
+ * Declare Request/Response event
  *
  *********************************************************************************/
 #define DECLARE_EVENT_RR( eventType, dataType, idType ) \
@@ -99,18 +102,6 @@
       using Signature   = Event::Signature; \
    }
 
-
-
-/**********************************************************************************
- *
- * This DECLARE_IPC_EVENT macro allowes to declare event with user defined id type
- * or with default id type depending on third parameter.
- * If third parameter is empty will be defined event with default 'base::NoIdInfoType'
- * using DECLARE_IPC_EVENT_SIMPLE macro.
- * If third parameter is not empty will be defined event with user defined type
- * mentioned in third parameter using DECLARE_IPC_EVENT_WITH_ID macro.
- *
- *********************************************************************************/
 #define DECLARE_IPC_EVENT_RR( eventType, dataType, idType ) \
    namespace eventType { \
       class ServiceType; \
@@ -126,7 +117,7 @@
 
 /**********************************************************************************
  *
- * This INIT_EVENT macro initializes all event types.
+ * This INIT_EVENT macro initializes static member for all event types.
  *
  *********************************************************************************/
 #define INIT_EVENT( eventType ) \

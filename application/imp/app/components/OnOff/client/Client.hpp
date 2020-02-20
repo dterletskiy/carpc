@@ -22,6 +22,7 @@ private:
 private:
    void response_trigger_state( const bool ) override;
    void request_trigger_state_failed( ) override;
+   void on_current_state( const std::string& ) override;
 
 public:
    void request_trigger_state( const std::string&, const size_t );

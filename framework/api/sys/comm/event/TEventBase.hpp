@@ -122,6 +122,11 @@ public:
       mp_data = std::make_shared< _DataType >( data );
       return nullptr != mp_data;
    }
+   bool data( const _DataTypePtr data )
+   {
+      mp_data = data;
+      return nullptr != mp_data;
+   }
 protected:
    _DataTypePtr mp_data = nullptr; // @TDA-issue: never check for nullptr during serrialization
 };

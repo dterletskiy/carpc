@@ -88,3 +88,6 @@ version 1.3.0
 version 1.4.0
  - Implemented proxy concept. Only one proxy instance created per service thread. This proxy subscribes on all needed events and receives them from Server and notifies all clients. Each client should call static method "create" for corresponding proxy. In this case proxy will be created or return already existinf one. Then client registers to proxy and will received needed callback. This leads to redusing event flow between Server and all client in one service thread. In this case Server communicates only with one Proxy instance in this thread.
  - Fixed critical issue with invalid useage Mutex.
+
+verion 1.4.1
+ - Notifications implemented

@@ -22,6 +22,7 @@ public:
 
 public:
    virtual void process_response_event( const typename TYPES::tEvent& ) = 0;
+   virtual void process_notification_event( const typename TYPES::tEvent& ) = 0;
 };
 
 

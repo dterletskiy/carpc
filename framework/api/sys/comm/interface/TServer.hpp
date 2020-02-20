@@ -74,7 +74,9 @@ private:
 
 protected:
    template< typename tResponseData, typename... Args >
-      void create_send_response( const Args&... args );
+      void response( const Args&... args );
+   template< typename tNotificationData, typename... Args >
+      void notify( const Args&... args );
    template< typename tRequestData >
       const tRequestData* get_event_data( const typename TYPES::tEvent& event );
 
@@ -83,7 +85,8 @@ private:
    virtual void process_request_event( const typename TYPES::tEvent& ) = 0;
 private:
    bool prepare_request( const typename TYPES::tEvent& );
-   std::optional< RequestInfo > prepare_response( const typename TYPES::tEventID& );
+   template< typename tResponseData >
+      std::optional< RequestInfo > prepare_response( );
 public:
    const SequenceID unblock_request( );
    void prepare_response( const SequenceID );
@@ -141,8 +144,8 @@ void TServer< TYPES >::disconnected( const void* const p_proxy )
 template< typename TYPES >
 void TServer< TYPES >::process_event( const typename TYPES::tEvent& event )
 {
-   m_processing_event_id = event.info( ).id( );
    SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
+   m_processing_event_id = event.info( ).id( );
 
    if( true == prepare_request( event ) )
    {
@@ -207,22 +210,23 @@ bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
 }
 
 template< typename TYPES >
-std::optional< RequestInfo > TServer< TYPES >::prepare_response( const typename TYPES::tEventID& id )
+template< typename tResponseData >
+std::optional< RequestInfo > TServer< TYPES >::prepare_response( )
 {
    // Find request id in request status map
-   auto iterator_status_map = m_request_status_map.find( id );
+   auto iterator_status_map = m_request_status_map.find( tResponseData::REQUEST );
    if( m_request_status_map.end( ) == iterator_status_map )
    {
-      SYS_WRN( "not a request ID: %s", to_string( id ).c_str( ) );
+      SYS_WRN( "not a request ID: %s", to_string( tResponseData::REQUEST ).c_str( ) );
       return std::nullopt;
    }
    RequestStatus& request_status = iterator_status_map->second;
 
    // Find request ID in request info map
-   auto iterator_info_map = m_request_info_map.find( id );
+   auto iterator_info_map = m_request_info_map.find( tResponseData::REQUEST );
    if( m_request_info_map.end( ) == iterator_info_map )
    {
-      SYS_WRN( "not a request ID: %s", to_string( id ).c_str( ) );
+      SYS_WRN( "not a request ID: %s", to_string( tResponseData::REQUEST ).c_str( ) );
       return std::nullopt;
    }
 
@@ -275,25 +279,26 @@ void TServer< TYPES >::prepare_response( const SequenceID seq_id )
 
 template< typename TYPES >
 template< typename tResponseData, typename... Args >
-void TServer< TYPES >::create_send_response( const Args&... args )
+void TServer< TYPES >::response( const Args&... args )
 {
-   std::optional< RequestInfo > request_info = std::nullopt;
-   for( auto item : TYPES::RR )
-   {
-      if( tResponseData::id == item.response )
-      {
-         request_info = prepare_response( item.request );
-         break;
-      }
-      return;
-   }
-
+   std::optional< RequestInfo > request_info = prepare_response< tResponseData >( );
    if( std::nullopt == request_info )
       return;
-   
+
    typename TYPES::tEventData data( std::make_shared< tResponseData >( args... ) );
    TYPES::tEvent::create_send(
-      typename TYPES::tEvent::Signature( role( ), tResponseData::id, this, request_info.value( ).client_addr, request_info.value( ).client_seq_id )
+      typename TYPES::tEvent::Signature( role( ), tResponseData::RESPONSE, this, request_info.value( ).client_addr, request_info.value( ).client_seq_id )
+      , data, TYPES::COMM_TYPE
+   );
+}
+
+template< typename TYPES >
+template< typename tNotificationData, typename... Args >
+void TServer< TYPES >::notify( const Args&... args )
+{
+   typename TYPES::tEventData data( std::make_shared< tNotificationData >( args... ) );
+   TYPES::tEvent::create_send(
+      typename TYPES::tEvent::Signature( role( ), tNotificationData::NOTIFICATION, this, nullptr, 0 )
       , data, TYPES::COMM_TYPE
    );
 }

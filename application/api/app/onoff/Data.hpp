@@ -9,9 +9,14 @@
 
 namespace api::onoff {
 
-   DEFINE_ENUM( eOnOff, size_t, RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState, NotificationCurrentState, Undefined );
+   DEFINE_ENUM( eOnOff, size_t
+      , RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState
+      , SubscribeCurrentState, UnsubscribeCurrentState, NotificationCurrentState
+      , Undefined
+   );
 
    extern const std::vector< base::RequestResponse< eOnOff > > s_rr;
+   extern const std::vector< base::Notification< eOnOff > > s_n;
 
 } // namespace api::onoff
 
@@ -19,23 +24,21 @@ namespace api::onoff {
 
 namespace api::onoff::ipc {
 
-   class BaseData;
+   struct BaseData;
    using tBaseDataPtr = std::shared_ptr< BaseData >;
 
 
 
-   class OnOffEventData
+   struct OnOffEventData
    {
-   public:
-      OnOffEventData( );
+      OnOffEventData( ) = default;
       OnOffEventData( tBaseDataPtr );
+
+      tBaseDataPtr ptr = nullptr;
 
    public:
       bool to_buffer( base::ByteBufferT& ) const;
       bool from_buffer( base::ByteBufferT& );
-
-   public:
-      tBaseDataPtr ptr = nullptr;
    };
    DECLARE_IPC_EVENT_RR( OnOffEvent, OnOffEventData, api::onoff::eOnOff );
 
@@ -50,82 +53,88 @@ namespace api::onoff::ipc {
 
       static const base::eCommType COMM_TYPE;
       static const std::vector< base::RequestResponse< tEventID > >& RR;
+      static const std::vector< base::Notification< tEventID > >& N;
    };
 
 
 
-   class BaseData : public Types
+   struct BaseData : public Types
    {
-   public:
-      BaseData( const eOnOff );
-      static tBaseDataPtr create( base::ByteBufferT& );
+      BaseData( ) = default;
+      virtual ~BaseData( ) = default;
 
    public:
+      static tBaseDataPtr create( base::ByteBufferT& );
+      bool serrialize( base::ByteBufferT& );
+
+   private:
       virtual bool to_buffer( base::ByteBufferT& ) = 0;
       virtual bool from_buffer( base::ByteBufferT& ) = 0;
-
-   public:
-      virtual const eOnOff id( ) const final;
-   private:
-      eOnOff m_id = eOnOff::Undefined;
+      virtual const eOnOff id( ) const = 0;
    };
 
 
 
-   class RequestTriggerStateData : public BaseData
+   struct RequestTriggerStateData : public BaseData
    {
-   public:
-      RequestTriggerStateData( );
+      static const eOnOff REQUEST;
+      static const eOnOff RESPONSE;
+      static const eOnOff BUSY;
+
+      RequestTriggerStateData( ) = default;
       RequestTriggerStateData( const std::string&, const size_t );
-   public:
-      static const eOnOff id;
+      ~RequestTriggerStateData( ) override = default;
 
-   public:
-      bool to_buffer( base::ByteBufferT& ) override;
-      bool from_buffer( base::ByteBufferT& ) override;
-
-   public:
       std::string state = "";
       size_t delay = 0;
+
+   private:
+      bool to_buffer( base::ByteBufferT& ) override;
+      bool from_buffer( base::ByteBufferT& ) override;
+      const eOnOff id( ) const override;
+      static const eOnOff ID;
    };
 
 
 
-   class ResponseTriggerStateData : public BaseData
+   struct ResponseTriggerStateData : public BaseData
    {
-   public:
-      using RequestData = RequestTriggerStateData;
+      static const eOnOff REQUEST;
+      static const eOnOff RESPONSE;
+      static const eOnOff BUSY;
 
-   public:
-      ResponseTriggerStateData( );
+      ResponseTriggerStateData( ) = default;
       ResponseTriggerStateData( const bool );
-   public:
-      static const eOnOff id;
+      ~ResponseTriggerStateData( ) override = default;
 
-   public:
+      bool result = false;
+
+   private:
       bool to_buffer( base::ByteBufferT& ) override;
       bool from_buffer( base::ByteBufferT& ) override;
-
-   public:
-      bool result = false;
+      const eOnOff id( ) const override;
+      static const eOnOff ID;
    };
 
 
 
-   class NotificationCurrentStateData : public BaseData
+   struct NotificationCurrentStateData : public BaseData
    {
-   public:
-      NotificationCurrentStateData( );
-      NotificationCurrentStateData( const std::string& );
-   public:
-      static const eOnOff id;
+      static const eOnOff SUBSCRIBE;
+      static const eOnOff UNSUBSCRIBE;
+      static const eOnOff NOTIFICATION;
 
-   public:
+      NotificationCurrentStateData( ) = default;
+      NotificationCurrentStateData( const std::string& );
+      ~NotificationCurrentStateData( ) override = default;
+
+      std::string state = "";
+
+   private:
       bool to_buffer( base::ByteBufferT& ) override;
       bool from_buffer( base::ByteBufferT& ) override;
-
-   public:
-      std::string state = "";
+      const eOnOff id( ) const override;
+      static const eOnOff ID;
    };
 
 } // namespace api::onoff::ipc
@@ -141,6 +150,7 @@ namespace api::onoff::no_ipc {
 
    struct OnOffEventData
    {
+      OnOffEventData( ) = default;
       OnOffEventData( tBaseDataPtr );
 
       tBaseDataPtr ptr = nullptr;
@@ -158,20 +168,28 @@ namespace api::onoff::no_ipc {
 
       static const base::eCommType COMM_TYPE;
       static const std::vector< base::RequestResponse< tEventID > >& RR;
+      static const std::vector< base::Notification< tEventID > >& N;
    };
 
 
 
    struct BaseData : public Types
    {
+      BaseData( ) = default;
+      virtual ~BaseData( ) = default;
    };
 
 
 
    struct RequestTriggerStateData : public BaseData
    {
+      static const eOnOff REQUEST;
+      static const eOnOff RESPONSE;
+      static const eOnOff BUSY;
+
+      RequestTriggerStateData( ) = default;
       RequestTriggerStateData( const std::string&, const size_t );
-      static const eOnOff id;
+      ~RequestTriggerStateData( ) override = default;
 
       std::string state = "";
       size_t delay = 0;
@@ -181,10 +199,13 @@ namespace api::onoff::no_ipc {
 
    struct ResponseTriggerStateData : public BaseData
    {
-      using RequestData = RequestTriggerStateData;
+      static const eOnOff REQUEST;
+      static const eOnOff RESPONSE;
+      static const eOnOff BUSY;
 
+      ResponseTriggerStateData( ) = default;
       ResponseTriggerStateData( const bool );
-      static const eOnOff id;
+      ~ResponseTriggerStateData( ) override = default;
 
       bool result = false;
    };
@@ -193,8 +214,13 @@ namespace api::onoff::no_ipc {
 
    struct NotificationCurrentStateData : public BaseData
    {
+      static const eOnOff SUBSCRIBE;
+      static const eOnOff UNSUBSCRIBE;
+      static const eOnOff NOTIFICATION;
+
+      NotificationCurrentStateData( ) = default;
       NotificationCurrentStateData( const std::string& );
-      static const eOnOff id;
+      ~NotificationCurrentStateData( ) override = default;
 
       std::string state = "";
    };
@@ -205,7 +231,7 @@ namespace api::onoff::no_ipc {
 
 namespace api::onoff {
 
-   namespace data = api::onoff::no_ipc;
+   namespace data = api::onoff::ipc;
 
    extern const std::string interface_name;
 

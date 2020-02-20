@@ -28,6 +28,12 @@ private:
 public:
    virtual void request_trigger_state( const std::string&, const size_t ) = 0;
    void response_trigger_state( const bool );
+
+public:
+   void current_state( const std::string& );
+   const std::string& current_state( ) const;
+private:
+   std::string m_current_state = "";
 };
 
 
