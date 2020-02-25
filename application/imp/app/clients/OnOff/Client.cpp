@@ -7,13 +7,14 @@
 
 
 
-namespace application::components::onoff {
+namespace application::clients::onoff {
 
 
 
-Client::Client( const std::string& role_name, const std::string& name )
+Client::Client( const std::string& role_name, const std::string& name, tConnectedCallback connected_callback )
    : api::onoff::Client( role_name )
    , m_name( name )
+   , m_connected_callback( connected_callback )
 {
    DBG_TRC( "%s: created", m_name.c_str( ) );
    subscribe_current_state( );
@@ -23,6 +24,17 @@ Client::~Client( )
 {
    DBG_TRC( "%s: destroyed", m_name.c_str( ) );
    unsubscribe_current_state( );
+}
+
+void Client::connected( )
+{
+   DBG_MSG( );
+   m_connected_callback( );
+}
+
+void Client::disconnected( )
+{
+   DBG_MSG( );
 }
 
 void Client::response_trigger_state( const bool result )
@@ -48,4 +60,4 @@ void Client::on_current_state( const std::string& state )
 
 
 
-} // namespace application::components::onoff
+} // namespace application::clients::onoff

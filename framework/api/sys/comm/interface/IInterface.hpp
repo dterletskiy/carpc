@@ -18,7 +18,7 @@ namespace base {
 
       const void* ptr = nullptr;
    };
-   DECLARE_IPC_EVENT( InterfaceEvent, InterfaceEventData, eInterface );
+   DECLARE_IPC_EVENT_RR( InterfaceEvent, InterfaceEventData, eInterface );
 
 } // namespace base
 

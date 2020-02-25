@@ -20,7 +20,7 @@ public:
 
    const bool operator<( const Timer& ) const;
 
-   bool start( const long int microseconds );
+   bool start( const long int nanoseconds );
    bool stop( );
 
 public:
@@ -34,9 +34,9 @@ private:
    TimerID           m_id = nullptr;
 
 public:
-   long int microseconds( ) const;
+   long int nanoseconds( ) const;
 private:
-   long int          m_microseconds = 0;
+   long int          m_nanoseconds = 0;
 
 private:
    ITimerConsumer*   mp_consumer = nullptr;

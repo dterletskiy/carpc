@@ -15,9 +15,6 @@ namespace api::onoff {
       , Undefined
    );
 
-   extern const std::vector< base::RequestResponse< eOnOff > > s_rr;
-   extern const std::vector< base::Notification< eOnOff > > s_n;
-
 } // namespace api::onoff
 
 
@@ -52,8 +49,8 @@ namespace api::onoff::ipc {
       using tEventID = OnOffEvent::ID;
 
       static const base::eCommType COMM_TYPE;
-      static const std::vector< base::RequestResponse< tEventID > >& RR;
-      static const std::vector< base::Notification< tEventID > >& N;
+      static const std::vector< base::RequestResponseIDs< tEventID > >& RR;
+      static const std::vector< base::NotificationIDs< tEventID > >& N;
    };
 
 
@@ -167,8 +164,8 @@ namespace api::onoff::no_ipc {
       using tEventID = OnOffEvent::ID;
 
       static const base::eCommType COMM_TYPE;
-      static const std::vector< base::RequestResponse< tEventID > >& RR;
-      static const std::vector< base::Notification< tEventID > >& N;
+      static const std::vector< base::RequestResponseIDs< tEventID > >& RR;
+      static const std::vector< base::NotificationIDs< tEventID > >& N;
    };
 
 
@@ -231,7 +228,7 @@ namespace api::onoff::no_ipc {
 
 namespace api::onoff {
 
-   namespace data = api::onoff::ipc;
+   namespace data = api::onoff::no_ipc;
 
    extern const std::string interface_name;
 

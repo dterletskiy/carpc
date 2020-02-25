@@ -15,7 +15,6 @@ namespace base {
 
       virtual const IEventSignature* const create_copy( ) const = 0;
 
-      virtual bool operator==( const IEventSignature& ) const = 0;
       virtual bool operator<( const IEventSignature& ) const = 0;
 
       virtual const bool to_buffer( ByteBufferT& ) const = 0;

@@ -21,12 +21,12 @@ namespace application::events {
       bool to_buffer( base::ByteBufferT& ) const;
       bool from_buffer( base::ByteBufferT& );
 
-      std::string    info = "";
+      std::string message = "";
    };
 
 
 
-   enum class eEventID : size_t { request, response };
+   enum class eEventID : size_t { boot, ping };
 
 
 

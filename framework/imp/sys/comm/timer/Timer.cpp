@@ -129,7 +129,7 @@ const bool Timer::operator<( const Timer& timer ) const
    return m_id < timer.m_id;
 }
 
-bool Timer::start( const long int microseconds )
+bool Timer::start( const long int nanoseconds )
 {
    if( true == m_is_running )
    {
@@ -137,14 +137,14 @@ bool Timer::start( const long int microseconds )
       return false;
    }
 
-   if( 0 >= microseconds )
+   if( 0 >= nanoseconds )
    {
-      SYS_ERR( "Invalid period value: %ld", microseconds );
+      SYS_ERR( "Invalid period value: %ld", nanoseconds );
       return false;
    }
 
-   m_microseconds = microseconds;
-   if( false == os::linux::timer::start( m_id, microseconds, os::linux::timer::eTimerType::continious ) )
+   m_nanoseconds = nanoseconds;
+   if( false == os::linux::timer::start( m_id, nanoseconds, os::linux::timer::eTimerType::continious ) )
    {
       SYS_ERR( "start timer error" );
       return false;
@@ -164,7 +164,7 @@ bool Timer::stop( )
    }
 
    m_is_running = false;
-   m_microseconds = 0;
+   m_nanoseconds = 0;
 
    if( false == os::linux::timer::stop( m_id ) )
    {

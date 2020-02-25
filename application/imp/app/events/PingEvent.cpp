@@ -12,13 +12,13 @@ namespace application::events {
    {
    }
 
-   PingEventData::PingEventData( const std::string& _info )
-      : info( _info )
+   PingEventData::PingEventData( const std::string& _message )
+      : message( _message )
    {
    }
 
    PingEventData::PingEventData( const PingEventData& data )
-      : info( data.info )
+      : message( data.message )
    {
    }
 
@@ -33,12 +33,12 @@ namespace application::events {
 
    bool PingEventData::to_buffer( base::ByteBufferT& buffer ) const
    {
-      return buffer.push( info );
+      return buffer.push( message );
    }
 
    bool PingEventData::from_buffer( base::ByteBufferT&  buffer )
    {
-      return buffer.pop( info );
+      return buffer.pop( message );
    }
 
 } // namespace application::events

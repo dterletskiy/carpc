@@ -7,11 +7,11 @@ namespace api::onoff {
 
    const std::string interface_name = "OnOff";
 
-   const std::vector< base::RequestResponse< eOnOff > > s_rr = {
+   const std::vector< base::RequestResponseIDs< eOnOff > > s_rr = {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState }
    };
 
-   const std::vector< base::Notification< eOnOff > > s_n = {
+   const std::vector< base::NotificationIDs< eOnOff > > s_n = {
       { eOnOff::SubscribeCurrentState, eOnOff::UnsubscribeCurrentState, eOnOff::NotificationCurrentState }
    };
 
@@ -22,8 +22,8 @@ namespace api::onoff {
 namespace api::onoff::ipc {
 
    const base::eCommType Types::COMM_TYPE = base::eCommType::IPC;
-   const std::vector< base::RequestResponse< Types::tEventID > >& Types::RR = s_rr;
-   const std::vector< base::Notification< Types::tEventID > >& Types::N = s_n;
+   const std::vector< base::RequestResponseIDs< Types::tEventID > >& Types::RR = s_rr;
+   const std::vector< base::NotificationIDs< Types::tEventID > >& Types::N = s_n;
 
 
 
@@ -171,8 +171,8 @@ INIT_EVENT( api::onoff::ipc::OnOffEvent );
 namespace api::onoff::no_ipc {
 
    const base::eCommType Types::COMM_TYPE = base::eCommType::ITC;
-   const std::vector< base::RequestResponse< Types::tEventID > >& Types::RR = s_rr;
-   const std::vector< base::Notification< Types::tEventID > >& Types::N = s_n;
+   const std::vector< base::RequestResponseIDs< Types::tEventID > >& Types::RR = s_rr;
+   const std::vector< base::NotificationIDs< Types::tEventID > >& Types::N = s_n;
 
 
 

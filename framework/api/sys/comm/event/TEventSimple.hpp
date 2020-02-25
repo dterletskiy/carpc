@@ -41,19 +41,10 @@ public:
    public:
       Signature( ) : _TEventBase::Signature( ) { }
       Signature( const Signature& other ) : _TEventBase::Signature( other ) { }
-      ~Signature( ) override { }
+      ~Signature( ) override = default;
       const IEventSignature* const create_copy( ) const { return new Signature( *this ); }
 
    public:
-      bool operator==( const IEventSignature& signature ) const override
-      {
-         if( signature.type_id( ) != _TEventBase::Signature::s_type_id )
-            return false;
-         if( signature.type( ) != _TEventBase::Signature::s_type_event )
-            return false;
-         return true;
-      }
-
       bool operator<( const IEventSignature& signature ) const override
       {
          if( signature.type_id( ) != _TEventBase::Signature::s_type_id )

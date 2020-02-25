@@ -59,8 +59,8 @@ void boot( )
    base::ServiceInfoVector services =
    {
         { "OnOff_Service", { application::components::onoff::Component::creator }, 5 }
-      // , { "Driver_Service", { application::components::driver::Component::creator }, 10 }
-      // , { "Device_Service", { application::components::master::Component::creator, application::components::slave::Component::creator }, 10 }
+      , { "Driver_Service", { application::components::driver::Component::creator }, 10 }
+      , { "Device_Service", { application::components::master::Component::creator, application::components::slave::Component::creator }, 10 }
    };
 
    base::ServiceProcessPtr p_process = base::ServiceProcess::instance( );

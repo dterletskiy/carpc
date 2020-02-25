@@ -91,3 +91,7 @@ version 1.4.0
 
 verion 1.4.1
  - Notifications implemented
+
+verion 1.4.2
+ - Fixing TServer/TProxy implementation.
+ - Implemented example for interface usage from different threads and components.

@@ -114,9 +114,9 @@ TServer< TYPES >::TServer( const std::string& name, const std::string& role_name
       TYPES::tEvent::set_notification( this, typename TYPES::tEvent::Signature( role( ), rr_item.request, nullptr, nullptr, 0 ) );
    }
 
-   InterfaceEvent::Event::set_notification( this, { eInterface::ClientConnected } );
-   InterfaceEvent::Event::set_notification( this, { eInterface::ClientDisconnected } );
-   InterfaceEvent::Event::create_send( { eInterface::ServerConnected }, { this }, TYPES::COMM_TYPE );
+   InterfaceEvent::Event::set_notification( this, { role( ), eInterface::ClientConnected } );
+   InterfaceEvent::Event::set_notification( this, { role( ), eInterface::ClientDisconnected } );
+   InterfaceEvent::Event::create_send( { role( ), eInterface::ServerConnected }, { this }, TYPES::COMM_TYPE );
 }
 
 template< typename TYPES >
@@ -124,20 +124,27 @@ TServer< TYPES >::~TServer( )
 {
    TYPES::tEvent::clear_all_notifications( this );
    InterfaceEvent::Event::clear_all_notifications( this );
-   InterfaceEvent::Event::create_send( { eInterface::ServerDisconnected }, { this }, TYPES::COMM_TYPE );
+   InterfaceEvent::Event::create_send( { role( ), eInterface::ServerDisconnected }, { this }, TYPES::COMM_TYPE );
 }
 
 template< typename TYPES >
 void TServer< TYPES >::connected( const void* const p_proxy )
 {
-   mp_proxy_set.emplace( reinterpret_cast< const tProxy* >( p_proxy ) );
+   const tProxy* const _p_proxy = reinterpret_cast< const tProxy* const >( p_proxy );
+   auto iterator = mp_proxy_set.find( _p_proxy );
+   if( mp_proxy_set.end( ) != iterator )
+      return;
+
+   mp_proxy_set.emplace( _p_proxy );
    connected( );
+   InterfaceEvent::Event::create_send( { role( ), eInterface::ServerConnected }, { this }, TYPES::COMM_TYPE );
 }
 
 template< typename TYPES >
 void TServer< TYPES >::disconnected( const void* const p_proxy )
 {
-   mp_proxy_set.erase( reinterpret_cast< const tProxy* >( p_proxy ) );
+   const tProxy* const _p_proxy = reinterpret_cast< const tProxy* const >( p_proxy );
+   mp_proxy_set.erase( _p_proxy );
    disconnected( );
 }
 

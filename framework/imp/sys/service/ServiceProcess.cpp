@@ -144,7 +144,7 @@ void ServiceProcess::boot( )
 {
    SYS_MSG( "booting..." );
 
-   sleep(1);
+   sleep(3);
 
    ServiceEvent::Event::create_send( { eServiceCommand::boot, "boot" }, eCommType::ITC );
 

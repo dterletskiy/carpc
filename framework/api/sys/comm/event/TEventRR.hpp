@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/comm/event/TEventBase.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -50,6 +51,13 @@ public:
          , mp_from_addr( from_addr )
          , mp_to_addr( to_addr )
          , m_seq_id( seq_id )
+         , m_context( base::os::Thread::current_id( ) )
+      { }
+      Signature( const std::string& service_name, const _IdType& id )
+         : _TEventBase::Signature( )
+         , m_service_name( service_name )
+         , m_id( id )
+         , m_context( base::os::Thread::current_id( ) )
       { }
       Signature( const Signature& other )
          : _TEventBase::Signature( other )
@@ -58,8 +66,9 @@ public:
          , mp_from_addr( other.mp_from_addr )
          , mp_to_addr( other.mp_to_addr )
          , m_seq_id( other.m_seq_id )
+         , m_context( other.m_context )
       { }
-      ~Signature( ) override { }
+      ~Signature( ) override = default;
       const IEventSignature* const create_copy( ) const { return new Signature( *this ); }
 
    public:
@@ -72,23 +81,11 @@ public:
                , ", from_addr: ", mp_from_addr
                , ", to_addr: ", mp_to_addr
                , ", seq_id: ", m_seq_id
+               , ", context: ", m_context
             );
       }
 
    public:
-      bool operator==( const IEventSignature& signature ) const override
-      {
-         if( signature.type_id( ) != _TEventBase::Signature::s_type_id )
-            return false;
-         if( signature.type( ) != _TEventBase::Signature::s_type_event )
-            return false;
-         if( static_cast< const Signature& >( signature ).m_service_name != m_service_name )
-            return false;
-         if( static_cast< const Signature& >( signature ).m_id != m_id )
-            return false;
-         return true;
-      }
-
       bool operator<( const IEventSignature& signature ) const override
       {
          if( signature.type_id( ) != _TEventBase::Signature::s_type_id )
@@ -100,6 +97,10 @@ public:
          if( static_cast< const Signature& >( signature ).m_service_name != m_service_name )
             return m_service_name < static_cast< const Signature& >( signature ).m_service_name;
 
+         if( static_cast< const Signature& >( signature ).mp_to_addr && mp_to_addr )
+            if( static_cast< const Signature& >( signature ).mp_to_addr != mp_to_addr )
+               return mp_to_addr < static_cast< const Signature& >( signature ).mp_to_addr;
+
          return m_id < static_cast< const Signature& >( signature ).m_id;
       }
 
@@ -107,13 +108,13 @@ public:
       const bool to_buffer( ByteBufferT& buffer ) const override
       {
          if constexpr( IS_IPC_EVENT )
-            return buffer.push( m_service_name, m_id, mp_from_addr, mp_to_addr, m_seq_id );
+            return buffer.push( m_service_name, m_id, mp_from_addr, mp_to_addr, m_seq_id, m_context );
          return false;
       }
       const bool from_buffer( ByteBufferT& buffer ) override
       {
          if constexpr( IS_IPC_EVENT )
-            return buffer.pop( m_seq_id, mp_to_addr, mp_from_addr, m_id, m_service_name );
+            return buffer.pop( m_context, m_seq_id, mp_to_addr, mp_from_addr, m_id, m_service_name );
          return false;
       }
 
@@ -123,12 +124,14 @@ public:
       const void* from_addr( ) const { return mp_from_addr; }
       const void* to_addr( ) const { return mp_to_addr; }
       const SequenceID seq_id( ) const { return m_seq_id; }
+      const TID& context( ) const;
    private:
       std::string    m_service_name = { };
       _IdType        m_id = { };
       const void*    mp_from_addr = nullptr;
       const void*    mp_to_addr = nullptr;
       SequenceID     m_seq_id = 0;
+      TID            m_context;
    };
 
 // constructors

@@ -97,6 +97,9 @@ bool ServiceThread::insert_event( const EventPtr p_event )
       return false;
    }
 
+   if( false == is_subscribed( p_event ) )
+      return false;
+
    SYS_TRC( "'%s': inserting event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
    m_buffer_cond_var.lock( );
    m_events.push_back( p_event );

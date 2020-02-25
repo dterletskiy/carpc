@@ -29,7 +29,7 @@ void Server::request_trigger_state( const std::string& state, const size_t delay
    std::shared_ptr< base::Timer > timer = std::make_shared< base::Timer >( this );
    timer->start( delay );
    m_timers.emplace_back( TimerSeqID{ state, timer, unblock_request( ) } );
-   // m_timers.emplace_back( TimerSeqID{ timer, 0 } );
+   // m_timers.emplace_back( TimerSeqID{ state, timer, 0 } );
 }
 
 void Server::process_timer( const base::TimerID id )
