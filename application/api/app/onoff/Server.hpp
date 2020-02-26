@@ -32,8 +32,6 @@ public:
 public:
    void current_state( const std::string& );
    const std::string& current_state( ) const;
-private:
-   std::string m_current_state = "";
 };
 
 

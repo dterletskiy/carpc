@@ -41,12 +41,13 @@ namespace api::onoff::ipc {
 
 
 
-   struct Types
+   struct BaseTypes
    {
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
+      using tBaseData = BaseData;
 
       static const base::eCommType COMM_TYPE;
       static const std::vector< base::RequestResponseIDs< tEventID > >& RR;
@@ -55,7 +56,7 @@ namespace api::onoff::ipc {
 
 
 
-   struct BaseData : public Types
+   struct BaseData : public BaseTypes
    {
       BaseData( ) = default;
       virtual ~BaseData( ) = default;
@@ -134,6 +135,10 @@ namespace api::onoff::ipc {
       static const eOnOff ID;
    };
 
+   struct Types : public BaseTypes
+   {
+   };
+
 } // namespace api::onoff::ipc
 
 
@@ -156,12 +161,13 @@ namespace api::onoff::no_ipc {
 
 
 
-   struct Types
+   struct BaseTypes
    {
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
+      using tBaseData = BaseData;
 
       static const base::eCommType COMM_TYPE;
       static const std::vector< base::RequestResponseIDs< tEventID > >& RR;
@@ -170,7 +176,7 @@ namespace api::onoff::no_ipc {
 
 
 
-   struct BaseData : public Types
+   struct BaseData : public BaseTypes
    {
       BaseData( ) = default;
       virtual ~BaseData( ) = default;
@@ -220,6 +226,10 @@ namespace api::onoff::no_ipc {
       ~NotificationCurrentStateData( ) override = default;
 
       std::string state = "";
+   };
+
+   struct Types : public BaseTypes
+   {
    };
 
 } // namespace api::onoff::no_ipc

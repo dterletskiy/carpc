@@ -40,12 +40,20 @@ void Server::response_trigger_state( const bool result )
 
 void Server::process_request_event( const data::OnOffEvent::Event& event )
 {
-   switch( event.info( ).id( ) )
+   auto event_id = event.info( ).id( );
+   switch( event_id )
    {
       case eOnOff::RequestTriggerState:
       {
          const data::RequestTriggerStateData* request_data = get_event_data< data::RequestTriggerStateData >( event );
-         request_trigger_state( request_data->state, request_data->delay );
+         if( nullptr == request_data )
+         {
+            DBG_ERR( "missing tequest data for request ID: %s", to_string( event_id ).c_str( ) );
+         }
+         else
+         {
+            request_trigger_state( request_data->state, request_data->delay );
+         }
          break;
       }
       default: break;
@@ -54,15 +62,18 @@ void Server::process_request_event( const data::OnOffEvent::Event& event )
 
 void Server::current_state( const std::string& _current_state )
 {
-   DBG_MSG( );
-   m_current_state = _current_state;
-   notify< data::NotificationCurrentStateData >( m_current_state );
+   notify< data::NotificationCurrentStateData >( _current_state );
 }
 
 const std::string& Server::current_state( ) const
 {
-   DBG_MSG( );
-   return m_current_state;
+   auto p_data = attribute< data::NotificationCurrentStateData >( );
+   if( nullptr == p_data )
+   {
+      static const std::string state = "";
+      return state;
+   }
+   return p_data->state;
 }
 
 

@@ -12,18 +12,14 @@ namespace api::onoff {
 
 
 Client::Client( const std::string& role_name )
-   : base::TClient< data::Types >( )
+   : base::TClient< data::Types >( api::onoff::interface_name, role_name )
 {
    // DBG_TRC( "Created" );
-   mp_proxy = base::TProxy< data::Types >::create( api::onoff::interface_name, role_name );
-   mp_proxy->register_client( this );
-   mp_proxy->subscribe< data::NotificationCurrentStateData >( this );
 }
 
 Client::~Client( )
 {
    // DBG_TRC( "Destroyed" );
-   mp_proxy->unregister_client( this );
 }
 
 void Client::connected( )

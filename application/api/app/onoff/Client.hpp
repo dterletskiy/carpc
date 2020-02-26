@@ -1,7 +1,6 @@
 #pragma once
 
 // Framework
-#include "api/sys/comm/interface/TProxy.hpp"
 #include "api/sys/comm/interface/TClient.hpp"
 // Application
 #include "Data.hpp"
@@ -35,9 +34,6 @@ private:
    virtual void request_trigger_state_failed( ) = 0;
    virtual void response_trigger_state( const bool ) = 0;
    virtual void on_current_state( const std::string& ) = 0;
-
-private:
-   base::TProxy< data::Types >* mp_proxy = nullptr;
 };
 
 

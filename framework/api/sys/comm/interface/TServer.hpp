@@ -77,6 +77,8 @@ protected:
       void response( const Args&... args );
    template< typename tNotificationData, typename... Args >
       void notify( const Args&... args );
+   template< typename tNotificationData >
+      const tNotificationData* attribute( ) const;
    template< typename tRequestData >
       const tRequestData* get_event_data( const typename TYPES::tEvent& event );
 
@@ -97,6 +99,7 @@ protected:
    SequenceID                                m_seq_id = 0;
    std::optional< typename TYPES::tEventID > m_processing_event_id = std::nullopt;
    std::optional< SequenceID >               m_processing_seq_id = std::nullopt;
+   std::map< typename TYPES::tEventID, std::shared_ptr< typename TYPES::tBaseData > > m_attribute_map;
 };
 
 
@@ -109,9 +112,13 @@ TServer< TYPES >::TServer( const std::string& name, const std::string& role_name
 {
    for( auto rr_item : TYPES::RR )
    {
-      m_request_status_map.emplace( std::make_pair( rr_item.request, RequestStatus{ } ) );
-      m_request_info_map.emplace( std::make_pair( rr_item.request, tRequestInfoSet{ } ) );
+      m_request_status_map.emplace( rr_item.request, RequestStatus{ } );
+      m_request_info_map.emplace( rr_item.request, tRequestInfoSet{ } );
       TYPES::tEvent::set_notification( this, typename TYPES::tEvent::Signature( role( ), rr_item.request, nullptr, nullptr, 0 ) );
+   }
+   for( auto n_item : TYPES::N )
+   {
+      m_attribute_map.emplace( n_item.notification, nullptr );
    }
 
    InterfaceEvent::Event::set_notification( this, { role( ), eInterface::ClientConnected } );
@@ -303,11 +310,35 @@ template< typename TYPES >
 template< typename tNotificationData, typename... Args >
 void TServer< TYPES >::notify( const Args&... args )
 {
-   typename TYPES::tEventData data( std::make_shared< tNotificationData >( args... ) );
+   auto iterator = m_attribute_map.find( tNotificationData::NOTIFICATION );
+   if( m_attribute_map.end( ) == iterator )
+   {
+      SYS_WRN( "not a notification ID: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+      return;
+   }
+
+   std::shared_ptr< typename TYPES::tBaseData > p_base_data = std::make_shared< tNotificationData >( args... );
+   typename TYPES::tEventData data( p_base_data );
    TYPES::tEvent::create_send(
       typename TYPES::tEvent::Signature( role( ), tNotificationData::NOTIFICATION, this, nullptr, 0 )
       , data, TYPES::COMM_TYPE
    );
+
+   iterator->second = p_base_data;
+}
+
+template< typename TYPES >
+template< typename tNotificationData >
+const tNotificationData* TServer< TYPES >::attribute( ) const
+{
+   auto iterator = m_attribute_map.find( tNotificationData::NOTIFICATION );
+   if( m_attribute_map.end( ) == iterator )
+   {
+      SYS_WRN( "not a notification ID: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+      return nullptr;
+   }
+
+   return static_cast< tNotificationData* >( iterator->second.get( ) );
 }
 
 template< typename TYPES >

@@ -21,9 +21,9 @@ namespace api::onoff {
 
 namespace api::onoff::ipc {
 
-   const base::eCommType Types::COMM_TYPE = base::eCommType::IPC;
-   const std::vector< base::RequestResponseIDs< Types::tEventID > >& Types::RR = s_rr;
-   const std::vector< base::NotificationIDs< Types::tEventID > >& Types::N = s_n;
+   const base::eCommType BaseTypes::COMM_TYPE = base::eCommType::IPC;
+   const std::vector< base::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
+   const std::vector< base::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
 
 
 
@@ -170,9 +170,9 @@ INIT_EVENT( api::onoff::ipc::OnOffEvent );
 
 namespace api::onoff::no_ipc {
 
-   const base::eCommType Types::COMM_TYPE = base::eCommType::ITC;
-   const std::vector< base::RequestResponseIDs< Types::tEventID > >& Types::RR = s_rr;
-   const std::vector< base::NotificationIDs< Types::tEventID > >& Types::N = s_n;
+   const base::eCommType BaseTypes::COMM_TYPE = base::eCommType::ITC;
+   const std::vector< base::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
+   const std::vector< base::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
 
 
 

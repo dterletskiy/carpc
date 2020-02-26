@@ -5,7 +5,7 @@
    <version major="0" minor="1" patch="0"/>
 
    <configuration>
-      <config name="SYS_TRACE" status="inactive"/>
+      <config name="SYS_TRACE" status="active"/>
       <config name="DBG_TRACE" status="active"/>
       <config name="COLORED_TRACE" status="active"/>
       <config name="MEMORY_HOOK" status="inactive"/>
