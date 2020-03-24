@@ -11,8 +11,9 @@ namespace api::onoff {
 
    DEFINE_ENUM( eOnOff, size_t
       , RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState
+      , RequestStart
       , SubscribeCurrentState, UnsubscribeCurrentState, NotificationCurrentState
-      , Undefined
+      , Undefined // Must present always for all interfaces
    );
 
 } // namespace api::onoff
@@ -106,6 +107,24 @@ namespace api::onoff::ipc {
       ~ResponseTriggerStateData( ) override = default;
 
       bool result = false;
+
+   private:
+      bool to_buffer( base::ByteBufferT& ) override;
+      bool from_buffer( base::ByteBufferT& ) override;
+      const eOnOff id( ) const override;
+      static const eOnOff ID;
+   };
+
+
+
+   struct RequestStartData : public BaseData
+   {
+      static const eOnOff REQUEST;
+      static const eOnOff RESPONSE;
+      static const eOnOff BUSY;
+
+      RequestStartData( ) = default;
+      ~RequestStartData( ) override = default;
 
    private:
       bool to_buffer( base::ByteBufferT& ) override;
@@ -211,6 +230,18 @@ namespace api::onoff::no_ipc {
       ~ResponseTriggerStateData( ) override = default;
 
       bool result = false;
+   };
+
+
+
+   struct RequestStartData : public BaseData
+   {
+      static const eOnOff REQUEST;
+      static const eOnOff RESPONSE;
+      static const eOnOff BUSY;
+
+      RequestStartData( ) = default;
+      ~RequestStartData( ) override = default;
    };
 
 

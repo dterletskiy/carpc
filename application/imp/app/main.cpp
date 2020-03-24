@@ -43,7 +43,6 @@ namespace memory {
 
 
 
-
 void test( )
 {
 }

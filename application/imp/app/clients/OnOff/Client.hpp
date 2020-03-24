@@ -29,6 +29,7 @@ private:
    void on_current_state( const std::string& ) override;
 
 public:
+   void request_start( );
    void request_trigger_state( const std::string&, const size_t );
 
 private:

@@ -32,6 +32,12 @@ void Client::disconnected( )
    DBG_MSG( );
 }
 
+void Client::request_start( )
+{
+   DBG_TRC( );
+   mp_proxy->request< data::RequestStartData >( this );
+}
+
 const size_t Client::request_trigger_state( const std::string& state, const size_t delay )
 {
    DBG_TRC( "state: %s / delay: %zu", state.c_str( ), delay );

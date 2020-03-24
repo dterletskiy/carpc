@@ -8,7 +8,8 @@ namespace api::onoff {
    const std::string interface_name = "OnOff";
 
    const std::vector< base::RequestResponseIDs< eOnOff > > s_rr = {
-      { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState }
+      { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState },
+      { eOnOff::RequestStart, eOnOff::Undefined, eOnOff::Undefined }
    };
 
    const std::vector< base::NotificationIDs< eOnOff > > s_n = {
@@ -63,27 +64,13 @@ namespace api::onoff::ipc {
    const eOnOff RequestTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
    RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay )
-      : BaseData( )
-      , state( _state )
-      , delay( _delay )
-   {
-   }
+      : BaseData( ), state( _state ), delay( _delay ) { }
 
    const eOnOff RequestTriggerStateData::ID = eOnOff::RequestTriggerState;
-   const eOnOff RequestTriggerStateData::id( ) const
-   {
-      return ID;
-   }
+   const eOnOff RequestTriggerStateData::id( ) const { return ID; }
 
-   bool RequestTriggerStateData::to_buffer( base::ByteBufferT& buffer )
-   {
-      return buffer.push( state, delay );
-   }
-
-   bool RequestTriggerStateData::from_buffer( base::ByteBufferT& buffer )
-   {
-      return buffer.pop( delay, state );
-   }
+   bool RequestTriggerStateData::to_buffer( base::ByteBufferT& buffer ) { return buffer.push( state, delay ); }
+   bool RequestTriggerStateData::from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( delay, state ); }
 
 
 
@@ -92,26 +79,25 @@ namespace api::onoff::ipc {
    const eOnOff ResponseTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
    ResponseTriggerStateData::ResponseTriggerStateData( const bool _result )
-      : BaseData( )
-      , result( _result )
-   {
-   }
+      : BaseData( ), result( _result ) { }
 
    const eOnOff ResponseTriggerStateData::ID = eOnOff::ResponseTriggerState;
-   const eOnOff ResponseTriggerStateData::id( ) const
-   {
-      return ID;
-   }
+   const eOnOff ResponseTriggerStateData::id( ) const { return ID; }
 
-   bool ResponseTriggerStateData::to_buffer( base::ByteBufferT& buffer )
-   {
-      return buffer.push( result );
-   }
+   bool ResponseTriggerStateData::to_buffer( base::ByteBufferT& buffer ) { return buffer.push( result ); }
+   bool ResponseTriggerStateData::from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( result ); }
 
-   bool ResponseTriggerStateData::from_buffer( base::ByteBufferT& buffer )
-   {
-      return buffer.pop( result );
-   }
+
+
+   const eOnOff RequestStartData::REQUEST = eOnOff::RequestStart;
+   const eOnOff RequestStartData::RESPONSE = eOnOff::Undefined;
+   const eOnOff RequestStartData::BUSY = eOnOff::Undefined;
+
+   const eOnOff RequestStartData::ID = eOnOff::RequestTriggerState;
+   const eOnOff RequestStartData::id( ) const { return ID; }
+
+   bool RequestStartData::to_buffer( base::ByteBufferT& buffer ) { return true; }
+   bool RequestStartData::from_buffer( base::ByteBufferT& buffer ) { return true; }
 
 
 
@@ -120,42 +106,23 @@ namespace api::onoff::ipc {
    const eOnOff NotificationCurrentStateData::NOTIFICATION = eOnOff::NotificationCurrentState;
 
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
-      : BaseData( )
-      , state( _state )
-   {
-   }
+      : BaseData( ), state( _state ) { }
 
    const eOnOff NotificationCurrentStateData::ID = eOnOff::NotificationCurrentState;
-   const eOnOff NotificationCurrentStateData::id( ) const
-   {
-      return ID;
-   }
+   const eOnOff NotificationCurrentStateData::id( ) const { return ID; }
 
-   bool NotificationCurrentStateData::to_buffer( base::ByteBufferT& buffer )
-   {
-      return buffer.push( state );
-   }
-
-   bool NotificationCurrentStateData::from_buffer( base::ByteBufferT& buffer )
-   {
-      return buffer.pop( state );
-   }
+   bool NotificationCurrentStateData::to_buffer( base::ByteBufferT& buffer ) { return buffer.push( state ); }
+   bool NotificationCurrentStateData::from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( state ); }
 
 
 
-   OnOffEventData::OnOffEventData( tBaseDataPtr _ptr )
-      : ptr( _ptr )
-   {
-   }
+   OnOffEventData::OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
 
    bool OnOffEventData::to_buffer( base::ByteBufferT& buffer ) const
    {
-      if( nullptr == ptr )
-         return true;
-
+      if( nullptr == ptr ) return true;
       return ptr->serrialize( buffer );
    }
-
    bool OnOffEventData::from_buffer( base::ByteBufferT& buffer )
    {
       ptr = BaseData::create( buffer );
@@ -181,11 +148,7 @@ namespace api::onoff::no_ipc {
    const eOnOff RequestTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
    RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay  )
-      : BaseData( )
-      , state( _state )
-      , delay( _delay )
-   {
-   }
+      : BaseData( ), state( _state ), delay( _delay ) { }
 
 
 
@@ -194,10 +157,13 @@ namespace api::onoff::no_ipc {
    const eOnOff ResponseTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
    ResponseTriggerStateData::ResponseTriggerStateData( const bool _result )
-      : BaseData( )
-      , result( _result )
-   {
-   }
+      : BaseData( ), result( _result ) { }
+
+
+
+   const eOnOff RequestStartData::REQUEST = eOnOff::RequestStart;
+   const eOnOff RequestStartData::RESPONSE = eOnOff::Undefined;
+   const eOnOff RequestStartData::BUSY = eOnOff::Undefined;
 
 
 
@@ -206,17 +172,11 @@ namespace api::onoff::no_ipc {
    const eOnOff NotificationCurrentStateData::NOTIFICATION = eOnOff::NotificationCurrentState;
 
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
-      : BaseData( )
-      , state( _state )
-   {
-   }
+      : BaseData( ), state( _state ) { }
 
 
 
-   OnOffEventData::OnOffEventData( tBaseDataPtr _ptr )
-      : ptr( _ptr )
-   {
-   }
+   OnOffEventData::OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
 
 } // namespace api::onoff::no_ipc
 

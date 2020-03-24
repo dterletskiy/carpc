@@ -54,8 +54,8 @@ class TServer
 {
 protected:
    using tProxy = TProxy< TYPES >;
-   using tRequestInfoSet = std::set< RequestInfo >;
    using tRequestStatusMap = std::map< typename TYPES::tEventID, RequestStatus >;
+   using tRequestInfoSet = std::set< RequestInfo >;
    using tRequestInfoMap = std::map< typename TYPES::tEventID, tRequestInfoSet >;
 
 public:
@@ -137,21 +137,28 @@ TServer< TYPES >::~TServer( )
 template< typename TYPES >
 void TServer< TYPES >::connected( const void* const p_proxy )
 {
+   // Check if current proxy was connected previously
    const tProxy* const _p_proxy = reinterpret_cast< const tProxy* const >( p_proxy );
    auto iterator = mp_proxy_set.find( _p_proxy );
    if( mp_proxy_set.end( ) != iterator )
       return;
 
+   // Add connected proxy to local collection
    mp_proxy_set.emplace( _p_proxy );
+   // Notifying final server implementation about connected proxy
    connected( );
+
+   // Send event to all consumers (just connected proxy) that server is connected
    InterfaceEvent::Event::create_send( { role( ), eInterface::ServerConnected }, { this }, TYPES::COMM_TYPE );
 }
 
 template< typename TYPES >
 void TServer< TYPES >::disconnected( const void* const p_proxy )
 {
+   // Remove just disconnected proxy from local collection
    const tProxy* const _p_proxy = reinterpret_cast< const tProxy* const >( p_proxy );
    mp_proxy_set.erase( _p_proxy );
+   // Notifying final server implementation about disconnected proxy
    disconnected( );
 }
 
@@ -186,6 +193,17 @@ bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
    {
       SYS_WRN( "not a request ID: %s", to_string( event_id ).c_str( ) );
       return false;
+   }
+
+   // Check if received request has connected response
+   for( auto item : TYPES::RR )
+   {
+      if( event_id != item.request ) continue;
+      if( TYPES::tEventID::Undefined == item.response )
+         // Current request does not have connected response.
+         // In this case request status should not be set to busy and all all data for response is not needed. 
+         return true;
+      break;
    }
 
    // Check request status for current request ID

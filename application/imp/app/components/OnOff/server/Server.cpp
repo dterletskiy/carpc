@@ -22,6 +22,11 @@ Server::~Server( )
    DBG_MSG( "%s: destroyed", m_name.c_str( ) );
 }
 
+void Server::request_start( )
+{
+   DBG_MSG( );
+}
+
 void Server::request_trigger_state( const std::string& state, const size_t delay )
 {
    DBG_MSG( "%s: state: %s / delay: %zu", m_name.c_str( ), state.c_str( ), delay );

@@ -27,6 +27,7 @@ private:
    void process_notification_event( const data::OnOffEvent::Event& ) override;
 
 public:
+   void request_start( );
    const size_t request_trigger_state( const std::string&, const size_t );
    void subscribe_current_state( );
    void unsubscribe_current_state( );

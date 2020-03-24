@@ -75,25 +75,28 @@ namespace base {
          return InvalidSequenceID;
       }
 
-      size_t& count = event_id_iterator->second.m_count;
-      // In case if count for current request id is zero this means current proxy is not subscribed for corresponding responses of mentioned request
-      if( 0 == count )
+      // If response exists for current request
+      if( TYPES::tEventID::Undefined != tRequestData::RESPONSE )
       {
-         if( TYPES::tEventID::Undefined != tRequestData::RESPONSE )
+         size_t& count = event_id_iterator->second.m_count;
+         // In case if count for current request id is zero this means current proxy is not subscribed for corresponding responses of mentioned request
+         if( 0 == count )
+         {
             TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), tRequestData::RESPONSE, nullptr, mp_proxy, 0 ) );
-         TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), tRequestData::BUSY, nullptr, mp_proxy, 0 ) );
-      }
-      ++count;
+            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), tRequestData::BUSY, nullptr, mp_proxy, 0 ) );
+         }
+         ++count;
 
-      // Incrementing common sequence id for all requests in this proxy. This sequence id will be sent to server in event.
-      // Also new sequence id and corresponding client pointer are added to the map for later client identifying in response by sequence id
-      // received from server.
-      auto& client_map = event_id_iterator->second.m_client_map;
-      auto result = client_map.emplace( ++m_seq_id, p_client );
-      if( false == result.second )
-      {
-         SYS_WRN( "can not insert: %zu -> %p", m_seq_id, p_client );
-         return InvalidSequenceID;
+         // Incrementing common sequence id for all requests in this proxy. This sequence id will be sent to server in event.
+         // Also new sequence id and corresponding client pointer are added to the map for later client identifying in response by sequence id
+         // received from server.
+         auto& client_map = event_id_iterator->second.m_client_map;
+         auto result = client_map.emplace( ++m_seq_id, p_client );
+         if( false == result.second )
+         {
+            SYS_WRN( "can not insert: %zu -> %p", m_seq_id, p_client );
+            return InvalidSequenceID;
+         }
       }
 
       typename TYPES::tEventData data( std::make_shared< tRequestData >( args... ) );

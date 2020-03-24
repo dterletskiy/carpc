@@ -40,7 +40,8 @@ void Component::process_event( const events::ID::PingEvent::Event& event )
          if( nullptr == mp_client_onoff )
          {
             auto request = [ this ]( ){ mp_client_onoff->request_trigger_state( "Slave", 1000000000 ); };
-            mp_client_onoff = new clients::onoff::Client( "OnOffService", "OnOffService-Client-Slave", request );
+            auto request_start = [ this ]( ){ mp_client_onoff->request_start( ); };
+            mp_client_onoff = new clients::onoff::Client( "OnOffService", "OnOffService-Client-Slave", request_start );
          }
          break;
       }

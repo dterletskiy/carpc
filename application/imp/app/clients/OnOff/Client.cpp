@@ -37,6 +37,13 @@ void Client::disconnected( )
    DBG_MSG( );
 }
 
+void Client::request_start( )
+{
+   DBG_MSG( "%s", m_name.c_str( ) );
+   api::onoff::Client::request_start( );
+}
+
+
 void Client::response_trigger_state( const bool result )
 {
    DBG_MSG( "%s: result: %s", m_name.c_str( ), BOOL_TO_STRING( result ) );

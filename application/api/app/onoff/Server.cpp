@@ -43,6 +43,11 @@ void Server::process_request_event( const data::OnOffEvent::Event& event )
    auto event_id = event.info( ).id( );
    switch( event_id )
    {
+      case eOnOff::RequestStart:
+      {
+         request_start( );
+         break;
+      }
       case eOnOff::RequestTriggerState:
       {
          const data::RequestTriggerStateData* request_data = get_event_data< data::RequestTriggerStateData >( event );
