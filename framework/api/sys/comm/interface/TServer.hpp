@@ -11,12 +11,6 @@ namespace base {
 
    enum class eRequestStatus : size_t { BUSY, READY };
 
-   struct RequestStatus
-   {
-      eRequestStatus status = eRequestStatus::READY;
-      SequenceID processing_server_seq_id = InvalidSequenceID;
-   };
-
    struct RequestInfo
    {
       RequestInfo( const SequenceID _server_seq_id )
@@ -32,6 +26,13 @@ namespace base {
       SequenceID server_seq_id = InvalidSequenceID;
       SequenceID client_seq_id = InvalidSequenceID;
       const void* client_addr = nullptr;
+   };
+
+   struct RequestStatus
+   {
+      eRequestStatus status = eRequestStatus::READY;
+      SequenceID processing_server_seq_id = InvalidSequenceID;
+      std::set< RequestInfo > info_set;
    };
 
 }
@@ -54,9 +55,9 @@ class TServer
 {
 protected:
    using tProxy = TProxy< TYPES >;
-   using tRequestStatusMap = std::map< typename TYPES::tEventID, RequestStatus >;
-   using tRequestInfoSet = std::set< RequestInfo >;
-   using tRequestInfoMap = std::map< typename TYPES::tEventID, tRequestInfoSet >;
+   using tRequestResponseIDs = RequestResponseIDs< typename TYPES::tEventID >;
+   struct Comparator { bool operator( )( const tRequestResponseIDs& rr1, const tRequestResponseIDs& rr2 ) const { return rr1.request < rr2.request; } };
+   using tRequestStatusMap = std::map< tRequestResponseIDs, RequestStatus, Comparator >;
 
 public:
    TServer( const std::string&, const std::string& );
@@ -95,7 +96,6 @@ public:
 
 protected:
    tRequestStatusMap                         m_request_status_map;
-   tRequestInfoMap                           m_request_info_map;
    SequenceID                                m_seq_id = 0;
    std::optional< typename TYPES::tEventID > m_processing_event_id = std::nullopt;
    std::optional< SequenceID >               m_processing_seq_id = std::nullopt;
@@ -112,8 +112,7 @@ TServer< TYPES >::TServer( const std::string& name, const std::string& role_name
 {
    for( auto rr_item : TYPES::RR )
    {
-      m_request_status_map.emplace( rr_item.request, RequestStatus{ } );
-      m_request_info_map.emplace( rr_item.request, tRequestInfoSet{ } );
+      m_request_status_map.emplace( rr_item, RequestStatus{ } );
       TYPES::tEvent::set_notification( this, typename TYPES::tEvent::Signature( role( ), rr_item.request, nullptr, nullptr, 0 ) );
    }
    for( auto n_item : TYPES::N )
@@ -188,47 +187,26 @@ bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
    const SequenceID seq_id = event.info( ).seq_id( );
 
    // Find request event_id in request status map
-   auto iterator_status_map = m_request_status_map.find( event_id );
+   auto iterator_status_map = m_request_status_map.find( tRequestResponseIDs( event_id ) );
    if( m_request_status_map.end( ) == iterator_status_map )
    {
       SYS_WRN( "not a request ID: %s", to_string( event_id ).c_str( ) );
       return false;
    }
+   auto& rrIDs = iterator_status_map->first;
+   auto& request_status = iterator_status_map->second;
 
-   // Check if received request has connected response
-   for( auto item : TYPES::RR )
-   {
-      if( event_id != item.request ) continue;
-      if( TYPES::tEventID::Undefined == item.response )
-         // Current request does not have connected response.
-         // In this case request status should not be set to busy and all all data for response is not needed. 
-         return true;
-      break;
-   }
+   // Check if received request has connected response.
+   // If current request does not have connected response request status should not be set to busy and all data for response is not needed.
+   if( TYPES::tEventID::Undefined == rrIDs.response )
+      return true;
 
    // Check request status for current request ID
-   RequestStatus& request_status = iterator_status_map->second;
    if( eRequestStatus::BUSY == request_status.status )
    {
       SYS_WRN( "request busy: %s", to_string( event_id ).c_str( ) );
-      // Searching for request busy event id related to current request id
-      for( auto item : TYPES::RR )
-      {
-         if( event_id != item.request ) continue;
-
-         // Sending event with request busy id
-         TYPES::tEvent::create_send( typename TYPES::tEvent::Signature( role( ), item.busy, this, p_from_addr, seq_id ), TYPES::COMM_TYPE );
-         return false;
-      }
-      SYS_WRN( "request busy event id has not been found" );
-      return false;
-   }
-
-   // Find request ID in request info map
-   auto iterator_info_map = m_request_info_map.find( event_id );
-   if( m_request_info_map.end( ) == iterator_info_map )
-   {
-      SYS_WRN( "not a request ID: %s", to_string( event_id ).c_str( ) );
+      // Sending event with request busy id
+      TYPES::tEvent::create_send( typename TYPES::tEvent::Signature( role( ), rrIDs.busy, this, p_from_addr, seq_id ), TYPES::COMM_TYPE );
       return false;
    }
 
@@ -237,7 +215,7 @@ bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
    // Increment common sequence ID and set it's value to current processing sequence ID for current request ID
    request_status.processing_server_seq_id = ++m_seq_id;
    // Store RequestInfo structure to request info set 
-   iterator_info_map->second.emplace( m_seq_id, seq_id, p_from_addr );
+   request_status.info_set.emplace( m_seq_id, seq_id, p_from_addr );
    return true;
 }
 
@@ -246,25 +224,17 @@ template< typename tResponseData >
 std::optional< RequestInfo > TServer< TYPES >::prepare_response( )
 {
    // Find request id in request status map
-   auto iterator_status_map = m_request_status_map.find( tResponseData::REQUEST );
+   auto iterator_status_map = m_request_status_map.find( tRequestResponseIDs( tResponseData::REQUEST ) );
    if( m_request_status_map.end( ) == iterator_status_map )
    {
       SYS_WRN( "not a request ID: %s", to_string( tResponseData::REQUEST ).c_str( ) );
       return std::nullopt;
    }
-   RequestStatus& request_status = iterator_status_map->second;
-
-   // Find request ID in request info map
-   auto iterator_info_map = m_request_info_map.find( tResponseData::REQUEST );
-   if( m_request_info_map.end( ) == iterator_info_map )
-   {
-      SYS_WRN( "not a request ID: %s", to_string( tResponseData::REQUEST ).c_str( ) );
-      return std::nullopt;
-   }
+   auto& request_status = iterator_status_map->second;
+   auto& request_info_set = request_status.info_set;
 
    SequenceID serching_seq_id = m_processing_seq_id.value_or( request_status.processing_server_seq_id );
    // Search for RequestInfo structure in request infor set for current request ID
-   auto& request_info_set = iterator_info_map->second;
    auto iterator_info_set = request_info_set.find( RequestInfo{ serching_seq_id } );
    if( request_info_set.end( ) == iterator_info_set )
    {
@@ -291,14 +261,14 @@ const SequenceID TServer< TYPES >::unblock_request( )
    }
 
    // Find request id in request status map
-   auto iterator_status_map = m_request_status_map.find( m_processing_event_id.value( ) );
+   auto iterator_status_map = m_request_status_map.find( tRequestResponseIDs( m_processing_event_id.value( ) ) );
    if( m_request_status_map.end( ) == iterator_status_map )
    {
       SYS_WRN( "not a request ID: %s", to_string( m_processing_event_id.value( ) ).c_str( ) );
       return InvalidSequenceID;
    }
+   auto& request_status = iterator_status_map->second;
 
-   RequestStatus& request_status = iterator_status_map->second;
    request_status.status = eRequestStatus::READY;
    return request_status.processing_server_seq_id;
 }
