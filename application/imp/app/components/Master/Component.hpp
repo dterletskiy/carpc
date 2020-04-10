@@ -17,10 +17,10 @@ class Component
    , public events::ID::PingEvent::Consumer
 {
 public:
-   static base::ComponentPtr creator( base::ServiceThreadPtr );
+   static base::IComponent::tSptr creator( base::IServiceThread::tSptr );
 
 private:
-   Component( const base::ServiceThreadPtr, const std::string& );
+   Component( const base::IServiceThread::tSptr, const std::string& );
 public:
    ~Component( ) override;
 

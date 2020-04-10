@@ -26,6 +26,7 @@ const char* c_str( const eEventType comm_type )
       case eEventType::SIMPLE:      return "eEventType::SIMPLE";
       case eEventType::SIMPLE_ID:   return "eEventType::SIMPLE_ID";
       case eEventType::RR:          return "eEventType::RR";
+      case eEventType::RUNNABLE:    return "eEventType::RUNNABLE";
       default:                      return "eEventType::UNEFINED";
    }
 }

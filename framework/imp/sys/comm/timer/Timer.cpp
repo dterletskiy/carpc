@@ -2,7 +2,6 @@
 #include "api/sys/oswrappers/linux/signals.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/service/ServiceThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
 
@@ -16,7 +15,7 @@ namespace base {
 
 
 static base::os::Mutex mutex_consumer_map;
-static std::map< TimerID, ServiceThreadPtrW > consumer_map;
+static std::map< TimerID, IServiceThread::tWptr > consumer_map;
 
 // This convert method is used because Event::id could not have time TimerID (aka void*)
 const size_t convert( void* id )
@@ -36,7 +35,7 @@ void timer_processor( const TimerID timer_id )
       SYS_ERR( "Timer has not been found" );
       return;
    }
-   ServiceThreadPtrW pw_service = iterator->second;
+   IServiceThread::tWptr pw_service = iterator->second;
    mutex_consumer_map.unlock( );
 
    TimerEvent::Event::create_send_to_context( convert( timer_id ), { timer_id }, pw_service );
@@ -68,8 +67,8 @@ Timer::Timer( ITimerConsumer* p_consumer )
       return;
    }
 
-   ServiceThreadPtr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
-   if( InvalidServiceThreadPtr == p_service )
+   IServiceThread::tSptr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
+   if( nullptr == p_service )
    {
       SYS_ERR( "ServiceThread has not been found. Creating timer not in service thread" );
       return;

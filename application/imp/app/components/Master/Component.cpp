@@ -10,12 +10,12 @@ namespace application::components::master {
 
 
 
-base::ComponentPtr Component::creator( base::ServiceThreadPtr p_service )
+base::IComponent::tSptr Component::creator( base::IServiceThread::tSptr p_service )
 {
    return std::shared_ptr< Component >( new Component( p_service, "Master" ) );
 }
 
-Component::Component( const base::ServiceThreadPtr p_service, const std::string& name )
+Component::Component( const base::IServiceThread::tSptr p_service, const std::string& name )
    : base::Component( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
@@ -41,7 +41,7 @@ void Component::process_event( const events::ID::PingEvent::Event& event )
          {
             auto request = [ this ]( ){ mp_client_onoff->request_trigger_state( "Master", 5000000000 ); };
             auto request_start = [ this ]( ){ mp_client_onoff->request_start( ); };
-            mp_client_onoff = new clients::onoff::Client( "OnOffService", "OnOffService-Client-Master", request_start );
+            mp_client_onoff = new clients::onoff::Client( "OnOffService", "OnOffService-Client-Master", request );
          }
          break;
       }

@@ -1,3 +1,5 @@
+// Framework
+#include "api/sys/comm/event/IRunnable.hpp"
 // Application
 #include "imp/app/components/OnOff/Component.hpp"
 
@@ -86,12 +88,12 @@ namespace {
 
 
 
-base::ComponentPtr Component::creator( base::ServiceThreadPtr p_service )
+base::IComponent::tSptr Component::creator( base::IServiceThread::tSptr p_service )
 {
    return std::shared_ptr< Component >( new Component( p_service, "OnOff" ) );
 }
 
-Component::Component( const base::ServiceThreadPtr p_service, const std::string& name )
+Component::Component( const base::IServiceThread::tSptr p_service, const std::string& name )
    : base::RootComponent( p_service, name )
    , m_server_onoff( "OnOffService", "OnOffService-Server" )
 {
@@ -114,12 +116,20 @@ Component::~Component( )
 bool Component::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
+   sleep(3);
 
    // s_event_test.execute( );
 
    // events::NoID::PingEvent::Event::create_send( { "WTF!!!" } );
-   events::ID::PingEvent::Event::create_send( events::eEventID::boot, { "booting" } );
+   // events::ID::PingEvent::Event::create_send( events::eEventID::boot, { "booting" } );
    // events::IPC::PingEvent::Event::create_send( events::eEventID::ping, { "WTF!!!" }, base::eCommType::IPC );
+
+   auto operation = [ ]( )
+   {
+      DBG_MSG( "operation" );
+      events::ID::PingEvent::Event::create_send( events::eEventID::boot, { "booting" } );
+   };
+   base::IRunnable::create_send( operation );
 
    return true;
 }

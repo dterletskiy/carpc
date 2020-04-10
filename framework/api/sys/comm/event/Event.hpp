@@ -99,7 +99,7 @@
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
       using ID          = idType; \
-      using Signature   = Event::Signature; \
+      using Signature   = Event::_Signature; \
    }
 
 #define DECLARE_IPC_EVENT_RR( eventType, dataType, idType ) \
@@ -110,7 +110,7 @@
       using Consumer    = Event::_ConsumerType; \
       using Data        = dataType; \
       using ID          = idType; \
-      using Signature   = Event::Signature; \
+      using Signature   = Event::_Signature; \
    }
 
 
@@ -122,7 +122,7 @@
  *********************************************************************************/
 #define INIT_EVENT( eventType ) \
    template< > const base::EventTypeID eventType::Event::_TEventBase::Signature::s_type_id = { #eventType }; \
-   template< > const base::eEventType eventType::Event::_TEventBase::Signature::s_type_event = eventType::Event::Signature::build_type( );
+   template< > const base::eEventType eventType::Event::_TEventBase::Signature::s_type_event = eventType::Event::_Signature::build_type( );
 
 /**********************************************************************************
  *

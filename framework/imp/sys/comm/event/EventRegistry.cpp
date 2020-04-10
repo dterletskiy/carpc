@@ -11,10 +11,10 @@ namespace base {
 
 
 
-EventRegistryPtr EventRegistry::mp_instance;
+EventRegistry::tSptr EventRegistry::mp_instance;
 
 namespace { os::Mutex s_mutex; }
-EventRegistryPtr EventRegistry::instance( )
+EventRegistry::tSptr EventRegistry::instance( )
 {
    base::os::MutexAutoLocker locker( s_mutex );
    if( nullptr == mp_instance )
@@ -32,7 +32,7 @@ bool EventRegistry::register_event( const EventTypeID& event_type, EventCreator 
    return true;
 }
 
-EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
+IEvent::tSptr EventRegistry::create_event( ByteBufferT& buffer ) const
 {
    EventTypeID event_type;
    if( false == buffer.pop( event_type ) )
@@ -48,7 +48,7 @@ EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
       return nullptr;
    }
 
-   EventPtr p_event = iterator->second( );
+   IEvent::tSptr p_event = iterator->second( );
    if( false == p_event->from_buffer( buffer ) )
    {
       SYS_ERR( "event '%s' deserrialization error", event_type.c_str( ) )
@@ -58,7 +58,7 @@ EventPtr EventRegistry::create_event( ByteBufferT& buffer ) const
    return p_event;
 }
 
-bool EventRegistry::create_buffer( ByteBufferT& buffer, EventPtr p_event ) const
+bool EventRegistry::create_buffer( ByteBufferT& buffer, IEvent::tSptr p_event ) const
 {
    if( m_registry.end( ) == m_registry.find( p_event->signature( )->type_id( ) ) )
    {

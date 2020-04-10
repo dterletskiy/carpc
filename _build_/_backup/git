@@ -1,0 +1,5 @@
+Revert all changes to latest baseline:
+git reset --hard
+
+Diff between file in HEAD and file in transaction:
+git diff --cached changelog.log

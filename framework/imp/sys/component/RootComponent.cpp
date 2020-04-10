@@ -11,7 +11,7 @@ namespace base {
 
 
 
-RootComponent::RootComponent( const ServiceThreadPtr p_service, const std::string& name )
+RootComponent::RootComponent( const IServiceThread::tSptr p_service, const std::string& name )
    : Component( p_service, name )
 {
    SYS_INF( "%p", this );

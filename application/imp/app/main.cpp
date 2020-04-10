@@ -55,14 +55,14 @@ void boot( )
    REGISTER_EVENT( api::onoff::ipc::OnOffEvent );
    base::EventRegistry::instance( )->dump( );
 
-   base::ServiceInfoVector services =
+   base::ServiceThread::Info::tVector services =
    {
         { "OnOff_Service", { application::components::onoff::Component::creator }, 5 }
       , { "Driver_Service", { application::components::driver::Component::creator }, 10 }
       , { "Device_Service", { application::components::master::Component::creator, application::components::slave::Component::creator }, 10 }
    };
 
-   base::ServiceProcessPtr p_process = base::ServiceProcess::instance( );
+   base::ServiceProcess::tSptr p_process = base::ServiceProcess::instance( );
    if( p_process->start( services ) )
    {
       DBG_MSG( "Booting..." );

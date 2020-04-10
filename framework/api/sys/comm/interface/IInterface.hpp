@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "api/sys/service/Types.hpp"
-#include "api/sys/comm/interface/Types.hpp"
+#include "api/sys/service/IServiceThread.hpp"
 #include "api/sys/comm/event/Event.hpp"
+#include "api/sys/comm/interface/Types.hpp"
 
 
 
@@ -52,9 +52,9 @@ private:
    std::string m_role = "";
 
 public:
-   ServiceThreadPtrW context( ) const;
+   IServiceThread::tWptr context( ) const;
 private:
-   ServiceThreadPtrW mp_service_thread;
+   IServiceThread::tWptr mp_service_thread;
 };
 
 
@@ -84,7 +84,7 @@ const bool IInterface::cmp_names( const IInterface* const p_interface ) const
 }
 
 inline
-ServiceThreadPtrW IInterface::context( ) const
+IServiceThread::tWptr IInterface::context( ) const
 {
    return mp_service_thread;
 }

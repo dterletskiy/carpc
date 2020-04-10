@@ -1,11 +1,9 @@
 #pragma once
 
-#include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/oswrappers/ConditionVariable.hpp"
-#include "api/sys/component/Types.hpp"
-#include "api/sys/comm/event/Types.hpp"
-#include "api/sys/comm/interface/Types.hpp"
-#include "api/sys/service/Types.hpp"
+#include "api/sys/comm/event/IAsync.hpp"
+#include "api/sys/component/IComponent.hpp"
+#include "api/sys/service/IServiceThread.hpp"
 
 
 
@@ -14,64 +12,70 @@ namespace base {
 
 
 class ServiceThread
-   : public std::enable_shared_from_this< ServiceThread >
+   : public IServiceThread
 {
 public:
-   ServiceThread( const ServiceInfo& );
+   using tSptr = std::shared_ptr< ServiceThread >;
+   using tWptr = std::weak_ptr< ServiceThread >;
+   using tSptrList = std::list< tSptr >;
+private:
+   struct Comparator { bool operator( )( const IAsync::ISignature* p_es1, const IAsync::ISignature* p_es2 ) const { return *p_es1 < *p_es2; } };
+   using tEventConsumersMap = std::map< const IAsync::ISignature*, std::set< IAsync::IConsumer* >, Comparator >;
+
+public:
+   struct Info
+   {
+      using tVector = std::vector< Info >;
+      std::string                m_name;
+      IComponent::tCreatorVector m_component_creators;
+      size_t                     m_wd_timeout;
+   };
+
+public:
+   ServiceThread( const Info& );
    ~ServiceThread( );
    ServiceThread( const ServiceThread& ) = delete;
    ServiceThread& operator=( const ServiceThread& ) = delete;
 
-public:
-   const TID id( ) const;
-
-public:
-   const std::string& name( ) const;
 private:
-   std::string             m_name;
+   const TID id( ) const override;
+   const std::string& name( ) const override;
+   std::string                   m_name;
 
-public:
-   const size_t wd_timeout( ) const;
 private:
-   size_t                  m_wd_timeout;
+   const size_t wd_timeout( ) const override;
+   const std::optional< time_t > process_started( ) const override;
+   size_t                        m_wd_timeout = 0;
+   std::optional< time_t >       m_process_started = std::nullopt;
 
-public:
-   bool start( );
-   void stop( );
-   bool started( ) const;
-   bool wait( );
 private:
+   bool start( ) override;
+   void stop( ) override;
+   bool started( ) const override;
+   bool wait( ) override;
    void thread_loop( );
-   os::ThreadPtr           mp_thread;
-   bool                    m_started = false;
+   os::ThreadPtr                 mp_thread;
+   bool                          m_started = false;
 
-public:
-   bool insert_event( const EventPtr );
 private:
-   EventPtr get_event( );
+   bool insert_event( const IAsync::tSptr ) override;
+   IAsync::tSptr get_event( );
    const uint64_t processed_events( ) const;
-   std::deque< EventPtr >  m_events;
-   os::ConditionVariable   m_buffer_cond_var;
-   uint64_t                m_processed_events = 0;
-
-public:
-   void set_notification( const IEventSignature&, IEventConsumer* );
-   void clear_notification( const IEventSignature&, IEventConsumer* );
-   void clear_all_notifications( const IEventSignature&, IEventConsumer* );
-   bool is_subscribed( const EventPtr );
-   const std::optional< time_t > process_started( ) const;
-private:
-   void notify( const EventPtr );
-   struct Comparator
-   {
-      bool operator( )( const IEventSignature*, const IEventSignature* ) const;
-   };
-   std::map< const IEventSignature*, std::set< IEventConsumer* >, Comparator > m_event_consumers_map;
-   std::optional< time_t > m_process_started = std::nullopt;
+   std::deque< IAsync::tSptr >   m_events;
+   os::ConditionVariable         m_buffer_cond_var;
+   uint64_t                      m_processed_events = 0;
 
 private:
-   ComponentPtrList        m_components;
-   ComponentCreatorVector  m_component_creators;
+   void set_notification( const IAsync::ISignature&, IAsync::IConsumer* ) override;
+   void clear_notification( const IAsync::ISignature&, IAsync::IConsumer* ) override;
+   void clear_all_notifications( const IAsync::ISignature&, IAsync::IConsumer* ) override;
+   bool is_subscribed( const IAsync::tSptr );
+   void notify( const IAsync::tSptr );
+   tEventConsumersMap            m_event_consumers_map;
+
+private:
+   IComponent::tSptrList         m_components;
+   IComponent::tCreatorVector    m_component_creators;
 };
 
 
@@ -80,6 +84,12 @@ inline
 const std::string& ServiceThread::name( ) const
 {
    return m_name;
+}
+
+inline
+const TID ServiceThread::id( ) const
+{
+   return mp_thread ? mp_thread->id( ) : 0;
 }
 
 inline

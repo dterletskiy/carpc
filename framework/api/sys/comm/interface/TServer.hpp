@@ -113,7 +113,7 @@ TServer< TYPES >::TServer( const std::string& name, const std::string& role_name
    for( auto rr_item : TYPES::RR )
    {
       m_request_status_map.emplace( rr_item, RequestStatus{ } );
-      TYPES::tEvent::set_notification( this, typename TYPES::tEvent::Signature( role( ), rr_item.request, nullptr, nullptr, 0 ) );
+      TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), rr_item.request, nullptr, nullptr, 0 ) );
    }
    for( auto n_item : TYPES::N )
    {
@@ -206,7 +206,7 @@ bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
    {
       SYS_WRN( "request busy: %s", to_string( event_id ).c_str( ) );
       // Sending event with request busy id
-      TYPES::tEvent::create_send( typename TYPES::tEvent::Signature( role( ), rrIDs.busy, this, p_from_addr, seq_id ), TYPES::COMM_TYPE );
+      TYPES::tEvent::create_send( typename TYPES::tSignature( role( ), rrIDs.busy, this, p_from_addr, seq_id ), TYPES::COMM_TYPE );
       return false;
    }
 
@@ -289,7 +289,7 @@ void TServer< TYPES >::response( const Args&... args )
 
    typename TYPES::tEventData data( std::make_shared< tResponseData >( args... ) );
    TYPES::tEvent::create_send(
-      typename TYPES::tEvent::Signature( role( ), tResponseData::RESPONSE, this, request_info.value( ).client_addr, request_info.value( ).client_seq_id )
+      typename TYPES::tSignature( role( ), tResponseData::RESPONSE, this, request_info.value( ).client_addr, request_info.value( ).client_seq_id )
       , data, TYPES::COMM_TYPE
    );
 }
@@ -308,7 +308,7 @@ void TServer< TYPES >::notify( const Args&... args )
    std::shared_ptr< typename TYPES::tBaseData > p_base_data = std::make_shared< tNotificationData >( args... );
    typename TYPES::tEventData data( p_base_data );
    TYPES::tEvent::create_send(
-      typename TYPES::tEvent::Signature( role( ), tNotificationData::NOTIFICATION, this, nullptr, 0 )
+      typename TYPES::tSignature( role( ), tNotificationData::NOTIFICATION, this, nullptr, 0 )
       , data, TYPES::COMM_TYPE
    );
 

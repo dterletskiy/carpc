@@ -48,6 +48,7 @@ namespace api::onoff::ipc {
       using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
+      using tSignature = OnOffEvent::Signature;
       using tBaseData = BaseData;
 
       static const base::eCommType COMM_TYPE;
@@ -186,6 +187,7 @@ namespace api::onoff::no_ipc {
       using tEventConsumer = OnOffEvent::Consumer;
       using tEventData = OnOffEvent::Data;
       using tEventID = OnOffEvent::ID;
+      using tSignature = OnOffEvent::Signature;
       using tBaseData = BaseData;
 
       static const base::eCommType COMM_TYPE;
@@ -269,7 +271,7 @@ namespace api::onoff::no_ipc {
 
 namespace api::onoff {
 
-   namespace data = api::onoff::no_ipc;
+   namespace data = api::onoff::ipc;
 
    extern const std::string interface_name;
 

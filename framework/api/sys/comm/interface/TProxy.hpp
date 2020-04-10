@@ -3,8 +3,6 @@
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/comm/interface/IInterface.hpp"
 #include "api/sys/comm/interface/TClient.hpp"
-#include "api/sys/comm/interface/Types.hpp"
-#include "api/sys/service/ServiceThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -82,8 +80,8 @@ namespace base {
          // In case if count for current request id is zero this means current proxy is not subscribed for corresponding responses of mentioned request
          if( 0 == count )
          {
-            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), tRequestData::RESPONSE, nullptr, mp_proxy, 0 ) );
-            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), tRequestData::BUSY, nullptr, mp_proxy, 0 ) );
+            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::RESPONSE, nullptr, mp_proxy, 0 ) );
+            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::BUSY, nullptr, mp_proxy, 0 ) );
          }
          ++count;
 
@@ -100,7 +98,7 @@ namespace base {
       }
 
       typename TYPES::tEventData data( std::make_shared< tRequestData >( args... ) );
-      TYPES::tEvent::create_send( typename TYPES::tEvent::Signature( mp_proxy->role( ), tRequestData::REQUEST, mp_proxy, mp_server, m_seq_id ), data, TYPES::COMM_TYPE );
+      TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tRequestData::REQUEST, mp_proxy, mp_server, m_seq_id ), data, TYPES::COMM_TYPE );
 
       return m_seq_id;
    }
@@ -131,8 +129,8 @@ namespace base {
          if( 0 == count )
          {
             if( TYPES::tEventID::Undefined != item.response )
-               TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), item.response, nullptr, nullptr, 0 ) );
-            TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), item.busy, nullptr, nullptr, 0 ) );
+               TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.response, nullptr, nullptr, 0 ) );
+            TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.busy, nullptr, nullptr, 0 ) );
          }
 
          auto& client_map = event_id_iterator->second.m_client_map;
@@ -225,8 +223,8 @@ namespace base {
       tClientsSet& clients_set = event_id_iterator->second.m_client_set;
       if( clients_set.empty( ) )
       {
-         TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, mp_proxy, 0 ) );
-         TYPES::tEvent::create_send( typename TYPES::tEvent::Signature( mp_proxy->role( ), tNotificationData::SUBSCRIBE, mp_proxy, mp_server, 0 ), TYPES::COMM_TYPE );
+         TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, mp_proxy, 0 ) );
+         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::SUBSCRIBE, mp_proxy, mp_server, 0 ), TYPES::COMM_TYPE );
       }
       clients_set.emplace( p_client );
 
@@ -234,7 +232,7 @@ namespace base {
       {
          SYS_TRC( "having cached attribute event" );
 
-         auto p_event = TYPES::tEvent::create( typename TYPES::tEvent::Signature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, p_client, 0 ) );
+         auto p_event = TYPES::tEvent::create( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, p_client, 0 ) );
          p_event->data( event_id_iterator->second.m_event_data.value( ) );
          p_event->send( eCommType::ETC );
       }
@@ -257,8 +255,8 @@ namespace base {
       clients_set.erase( p_client );
       if( clients_set.empty( ) )
       {
-         TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tEvent::Signature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, nullptr, 0 ) );
-         TYPES::tEvent::create_send( typename TYPES::tEvent::Signature( mp_proxy->role( ), tNotificationData::UNSUBSCRIBE, mp_proxy, mp_server, 0 ), TYPES::COMM_TYPE );
+         TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, nullptr, 0 ) );
+         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::UNSUBSCRIBE, mp_proxy, mp_server, 0 ), TYPES::COMM_TYPE );
          event_id_iterator->second.m_event_data = std::nullopt;
       }
 

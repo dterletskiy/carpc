@@ -1,5 +1,4 @@
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/service/ServiceThread.hpp"
 #include "imp/sys/events/SysEvent.hpp"
 #include "imp/sys/service/ServiceEventConsumer.hpp"
 
@@ -11,7 +10,7 @@ namespace base {
 
 
 
-ServiceEventConsumer::ServiceEventConsumer( ServiceThreadPtr p_service )
+ServiceEventConsumer::ServiceEventConsumer( IServiceThread::tSptr p_service )
    : mp_service( p_service )
 {
    ServiceEvent::Event::set_notification( this );
@@ -26,7 +25,7 @@ void ServiceEventConsumer::process_event( const ServiceEvent::Event& event )
 {
    SYS_INF( "command = %#zx, info = %s", static_cast< size_t >( event.data( )->command ), event.data( )->info.c_str( ) );
 
-   ServiceThreadPtr p_service = mp_service.lock();
+   IServiceThread::tSptr p_service = mp_service.lock();
    if( nullptr == p_service )
       return;
 

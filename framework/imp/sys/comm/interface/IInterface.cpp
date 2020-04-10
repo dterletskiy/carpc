@@ -1,4 +1,3 @@
-#include "api/sys/service/ServiceThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/comm/interface/IInterface.hpp"
 

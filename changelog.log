@@ -104,3 +104,8 @@ verion 1.4.4
 
 verion 1.4.5
  - TServer refactoring.
+
+version 1.5.0
+ - IAsync object type itroduced as base for IEvent and IRunnable.
+ - Runnable onject introduced.
+ - Code refactoring.

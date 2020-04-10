@@ -19,7 +19,7 @@ namespace base {
 
 
 
-ServiceBrockerThreadPtr ServiceBrockerThread::mp_instance;
+ServiceBrockerThread::tSptr ServiceBrockerThread::mp_instance;
 
 ServiceBrockerThread::ServiceBrockerThread( )
    : m_events( )
@@ -36,7 +36,7 @@ ServiceBrockerThread::~ServiceBrockerThread( )
 }
 
 namespace { os::Mutex s_mutex; }
-ServiceBrockerThreadPtr ServiceBrockerThread::instance( )
+ServiceBrockerThread::tSptr ServiceBrockerThread::instance( )
 {
    base::os::MutexAutoLocker locker( s_mutex );
    if( nullptr == mp_instance )
@@ -140,7 +140,7 @@ void ServiceBrockerThread::thread_loop_send( )
 
    while( started_send( ) )
    {
-      EventPtr p_event = get_event( );
+      IEvent::tSptr p_event = get_event( );
       SYS_TRC( "sending event (%s)", p_event->signature( )->name( ).c_str( ) );
       ByteBufferT byte_buffer;
       if( false == EventRegistry::instance( )->create_buffer( byte_buffer, p_event ) )
@@ -209,7 +209,7 @@ void ServiceBrockerThread::thread_loop_receive( )
       while( 0 < byte_buffer.size( ) )
       {
          // @TDA: issue: in case of receiving several event all of them will be processed in reverce sequence
-         EventPtr p_event = EventRegistry::instance( )->create_event( byte_buffer );
+         IEvent::tSptr p_event = EventRegistry::instance( )->create_event( byte_buffer );
          if( nullptr == p_event )
          {
             SYS_ERR( "lost received event" );
@@ -242,7 +242,7 @@ void ServiceBrockerThread::stop_receive( )
    m_started_receive = false;
 }
 
-bool ServiceBrockerThread::insert_event( const EventPtr p_event )
+bool ServiceBrockerThread::insert_event( const IEvent::tSptr p_event )
 {
    if( false == m_started_send )
    {
@@ -257,14 +257,14 @@ bool ServiceBrockerThread::insert_event( const EventPtr p_event )
    return true;
 }
 
-EventPtr ServiceBrockerThread::get_event( )
+IEvent::tSptr ServiceBrockerThread::get_event( )
 {
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )
    {
       m_buffer_cond_var.wait( );
    }
-   EventPtr p_event = m_events.front( );
+   IEvent::tSptr p_event = m_events.front( );
    m_events.pop_front( );
    m_buffer_cond_var.unlock( );
 

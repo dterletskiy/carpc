@@ -1,10 +1,9 @@
 #pragma once
 
 #include "api/sys/common/ByteBufferT.hpp"
-#include "api/sys/helpers/functions/format.hpp"
-#include "api/sys/service/Types.hpp"
+#include "api/sys/service/IServiceThread.hpp"
 #include "api/sys/comm/event/Types.hpp"
-#include "api/sys/comm/event/EventConsumer.hpp"
+#include "api/sys/comm/event/IAsync.hpp"
 
 
 
@@ -13,22 +12,48 @@ namespace base {
 
 
 class IEvent
+   : public IAsync
+   , public std::enable_shared_from_this< IEvent >
 {
 public:
-   IEvent( const eCommType );
-   virtual ~IEvent( ) = default;
+   using tSptr = std::shared_ptr< IEvent >;
 
 public:
-   static const bool set_notification( IEventConsumer*, const IEventSignature& );
-   static const bool clear_notification( IEventConsumer*, const IEventSignature& );
-   static const bool clear_all_notifications( IEventConsumer*, const IEventSignature& );
-   static const bool send( EventPtr, const eCommType comm_type = eCommType::NONE );
-   static const bool send_to_context( EventPtr, ServiceThreadPtrW  );
+   struct ISignature : public IAsync::ISignature
+   {
+      virtual const bool to_buffer( ByteBufferT& ) const = 0;
+      virtual const bool from_buffer( ByteBufferT& ) = 0;
+   };
+
+   template< typename _Generator >
+   struct TConsumer : public IAsync::IConsumer
+   {
+      using _EventType = typename _Generator::Config::EventType;
+
+      TConsumer( ) = default;
+      ~TConsumer( ) override { _EventType::clear_all_notifications( this ); }
+
+      virtual void process_event( const _EventType& ) = 0;
+   };
+
+public:
+   IEvent( const eCommType );
+   ~IEvent( ) override = default;
+
+public:
+   static const bool set_notification( IAsync::IConsumer*, const ISignature& );
+   static const bool clear_notification( IAsync::IConsumer*, const ISignature& );
+   static const bool clear_all_notifications( IAsync::IConsumer*, const ISignature& );
+   static const bool send( tSptr, const eCommType comm_type = eCommType::NONE );
+   static const bool send_to_context( tSptr, IServiceThread::tWptr );
 
 public:
    virtual const bool send( const eCommType comm_type = eCommType::NONE ) = 0;
-   virtual const bool send_to_context( ServiceThreadPtrW ) = 0;
-   virtual void process( IEventConsumer* ) = 0;
+   virtual const bool send_to_context( IServiceThread::tWptr ) = 0;
+
+private:
+   void process( IAsync::IConsumer* ) const override;
+   virtual void process_event( IAsync::IConsumer* ) const = 0;
 
 public:
    // serrialization / deserrialization methods should
@@ -38,9 +63,6 @@ public:
 
 public:
    virtual const bool is_ipc( ) const = 0;
-
-public:
-   virtual const IEventSignature* const signature( ) const = 0;
 
 public:
    const eCommType& comm_type( );
@@ -74,7 +96,7 @@ const eCommType& IEvent::comm_type( )
 namespace base {
 
    template< typename TYPE >
-   inline EventPtr create_event( )
+   inline IEvent::tSptr create_event( )
    {
       return TYPE::create( eCommType::IPC );
    }

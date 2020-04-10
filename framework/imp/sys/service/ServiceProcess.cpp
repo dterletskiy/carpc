@@ -37,7 +37,7 @@ namespace base {
 
 
 
-ServiceProcessPtr ServiceProcess::mp_instance = nullptr;
+ServiceProcess::tSptr ServiceProcess::mp_instance = nullptr;
 
 ServiceProcess::ServiceProcess( )
    : m_service_list( )
@@ -51,7 +51,7 @@ ServiceProcess::~ServiceProcess( )
 }
 
 namespace { os::Mutex s_mutex; }
-ServiceProcessPtr ServiceProcess::instance( )
+ServiceProcess::tSptr ServiceProcess::instance( )
 {
    base::os::MutexAutoLocker locker( s_mutex );
    if( nullptr == mp_instance )
@@ -60,12 +60,12 @@ ServiceProcessPtr ServiceProcess::instance( )
    return mp_instance;
 }
 
-ServiceBrockerThreadPtr ServiceProcess::service_brocker( ) const
+ServiceBrockerThread::tSptr ServiceProcess::service_brocker( ) const
 {
    return mp_service_brocker;
 }
 
-ServiceThreadPtr ServiceProcess::service( const TID& id ) const
+IServiceThread::tSptr ServiceProcess::service( const TID& id ) const
 {
    for( auto& p_service : m_service_list )
    {
@@ -73,10 +73,10 @@ ServiceThreadPtr ServiceProcess::service( const TID& id ) const
          return p_service;
    }
 
-   return InvalidServiceThreadPtr;
+   return nullptr;
 }
 
-ServiceThreadPtr ServiceProcess::current_service( ) const
+IServiceThread::tSptr ServiceProcess::current_service( ) const
 {
    for( auto& p_service : m_service_list )
    {
@@ -84,15 +84,15 @@ ServiceThreadPtr ServiceProcess::current_service( ) const
          return p_service;
    }
 
-   return InvalidServiceThreadPtr;
+   return nullptr;
 }
 
-ServiceThreadPtrList ServiceProcess::service_list( ) const
+IServiceThread::tSptrList ServiceProcess::service_list( ) const
 {
    return m_service_list;
 }
 
-bool ServiceProcess::start( const ServiceInfoVector& service_infos )
+bool ServiceProcess::start( const ServiceThread::Info::tVector& service_infos )
 {
    REGISTER_EVENT( base::InterfaceEvent );
 
@@ -103,7 +103,7 @@ bool ServiceProcess::start( const ServiceInfoVector& service_infos )
    // Creating service threads
    for( const auto& service_info : service_infos )
    {
-      ServiceThreadPtr p_service = std::make_shared< ServiceThread >( service_info );
+      IServiceThread::tSptr p_service = std::make_shared< ServiceThread >( service_info );
       if( nullptr == p_service )
          return false;
       m_service_list.emplace_back( p_service );

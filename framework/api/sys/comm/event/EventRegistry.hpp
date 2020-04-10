@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/comm/event/Types.hpp"
+#include "api/sys/comm/event/IEvent.hpp"
 
 
 
@@ -20,20 +20,21 @@ class ByteBufferT;
 class EventRegistry
 {
 public:
-   using EventCreator = EventPtr(*)( );
+   using tSptr = std::shared_ptr< EventRegistry >;
+   using EventCreator = IEvent::tSptr(*)( );
    using Registry = std::map< EventTypeID, EventCreator >;
 
 public:
    ~EventRegistry( ) = default;
-   static EventRegistryPtr instance( );
+   static tSptr instance( );
 
 private:
    EventRegistry( ) = default;
-   static EventRegistryPtr mp_instance;
+   static tSptr mp_instance;
 
 public:
-   EventPtr create_event( ByteBufferT& ) const;
-   bool create_buffer( ByteBufferT&, EventPtr ) const;
+   IEvent::tSptr create_event( ByteBufferT& ) const;
+   bool create_buffer( ByteBufferT&, IEvent::tSptr ) const;
 
 public:
    bool register_event( const EventTypeID&, EventCreator );

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "api/sys/comm/event/IEventSignature.hpp"
 #include "api/sys/comm/event/IEvent.hpp"
 
 
@@ -14,9 +13,7 @@ namespace base {
 
 
 template< typename _Generator >
-class TEventBase
-   : public IEvent
-   , public std::enable_shared_from_this< TEventBase< _Generator > >
+class TEventBase : public IEvent
 {
 // using and types
 public:
@@ -25,7 +22,7 @@ public:
    using _DataTypePtr         = typename std::shared_ptr< _DataType >;
 
 public:
-   class Signature : public IEventSignature
+   class Signature : public IEvent::ISignature
    {
    public:
       Signature( ) = default;
@@ -52,8 +49,7 @@ public:
 protected:
    TEventBase( const eCommType comm_type )
       : IEvent( comm_type )
-   {
-   }
+   { }
    TEventBase( const _DataType& data, const eCommType comm_type )
       : IEvent( comm_type )
    {
@@ -67,7 +63,7 @@ public:
    {
       return IEvent::send( TEventBase< _Generator >::shared_from_this( ), comm_type );
    }
-   const bool send_to_context( ServiceThreadPtrW pw_service ) override
+   const bool send_to_context( IServiceThread::tWptr pw_service ) override
    {
       return IEvent::send_to_context( TEventBase< _Generator >::shared_from_this( ), pw_service );
    }
@@ -128,7 +124,7 @@ public:
       return nullptr != mp_data;
    }
 protected:
-   _DataTypePtr mp_data = nullptr; // @TDA-issue: never check for nullptr during serrialization
+   _DataTypePtr mp_data = nullptr;
 };
 
 

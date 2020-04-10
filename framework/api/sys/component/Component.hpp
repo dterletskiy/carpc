@@ -1,7 +1,6 @@
 #pragma once
 
-#include "api/sys/service/Types.hpp"
-#include "api/sys/component/Types.hpp"
+#include "api/sys/component/IComponent.hpp"
 #include "api/sys/tools/Performance.hpp"
 
 
@@ -10,24 +9,24 @@ namespace base {
 
 
 
-class Component
+class Component : public IComponent
 {
 public:
-   Component( const ServiceThreadPtr, const std::string& );
-   virtual ~Component( );
+   Component( const IServiceThread::tSptr, const std::string& );
+   ~Component( ) override;
 
 public:
-   const std::string& name( ) const;
+   const std::string& name( ) const override final;
 private:
-   std::string    m_name;
+   std::string                m_name;
 
 public:
-   const ID& id( ) const;
+   const ID& id( ) const override final;
 private:
-   ID             m_id;
+   ID                         m_id;
 
 private:
-   ServiceThreadPtrW    mp_service;
+   IServiceThread::tWptr      mp_service;
 
 protected:
    void start_performance( const std::string& message = "" );

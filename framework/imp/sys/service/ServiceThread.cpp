@@ -11,14 +11,7 @@ namespace base {
 
 
 
-bool ServiceThread::Comparator::operator( )( const IEventSignature* p_es1, const IEventSignature* p_es2 ) const
-{
-   return *p_es1 < *p_es2;
-}
-
-
-
-ServiceThread::ServiceThread( const ServiceInfo& info )
+ServiceThread::ServiceThread( const Info& info )
    : m_name( info.m_name )
    , m_wd_timeout( info.m_wd_timeout )
    , m_events( )
@@ -37,15 +30,6 @@ ServiceThread::~ServiceThread( )
    SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
 }
 
-const TID ServiceThread::id( ) const
-{
-   TID id = 0;
-   if( mp_thread )
-      id = mp_thread->id( );
-
-   return id;
-}
-
 void ServiceThread::thread_loop( )
 {
    SYS_INF( "'%s': enter", m_name.c_str( ) );
@@ -59,14 +43,13 @@ void ServiceThread::thread_loop( )
 
    while( started( ) )
    {
-      EventPtr p_event = get_event( );
+      IAsync::tSptr p_event = get_event( );
       SYS_TRC( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       notify( p_event );
    }
 
    // Destroying components
    m_components.clear( );
-   // Destroying interface registry
 
    SYS_INF( "'%s': exit", m_name.c_str( ) );
 }
@@ -89,7 +72,7 @@ void ServiceThread::stop( )
    m_started = false;
 }
 
-bool ServiceThread::insert_event( const EventPtr p_event )
+bool ServiceThread::insert_event( const IAsync::tSptr p_event )
 {
    if( false == started( ) )
    {
@@ -98,7 +81,10 @@ bool ServiceThread::insert_event( const EventPtr p_event )
    }
 
    if( false == is_subscribed( p_event ) )
+   {
+      SYS_INF( "'%s': there are no consumers for event '%s'", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) )
       return false;
+   }
 
    SYS_TRC( "'%s': inserting event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
    m_buffer_cond_var.lock( );
@@ -109,7 +95,7 @@ bool ServiceThread::insert_event( const EventPtr p_event )
    return true;
 }
 
-EventPtr ServiceThread::get_event( )
+IAsync::tSptr ServiceThread::get_event( )
 {
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )
@@ -117,7 +103,7 @@ EventPtr ServiceThread::get_event( )
       SYS_TRC( "'%s': waiting for event...", m_name.c_str( ) );
       m_buffer_cond_var.wait( );
    }
-   EventPtr p_event = m_events.front( );
+   IAsync::tSptr p_event = m_events.front( );
    m_events.pop_front( );
    ++m_processed_events;
    SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
@@ -126,8 +112,20 @@ EventPtr ServiceThread::get_event( )
    return p_event;
 }
 
-void ServiceThread::notify( const EventPtr p_event )
+void ServiceThread::notify( const IAsync::tSptr p_event )
 {
+   // Processing runnable IAsync object
+   if( eEventType::RUNNABLE == p_event->signature( )->type( ) )
+   {
+      m_process_started = time( nullptr );
+      SYS_TRC( "'%s': start processing runnable at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
+      p_event->process( );
+      SYS_TRC( "'%s': finished processing runnable started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
+      m_process_started.reset( );
+      return;
+   }
+
+   // Processing event IAsync object
    const auto& iterator = m_event_consumers_map.find( p_event->signature( ) );
    if( iterator == m_event_consumers_map.end( ) )
       return;
@@ -136,17 +134,17 @@ void ServiceThread::notify( const EventPtr p_event )
    // for example, during calling "clear_notification" from "process_event".
    auto consumers_set = iterator->second;
    SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
-   for( IEventConsumer* p_consumer : consumers_set )
+   for( IAsync::IConsumer* p_consumer : consumers_set )
    {
       m_process_started = time( nullptr );
-      SYS_TRC( "'%s': start processing at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
+      SYS_TRC( "'%s': start processing event at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
       p_event->process( p_consumer );
-      SYS_TRC( "'%s': finished processing started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
+      SYS_TRC( "'%s': finished processing event started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
    }
    m_process_started.reset( );
 }
 
-void ServiceThread::set_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
+void ServiceThread::set_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -158,7 +156,7 @@ void ServiceThread::set_notification( const IEventSignature& signature, IEventCo
       // So we should create a copy of this signature in a heap and store its pointer to consumers map.
       // Later on when number of consumers for this signature becase zero we must delete object by this pointer and remove poinetr from this map.
       auto p_signature = signature.create_copy( );
-      m_event_consumers_map.emplace( std::pair< const IEventSignature*, std::set< IEventConsumer* > >( p_signature, { p_consumer } ) );
+      m_event_consumers_map.emplace( std::pair< const IAsync::ISignature*, std::set< IAsync::IConsumer* > >( p_signature, { p_consumer } ) );
    }
    else
    {
@@ -166,7 +164,7 @@ void ServiceThread::set_notification( const IEventSignature& signature, IEventCo
    }
 }
 
-void ServiceThread::clear_notification( const IEventSignature& signature, IEventConsumer* p_consumer )
+void ServiceThread::clear_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -185,7 +183,7 @@ void ServiceThread::clear_notification( const IEventSignature& signature, IEvent
    }
 }
 
-void ServiceThread::clear_all_notifications( const IEventSignature& signature, IEventConsumer* p_consumer )
+void ServiceThread::clear_all_notifications( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -213,16 +211,12 @@ void ServiceThread::clear_all_notifications( const IEventSignature& signature, I
    }
 }
 
-bool ServiceThread::is_subscribed( const EventPtr p_event )
+bool ServiceThread::is_subscribed( const IAsync::tSptr p_event )
 {
-   const auto& iterator = m_event_consumers_map.find( p_event->signature( ) );
-   if( iterator == m_event_consumers_map.end( ) )
-   {
-      SYS_TRC( "'%s': is not subscribed on event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
-      return false;
-   }
+   if( eEventType::RUNNABLE == p_event->signature( )->type( ) )
+      return true;
 
-   return true;
+   return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );
 }
 
 
