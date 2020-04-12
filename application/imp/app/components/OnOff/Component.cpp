@@ -1,5 +1,5 @@
 // Framework
-#include "api/sys/comm/event/IRunnable.hpp"
+#include "api/sys/comm/event/Runnable.hpp"
 // Application
 #include "imp/app/components/OnOff/Component.hpp"
 
@@ -129,7 +129,7 @@ bool Component::boot( const std::string& command )
       DBG_MSG( "operation" );
       events::ID::PingEvent::Event::create_send( events::eEventID::boot, { "booting" } );
    };
-   base::IRunnable::create_send( operation );
+   base::Runnable::create_send( operation );
 
    return true;
 }

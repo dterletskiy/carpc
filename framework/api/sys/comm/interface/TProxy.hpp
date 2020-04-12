@@ -41,7 +41,7 @@ namespace base {
    public:
       template< typename tRequestData, typename... Args >
          const SequenceID request( tClient* p_client, const Args&... args );
-      tClient* response( const typename TYPES::tEvent& );
+      const bool response( const typename TYPES::tEvent& );
 
    private:
       size_t                                             m_seq_id = 0;
@@ -80,8 +80,8 @@ namespace base {
          // In case if count for current request id is zero this means current proxy is not subscribed for corresponding responses of mentioned request
          if( 0 == count )
          {
-            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::RESPONSE, nullptr, mp_proxy, 0 ) );
-            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::BUSY, nullptr, mp_proxy, 0 ) );
+            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::RESPONSE, mp_server, mp_proxy ) );
+            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::BUSY, mp_server, mp_proxy ) );
          }
          ++count;
 
@@ -104,11 +104,9 @@ namespace base {
    }
 
    template< typename TYPES >
-   TClient< TYPES >* RequestCount< TYPES >::response( const typename TYPES::tEvent& event )
+   const bool RequestCount< TYPES >::response( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const void* p_from_addr = event.info( ).from_addr( );
-      const void* p_to_addr = event.info( ).to_addr( );
       const SequenceID seq_id = event.info( ).seq_id( );
 
       for( auto& item : TYPES::RR )
@@ -120,7 +118,7 @@ namespace base {
          if( m_map.end( ) == event_id_iterator )
          {
             SYS_WRN( "request id does not exist: %s", to_string( item.request ).c_str( ) );
-            return nullptr;
+            return false;
          }
 
          size_t& count = event_id_iterator->second.m_count;
@@ -129,8 +127,8 @@ namespace base {
          if( 0 == count )
          {
             if( TYPES::tEventID::Undefined != item.response )
-               TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.response, nullptr, nullptr, 0 ) );
-            TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.busy, nullptr, nullptr, 0 ) );
+               TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.response, mp_server, mp_proxy ) );
+            TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.busy, mp_server, mp_proxy ) );
          }
 
          auto& client_map = event_id_iterator->second.m_client_map;
@@ -138,16 +136,16 @@ namespace base {
          if( client_map.end( ) == seq_id_iterator )
          {
             SYS_WRN( "delivered event to unknown client" );
-            return nullptr;
+            return false;
          }
-         tClient* p_client = seq_id_iterator->second;
+         seq_id_iterator->second->process_response_event( event );
          client_map.erase( seq_id_iterator );
 
-         return p_client;
+         return true;
       }
 
       // SYS_WRN( "related request id has not been found for %s", to_string( event_id ).c_str( ) );
-      return nullptr;
+      return false;
    }
 
 }
@@ -189,7 +187,7 @@ namespace base {
          const bool subscribe( tClient* );
       template< typename tNotificationData >
          const bool unsubscribe( tClient* );
-      const std::set< tClient* >* notification( const typename TYPES::tEvent& );
+      const bool notification( const typename TYPES::tEvent& );
 
    private:
       std::map< typename TYPES::tEventID, tNotificationDB > m_map;
@@ -223,8 +221,8 @@ namespace base {
       tClientsSet& clients_set = event_id_iterator->second.m_client_set;
       if( clients_set.empty( ) )
       {
-         TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, mp_proxy, 0 ) );
-         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::SUBSCRIBE, mp_proxy, mp_server, 0 ), TYPES::COMM_TYPE );
+         TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, mp_server, mp_proxy ) );
+         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::SUBSCRIBE, mp_proxy, mp_server ), TYPES::COMM_TYPE );
       }
       clients_set.emplace( p_client );
 
@@ -232,9 +230,10 @@ namespace base {
       {
          SYS_TRC( "having cached attribute event" );
 
-         auto p_event = TYPES::tEvent::create( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, p_client, 0 ) );
+         auto p_event = TYPES::tEvent::create( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION ) );
          p_event->data( event_id_iterator->second.m_event_data.value( ) );
-         p_event->send( eCommType::ETC );
+         auto operation = [ p_client, p_event ]( ){ p_client->process_notification_event( *p_event ); };
+         Runnable::create_send( operation );
       }
 
       return true;
@@ -255,8 +254,8 @@ namespace base {
       clients_set.erase( p_client );
       if( clients_set.empty( ) )
       {
-         TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, nullptr, nullptr, 0 ) );
-         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::UNSUBSCRIBE, mp_proxy, mp_server, 0 ), TYPES::COMM_TYPE );
+         TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, mp_server, mp_proxy ) );
+         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::UNSUBSCRIBE, mp_proxy, mp_server ), TYPES::COMM_TYPE );
          event_id_iterator->second.m_event_data = std::nullopt;
       }
 
@@ -264,27 +263,21 @@ namespace base {
    }
 
    template< typename TYPES >
-   const std::set< TClient< TYPES >* >* NotificationCount< TYPES >::notification( const typename TYPES::tEvent& event )
+   const bool NotificationCount< TYPES >::notification( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const void* p_to_addr = event.info( ).to_addr( );
 
       auto event_id_iterator = m_map.find( event_id );
       if( m_map.end( ) == event_id_iterator )
       {
          // SYS_WRN( "notification id does not exist: %s", to_string( event_id ).c_str( ) );
-         return nullptr;
+         return false;
       }
 
-      event_id_iterator->second.m_event_data = event.data( );
-      if( nullptr != p_to_addr )
-      {
-         static tClientsSet s_client_set;
-         s_client_set = { (tClient*)p_to_addr };
-         return &s_client_set;
-      }
+      for( auto p_client : event_id_iterator->second.m_client_set )
+         p_client->process_notification_event( event );
 
-      return &( event_id_iterator->second.m_client_set );
+      return true;
    }
 
 }
@@ -477,18 +470,10 @@ void TProxy< TYPES >::process_event( const typename TYPES::tEvent& event )
 
    SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
 
-   if( tClient* p_client = m_request_count.response( event ) )
-   {
-      p_client->process_response_event( event );
+   if( true == m_request_count.response( event ) )
       return;
-   }
-
-   if( const std::set< tClient* >* p_clients_set = m_notification_count.notification( event ) )
-   {
-      for( auto p_client : *p_clients_set )
-         p_client->process_notification_event( event );
+   if( true == m_notification_count.notification( event ) )
       return;
-   }
 
    SYS_WRN( "unknown event" );
 }
@@ -510,6 +495,12 @@ template< typename TYPES >
 template< typename tNotificationData >
 const bool TProxy< TYPES >::subscribe( tClient* p_client )
 {
+   if( !is_connected( ) )
+   {
+      SYS_WRN( "proxy is not connected" );
+      return InvalidSequenceID;
+   }
+
    return m_notification_count.template subscribe< tNotificationData >( p_client );
 }
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/service/IServiceThread.hpp"
 #include "api/sys/comm/event/Types.hpp"
 #include "api/sys/comm/event/IAsync.hpp"
@@ -50,11 +49,6 @@ public:
 public:
    IRunnable( const tOperation );
    ~IRunnable( ) override = default;
-
-public:
-   static tSptr create( const tOperation );
-   static const bool create_send( const tOperation );
-   static const bool create_send_to_context( const tOperation, IServiceThread::tWptr );
 
 public:
    const bool send( );

@@ -16,21 +16,6 @@ const eEventType IRunnable::Signature::s_type_event = eEventType::RUNNABLE;
 
 
 
-IRunnable::tSptr IRunnable::create( const tOperation operation )
-{
-   return std::make_shared< IRunnable >( operation );
-}
-
-const bool IRunnable::create_send( const tOperation operation )
-{
-   return create( operation )->send( );
-}
-
-const bool IRunnable::create_send_to_context( const tOperation operation, IServiceThread::tWptr pw_service )
-{
-   return create( operation )->send_to_context( pw_service );
-}
-
 const bool IRunnable::send( )
 {
    IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );

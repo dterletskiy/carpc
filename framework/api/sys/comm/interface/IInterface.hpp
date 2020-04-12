@@ -4,6 +4,7 @@
 
 #include "api/sys/service/IServiceThread.hpp"
 #include "api/sys/comm/event/Event.hpp"
+#include "api/sys/comm/event/Runnable.hpp"
 #include "api/sys/comm/interface/Types.hpp"
 
 

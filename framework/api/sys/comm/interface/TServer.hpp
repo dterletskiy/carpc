@@ -113,11 +113,13 @@ TServer< TYPES >::TServer( const std::string& name, const std::string& role_name
    for( auto rr_item : TYPES::RR )
    {
       m_request_status_map.emplace( rr_item, RequestStatus{ } );
-      TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), rr_item.request, nullptr, nullptr, 0 ) );
+      TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), rr_item.request, nullptr, this ) );
    }
    for( auto n_item : TYPES::N )
    {
       m_attribute_map.emplace( n_item.notification, nullptr );
+      TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), n_item.subscribe, nullptr, this ) );
+      TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), n_item.unsubscribe, nullptr, this ) );
    }
 
    InterfaceEvent::Event::set_notification( this, { role( ), eInterface::ClientConnected } );
@@ -305,10 +307,11 @@ void TServer< TYPES >::notify( const Args&... args )
       return;
    }
 
+   // @TDA: Here should be logic to check is there any subsrciber for this notification
    std::shared_ptr< typename TYPES::tBaseData > p_base_data = std::make_shared< tNotificationData >( args... );
    typename TYPES::tEventData data( p_base_data );
    TYPES::tEvent::create_send(
-      typename TYPES::tSignature( role( ), tNotificationData::NOTIFICATION, this, nullptr, 0 )
+      typename TYPES::tSignature( role( ), tNotificationData::NOTIFICATION, this, nullptr )
       , data, TYPES::COMM_TYPE
    );
 

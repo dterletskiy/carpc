@@ -17,7 +17,6 @@ Client::Client( const std::string& role_name, const std::string& name, tConnecte
    , m_connected_callback( connected_callback )
 {
    DBG_TRC( "%s: created", m_name.c_str( ) );
-   subscribe_current_state( );
 }
 
 Client::~Client( )
@@ -30,11 +29,13 @@ void Client::connected( )
 {
    DBG_MSG( );
    m_connected_callback( );
+   subscribe_current_state( );
 }
 
 void Client::disconnected( )
 {
    DBG_MSG( );
+   unsubscribe_current_state( );
 }
 
 void Client::request_start( )

@@ -162,6 +162,14 @@ public:
          , m_seq_id( seq_id )
          , m_context( base::os::Thread::current_id( ) )
       { }
+      _Signature( const std::string& service_name, const _IdType& id, const void* from_addr, const void* to_addr )
+         : _TEventBase::Signature( )
+         , m_service_name( service_name )
+         , m_id( id )
+         , mp_from_addr( from_addr )
+         , mp_to_addr( to_addr )
+         , m_context( base::os::Thread::current_id( ) )
+      { }
       _Signature( const std::string& service_name, const _IdType& id )
          : _TEventBase::Signature( )
          , m_service_name( service_name )
@@ -205,6 +213,10 @@ public:
 
          if( static_cast< const _Signature& >( signature ).m_service_name != m_service_name )
             return m_service_name < static_cast< const _Signature& >( signature ).m_service_name;
+
+         if( static_cast< const _Signature& >( signature ).mp_from_addr && mp_from_addr )
+            if( static_cast< const _Signature& >( signature ).mp_from_addr != mp_from_addr )
+               return mp_from_addr < static_cast< const _Signature& >( signature ).mp_from_addr;
 
          if( static_cast< const _Signature& >( signature ).mp_to_addr && mp_to_addr )
             if( static_cast< const _Signature& >( signature ).mp_to_addr != mp_to_addr )
