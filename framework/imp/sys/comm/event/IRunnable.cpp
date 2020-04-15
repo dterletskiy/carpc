@@ -11,11 +11,6 @@ namespace base {
 
 
 
-const EventTypeID IRunnable::Signature::s_type_id = "Runnable";
-const eEventType IRunnable::Signature::s_type_event = eEventType::RUNNABLE;
-
-
-
 const bool IRunnable::send( )
 {
    IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );

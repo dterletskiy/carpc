@@ -48,7 +48,7 @@ struct TimerEventData
 {
    TimerID id;
 };
-DECLARE_EVENT( TimerEvent, TimerEventData, size_t );
+DEFINE_EVENT( TimerEvent, TimerEventData, TSignatureID< size_t > );
 
 
 

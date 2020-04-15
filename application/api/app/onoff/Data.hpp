@@ -15,6 +15,7 @@ namespace api::onoff {
       , SubscribeCurrentState, UnsubscribeCurrentState, NotificationCurrentState
       , Undefined // Must present always for all interfaces
    );
+   using tSignature = base::TSignatureRR< eOnOff >;
 
 } // namespace api::onoff
 
@@ -38,7 +39,7 @@ namespace api::onoff::ipc {
       bool to_buffer( base::ByteBufferT& ) const;
       bool from_buffer( base::ByteBufferT& );
    };
-   DECLARE_IPC_EVENT_RR( OnOffEvent, OnOffEventData, api::onoff::eOnOff );
+   DEFINE_IPC_EVENT( OnOffEvent, OnOffEventData, api::onoff::tSignature );
 
 
 
@@ -46,10 +47,10 @@ namespace api::onoff::ipc {
    {
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
-      using tEventData = OnOffEvent::Data;
-      using tEventID = OnOffEvent::ID;
-      using tSignature = OnOffEvent::Signature;
+      using tSignature = api::onoff::tSignature;
+      using tEventID = api::onoff::eOnOff;
       using tBaseData = BaseData;
+      using tEventData = OnOffEventData;
 
       static const base::eCommType COMM_TYPE;
       static const std::vector< base::RequestResponseIDs< tEventID > >& RR;
@@ -177,7 +178,7 @@ namespace api::onoff::no_ipc {
 
       tBaseDataPtr ptr = nullptr;
    };
-   DECLARE_EVENT_RR( OnOffEvent, OnOffEventData, api::onoff::eOnOff );
+   DEFINE_EVENT( OnOffEvent, OnOffEventData, api::onoff::tSignature );
 
 
 
@@ -185,10 +186,10 @@ namespace api::onoff::no_ipc {
    {
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
-      using tEventData = OnOffEvent::Data;
-      using tEventID = OnOffEvent::ID;
-      using tSignature = OnOffEvent::Signature;
+      using tSignature = api::onoff::tSignature;
+      using tEventID = api::onoff::eOnOff;
       using tBaseData = BaseData;
+      using tEventData = OnOffEventData;
 
       static const base::eCommType COMM_TYPE;
       static const std::vector< base::RequestResponseIDs< tEventID > >& RR;

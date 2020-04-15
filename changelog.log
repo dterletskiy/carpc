@@ -112,3 +112,9 @@ version 1.5.0
 
 version 1.5.1
  - "Client/Server" refactoring and improvement.
+
+version 1.6.0
+ - Implemented new Event building concept. Signature (=> event type) could be created by any developer.
+ - Reimplemented all concrete events using new Event concept.
+ - Removed TBaseEvent, TSimpleEvent, TSimpleEventID, TEventRR.
+ - System boot sequence refactored. Removed SysEvent.

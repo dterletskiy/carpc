@@ -14,6 +14,11 @@ namespace base {
 
    template< typename TYPES >
       class TServer;
+   template< typename TYPES >
+      class TProxy;
+   template< typename TYPES >
+      class TClient;
+
 
    template< typename TYPES >
    struct RequestDB
@@ -40,7 +45,7 @@ namespace base {
 
    public:
       template< typename tRequestData, typename... Args >
-         const SequenceID request( tClient* p_client, const Args&... args );
+         const tSequenceID request( tClient* p_client, const Args&... args );
       const bool response( const typename TYPES::tEvent& );
 
    private:
@@ -64,7 +69,7 @@ namespace base {
 
    template< typename TYPES >
    template< typename tRequestData, typename... Args >
-   const SequenceID RequestCount< TYPES >::request( tClient* p_client, const Args&... args )
+   const tSequenceID RequestCount< TYPES >::request( tClient* p_client, const Args&... args )
    {
       auto event_id_iterator = m_map.find( tRequestData::REQUEST );
       if( m_map.end( ) == event_id_iterator )
@@ -107,7 +112,7 @@ namespace base {
    const bool RequestCount< TYPES >::response( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const SequenceID seq_id = event.info( ).seq_id( );
+      const tSequenceID seq_id = event.info( ).seq_id( );
 
       for( auto& item : TYPES::RR )
       {
@@ -326,7 +331,7 @@ private:
 
 public:
    template< typename tRequestData, typename... Args >
-      const SequenceID request( tClient*, const Args&... args );
+      const tSequenceID request( tClient*, const Args&... args );
    template< typename tNotificationData >
       const bool subscribe( tClient* );
    template< typename tNotificationData >
@@ -466,7 +471,7 @@ void TProxy< TYPES >::process_event( const typename TYPES::tEvent& event )
    const typename TYPES::tEventID event_id = event.info( ).id( );
    const void* p_from_addr = event.info( ).from_addr( );
    const void* p_to_addr = event.info( ).to_addr( );
-   const SequenceID seq_id = event.info( ).seq_id( );
+   const tSequenceID seq_id = event.info( ).seq_id( );
 
    SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
 
@@ -480,7 +485,7 @@ void TProxy< TYPES >::process_event( const typename TYPES::tEvent& event )
 
 template< typename TYPES >
 template< typename tRequestData, typename... Args >
-const SequenceID TProxy< TYPES >::request( tClient* p_client, const Args&... args )
+const tSequenceID TProxy< TYPES >::request( tClient* p_client, const Args&... args )
 {
    if( !is_connected( ) )
    {

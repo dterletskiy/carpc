@@ -15,6 +15,11 @@ public:
    Component( const IServiceThread::tSptr, const std::string& );
    ~Component( ) override;
 
+private:
+   const bool is_root( ) const override { return false; }
+   void boot( const std::string& info = "boot" ) override { }
+   void shutdown( const std::string& info = "shutdown" ) override { }
+
 public:
    const std::string& name( ) const override final;
 private:

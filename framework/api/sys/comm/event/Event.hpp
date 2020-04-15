@@ -1,12 +1,40 @@
 #pragma once
 
-#include "api/sys/comm/event/TEventSimple.hpp"
-#include "api/sys/comm/event/TEventSimpleID.hpp"
-#include "api/sys/comm/event/TEventRR.hpp"
+#include "api/sys/comm/event/TEvent.hpp"
 #include "api/sys/comm/event/EventRegistry.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 
 
+
+#define DEFINE_EVENT( eventType, dataType, signatureType ) \
+   namespace eventType { \
+      class eventType; \
+      using Generator      = base::TGenerator< base::NoServiceType, eventType, dataType, signatureType >; \
+      using Event          = Generator::Config::tEvent; \
+      using Signature      = Generator::Config::tSignature; \
+      using UserSignature  = Generator::Config::tUserSignature; \
+      using Data           = dataType; \
+      using Consumer       = Generator::Config::tConsumer; \
+   }
+
+#define DEFINE_IPC_EVENT( eventType, dataType, signatureType ) \
+   namespace eventType { \
+      class ServiceType; \
+      class eventType; \
+      using Generator      = base::TGenerator< ServiceType, eventType, dataType, signatureType >; \
+      using Event          = Generator::Config::tEvent; \
+      using Signature      = Generator::Config::tSignature; \
+      using UserSignature  = Generator::Config::tUserSignature; \
+      using Data           = dataType; \
+      using Consumer       = Generator::Config::tConsumer; \
+   }
+
+#define REGISTER_EVENT( eventType ) \
+   base::EventRegistry::instance( )->register_event( base::build_type_id< eventType::Signature >( ), base::create_event< eventType::Event > );
+
+
+
+#if 0
 
 #define _ARG_2_( _0, _1, _2, ... )  _2
 #define _DETECT_TYPE_( ... )        _ARG_2_( __VA_ARGS__, SIMPLE_ID, SIMPLE )
@@ -131,3 +159,5 @@
  *********************************************************************************/
 #define REGISTER_EVENT( eventType ) \
    base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
+
+#endif

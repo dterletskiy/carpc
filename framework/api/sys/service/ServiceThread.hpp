@@ -53,6 +53,8 @@ private:
    void stop( ) override;
    bool started( ) const override;
    bool wait( ) override;
+   void boot( const std::string& ) override;
+   void shutdown( const std::string& ) override;
    void thread_loop( );
    os::ThreadPtr                 mp_thread;
    bool                          m_started = false;

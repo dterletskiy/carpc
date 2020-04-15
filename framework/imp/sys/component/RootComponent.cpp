@@ -1,7 +1,6 @@
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/component/RootComponent.hpp"
-#include "imp/sys/events/ServiceEvent.hpp"
-#include "imp/sys/component/SysEventConsumer.hpp"
+#include "imp/sys/events/Events.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "RootComponent"
@@ -15,16 +14,19 @@ RootComponent::RootComponent( const IServiceThread::tSptr p_service, const std::
    : Component( p_service, name )
 {
    SYS_INF( "%p", this );
-   mp_consumer = std::shared_ptr< SysEventConsumer >( SysEventConsumer::instance( this ) );
 }
 
 RootComponent::~RootComponent( )
 {
 }
 
-void RootComponent::shutdown( const std::string& info ) const
+void RootComponent::boot( const std::string& message )
 {
-   ServiceEvent::Event::create_send( { eServiceCommand::shutdown, "shutdown" }, eCommType::ITC );
+}
+
+void RootComponent::shutdown( const std::string& message )
+{
+   events::service::ServiceEvent::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::ITC );
 }
 
 

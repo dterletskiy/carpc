@@ -56,11 +56,11 @@ void ServiceThread::thread_loop( )
 
 bool ServiceThread::start( )
 {
-   SYS_INF( "Starting service '%s'", m_name.c_str( ) );
+   SYS_INF( "'%s': starting", m_name.c_str( ) );
    bool result = mp_thread->run( );
    if( false == result )
    {
-      SYS_ERR( "ServiceThread '%s' can't be started", m_name.c_str( ) );
+      SYS_ERR( "'%s': can't be started", m_name.c_str( ) );
    }
 
    return result;
@@ -70,6 +70,20 @@ void ServiceThread::stop( )
 {
    SYS_INF( "'%s': stopping", m_name.c_str( ) );
    m_started = false;
+}
+
+void ServiceThread::boot( const std::string& message )
+{
+   SYS_INF( "'%s': booting", m_name.c_str( ) );
+   for( auto component : m_components )
+      if( component->is_root( ) )
+         component->boot( message );
+}
+
+void ServiceThread::shutdown( const std::string& message )
+{
+   SYS_INF( "'%s': shutting down", m_name.c_str( ) );
+   stop( );
 }
 
 bool ServiceThread::insert_event( const IAsync::tSptr p_event )
@@ -115,7 +129,7 @@ IAsync::tSptr ServiceThread::get_event( )
 void ServiceThread::notify( const IAsync::tSptr p_event )
 {
    // Processing runnable IAsync object
-   if( eEventType::RUNNABLE == p_event->signature( )->type( ) )
+   if( eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
    {
       m_process_started = time( nullptr );
       SYS_TRC( "'%s': start processing runnable at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
@@ -213,7 +227,7 @@ void ServiceThread::clear_all_notifications( const IAsync::ISignature& signature
 
 bool ServiceThread::is_subscribed( const IAsync::tSptr p_event )
 {
-   if( eEventType::RUNNABLE == p_event->signature( )->type( ) )
+   if( eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
       return true;
 
    return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );

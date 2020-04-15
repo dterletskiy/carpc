@@ -21,15 +21,15 @@ public:
 public:
    struct ISignature : public IAsync::ISignature
    {
+      const eAsyncType type( ) const override final { return eAsyncType::EVENT; }
+
       virtual const bool to_buffer( ByteBufferT& ) const = 0;
       virtual const bool from_buffer( ByteBufferT& ) = 0;
    };
 
-   template< typename _Generator >
+   template< typename _EventType >
    struct TConsumer : public IAsync::IConsumer
    {
-      using _EventType = typename _Generator::Config::EventType;
-
       TConsumer( ) = default;
       ~TConsumer( ) override { _EventType::clear_all_notifications( this ); }
 

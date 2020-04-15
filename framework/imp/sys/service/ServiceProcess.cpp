@@ -3,7 +3,7 @@
 #include "api/sys/service/ServiceThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/comm/interface/IInterface.hpp"
-#include "imp/sys/events/ServiceEvent.hpp"
+#include "imp/sys/events/Events.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvcProc"
@@ -146,7 +146,7 @@ void ServiceProcess::boot( )
 
    sleep(3);
 
-   ServiceEvent::Event::create_send( { eServiceCommand::boot, "boot" }, eCommType::ITC );
+   events::service::ServiceEvent::Event::create_send( { events::service::eID::boot }, { "booting application" }, eCommType::ITC );
 
    for( auto& p_service : m_service_list )
       p_service->wait( );

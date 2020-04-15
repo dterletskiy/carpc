@@ -27,8 +27,8 @@ public:
 
       virtual const std::string name( ) const = 0;
 
-      virtual const EventTypeID& type_id( ) const = 0;
-      virtual const eEventType type( ) const = 0;
+      virtual const tAsyncTypeID& type_id( ) const = 0;
+      virtual const eAsyncType type( ) const = 0;
    };
 
    struct IConsumer

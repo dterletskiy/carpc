@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/service/IServiceThread.hpp"
-#include "imp/sys/events/ServiceEvent.hpp"
+#include "imp/sys/events/Events.hpp"
 
 
 
@@ -10,7 +10,7 @@ namespace base {
 
 
 class ServiceEventConsumer
-   : public ServiceEvent::Consumer
+   : public events::service::ServiceEvent::Consumer
 {
 public:
    ServiceEventConsumer( IServiceThread::tSptr );
@@ -23,7 +23,7 @@ private:
    IServiceThread::tWptr mp_service;
 
 private:
-   void process_event( const ServiceEvent::Event& ) override;
+   void process_event( const events::service::ServiceEvent::Event& ) override;
 };
 
 

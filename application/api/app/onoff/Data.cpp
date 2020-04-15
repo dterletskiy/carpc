@@ -131,8 +131,6 @@ namespace api::onoff::ipc {
 
 } // namespace api::onoff::ipc
 
-INIT_EVENT( api::onoff::ipc::OnOffEvent );
-
 
 
 namespace api::onoff::no_ipc {
@@ -179,5 +177,3 @@ namespace api::onoff::no_ipc {
    OnOffEventData::OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
 
 } // namespace api::onoff::no_ipc
-
-INIT_EVENT( api::onoff::no_ipc::OnOffEvent );

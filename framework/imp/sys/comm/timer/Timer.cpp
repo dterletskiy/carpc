@@ -38,7 +38,7 @@ void timer_processor( const TimerID timer_id )
    IServiceThread::tWptr pw_service = iterator->second;
    mutex_consumer_map.unlock( );
 
-   TimerEvent::Event::create_send_to_context( convert( timer_id ), { timer_id }, pw_service );
+   TimerEvent::Event::create_send_to_context( { convert( timer_id ) }, { timer_id }, pw_service );
 }
 
 void signal_handler( int signal, siginfo_t* si, void* uc )
@@ -95,11 +95,11 @@ Timer::Timer( ITimerConsumer* p_consumer )
    }
 
    SYS_TRC( "created timer: %#lx", (long) m_id );
-   TimerEvent::Event::set_notification( mp_consumer, convert( m_id ) );
+   TimerEvent::Event::set_notification( mp_consumer, { convert( m_id ) } );
 }
 Timer::~Timer( )
 {
-   TimerEvent::Event::clear_notification( mp_consumer, convert( m_id ) );
+   TimerEvent::Event::clear_notification( mp_consumer, { convert( m_id ) } );
 
    mutex_consumer_map.lock( );
    const size_t result = consumer_map.erase( m_id );
@@ -203,7 +203,3 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 
 
 } // namespace base
-
-
-
-INIT_EVENT( base::TimerEvent );

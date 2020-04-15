@@ -29,21 +29,25 @@ public:
       const IAsync::ISignature* const create_copy( ) const override { return new Signature( *this ); }
       bool operator<( const IAsync::ISignature& signature ) const override
       {
-         if( signature.type_id( ) != s_type_id )
-            return s_type_id < signature.type_id( );
+         if( signature.type_id( ) != type_id( ) )
+            return type_id( ) < signature.type_id( );
 
-         return s_type_event < signature.type( );
+         return type( ) < signature.type( );
       }
       const std::string name( ) const override
       {
-         static const std::string s_name = base::format_string( s_type_id, "/", base::c_str( s_type_event ) );
+         static const std::string s_name = base::format_string( type_id( ), "/", base::c_str( type( ) ) );
          return s_name;
       }
-      const EventTypeID& type_id( ) const override final { return s_type_id; }
-      const eEventType type( ) const override final { return s_type_event; }
-
-      static const EventTypeID   s_type_id;
-      static const eEventType    s_type_event;
+      const tAsyncTypeID& type_id( ) const override final
+      {
+         static const std::string s_type_id = "Runnable";
+         return s_type_id;
+      }
+      const eAsyncType type( ) const override final
+      {
+         return eAsyncType::RUNNABLE;
+      }
    };
 
 public:

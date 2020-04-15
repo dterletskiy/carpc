@@ -8,6 +8,19 @@
 
 namespace base {
 
+   const char* c_str( const eInterface id )
+   {
+      switch( id )
+      {
+         case eInterface::ServerConnected:      return "eInterface::ServerConnected";
+         case eInterface::ServerDisconnected:   return "eInterface::ServerDisconnected";
+         case eInterface::ClientConnected:      return "eInterface::ClientConnected";
+         case eInterface::ClientDisconnected:   return "eInterface::ClientDisconnected";
+         case eInterface::Undefined:            return "eInterface::Undefined";
+         default:                               return "eInterface::Undefined";
+      }
+   }
+
    bool InterfaceEventData::to_buffer( base::ByteBufferT& buffer ) const
    {
       return buffer.push( ptr );
@@ -19,8 +32,6 @@ namespace base {
    }
 
 } // namespase base
-
-INIT_EVENT( base::InterfaceEvent );
 
 
 

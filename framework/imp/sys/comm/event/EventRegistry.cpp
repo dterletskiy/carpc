@@ -23,7 +23,7 @@ EventRegistry::tSptr EventRegistry::instance( )
    return mp_instance;
 }
 
-bool EventRegistry::register_event( const EventTypeID& event_type, EventCreator p_creator )
+bool EventRegistry::register_event( const tAsyncTypeID& event_type, EventCreator p_creator )
 {
    if( nullptr == p_creator )
       return false;
@@ -34,7 +34,7 @@ bool EventRegistry::register_event( const EventTypeID& event_type, EventCreator 
 
 IEvent::tSptr EventRegistry::create_event( ByteBufferT& buffer ) const
 {
-   EventTypeID event_type;
+   tAsyncTypeID event_type;
    if( false == buffer.pop( event_type ) )
    {
       SYS_ERR( "meta data deserrialization error" );

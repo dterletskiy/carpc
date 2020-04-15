@@ -42,105 +42,8 @@ namespace memory {
 
 
 
-typedef void ( *tOperation ) ( void );
-void performance( const std::string& name, const size_t count, std::function< void( void ) > operation )
-{
-   DBG_MSG( "Starting test: %s", name.c_str( ) );
-   base::tools::Performance performance( name );
-   performance.start( );
-   for( size_t i = 0 ; i < count; ++i )
-   {
-      operation( );
-   }
-   performance.stop( );
-   DBG_MSG( "%s: microseconds per operation: %f", name.c_str( ), static_cast< float >( performance.info( ) ) / count );
-}
-
 void test( )
 {
-   using tAllocationType = size_t;
-   size_t count = 1000000;
-
-   {
-      auto operation = [ ]( ){ tAllocationType* tmp( new tAllocationType( ) ); delete tmp; };
-      performance( "new", count, operation );
-   }
-   {
-      std::string name = "new";
-      base::tools::Performance performance( name );
-      performance.start( );
-      for( size_t i = 0 ; i < count; ++i )
-      {
-         tAllocationType* tmp( new tAllocationType( i ) );
-         delete tmp;
-      }
-      performance.stop( );
-      DBG_MSG( "%s: microseconds per action: %f", name.c_str( ), static_cast< float >( performance.info( ) ) / count );
-   }
-
-   {
-      auto operation = [ ]( ){ std::shared_ptr< tAllocationType > tmp( std::make_shared< tAllocationType >( ) ); };
-      performance( "make_shared", count, operation );
-   }
-   {
-      std::string name = "make_shared";
-      base::tools::Performance performance( name );
-      performance.start( );
-      for( size_t i = 0 ; i < count; ++i )
-      {
-         std::shared_ptr< tAllocationType > tmp( std::make_shared< tAllocationType >( i ) );
-      }
-      performance.stop( );
-      DBG_MSG( "%s: microseconds per action: %f", name.c_str( ), static_cast< float >( performance.info( ) ) / count );
-   }
-
-   {
-      auto operation = [ ]( ){ std::shared_ptr< tAllocationType > tmp( new tAllocationType( ) ); };
-      performance( "shared_ptr", count, operation );
-   }
-   {
-      std::string name = "shared_ptr";
-      base::tools::Performance performance( name );
-      performance.start( );
-      for( size_t i = 0 ; i < count; ++i )
-      {
-         std::shared_ptr< tAllocationType > tmp( new tAllocationType( i ) );
-      }
-      performance.stop( );
-      DBG_MSG( "%s: microseconds per action: %f", name.c_str( ), static_cast< float >( performance.info( ) ) / count );
-   }
-
-   {
-      auto operation = [ ]( ){ std::unique_ptr< tAllocationType > tmp( std::make_unique< tAllocationType >( ) ); };
-      performance( "make_unique", count, operation );
-   }
-   {
-      std::string name = "make_unique";
-      base::tools::Performance performance( name );
-      performance.start( );
-      for( size_t i = 0 ; i < count; ++i )
-      {
-         std::unique_ptr< tAllocationType > tmp( std::make_unique< tAllocationType >( i ) );
-      }
-      performance.stop( );
-      DBG_MSG( "%s: microseconds per action: %f", name.c_str( ), static_cast< float >( performance.info( ) ) / count );
-   }
-
-   {
-      auto operation = [ ]( ){ std::unique_ptr< tAllocationType > tmp( new tAllocationType( ) ); };
-      performance( "unique_ptr", count, operation );
-   }
-   {
-      std::string name = "unique_ptr";
-      base::tools::Performance performance( name );
-      performance.start( );
-      for( size_t i = 0 ; i < count; ++i )
-      {
-         std::unique_ptr< tAllocationType > tmp( new tAllocationType( i ) );
-      }
-      performance.stop( );
-      DBG_MSG( "%s: microseconds per action: %f", name.c_str( ), static_cast< float >( performance.info( ) ) / count );
-   }
 }
 
 void boot( )
@@ -148,6 +51,7 @@ void boot( )
    memory::dump( );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
+   REGISTER_EVENT( application::events::AppEvent );
    REGISTER_EVENT( api::onoff::ipc::OnOffEvent );
    base::EventRegistry::instance( )->dump( );
 

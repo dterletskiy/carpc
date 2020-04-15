@@ -8,24 +8,18 @@ namespace base {
 
 
 
-class SysEventConsumer;
-
-
-
-class RootComponent
-   : public Component
+class RootComponent : public Component
 {
 public:
    RootComponent( const IServiceThread::tSptr, const std::string& );
    ~RootComponent( ) override;
 
-public:
-   virtual bool boot( const std::string& info = "boot" ) = 0;
-protected:
-   virtual void shutdown( const std::string& info = "shutdown" ) const final;
-
 private:
-   std::shared_ptr< SysEventConsumer > mp_consumer = nullptr;
+   const bool is_root( ) const override { return true; }
+
+protected:
+   void boot( const std::string& info = "boot" ) override;
+   void shutdown( const std::string& info = "shutdown" ) override;
 };
 
 

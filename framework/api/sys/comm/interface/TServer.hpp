@@ -13,25 +13,25 @@ namespace base {
 
    struct RequestInfo
    {
-      RequestInfo( const SequenceID _server_seq_id )
+      RequestInfo( const tSequenceID _server_seq_id )
          : server_seq_id( _server_seq_id )
       { }
-      RequestInfo( const SequenceID _server_seq_id, const SequenceID _client_seq_id, const void* _client_addr )
+      RequestInfo( const tSequenceID _server_seq_id, const tSequenceID _client_seq_id, const void* _client_addr )
          : server_seq_id( _server_seq_id )
          , client_seq_id( _client_seq_id )
          , client_addr( _client_addr )
       { }
       const bool operator<( const RequestInfo& other ) const { return server_seq_id < other.server_seq_id; }
 
-      SequenceID server_seq_id = InvalidSequenceID;
-      SequenceID client_seq_id = InvalidSequenceID;
+      tSequenceID server_seq_id = InvalidSequenceID;
+      tSequenceID client_seq_id = InvalidSequenceID;
       const void* client_addr = nullptr;
    };
 
    struct RequestStatus
    {
       eRequestStatus status = eRequestStatus::READY;
-      SequenceID processing_server_seq_id = InvalidSequenceID;
+      tSequenceID processing_server_seq_id = InvalidSequenceID;
       std::set< RequestInfo > info_set;
    };
 
@@ -91,14 +91,14 @@ private:
    template< typename tResponseData >
       std::optional< RequestInfo > prepare_response( );
 public:
-   const SequenceID unblock_request( );
-   void prepare_response( const SequenceID );
+   const tSequenceID unblock_request( );
+   void prepare_response( const tSequenceID );
 
 protected:
    tRequestStatusMap                         m_request_status_map;
-   SequenceID                                m_seq_id = 0;
+   tSequenceID                                m_seq_id = 0;
    std::optional< typename TYPES::tEventID > m_processing_event_id = std::nullopt;
-   std::optional< SequenceID >               m_processing_seq_id = std::nullopt;
+   std::optional< tSequenceID >               m_processing_seq_id = std::nullopt;
    std::map< typename TYPES::tEventID, std::shared_ptr< typename TYPES::tBaseData > > m_attribute_map;
 };
 
@@ -186,7 +186,7 @@ bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
 {
    const typename TYPES::tEventID event_id = event.info( ).id( );
    const void* p_from_addr = event.info( ).from_addr( );
-   const SequenceID seq_id = event.info( ).seq_id( );
+   const tSequenceID seq_id = event.info( ).seq_id( );
 
    // Find request event_id in request status map
    auto iterator_status_map = m_request_status_map.find( tRequestResponseIDs( event_id ) );
@@ -235,7 +235,7 @@ std::optional< RequestInfo > TServer< TYPES >::prepare_response( )
    auto& request_status = iterator_status_map->second;
    auto& request_info_set = request_status.info_set;
 
-   SequenceID serching_seq_id = m_processing_seq_id.value_or( request_status.processing_server_seq_id );
+   tSequenceID serching_seq_id = m_processing_seq_id.value_or( request_status.processing_server_seq_id );
    // Search for RequestInfo structure in request infor set for current request ID
    auto iterator_info_set = request_info_set.find( RequestInfo{ serching_seq_id } );
    if( request_info_set.end( ) == iterator_info_set )
@@ -254,7 +254,7 @@ std::optional< RequestInfo > TServer< TYPES >::prepare_response( )
 }
 
 template< typename TYPES >
-const SequenceID TServer< TYPES >::unblock_request( )
+const tSequenceID TServer< TYPES >::unblock_request( )
 {
    if( std::nullopt == m_processing_event_id )
    {
@@ -276,7 +276,7 @@ const SequenceID TServer< TYPES >::unblock_request( )
 }
 
 template< typename TYPES >
-void TServer< TYPES >::prepare_response( const SequenceID seq_id )
+void TServer< TYPES >::prepare_response( const tSequenceID seq_id )
 {
    m_processing_seq_id = seq_id;
 }

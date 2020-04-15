@@ -81,7 +81,7 @@ namespace {
       base::tools::Performance   m_performance;
    };
    static size_t s_count = 1000000;
-   auto send_event = [ ]( const base::eCommType _type ) { events::IPC::PingEvent::Event::create_send( events::eEventID::ping, { base::c_str( _type ) }, _type ); };
+   auto send_event = [ ]( const base::eCommType _type ) { events::AppEvent::Event::create_send( events::eAppEventID::PING, { base::c_str( _type ) }, _type ); };
    Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC }, s_count );
 
 }
@@ -98,57 +98,26 @@ Component::Component( const base::IServiceThread::tSptr p_service, const std::st
    , m_server_onoff( "OnOffService", "OnOffService-Server" )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   // events::NoID::PingEvent::Event::set_notification( this );
-   // events::ID::PingEvent::Event::set_notification( this, events::eEventID::boot );
-   // events::ID::PingEvent::Event::set_notification( this, events::eEventID::ping );
-   // events::IPC::PingEvent::Event::set_notification( this, events::eEventID::ping );
 }
 
 Component::~Component( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   // events::NoID::PingEvent::Event::clear_notification( this );
-   // events::ID::PingEvent::Event::clear_notification( this, events::eEventID::boot );
-   // events::ID::PingEvent::Event::clear_notification( this, events::eEventID::ping );
-   // events::IPC::PingEvent::Event::clear_notification( this, events::eEventID::ping );
 }
 
-bool Component::boot( const std::string& command )
+void Component::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
    sleep(3);
 
    // s_event_test.execute( );
 
-   // events::NoID::PingEvent::Event::create_send( { "WTF!!!" } );
-   // events::ID::PingEvent::Event::create_send( events::eEventID::boot, { "booting" } );
-   // events::IPC::PingEvent::Event::create_send( events::eEventID::ping, { "WTF!!!" }, base::eCommType::IPC );
-
    auto operation = [ ]( )
    {
       DBG_MSG( "operation" );
-      events::ID::PingEvent::Event::create_send( events::eEventID::boot, { "booting" } );
+      events::AppEvent::Event::create_send( { events::eAppEventID::BOOT }, { "booting" }, base::eCommType::ITC );
    };
    base::Runnable::create_send( operation );
-
-   return true;
-}
-
-void Component::process_event( const events::NoID::PingEvent::Event& event )
-{
-   DBG_MSG( "message = %s", event.data( )->message.c_str( ) );
-}
-
-void Component::process_event( const events::ID::PingEvent::Event& event )
-{
-   DBG_MSG( "message = %s", event.data( )->message.c_str( ) );
-}
-
-void Component::process_event( const events::IPC::PingEvent::Event& event )
-{
-   DBG_MSG( "message = %s", event.data( )->message.c_str( ) );
-
-   if( false == s_event_test.execute( ) ) shutdown( );
 }
 
 

@@ -38,6 +38,8 @@ public:
    virtual void stop( ) = 0;
    virtual bool started( ) const = 0;
    virtual bool wait( ) = 0;
+   virtual void boot( const std::string& ) = 0;
+   virtual void shutdown( const std::string& ) = 0;
 
 public:
    virtual void set_notification( const IAsync::ISignature&, IAsync::IConsumer* ) = 0;

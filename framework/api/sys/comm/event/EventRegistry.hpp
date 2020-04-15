@@ -22,7 +22,7 @@ class EventRegistry
 public:
    using tSptr = std::shared_ptr< EventRegistry >;
    using EventCreator = IEvent::tSptr(*)( );
-   using Registry = std::map< EventTypeID, EventCreator >;
+   using Registry = std::map< tAsyncTypeID, EventCreator >;
 
 public:
    ~EventRegistry( ) = default;
@@ -37,7 +37,7 @@ public:
    bool create_buffer( ByteBufferT&, IEvent::tSptr ) const;
 
 public:
-   bool register_event( const EventTypeID&, EventCreator );
+   bool register_event( const tAsyncTypeID&, EventCreator );
    const Registry& registry( ) const;
    void dump( ) const;
 private:

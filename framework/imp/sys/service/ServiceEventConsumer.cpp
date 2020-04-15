@@ -1,5 +1,4 @@
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "imp/sys/events/SysEvent.hpp"
 #include "imp/sys/service/ServiceEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -13,35 +12,40 @@ namespace base {
 ServiceEventConsumer::ServiceEventConsumer( IServiceThread::tSptr p_service )
    : mp_service( p_service )
 {
-   ServiceEvent::Event::set_notification( this );
+   events::service::ServiceEvent::Event::set_notification( this, { events::service::eID::boot } );
+   events::service::ServiceEvent::Event::set_notification( this, { events::service::eID::shutdown } );
+   events::service::ServiceEvent::Event::set_notification( this, { events::service::eID::ping } );
 }
 
 ServiceEventConsumer::~ServiceEventConsumer( )
 {
-   ServiceEvent::Event::clear_notification( this );
+   events::service::ServiceEvent::Event::clear_all_notifications( this );
 }
 
-void ServiceEventConsumer::process_event( const ServiceEvent::Event& event )
+void ServiceEventConsumer::process_event( const events::service::ServiceEvent::Event& event )
 {
-   SYS_INF( "command = %#zx, info = %s", static_cast< size_t >( event.data( )->command ), event.data( )->info.c_str( ) );
+   std::string message = "";
+   if( event.data( ) ) message = event.data( )->message;
+
+   SYS_INF( "message = %s", message.c_str( ) );
 
    IServiceThread::tSptr p_service = mp_service.lock();
    if( nullptr == p_service )
       return;
 
-   switch( event.data( )->command )
+   switch( event.info( ).id( ) )
    {
-      case eServiceCommand::boot:
+      case events::service::eID::boot:
       {
-         SysEvent::Event::create_send( { eSysCommand::boot, "request boot" }, eCommType::ETC );
+         p_service->boot( message );
          break;
       }
-      case eServiceCommand::shutdown:
+      case events::service::eID::shutdown:
       {
-         p_service->stop( );
+         p_service->shutdown( message );
          break;
       }
-      case eServiceCommand::ping:
+      case events::service::eID::ping:
       {
          break;
       }

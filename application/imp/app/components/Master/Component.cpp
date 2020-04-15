@@ -19,23 +19,24 @@ Component::Component( const base::IServiceThread::tSptr p_service, const std::st
    : base::Component( p_service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
-   events::ID::PingEvent::Event::set_notification( this, events::eEventID::boot );
-   events::ID::PingEvent::Event::set_notification( this, events::eEventID::ping );
+   events::AppEvent::Event::set_notification( this, events::eAppEventID::BOOT );
+   events::AppEvent::Event::set_notification( this, events::eAppEventID::SHUTDOWN );
+   events::AppEvent::Event::set_notification( this, events::eAppEventID::PING );
 }
 
 Component::~Component( )
 {
    DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
-   events::ID::PingEvent::Event::clear_all_notifications( this );
+   events::AppEvent::Event::clear_all_notifications( this );
 }
 
-void Component::process_event( const events::ID::PingEvent::Event& event )
+void Component::process_event( const events::AppEvent::Event& event )
 {
    DBG_MSG( "message = %s", event.data( )->message.c_str( ) );
 
    switch( event.info( ).id( ) )
    {
-      case events::eEventID::boot:
+      case events::eAppEventID::BOOT:
       {
          if( nullptr == mp_client_onoff )
          {

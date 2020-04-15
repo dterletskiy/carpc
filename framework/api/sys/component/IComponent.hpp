@@ -24,6 +24,11 @@ public:
 public:
    virtual const std::string& name( ) const = 0;
    virtual const ID& id( ) const = 0;
+   virtual const bool is_root( ) const = 0;
+
+public:
+   virtual void boot( const std::string& message = "boot" ) = 0;
+   virtual void shutdown( const std::string& message = "shutdown" ) = 0;
 };
 
 

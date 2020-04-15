@@ -12,6 +12,8 @@
 namespace base {
 
    DEFINE_ENUM( eInterface, size_t, ServerConnected, ServerDisconnected, ClientConnected, ClientDisconnected, Undefined );
+   const char* c_str( const eInterface );
+
    struct InterfaceEventData
    {
       bool to_buffer( base::ByteBufferT& ) const;
@@ -19,7 +21,8 @@ namespace base {
 
       const void* ptr = nullptr;
    };
-   DECLARE_IPC_EVENT_RR( InterfaceEvent, InterfaceEventData, eInterface );
+
+   DEFINE_IPC_EVENT( InterfaceEvent, InterfaceEventData, TSignatureRR< eInterface > );
 
 } // namespace base
 
