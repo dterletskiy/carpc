@@ -16,30 +16,18 @@ using NoServiceType = void;
 
 
 
-template< typename T >
-const std::string build_type_id( )
-{
-   return typeid( T ).name( );
-}
-template< typename T >
-const std::string build_type_id( const T& object )
-{
-   return typeid( object ).name( );
-}
-template< typename T >
-const std::string build_type_id( const T* object )
-{
-   return typeid( object ).name( );
-}
-
-
-
 template< typename _Generator >
 class TSignature : public IEvent::ISignature
 {
    using tSignature     = typename _Generator::Config::tSignature;
    using tUserSignature = typename _Generator::Config::tUserSignature;
    using tService       = typename _Generator::Config::tService;
+
+public:
+   static const tAsyncTypeID build_type_id( )
+   {
+      return tAsyncTypeID::generate< tSignature >( );
+   }
 
 public:
    TSignature( ) = default;
@@ -54,13 +42,13 @@ public:
    }
    const std::string name( ) const override
    {
-      static const std::string s_name = format_string( type_id( ), "/", c_str( type( ) ), "/" );
+      static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", type: ", c_str( type( ) ) );
       return s_name + m_user_signature.name( );
    }
    const tAsyncTypeID& type_id( ) const override
    {
-      static std::string s_type_id = build_type_id< tSignature >( );
-      return s_type_id;
+      static tAsyncTypeID _s_type_id = build_type_id( );
+      return _s_type_id;
    }
    bool operator<( const IAsync::ISignature& signature ) const override
    {
@@ -114,7 +102,7 @@ public:
 public:
    const std::string name( ) const
    {
-      return base::format_string( "id: ", size_t(m_id) );
+      return base::format_string( ", id: ", size_t(m_id) );
    }
    bool operator<( const TSignatureID& signature ) const
    {

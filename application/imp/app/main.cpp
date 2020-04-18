@@ -51,7 +51,6 @@ void boot( )
    memory::dump( );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
-   REGISTER_EVENT( application::events::AppEvent );
    REGISTER_EVENT( api::onoff::ipc::OnOffEvent );
    base::EventRegistry::instance( )->dump( );
 

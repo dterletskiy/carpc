@@ -3,7 +3,6 @@
 // Framework
 #include "api/sys/component/RootComponent.hpp"
 // Application
-#include "imp/app/events/AppEvent.hpp"
 #include "imp/app/components/OnOff/server/Server.hpp"
 
 

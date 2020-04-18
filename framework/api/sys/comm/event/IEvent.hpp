@@ -1,6 +1,5 @@
 #pragma once
 
-#include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/service/IServiceThread.hpp"
 #include "api/sys/comm/event/Types.hpp"
 #include "api/sys/comm/event/IAsync.hpp"

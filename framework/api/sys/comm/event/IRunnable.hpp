@@ -36,12 +36,12 @@ public:
       }
       const std::string name( ) const override
       {
-         static const std::string s_name = base::format_string( type_id( ), "/", base::c_str( type( ) ) );
+         static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", type: ", c_str( type( ) ) );
          return s_name;
       }
       const tAsyncTypeID& type_id( ) const override final
       {
-         static const std::string s_type_id = "Runnable";
+         static const tAsyncTypeID s_type_id = tAsyncTypeID::generate< Signature >( );
          return s_type_id;
       }
       const eAsyncType type( ) const override final

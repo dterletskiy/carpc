@@ -1,6 +1,7 @@
 // Framework
 #include "api/sys/comm/event/Runnable.hpp"
 // Application
+#include "imp/app/events/AppEvent.hpp"
 #include "imp/app/components/OnOff/Component.hpp"
 
 #include "api/sys/trace/Trace.hpp"

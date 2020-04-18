@@ -30,11 +30,40 @@
    }
 
 #define REGISTER_EVENT( eventType ) \
-   base::EventRegistry::instance( )->register_event( base::build_type_id< eventType::Signature >( ), base::create_event< eventType::Event > );
+   base::EventRegistry::instance( )->register_event( eventType::Signature::build_type_id( ), base::create_event< eventType::Event > );
 
 
 
 #if 0
+
+
+
+#define INIT_EVENT( eventType ) \
+   template< > const base::tAsyncTypeID eventType::Signature::s_type_id = { #eventType };
+
+#define DECLARE_EVENT( eventType, dataType, signatureType ) \
+   namespace eventType { \
+      class eventType; \
+      using Generator      = base::TGeneratorExt< base::NoServiceType, eventType, dataType, signatureType >; \
+      using Event          = Generator::Config::tEvent; \
+      using Signature      = Generator::Config::tSignature; \
+      using UserSignature  = Generator::Config::tUserSignature; \
+      using Data           = dataType; \
+      using Consumer       = Generator::Config::tConsumer; \
+   }
+
+#define REGISTER_EVENT( eventType ) \
+   base::EventRegistry::instance( )->register_event( base::build_type_id< eventType::Signature >( ), base::create_event< eventType::Event > );
+   base::EventRegistry::instance( )->register_event( #eventType, base::create_event< eventType::Event > );
+   base::EventRegistry::instance( )->register_event( eventType::Signature::build_type_id( #eventType ), base::create_event< eventType::Event > );
+
+
+
+
+
+
+
+
 
 #define _ARG_2_( _0, _1, _2, ... )  _2
 #define _DETECT_TYPE_( ... )        _ARG_2_( __VA_ARGS__, SIMPLE_ID, SIMPLE )

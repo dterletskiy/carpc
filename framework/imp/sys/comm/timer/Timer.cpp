@@ -97,6 +97,7 @@ Timer::Timer( ITimerConsumer* p_consumer )
    SYS_TRC( "created timer: %#lx", (long) m_id );
    TimerEvent::Event::set_notification( mp_consumer, { convert( m_id ) } );
 }
+
 Timer::~Timer( )
 {
    TimerEvent::Event::clear_notification( mp_consumer, { convert( m_id ) } );

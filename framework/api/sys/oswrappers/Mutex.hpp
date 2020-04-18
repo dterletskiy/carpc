@@ -30,7 +30,8 @@ private:
 public:
    pthread_mutex_t& mutex( );
 private:
-   pthread_mutex_t   m_mutex = PTHREAD_MUTEX_INITIALIZER;
+   pthread_mutex_t      m_mutex = PTHREAD_MUTEX_INITIALIZER;
+   pthread_mutexattr_t  m_attr;
 };
 
 
