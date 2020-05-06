@@ -1,12 +1,8 @@
 #pragma once
 
-#include <sys/un.h>
-#include <sys/select.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
 #include <set>
 
+#include "api/sys/oswrappers/Socket.hpp"
 #include "api/sys/common/Types.hpp"
 #include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/configuration/DSI.hpp"
@@ -36,6 +32,7 @@ private:
 
 private:
    void fd_set_reset( );
+   int fd_set_init( );
 private:
    fd_set m_fd_set_read;
    fd_set m_fd_set_write;
@@ -43,5 +40,4 @@ private:
 
 private:
    void* mp_buffer = nullptr;
-   int m_last_errno = 0;
 };

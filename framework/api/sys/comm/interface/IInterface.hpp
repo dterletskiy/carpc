@@ -35,8 +35,11 @@ namespace base {
 class IInterface
    : public InterfaceEvent::Consumer
 {
+protected:
+   enum class eType { Server, Client, Undefined };
+
 public:
-   IInterface( const std::string&, const std::string& );
+   IInterface( const std::string&, const std::string&, const eType, const eCommType );
    virtual ~IInterface( );
 
 public:
@@ -45,6 +48,10 @@ public:
 
 private:
    void process_event( const InterfaceEvent::Event& ) override;
+
+private:
+   eType       m_type = eType::Undefined;
+   eCommType   m_comm_type = eCommType::NONE;
 
 public:
    const std::string& name( ) const;

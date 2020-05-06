@@ -23,7 +23,7 @@ public:
       ByteBuffer& operator >> ( TYPE& );
 
 public:
-   ByteBuffer( );
+   ByteBuffer( const size_t capacity = 1024 );
    ByteBuffer( const void*, const size_t );
    template< typename TYPE >
       ByteBuffer( const TYPE& );
@@ -144,6 +144,7 @@ public:
    bool reallocate( const size_t, const bool is_store = false );
    bool trancate( );
    void reset( );
+   void fill( const char symbol = 0 );
 
 public:
    const uint8_t* const buffer( ) const;

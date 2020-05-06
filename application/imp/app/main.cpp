@@ -42,9 +42,7 @@ namespace memory {
 
 
 
-void test( )
-{
-}
+const bool test( );
 
 void boot( )
 {
@@ -85,8 +83,8 @@ void boot( )
    {
       DBG_MSG( "argc = %d", argc );
 
-      // test( );
-      boot( );
+      if( test( ) )
+         boot( );
 
       return 0;
    }
@@ -114,3 +112,59 @@ void boot( )
    }
 
 #endif
+
+
+
+
+
+
+#include "api/sys/oswrappers/Socket.hpp"
+#include "api/sys/configuration/DSI.hpp"
+
+
+
+const bool test( )
+{
+   // return true;
+
+
+
+
+   const char* const message = "RPC / DSI - 0123456789ABCDEF";
+   char buffer[ 1024 ];
+
+   const int fd_socket = base::socket::socket(
+                 base::configuration::dsi::socket_family
+               , base::configuration::dsi::socket_type
+               , base::configuration::dsi::socket_protocole
+   );
+   base::socket::connect(
+                 fd_socket
+               , base::configuration::dsi::socket_family
+               , base::configuration::dsi::server_address
+               , base::configuration::dsi::server_port
+   );
+   base::socket::send( fd_socket, (const void* const)message, strlen(message) + 1 );
+   base::socket::recv( fd_socket, buffer, 1024 );
+   DBG_MSG( "buffer = %s", buffer );
+
+   return false;
+
+
+
+   base::Server socket(
+                 base::configuration::dsi::socket_family
+               , base::configuration::dsi::socket_type
+               , base::configuration::dsi::socket_protocole
+               , base::configuration::dsi::server_address
+               , base::configuration::dsi::server_port
+               , base::configuration::dsi::buffer_size
+            );
+   socket.create( );
+   socket.connect( );
+   socket.select( );
+   sleep( 10 );
+   socket.close( );
+
+   return false;
+}

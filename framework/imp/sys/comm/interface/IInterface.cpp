@@ -16,7 +16,7 @@ namespace base {
          case eInterface::ServerDisconnected:   return "eInterface::ServerDisconnected";
          case eInterface::ClientConnected:      return "eInterface::ClientConnected";
          case eInterface::ClientDisconnected:   return "eInterface::ClientDisconnected";
-         case eInterface::Undefined:            return "eInterface::Undefined";
+         case eInterface::Undefined:
          default:                               return "eInterface::Undefined";
       }
    }
@@ -39,21 +39,29 @@ namespace base {
 
 
 
-IInterface::IInterface( const std::string& name, const std::string& role )
-   : m_name( name )
+IInterface::IInterface( const std::string& name, const std::string& role, const eType type, const eCommType comm_type )
+   : m_type( type )
+   , m_comm_type( comm_type )
+   , m_name( name )
    , m_role( role )
 {
-   SYS_TRC( "created" );
+   SYS_TRC( "created %s/%s", m_name.c_str( ), m_role.c_str( ) );
    mp_service_thread = ServiceProcess::instance( )->current_service( );
 }
 
 IInterface::~IInterface( )
 {
-   SYS_TRC( "destroyed" );
+   SYS_TRC( "destroyed %s/%s", m_name.c_str( ), m_role.c_str( ) );
 }
 
 void IInterface::process_event( const InterfaceEvent::Event& event )
 {
+   if( !(event.data( )) )
+   {
+      SYS_ERR( "event data is empty" );
+      return;
+   }
+
    const void* const ptr = event.data( )->ptr;
    SYS_TRC( "connected side: %p", ptr );
    switch( event.info( ).id( ) )

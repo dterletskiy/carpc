@@ -61,7 +61,7 @@ execute:
 
 debug:
 	reset
-	$(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
+	export LD_LIBRARY_PATH=$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib ; $(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
 
 disassm:
 	$(DISASSEMBLER) -S --disassemble $(TARGET_DIR)/$(PROJECT_NAME) > $(TARGET_DIR)/$(PROJECT_NAME).s

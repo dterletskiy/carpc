@@ -1,9 +1,4 @@
-#include <sys/un.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
-#include <sys/types.h>
-
+#include "api/sys/oswrappers/Socket.hpp"
 #include "api/sys/configuration/DSI.hpp"
 #include "api/sys/comm/event/Event.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
@@ -15,7 +10,7 @@
 
 
 
-namespace base {
+using namespace base;
 
 
 
@@ -47,50 +42,14 @@ ServiceBrockerThread::tSptr ServiceBrockerThread::instance( )
 
 bool ServiceBrockerThread::setup_connection( )
 {
-   m_master_socket = socket( configuration::dsi::socket_family, configuration::dsi::socket_type, configuration::dsi::socket_protocole );
+   m_master_socket = base::socket::socket( configuration::dsi::socket_family, configuration::dsi::socket_type, configuration::dsi::socket_protocole );
    if( -1 == m_master_socket )
-   {
-      m_last_errno = errno;
-      SYS_ERR( "socket(%d) error: %d", m_master_socket, m_last_errno );
       return false;
-   }
-   SYS_MSG( "socket(%d)", m_master_socket );
 
-   sockaddr* p_sockaddr = nullptr;
-   size_t sockaddr_size = 0;
-   struct sockaddr_un serv_addr_un;
-   struct sockaddr_in serv_addr_in;
-   if( AF_UNIX == configuration::dsi::socket_family )
-   {
-      memset( &serv_addr_un, 0, sizeof( serv_addr_un ) );
-      serv_addr_un.sun_family = configuration::dsi::socket_family;
-      strncpy( serv_addr_un.sun_path, configuration::dsi::server_address, sizeof( serv_addr_un.sun_path ) - 1 );
-      // unlink( configuration::dsi::server_address );
-      sockaddr_size = sizeof( serv_addr_un.sun_family ) + strlen( serv_addr_un.sun_path );
-
-      p_sockaddr = reinterpret_cast< sockaddr* >( &serv_addr_un );
-   }
-   else if( AF_INET == configuration::dsi::socket_family )
-   {
-      memset( &serv_addr_in, 0, sizeof( serv_addr_in ) );
-      serv_addr_in.sin_family = configuration::dsi::socket_family;
-      serv_addr_in.sin_addr.s_addr = inet_addr( configuration::dsi::server_address );
-      // serv_addr_in.sin_addr.s_addr = htonl( INADDR_ANY );
-      // serv_addr_in.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
-      serv_addr_in.sin_port = htons( configuration::dsi::server_port );
-      sockaddr_size = sizeof( serv_addr_in );
-
-      p_sockaddr = reinterpret_cast< sockaddr* >( &serv_addr_in );
-   }
-
-   int result_connect = connect( m_master_socket, p_sockaddr, sockaddr_size );
-   if( -1 == result_connect )
-   {
-      m_last_errno = errno;
-      SYS_ERR( "connect(%d): %d", m_master_socket, m_last_errno );
+   if( false == base::socket::connect( m_master_socket, configuration::dsi::socket_family, configuration::dsi::server_address, configuration::dsi::server_port ) )
       return false;
-   }
-   SYS_MSG( "connect(%d)", m_master_socket );
+
+   base::socket::info( m_master_socket, "Connection created" );
 
    return true;
 }
@@ -119,45 +78,16 @@ void ServiceBrockerThread::thread_loop_send( )
    SYS_INF( "enter" );
    m_started_send = true;
 
-   // ByteBufferT register_buffer;
-   // for( const auto& pair : EventRegistry::instance( )->registry( ) )
-   // {
-   //    if( false == register_buffer.push( pair.first ) )
-   //    {
-   //       SYS_ERR( "registration error" );
-   //       return;
-   //    }
-   // }
-   // size_t send_size = send( m_master_socket, register_buffer.buffer( ), register_buffer.size( ), 0 );
-   // m_last_errno = errno;
-   // if( send_size != register_buffer.size( ) )
-   // {
-   //    SYS_ERR( "send(%d): %d", m_master_socket, m_last_errno );
-   //    SYS_ERR( "registration error" );
-   //    return;
-   // }
-   // SYS_MSG( "send(%d): %zu bytes", m_master_socket, send_size );
-
    while( started_send( ) )
    {
       IEvent::tSptr p_event = get_event( );
       SYS_TRC( "sending event (%s)", p_event->signature( )->name( ).c_str( ) );
       ByteBufferT byte_buffer;
       if( false == EventRegistry::instance( )->create_buffer( byte_buffer, p_event ) )
-      {
-         SYS_ERR( "lost sent event" );
          continue;
-      }
       // byte_buffer.dump( );
 
-      size_t send_size = send( m_master_socket, byte_buffer.buffer( ), byte_buffer.size( ), 0 );
-      m_last_errno = errno;
-      if( send_size != byte_buffer.size( ) )
-      {
-         SYS_ERR( "send(%d): %d", m_master_socket, m_last_errno );
-         continue;
-      }
-      SYS_MSG( "send(%d): %zu bytes", m_master_socket, send_size );
+      base::socket::send( m_master_socket, byte_buffer.buffer( ), byte_buffer.size( ) );
    }
 
    SYS_INF( "exit" );
@@ -194,14 +124,9 @@ void ServiceBrockerThread::thread_loop_receive( )
    while( started_receive( ) )
    {
       memset( p_buffer, 0, sizeof( configuration::dsi::buffer_size ) );
-      ssize_t recv_size = recv( m_master_socket, p_buffer, configuration::dsi::buffer_size, 0 );
+      ssize_t recv_size = base::socket::recv( m_master_socket, p_buffer, configuration::dsi::buffer_size );
       if( 0 >= recv_size )
-      {
-         m_last_errno = errno;
-         SYS_ERR( "recv(%d): %d", m_master_socket, m_last_errno );
          continue;
-      }
-      SYS_MSG( "recv(%d): %ld bytes", m_master_socket, recv_size );
 
       ByteBufferT byte_buffer( p_buffer, recv_size );
       // byte_buffer.dump( );
@@ -270,7 +195,3 @@ IEvent::tSptr ServiceBrockerThread::get_event( )
 
    return p_event;
 }
-
-
-
-} // namespace base

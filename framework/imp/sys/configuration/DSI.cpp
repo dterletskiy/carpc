@@ -14,7 +14,8 @@ namespace base::configuration::dsi {
    const char* server_address = "/tmp/9Lq7BNBnBycd6nxy.socket";
 #elif defined INET_SOCKET
    const int socket_family = AF_INET;
-   const char* server_address = "192.168.6.134";
+   const char* server_address = "127.0.0.1";
+   // const char* server_address = "192.168.6.134";
 #endif
 
    const int socket_type = SOCK_STREAM;

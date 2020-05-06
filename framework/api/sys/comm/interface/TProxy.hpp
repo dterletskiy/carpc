@@ -19,46 +19,51 @@ namespace base {
    template< typename TYPES >
       class TClient;
 
+}
+
+
+
+namespace base {
 
    template< typename TYPES >
    struct RequestDB
    {
       using tClient = TClient< TYPES >;
 
-      size_t                        m_count = 0;
-      std::map< size_t, tClient* >  m_client_map;
+      size_t                              m_count = 0;
+      std::map< tSequenceID, tClient* >   m_client_map;
    };
 
 
 
    template< typename TYPES >
-   class RequestCount
+   class RequestProcessor
    {
       using tServer = TServer< TYPES >;
       using tProxy = TProxy< TYPES >;
       using tClient = TClient< TYPES >;
       using tRequestDB = RequestDB< TYPES >;
 
-   public:
-      RequestCount( tProxy* );
-      void server( const tServer* const p_server ) { mp_server = p_server; }
+      public:
+         RequestProcessor( tProxy* );
+         void server( const tServer* const p_server );
 
-   public:
-      template< typename tRequestData, typename... Args >
-         const tSequenceID request( tClient* p_client, const Args&... args );
-      const bool response( const typename TYPES::tEvent& );
+      public:
+         template< typename tRequestData, typename... Args >
+            const tSequenceID request( tClient* p_client, const Args&... args );
+         const bool response( const typename TYPES::tEvent& );
 
-   private:
-      size_t                                             m_seq_id = 0;
-      std::map< typename TYPES::tEventID, tRequestDB >   m_map;
-      const tServer*                                     mp_server = nullptr;
-      tProxy*                                            mp_proxy = nullptr;
+      private:
+         tSequenceID                                        m_seq_id = 0;
+         std::map< typename TYPES::tEventID, tRequestDB >   m_map;
+         const tServer*                                     mp_server = nullptr;
+         tProxy*                                            mp_proxy = nullptr;
    };
 
 
 
    template< typename TYPES >
-   RequestCount< TYPES >::RequestCount( tProxy* p_proxy )
+   RequestProcessor< TYPES >::RequestProcessor( tProxy* p_proxy )
       : mp_proxy( p_proxy )
    {
       for( auto item : TYPES::RR )
@@ -68,8 +73,15 @@ namespace base {
    }
 
    template< typename TYPES >
+   void RequestProcessor< TYPES >::server( const tServer* const p_server )
+   {
+      mp_server = p_server;
+      m_map.clear( );
+   }
+
+   template< typename TYPES >
    template< typename tRequestData, typename... Args >
-   const tSequenceID RequestCount< TYPES >::request( tClient* p_client, const Args&... args )
+   const tSequenceID RequestProcessor< TYPES >::request( tClient* p_client, const Args&... args )
    {
       auto event_id_iterator = m_map.find( tRequestData::REQUEST );
       if( m_map.end( ) == event_id_iterator )
@@ -109,7 +121,7 @@ namespace base {
    }
 
    template< typename TYPES >
-   const bool RequestCount< TYPES >::response( const typename TYPES::tEvent& event )
+   const bool RequestProcessor< TYPES >::response( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
       const tSequenceID seq_id = event.info( ).seq_id( );
@@ -160,9 +172,6 @@ namespace base {
 namespace base {
 
    template< typename TYPES >
-      class TServer;
-
-   template< typename TYPES >
    struct NotificationDB
    {
       using tClient = TClient< TYPES >;
@@ -175,7 +184,7 @@ namespace base {
 
 
    template< typename TYPES >
-   class NotificationCount
+   class NotificationProcessor
    {
       using tServer = TServer< TYPES >;
       using tProxy = TProxy< TYPES >;
@@ -183,27 +192,27 @@ namespace base {
       using tClientsSet = std::set< tClient* >;
       using tNotificationDB = NotificationDB< TYPES >;
 
-   public:
-      NotificationCount( tProxy* );
-      void server( const tServer* const p_server ) { mp_server = p_server; }
+      public:
+         NotificationProcessor( tProxy* );
+         void server( const tServer* const p_server );
 
-   public:
-      template< typename tNotificationData >
-         const bool subscribe( tClient* );
-      template< typename tNotificationData >
-         const bool unsubscribe( tClient* );
-      const bool notification( const typename TYPES::tEvent& );
+      public:
+         template< typename tNotificationData >
+            const bool subscribe( tClient* );
+         template< typename tNotificationData >
+            const bool unsubscribe( tClient* );
+         const bool notification( const typename TYPES::tEvent& );
 
-   private:
-      std::map< typename TYPES::tEventID, tNotificationDB > m_map;
-      const tServer*                                        mp_server = nullptr;
-      tProxy*                                               mp_proxy = nullptr;
+      private:
+         std::map< typename TYPES::tEventID, tNotificationDB > m_map;
+         const tServer*                                        mp_server = nullptr;
+         tProxy*                                               mp_proxy = nullptr;
    };
 
 
 
    template< typename TYPES >
-   NotificationCount< TYPES >::NotificationCount( tProxy* p_proxy )
+   NotificationProcessor< TYPES >::NotificationProcessor( tProxy* p_proxy )
       : mp_proxy( p_proxy )
    {
       for( auto item : TYPES::N )
@@ -213,8 +222,15 @@ namespace base {
    }
 
    template< typename TYPES >
+   void NotificationProcessor< TYPES >::server( const tServer* const p_server )
+   {
+      mp_server = p_server;
+      m_map.clear( );
+   }
+
+   template< typename TYPES >
    template< typename tNotificationData >
-   const bool NotificationCount< TYPES >::subscribe( tClient* p_client )
+   const bool NotificationProcessor< TYPES >::subscribe( tClient* p_client )
    {
       auto event_id_iterator = m_map.find( tNotificationData::NOTIFICATION );
       if( m_map.end( ) == event_id_iterator )
@@ -246,7 +262,7 @@ namespace base {
 
    template< typename TYPES >
    template< typename tNotificationData >
-   const bool NotificationCount< TYPES >::unsubscribe( tClient* p_client )
+   const bool NotificationProcessor< TYPES >::unsubscribe( tClient* p_client )
    {
       auto event_id_iterator = m_map.find( tNotificationData::NOTIFICATION );
       if( m_map.end( ) == event_id_iterator )
@@ -268,7 +284,7 @@ namespace base {
    }
 
    template< typename TYPES >
-   const bool NotificationCount< TYPES >::notification( const typename TYPES::tEvent& event )
+   const bool NotificationProcessor< TYPES >::notification( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
 
@@ -291,239 +307,228 @@ namespace base {
 
 namespace base {
 
+   template< typename TYPES >
+   class TProxy
+      : public IInterface
+      , public TYPES::tEventConsumer
+   {
+      using tServer = TServer< TYPES >;
+      using tClient = TClient< TYPES >;
+      using tProxy = TProxy< TYPES >;
+      using tRequestProcessor = RequestProcessor< TYPES >;
+      using tNotificationProcessor = NotificationProcessor< TYPES >;
+      using tAttributeMap = std::map< typename TYPES::tEventID, typename TYPES::tEvent >;
+
+      private:
+         TProxy( const std::string&, const std::string& );
+         static std::map< TID, tProxy* > s_proxy_map;
+      public:
+         ~TProxy( ) override;
+         static tProxy* create( const std::string&, const std::string& );
+
+      public:
+         void register_client( tClient* );
+         void unregister_client( tClient* );
+
+      private:
+         void connected( const void* const ) override final;
+         void disconnected( const void* const ) override final;
+
+      private:
+         void process_event( const typename TYPES::tEvent& ) override final;
+
+      public:
+         template< typename tRequestData, typename... Args >
+            const tSequenceID request( tClient*, const Args&... args );
+         template< typename tNotificationData >
+            const bool subscribe( tClient* );
+         template< typename tNotificationData >
+            const bool unsubscribe( tClient* );
+         template< typename tResponseData >
+            const tResponseData* get_event_data( const typename TYPES::tEvent& event );
+
+      public:
+         const bool is_connected( ) const;
+      private:
+         const tServer*             mp_server = nullptr;
+
+      private:
+         std::set< tClient* >       m_client_set;
+         tRequestProcessor          m_request_processor;
+         tNotificationProcessor     m_notification_processor;
+         tAttributeMap              m_attribute_map;
+   };
 
 
-template< typename TYPES >
-   class TServer;
-template< typename TYPES >
-   class TClient;
+
+   template< typename TYPES >
+   TProxy< TYPES >::TProxy( const std::string& name, const std::string& role_name )
+      : IInterface( name, role_name, eType::Client, TYPES::COMM_TYPE )
+      , TYPES::tEventConsumer( )
+      , m_request_processor( this )
+      , m_notification_processor( this )
+   {
+      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ServerConnected } );
+      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ClientConnected }, { this }, TYPES::COMM_TYPE );
+   }
+
+   template< typename TYPES >
+   TProxy< TYPES >::~TProxy( )
+   {
+      TYPES::tEvent::clear_all_notifications( this );
+      InterfaceEvent::Event::clear_all_notifications( this );
+      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ClientDisconnected }, { this }, TYPES::COMM_TYPE );
+   }
+
+   template< typename TYPES >
+   std::map< TID, TProxy< TYPES >* > TProxy< TYPES >::s_proxy_map;
+
+   template< typename TYPES >
+   TProxy< TYPES >* TProxy< TYPES >::create( const std::string& name, const std::string& role_name )
+   {
+      TID tid = ServiceProcess::instance( )->current_service( )->id( );
+      os::Mutex mutex( true );
+
+      auto iterator = s_proxy_map.find( tid );
+      if( s_proxy_map.end( ) != iterator )
+      {
+         SYS_TRC( "return existing proxy: %p", iterator->second );
+         return iterator->second;
+      }
+
+      tProxy* p_proxy = new tProxy( name, role_name );
+      if( nullptr == p_proxy )
+      {
+         SYS_ERR( "unable create proxy" );
+         return nullptr;
+      }
+      auto pair = s_proxy_map.emplace( tid, p_proxy );
+      if( false == pair.second )
+      {
+         SYS_ERR( "unable emplace create proxy" );
+         delete p_proxy;
+      }
+      SYS_TRC( "proxy created: %p", p_proxy );
+
+      return p_proxy;
+   }
+
+   template< typename TYPES >
+   const bool TProxy< TYPES >::is_connected( ) const
+   {
+      return nullptr != mp_server;
+   }
+
+   template< typename TYPES >
+   void TProxy< TYPES >::register_client( tClient* p_client )
+   {
+      if( nullptr == p_client )
+         return;
+
+      m_client_set.emplace( p_client );
+      if( is_connected( ) )
+         p_client->connected( );
+   }
+
+   template< typename TYPES >
+   void TProxy< TYPES >::unregister_client( tClient* p_client )
+   {
+      if( nullptr == p_client )
+         return;
+
+      m_client_set.erase( p_client );
+   }
 
 
+   template< typename TYPES >
+   void TProxy< TYPES >::connected( const void* const p_server )
+   {
+      if( nullptr != mp_server )
+         return;
 
-template< typename TYPES >
-class TProxy
-   : public IInterface
-   , public TYPES::tEventConsumer
-{
-   using tServer = TServer< TYPES >;
-   using tClient = TClient< TYPES >;
-   using tProxy = TProxy< TYPES >;
-   using tRequestCount = RequestCount< TYPES >;
-   using tNotificationCount = NotificationCount< TYPES >;
+      mp_server = reinterpret_cast< const tServer* >( p_server );
+      m_request_processor.server( mp_server );
+      m_notification_processor.server( mp_server );
 
-private:
-   TProxy( const std::string&, const std::string& );
-   static std::map< TID, tProxy* > s_proxy_map;
-public:
-   ~TProxy( ) override;
-   static tProxy* create( const std::string&, const std::string& );
+      for( auto item : m_client_set )
+         item->connected( );
 
-public:
-   void register_client( tClient* );
-   void unregister_client( tClient* );
+      InterfaceEvent::Event::clear_notification( this, { service_name( ), eInterface::ServerConnected } );
+      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ServerDisconnected } );
+      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ClientConnected }, { this }, TYPES::COMM_TYPE );
+   }
 
-private:
-   void connected( const void* const ) override final;
-   void disconnected( const void* const ) override final;
+   template< typename TYPES >
+   void TProxy< TYPES >::disconnected( const void* const p_server )
+   {
+      m_request_processor.server( nullptr );
+      m_notification_processor.server( nullptr );
 
-private:
-   void process_event( const typename TYPES::tEvent& ) override final;
+      mp_server = nullptr;
+      for( auto item : m_client_set )
+         item->disconnected( );
 
-public:
+      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ServerConnected } );
+      InterfaceEvent::Event::clear_notification( this, { service_name( ), eInterface::ServerDisconnected } );
+   }
+
+   template< typename TYPES >
+   void TProxy< TYPES >::process_event( const typename TYPES::tEvent& event )
+   {
+      const typename TYPES::tEventID event_id = event.info( ).id( );
+      const void* p_from_addr = event.info( ).from_addr( );
+      const void* p_to_addr = event.info( ).to_addr( );
+      const tSequenceID seq_id = event.info( ).seq_id( );
+
+      SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
+
+      if( true == m_request_processor.response( event ) )
+         return;
+      if( true == m_notification_processor.notification( event ) )
+         return;
+
+      SYS_WRN( "unknown event" );
+   }
+
+   template< typename TYPES >
    template< typename tRequestData, typename... Args >
-      const tSequenceID request( tClient*, const Args&... args );
+   const tSequenceID TProxy< TYPES >::request( tClient* p_client, const Args&... args )
+   {
+      if( !is_connected( ) )
+      {
+         SYS_WRN( "proxy is not connected" );
+         return InvalidSequenceID;
+      }
+
+      return m_request_processor.template request< tRequestData >( p_client, args... );
+   }
+
+   template< typename TYPES >
    template< typename tNotificationData >
-      const bool subscribe( tClient* );
+   const bool TProxy< TYPES >::subscribe( tClient* p_client )
+   {
+      if( !is_connected( ) )
+      {
+         SYS_WRN( "proxy is not connected" );
+         return InvalidSequenceID;
+      }
+
+      return m_notification_processor.template subscribe< tNotificationData >( p_client );
+   }
+
+   template< typename TYPES >
    template< typename tNotificationData >
-      const bool unsubscribe( tClient* );
+   const bool TProxy< TYPES >::unsubscribe( tClient* p_client )
+   {
+      return m_notification_processor.template unsubscribe< tNotificationData >( p_client );
+   }
+
+   template< typename TYPES >
    template< typename tResponseData >
-      const tResponseData* get_event_data( const typename TYPES::tEvent& event );
-
-public:
-   const bool is_connected( ) const;
-private:
-   const tServer*                                              mp_server = nullptr;
-
-private:
-   std::set< tClient* >                                           m_client_set;
-   tRequestCount                                                  m_request_count;
-   tNotificationCount                                             m_notification_count;
-   std::map< typename TYPES::tEventID, typename TYPES::tEvent >   m_attribute_map;
-};
-
-
-
-template< typename TYPES >
-TProxy< TYPES >::TProxy( const std::string& name, const std::string& role_name )
-   : IInterface( name, role_name )
-   , TYPES::tEventConsumer( )
-   , m_request_count( this )
-   , m_notification_count( this )
-{
-   InterfaceEvent::Event::set_notification( this, { role( ), eInterface::ServerConnected } );
-   InterfaceEvent::Event::create_send( { role( ), eInterface::ClientConnected }, { this }, TYPES::COMM_TYPE );
-}
-
-template< typename TYPES >
-TProxy< TYPES >::~TProxy( )
-{
-   TYPES::tEvent::clear_all_notifications( this );
-   InterfaceEvent::Event::clear_all_notifications( this );
-   InterfaceEvent::Event::create_send( { role( ), eInterface::ClientDisconnected }, { this }, TYPES::COMM_TYPE );
-}
-
-template< typename TYPES >
-std::map< TID, TProxy< TYPES >* > TProxy< TYPES >::s_proxy_map;
-
-template< typename TYPES >
-TProxy< TYPES >* TProxy< TYPES >::create( const std::string& name, const std::string& role_name )
-{
-   TID tid = ServiceProcess::instance( )->current_service( )->id( );
-   os::Mutex mutex( true );
-
-   auto iterator = s_proxy_map.find( tid );
-   if( s_proxy_map.end( ) != iterator )
+   const tResponseData* TProxy< TYPES >::get_event_data( const typename TYPES::tEvent& event )
    {
-      SYS_TRC( "return existing proxy: %p", iterator->second );
-      return iterator->second;
+      return static_cast< tResponseData* >( event.data( )->ptr.get( ) );
    }
-
-   tProxy* p_proxy = new tProxy( name, role_name );
-   if( nullptr == p_proxy )
-   {
-      SYS_ERR( "unable create proxy" );
-      return nullptr;
-   }
-   auto pair = s_proxy_map.emplace( tid, p_proxy );
-   if( false == pair.second )
-   {
-      SYS_ERR( "unable emplace create proxy" );
-      delete p_proxy;
-   }
-   SYS_TRC( "proxy created: %p", p_proxy );
-
-   return p_proxy;
-}
-
-template< typename TYPES >
-const bool TProxy< TYPES >::is_connected( ) const
-{
-   return nullptr != mp_server;
-}
-
-template< typename TYPES >
-void TProxy< TYPES >::register_client( tClient* p_client )
-{
-   if( nullptr == p_client )
-      return;
-
-   m_client_set.emplace( p_client );
-   if( is_connected( ) )
-      p_client->connected( );
-}
-
-template< typename TYPES >
-void TProxy< TYPES >::unregister_client( tClient* p_client )
-{
-   if( nullptr == p_client )
-      return;
-
-   m_client_set.erase( p_client );
-}
-
-
-template< typename TYPES >
-void TProxy< TYPES >::connected( const void* const p_server )
-{
-   if( nullptr != mp_server )
-      return;
-
-   InterfaceEvent::Event::clear_notification( this, { role( ), eInterface::ServerConnected } );
-   InterfaceEvent::Event::set_notification( this, { role( ), eInterface::ServerDisconnected } );
-
-   mp_server = reinterpret_cast< const tServer* >( p_server );
-   m_request_count.server( mp_server );
-   m_notification_count.server( mp_server );
-
-   for( auto item : m_client_set )
-      item->connected( );
-
-   InterfaceEvent::Event::create_send( { role( ), eInterface::ClientConnected }, { this }, TYPES::COMM_TYPE );
-}
-
-template< typename TYPES >
-void TProxy< TYPES >::disconnected( const void* const p_server )
-{
-   m_request_count.server( nullptr );
-   m_notification_count.server( nullptr );
-
-   InterfaceEvent::Event::set_notification( this, { role( ), eInterface::ServerConnected } );
-   InterfaceEvent::Event::clear_notification( this, { role( ), eInterface::ServerDisconnected } );
-
-   mp_server = nullptr;
-   for( auto item : m_client_set )
-      item->disconnected( );
-}
-
-template< typename TYPES >
-void TProxy< TYPES >::process_event( const typename TYPES::tEvent& event )
-{
-   const typename TYPES::tEventID event_id = event.info( ).id( );
-   const void* p_from_addr = event.info( ).from_addr( );
-   const void* p_to_addr = event.info( ).to_addr( );
-   const tSequenceID seq_id = event.info( ).seq_id( );
-
-   SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
-
-   if( true == m_request_count.response( event ) )
-      return;
-   if( true == m_notification_count.notification( event ) )
-      return;
-
-   SYS_WRN( "unknown event" );
-}
-
-template< typename TYPES >
-template< typename tRequestData, typename... Args >
-const tSequenceID TProxy< TYPES >::request( tClient* p_client, const Args&... args )
-{
-   if( !is_connected( ) )
-   {
-      SYS_WRN( "proxy is not connected" );
-      return InvalidSequenceID;
-   }
-
-   return m_request_count.template request< tRequestData >( p_client, args... );
-}
-
-template< typename TYPES >
-template< typename tNotificationData >
-const bool TProxy< TYPES >::subscribe( tClient* p_client )
-{
-   if( !is_connected( ) )
-   {
-      SYS_WRN( "proxy is not connected" );
-      return InvalidSequenceID;
-   }
-
-   return m_notification_count.template subscribe< tNotificationData >( p_client );
-}
-
-template< typename TYPES >
-template< typename tNotificationData >
-const bool TProxy< TYPES >::unsubscribe( tClient* p_client )
-{
-   return m_notification_count.template unsubscribe< tNotificationData >( p_client );
-}
-
-template< typename TYPES >
-template< typename tResponseData >
-const tResponseData* TProxy< TYPES >::get_event_data( const typename TYPES::tEvent& event )
-{
-   return static_cast< tResponseData* >( event.data( )->ptr.get( ) );
-}
-
-
 
 } // namespace base
 

@@ -15,6 +15,7 @@ Server::Server( const std::string& role_name, const std::string& name )
    , m_name( name )
 {
    DBG_MSG( "%s: created", m_name.c_str( ) );
+   current_state( "Unloaded" );
 }
 
 Server::~Server( )

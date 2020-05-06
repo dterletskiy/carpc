@@ -5,7 +5,7 @@
 
 namespace api::onoff {
 
-   const std::string interface_name = "OnOff";
+   const std::string interface_name = data::OnOffEvent::Signature::build_type_id( ).name( );
 
    const std::vector< base::RequestResponseIDs< eOnOff > > s_rr = {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState },

@@ -1,3 +1,7 @@
+version 1.6.2
+ - Socket class implemented.
+ - Subscribe/unsubscribe on notification handling on server side.
+
 version 1.6.1
  - AsyncTypeID implemented as template class what contains type_id inside and could be as:
       - std::string and in this case it is built as typeid::type_info::name (not optimized size for IPC but more readable)

@@ -9,10 +9,10 @@ namespace base {
 
 
 
-ByteBuffer::ByteBuffer( )
+ByteBuffer::ByteBuffer( const size_t capacity )
 {
-   if( true == allocate( 100 ) )
-      memset( mp_buffer, 0, m_size );
+   if( true == allocate( capacity ) )
+      fill( );
 }
 
 ByteBuffer::ByteBuffer( const void* p_buffer, const size_t size )
@@ -52,6 +52,11 @@ void ByteBuffer::dump( ) const
 void ByteBuffer::info( ) const
 {
    SYS_INF( "address: %p / capacity: %zu / size: %zu", mp_buffer, m_capacity, m_size );
+}
+
+void ByteBuffer::fill( const char symbol )
+{
+   memset( mp_buffer, symbol, m_capacity );
 }
 
 bool ByteBuffer::allocate( const size_t capacity )
@@ -98,8 +103,7 @@ bool ByteBuffer::reallocate( const size_t capacity, const bool is_store )
    if( true == is_store )
       memcpy( p_buffer, mp_buffer, m_size );
    // Storing data was not requested => size should be 0
-   else
-      m_size = 0;
+   else m_size = 0;
 
    free( mp_buffer );
    mp_buffer = p_buffer;
@@ -138,12 +142,15 @@ bool ByteBuffer::write( const void* p_buffer, const size_t size, const bool is_r
    // Buffer is not allocated
    if( nullptr == mp_buffer ) return false;
    // Reallocating buffer is requested with saving prevous content
-   if( ( m_capacity - m_size ) < size && false == is_reallocate )
-      return false;
-
    if( ( m_capacity - m_size ) < size )
-      if( false == reallocate( m_size + size, true ) )
-         return false;
+   {
+      if( true == is_reallocate )
+      {
+         if( false == reallocate( m_size + size, true ) )
+            return false;
+      }
+      else return false;
+   }
 
    memcpy( mp_buffer + m_size, p_buffer, size );
 

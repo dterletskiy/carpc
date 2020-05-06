@@ -13,6 +13,19 @@ namespace base {
    template< typename _ID >
    struct RequestResponseIDs
    {
+      using tRequestResponseIDs = RequestResponseIDs< _ID >;
+
+      struct Comparator
+      {
+         struct ByRequest
+         {
+            bool operator( )( const tRequestResponseIDs& rr1, const tRequestResponseIDs& rr2 ) const
+            {
+               return rr1.request < rr2.request;
+            }
+         };
+      };
+
       RequestResponseIDs( const _ID& _request )
          : request( _request ) { }
       RequestResponseIDs( const _ID& _request, const _ID& _busy, const _ID& _response )

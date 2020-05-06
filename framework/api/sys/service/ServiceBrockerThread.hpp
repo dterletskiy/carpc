@@ -64,9 +64,6 @@ private:
 private:
    bool setup_connection( );
    int                           m_master_socket;
-
-private:
-   int                           m_last_errno = 0;
 };
 
 
