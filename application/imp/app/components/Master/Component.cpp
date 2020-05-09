@@ -10,13 +10,13 @@ namespace application::components::master {
 
 
 
-base::IComponent::tSptr Component::creator( base::IServiceThread::tSptr p_service )
+base::IComponent::tSptr Component::creator( base::IServiceThread& service )
 {
-   return std::shared_ptr< Component >( new Component( p_service, "Master" ) );
+   return std::shared_ptr< Component >( new Component( service, "Master" ) );
 }
 
-Component::Component( const base::IServiceThread::tSptr p_service, const std::string& name )
-   : base::Component( p_service, name )
+Component::Component( base::IServiceThread& service, const std::string& name )
+   : base::Component( service, name )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::BOOT );

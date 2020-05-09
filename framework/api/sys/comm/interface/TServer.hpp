@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/comm/interface/IInterface.hpp"
+#include "api/sys/comm/interface/IServer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TServer"
@@ -65,10 +65,9 @@ namespace base {
 
    template< typename TYPES >
    class TServer
-      : public IInterface
+      : public IServer
       , public TYPES::tEventConsumer
    {
-      using tProxy = TProxy< TYPES >;
       using tRequestResponseIDs = RequestResponseIDs< typename TYPES::tEventID >;
       using tRequestStatusMap = std::map< tRequestResponseIDs, RequestStatus, typename tRequestResponseIDs::Comparator::ByRequest >;
       using tNotificationStatus = NotificationStatus< TYPES >;
@@ -77,16 +76,6 @@ namespace base {
       public:
          TServer( const std::string&, const std::string& );
          ~TServer( ) override;
-
-      private:
-         void connected( const void* const ) override final;
-         void disconnected( const void* const ) override final;
-      private:
-         virtual void connected( ) = 0;
-         virtual void disconnected( ) = 0;
-
-      private:
-         std::set< const tProxy* > mp_proxy_set;
 
       protected:
          template< typename tResponseData, typename... Args >
@@ -123,7 +112,7 @@ namespace base {
 
    template< typename TYPES >
    TServer< TYPES >::TServer( const std::string& name, const std::string& role_name )
-      : IInterface( name, role_name, eType::Server, TYPES::COMM_TYPE )
+      : IServer( name, role_name, TYPES::COMM_TYPE )
       , TYPES::tEventConsumer( )
    {
       for( auto rr_item : TYPES::RR )
@@ -137,46 +126,12 @@ namespace base {
          TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), n_item.subscribe, nullptr, this ) );
          TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), n_item.unsubscribe, nullptr, this ) );
       }
-
-      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ClientConnected } );
-      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ClientDisconnected } );
-      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ServerConnected }, { this }, TYPES::COMM_TYPE );
    }
 
    template< typename TYPES >
    TServer< TYPES >::~TServer( )
    {
       TYPES::tEvent::clear_all_notifications( this );
-      InterfaceEvent::Event::clear_all_notifications( this );
-      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ServerDisconnected }, { this }, TYPES::COMM_TYPE );
-   }
-
-   template< typename TYPES >
-   void TServer< TYPES >::connected( const void* const p_proxy )
-   {
-      // Check if current proxy was connected previously
-      const tProxy* const _p_proxy = reinterpret_cast< const tProxy* const >( p_proxy );
-      auto iterator = mp_proxy_set.find( _p_proxy );
-      if( mp_proxy_set.end( ) != iterator )
-         return;
-
-      // Add connected proxy to local collection
-      mp_proxy_set.emplace( _p_proxy );
-      // Notifying final server implementation about connected proxy
-      connected( );
-
-      // Send event to all consumers (just connected proxy) that server is connected
-      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ServerConnected }, { this }, TYPES::COMM_TYPE );
-   }
-
-   template< typename TYPES >
-   void TServer< TYPES >::disconnected( const void* const p_proxy )
-   {
-      // Remove just disconnected proxy from local collection
-      const tProxy* const _p_proxy = reinterpret_cast< const tProxy* const >( p_proxy );
-      mp_proxy_set.erase( _p_proxy );
-      // Notifying final server implementation about disconnected proxy
-      disconnected( );
    }
 
    template< typename TYPES >

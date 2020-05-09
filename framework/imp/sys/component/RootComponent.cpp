@@ -1,17 +1,18 @@
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/component/RootComponent.hpp"
-#include "imp/sys/events/Events.hpp"
+#include "api/sys/events/Events.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "RootComponent"
 
 
-namespace base {
+
+using namespace base;
 
 
 
-RootComponent::RootComponent( const IServiceThread::tSptr p_service, const std::string& name )
-   : Component( p_service, name )
+RootComponent::RootComponent( IServiceThread& service, const std::string& name )
+   : Component( service, name )
 {
    SYS_INF( "%p", this );
 }
@@ -26,8 +27,6 @@ void RootComponent::boot( const std::string& message )
 
 void RootComponent::shutdown( const std::string& message )
 {
-   events::service::ServiceEvent::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::ITC );
+   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::ITC );
+   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::IPC );
 }
-
-
-} // namespace base

@@ -2,7 +2,6 @@
 
 #include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/timer.hpp"
-#include "api/sys/service/ServiceBrockerThread.hpp"
 #include "api/sys/service/ServiceThread.hpp"
 
 
@@ -35,9 +34,9 @@ public:
    void boot( );
 
 public:
-   ServiceBrockerThread::tSptr service_brocker( ) const;
+   IServiceThread::tSptr service_ipc( ) const;
 private:
-   ServiceBrockerThread::tSptr   mp_service_brocker = nullptr;
+   IServiceThread::tSptr   mp_service_ipc = nullptr;
 
 public:
    IServiceThread::tSptr service( const TID& ) const;

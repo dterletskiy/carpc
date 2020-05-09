@@ -12,7 +12,7 @@ namespace base {
 class Component : public IComponent
 {
 public:
-   Component( const IServiceThread::tSptr, const std::string& );
+   Component( IServiceThread&, const std::string& );
    ~Component( ) override;
 
 private:
@@ -31,7 +31,7 @@ private:
    ID                         m_id;
 
 private:
-   IServiceThread::tWptr      mp_service;
+   IServiceThread&            m_service;
 
 protected:
    void start_performance( const std::string& message = "" );

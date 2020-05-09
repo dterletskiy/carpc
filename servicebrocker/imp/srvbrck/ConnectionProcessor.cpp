@@ -8,8 +8,8 @@
 
 namespace {
 
-   // const size_t s_buffer_size = base::configuration::dsi::buffer_size;
-   const size_t s_buffer_size = 10;
+   const size_t s_buffer_size = base::configuration::dsi::buffer_size;
+   // const size_t s_buffer_size = 10;
 
 }
 

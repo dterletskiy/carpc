@@ -5,14 +5,14 @@
 #define CLASS_ABBR "Component"
 
 
-namespace base {
+using namespace base;
 
 
 
-Component::Component( const IServiceThread::tSptr p_service, const std::string& name )
+Component::Component( IServiceThread& service, const std::string& name )
    : m_name( name )
    , m_id( tools::generate_id( "Component" ) )
-   , mp_service( p_service )
+   , m_service( service )
    , m_performance( m_name )
 {
    DBG_MSG( "Created: %s", m_name.c_str( ) );
@@ -22,7 +22,3 @@ Component::~Component( )
 {
    DBG_MSG( "Destroyed: %s", m_name.c_str( ) );
 }
-
-
-
-} // namespace base

@@ -2,6 +2,7 @@
 
 // Framework
 #include "api/sys/component/RootComponent.hpp"
+#include "api/sys/comm/timer/Timer.hpp"
 // Application
 #include "imp/app/components/OnOff/server/Server.hpp"
 
@@ -13,12 +14,13 @@ namespace application::components::onoff {
 
 class Component
    : public base::RootComponent
+   , public base::ITimerConsumer
 {
 public:
-   static base::IComponent::tSptr creator( base::IServiceThread::tSptr );
+   static base::IComponent::tSptr creator( base::IServiceThread& service );
 
 private:
-   Component( const base::IServiceThread::tSptr, const std::string& );
+   Component( base::IServiceThread& service, const std::string& );
 public:
    ~Component( ) override;
 
@@ -27,6 +29,11 @@ private:
 
 private:
    Server m_server_onoff;
+
+// Timer
+private:
+   void process_timer( const base::TimerID ) override;
+   base::Timer m_timer;
 };
 
 

@@ -1,9 +1,8 @@
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/service/ServiceBrockerThread.hpp"
 #include "api/sys/service/ServiceThread.hpp"
+#include "api/sys/service/ServiceIpcThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
-#include "api/sys/comm/interface/IInterface.hpp"
-#include "imp/sys/events/Events.hpp"
+#include "api/sys/events/Events.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvcProc"
@@ -33,7 +32,7 @@ namespace {
 
 
 
-namespace base {
+using namespace base;
 
 
 
@@ -60,9 +59,9 @@ ServiceProcess::tSptr ServiceProcess::instance( )
    return mp_instance;
 }
 
-ServiceBrockerThread::tSptr ServiceProcess::service_brocker( ) const
+IServiceThread::tSptr ServiceProcess::service_ipc( ) const
 {
-   return mp_service_brocker;
+   return mp_service_ipc;
 }
 
 IServiceThread::tSptr ServiceProcess::service( const TID& id ) const
@@ -84,6 +83,9 @@ IServiceThread::tSptr ServiceProcess::current_service( ) const
          return p_service;
    }
 
+   if( os::Thread::current_id( ) == mp_service_ipc->id( ) )
+      return mp_service_ipc;
+
    return nullptr;
 }
 
@@ -94,11 +96,11 @@ IServiceThread::tSptrList ServiceProcess::service_list( ) const
 
 bool ServiceProcess::start( const ServiceThread::Info::tVector& service_infos )
 {
-   REGISTER_EVENT( base::InterfaceEvent );
+   REGISTER_EVENT( base::events::interface::Interface );
 
    // Creating service brocker thread
-   mp_service_brocker = ServiceBrockerThread::instance( );
-   if( nullptr == mp_service_brocker )
+   mp_service_ipc = ServiceIpcThread::instance( );
+   if( nullptr == mp_service_ipc )
       return false;
    // Creating service threads
    for( const auto& service_info : service_infos )
@@ -110,14 +112,16 @@ bool ServiceProcess::start( const ServiceThread::Info::tVector& service_infos )
    }
 
    // Starting service brocker thread
-   if( false == mp_service_brocker->start( ) )
+   if( false == mp_service_ipc->start( ) )
    {
       // return false;
    }
+   sleep(1); // timeout IPC service thread is started before other service threads
    // Starting service threads
    for( const auto p_service : m_service_list )
       if( false == p_service->start( ) )
          return false;
+   sleep(1); // timeout all service threads is started before booting system
 
    // Watchdog timer
    if( false == os::linux::timer::create( m_timer_id, timer_handler ) )
@@ -133,7 +137,7 @@ bool ServiceProcess::stop( )
    for( auto& p_service : m_service_list )
       p_service->stop( );
    m_service_list.clear( );
-   mp_service_brocker->stop( );
+   mp_service_ipc->stop( );
 
    os::linux::timer::remove( m_timer_id );
 
@@ -144,25 +148,18 @@ void ServiceProcess::boot( )
 {
    SYS_MSG( "booting..." );
 
-   sleep(3);
-
-   events::service::ServiceEvent::Event::create_send( { events::service::eID::boot }, { "booting application" }, eCommType::ITC );
+   events::service::Service::Event::create_send( { events::service::eID::boot }, { "booting application" }, eCommType::ITC );
+   events::service::Service::Event::create_send( { events::service::eID::boot }, { "booting application" }, eCommType::IPC );
 
    for( auto& p_service : m_service_list )
       p_service->wait( );
-   SYS_MSG( "All services are finished" );
+   SYS_MSG( "All services are stopped" );
 
-   SYS_MSG( "Stopping ServiceBrockerThread" );
-   mp_service_brocker->stop( );
-   mp_service_brocker->wait( );
-   SYS_MSG( "ServiceBrockerThread is finished" );
+   mp_service_ipc->wait( );
+   SYS_MSG( "IPC service is stopped" );
 
    os::linux::timer::remove( m_timer_id );
 
    m_service_list.clear( );
-   mp_service_brocker.reset( );
+   mp_service_ipc.reset( );
 }
-
-
-
-} // namespace base

@@ -6,42 +6,12 @@
 
 
 
-namespace base {
-
-   const char* c_str( const eInterface id )
-   {
-      switch( id )
-      {
-         case eInterface::ServerConnected:      return "eInterface::ServerConnected";
-         case eInterface::ServerDisconnected:   return "eInterface::ServerDisconnected";
-         case eInterface::ClientConnected:      return "eInterface::ClientConnected";
-         case eInterface::ClientDisconnected:   return "eInterface::ClientDisconnected";
-         case eInterface::Undefined:
-         default:                               return "eInterface::Undefined";
-      }
-   }
-
-   bool InterfaceEventData::to_buffer( base::ByteBufferT& buffer ) const
-   {
-      return buffer.push( ptr );
-   }
-
-   bool InterfaceEventData::from_buffer( base::ByteBufferT& buffer )
-   {
-      return buffer.pop( ptr );
-   }
-
-} // namespase base
+using namespace base;
 
 
 
-namespace base {
-
-
-
-IInterface::IInterface( const std::string& name, const std::string& role, const eType type, const eCommType comm_type )
-   : m_type( type )
-   , m_comm_type( comm_type )
+IInterface::IInterface( const std::string& name, const std::string& role, const eCommType comm_type )
+   : m_comm_type( comm_type )
    , m_name( name )
    , m_role( role )
 {
@@ -54,7 +24,7 @@ IInterface::~IInterface( )
    SYS_TRC( "destroyed %s/%s", m_name.c_str( ), m_role.c_str( ) );
 }
 
-void IInterface::process_event( const InterfaceEvent::Event& event )
+void IInterface::process_event( const events::interface::Interface::Event& event )
 {
    if( !(event.data( )) )
    {
@@ -63,25 +33,22 @@ void IInterface::process_event( const InterfaceEvent::Event& event )
    }
 
    const void* const ptr = event.data( )->ptr;
-   SYS_TRC( "connected side: %p", ptr );
    switch( event.info( ).id( ) )
    {
-      case eInterface::ServerConnected:
-      case eInterface::ClientConnected:
+      case events::interface::eID::ServerConnected:
+      case events::interface::eID::ClientConnected:
       {
+         SYS_TRC( "connected side: %p", ptr );
          connected( ptr );
          break;
       }
-      case eInterface::ServerDisconnected:
-      case eInterface::ClientDisconnected:
+      case events::interface::eID::ServerDisconnected:
+      case events::interface::eID::ClientDisconnected:
       {
+         SYS_TRC( "disconnected side: %p", ptr );
          disconnected( ptr );
          break;
       }
       default: break;
    }
 }
-
-
-
-} // namespace base

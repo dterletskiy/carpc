@@ -89,14 +89,15 @@ namespace {
 
 
 
-base::IComponent::tSptr Component::creator( base::IServiceThread::tSptr p_service )
+base::IComponent::tSptr Component::creator( base::IServiceThread& service )
 {
-   return std::shared_ptr< Component >( new Component( p_service, "OnOff" ) );
+   return std::shared_ptr< Component >( new Component( service, "OnOff" ) );
 }
 
-Component::Component( const base::IServiceThread::tSptr p_service, const std::string& name )
-   : base::RootComponent( p_service, name )
+Component::Component( base::IServiceThread& service, const std::string& name )
+   : base::RootComponent( service, name )
    , m_server_onoff( "OnOffService", "OnOffService-Server" )
+   , m_timer( this )
 {
    DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
 }
@@ -113,12 +114,23 @@ void Component::boot( const std::string& command )
 
    // s_event_test.execute( );
 
-   auto operation = [ ]( )
+   auto operation = [ this ]( )
    {
       DBG_MSG( "operation" );
       events::AppEvent::Event::create_send( { events::eAppEventID::BOOT }, { "booting" }, base::eCommType::ITC );
+      m_timer.start( 15000000000 );
    };
    base::Runnable::create_send( operation );
+}
+
+void Component::process_timer( const base::TimerID id )
+{
+   DBG_MSG( "Timer '%#lx' expired", (long)id );
+   if( id == m_timer.id( ) )
+   {
+      DBG_WRN( "Shutting down system" );
+      shutdown( );
+   }
 }
 
 

@@ -125,7 +125,7 @@ void boot( )
 
 const bool test( )
 {
-   // return true;
+   return true;
 
 
 

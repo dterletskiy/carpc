@@ -7,7 +7,7 @@
 
 
 
-namespace base {
+using namespace base;
 
 
 
@@ -35,11 +35,11 @@ void ServiceThread::thread_loop( )
    SYS_INF( "'%s': enter", m_name.c_str( ) );
    m_started = true;
 
+   ServiceEventConsumer service_event_consumer( *this );
+
    // Creating components
    for( auto creator : m_component_creators )
-      m_components.emplace_back( creator( shared_from_this( ) ) );
-
-   ServiceEventConsumer service_event_consumer( shared_from_this( ) );
+      m_components.emplace_back( creator( *this ) );
 
    while( started( ) )
    {
@@ -232,7 +232,3 @@ bool ServiceThread::is_subscribed( const IAsync::tSptr p_event )
 
    return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );
 }
-
-
-
-} // namespace base

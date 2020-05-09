@@ -11,7 +11,7 @@ namespace base {
 class RootComponent : public Component
 {
 public:
-   RootComponent( const IServiceThread::tSptr, const std::string& );
+   RootComponent( IServiceThread&, const std::string& );
    ~RootComponent( ) override;
 
 private:

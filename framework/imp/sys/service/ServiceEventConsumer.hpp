@@ -1,32 +1,27 @@
 #pragma once
 
-#include "api/sys/service/IServiceThread.hpp"
-#include "imp/sys/events/Events.hpp"
+#include "api/sys/events/Events.hpp"
 
 
 
 namespace base {
 
+   class IServiceThread;
 
+   class ServiceEventConsumer : public events::service::Service::Consumer
+   {
+      public:
+         ServiceEventConsumer( IServiceThread& );
+         ~ServiceEventConsumer( ) override;
+      private:
+         ServiceEventConsumer( const ServiceEventConsumer& ) = delete;
+         ServiceEventConsumer& operator=( const ServiceEventConsumer& ) = delete;
 
-class ServiceEventConsumer
-   : public events::service::ServiceEvent::Consumer
-{
-public:
-   ServiceEventConsumer( IServiceThread::tSptr );
-   ~ServiceEventConsumer( ) override;
-private:
-   ServiceEventConsumer( const ServiceEventConsumer& ) = delete;
-   ServiceEventConsumer& operator=( const ServiceEventConsumer& ) = delete;
+      private:
+         IServiceThread& m_service;
 
-private:
-   IServiceThread::tWptr mp_service;
-
-private:
-   void process_event( const events::service::ServiceEvent::Event& ) override;
-};
-
-
-
+      private:
+         void process_event( const events::service::Service::Event& ) override;
+   };
 
 } // namespace base

@@ -4,6 +4,6 @@
 
 namespace base {
 
-const tSequenceID InvalidSequenceID = 0;
+
 
 } // namespace base

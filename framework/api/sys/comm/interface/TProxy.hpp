@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/comm/interface/IInterface.hpp"
+#include "api/sys/comm/interface/IProxy.hpp"
 #include "api/sys/comm/interface/TClient.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 
@@ -39,14 +39,13 @@ namespace base {
    template< typename TYPES >
    class RequestProcessor
    {
-      using tServer = TServer< TYPES >;
       using tProxy = TProxy< TYPES >;
       using tClient = TClient< TYPES >;
       using tRequestDB = RequestDB< TYPES >;
 
       public:
          RequestProcessor( tProxy* );
-         void server( const tServer* const p_server );
+         void server( const void* const p_server );
 
       public:
          template< typename tRequestData, typename... Args >
@@ -56,7 +55,7 @@ namespace base {
       private:
          tSequenceID                                        m_seq_id = 0;
          std::map< typename TYPES::tEventID, tRequestDB >   m_map;
-         const tServer*                                     mp_server = nullptr;
+         const void*                                        mp_server = nullptr;
          tProxy*                                            mp_proxy = nullptr;
    };
 
@@ -73,10 +72,11 @@ namespace base {
    }
 
    template< typename TYPES >
-   void RequestProcessor< TYPES >::server( const tServer* const p_server )
+   void RequestProcessor< TYPES >::server( const void* const p_server )
    {
       mp_server = p_server;
-      m_map.clear( );
+      for( auto item : m_map )
+         item.second = tRequestDB{ };
    }
 
    template< typename TYPES >
@@ -186,7 +186,6 @@ namespace base {
    template< typename TYPES >
    class NotificationProcessor
    {
-      using tServer = TServer< TYPES >;
       using tProxy = TProxy< TYPES >;
       using tClient = TClient< TYPES >;
       using tClientsSet = std::set< tClient* >;
@@ -194,7 +193,7 @@ namespace base {
 
       public:
          NotificationProcessor( tProxy* );
-         void server( const tServer* const p_server );
+         void server( const void* const p_server );
 
       public:
          template< typename tNotificationData >
@@ -205,7 +204,7 @@ namespace base {
 
       private:
          std::map< typename TYPES::tEventID, tNotificationDB > m_map;
-         const tServer*                                        mp_server = nullptr;
+         const void*                                           mp_server = nullptr;
          tProxy*                                               mp_proxy = nullptr;
    };
 
@@ -222,10 +221,11 @@ namespace base {
    }
 
    template< typename TYPES >
-   void NotificationProcessor< TYPES >::server( const tServer* const p_server )
+   void NotificationProcessor< TYPES >::server( const void* const p_server )
    {
       mp_server = p_server;
-      m_map.clear( );
+      for( auto item : m_map )
+         item.second = tNotificationDB{ };
    }
 
    template< typename TYPES >
@@ -309,10 +309,9 @@ namespace base {
 
    template< typename TYPES >
    class TProxy
-      : public IInterface
+      : public IProxy
       , public TYPES::tEventConsumer
    {
-      using tServer = TServer< TYPES >;
       using tClient = TClient< TYPES >;
       using tProxy = TProxy< TYPES >;
       using tRequestProcessor = RequestProcessor< TYPES >;
@@ -326,13 +325,9 @@ namespace base {
          ~TProxy( ) override;
          static tProxy* create( const std::string&, const std::string& );
 
-      public:
-         void register_client( tClient* );
-         void unregister_client( tClient* );
-
       private:
-         void connected( const void* const ) override final;
-         void disconnected( const void* const ) override final;
+         void connected( ) override final;
+         void disconnected( ) override final;
 
       private:
          void process_event( const typename TYPES::tEvent& ) override final;
@@ -347,13 +342,7 @@ namespace base {
          template< typename tResponseData >
             const tResponseData* get_event_data( const typename TYPES::tEvent& event );
 
-      public:
-         const bool is_connected( ) const;
       private:
-         const tServer*             mp_server = nullptr;
-
-      private:
-         std::set< tClient* >       m_client_set;
          tRequestProcessor          m_request_processor;
          tNotificationProcessor     m_notification_processor;
          tAttributeMap              m_attribute_map;
@@ -363,21 +352,17 @@ namespace base {
 
    template< typename TYPES >
    TProxy< TYPES >::TProxy( const std::string& name, const std::string& role_name )
-      : IInterface( name, role_name, eType::Client, TYPES::COMM_TYPE )
+      : IProxy( name, role_name, TYPES::COMM_TYPE )
       , TYPES::tEventConsumer( )
       , m_request_processor( this )
       , m_notification_processor( this )
    {
-      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ServerConnected } );
-      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ClientConnected }, { this }, TYPES::COMM_TYPE );
    }
 
    template< typename TYPES >
    TProxy< TYPES >::~TProxy( )
    {
       TYPES::tEvent::clear_all_notifications( this );
-      InterfaceEvent::Event::clear_all_notifications( this );
-      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ClientDisconnected }, { this }, TYPES::COMM_TYPE );
    }
 
    template< typename TYPES >
@@ -414,62 +399,17 @@ namespace base {
    }
 
    template< typename TYPES >
-   const bool TProxy< TYPES >::is_connected( ) const
+   void TProxy< TYPES >::connected( )
    {
-      return nullptr != mp_server;
-   }
-
-   template< typename TYPES >
-   void TProxy< TYPES >::register_client( tClient* p_client )
-   {
-      if( nullptr == p_client )
-         return;
-
-      m_client_set.emplace( p_client );
-      if( is_connected( ) )
-         p_client->connected( );
-   }
-
-   template< typename TYPES >
-   void TProxy< TYPES >::unregister_client( tClient* p_client )
-   {
-      if( nullptr == p_client )
-         return;
-
-      m_client_set.erase( p_client );
-   }
-
-
-   template< typename TYPES >
-   void TProxy< TYPES >::connected( const void* const p_server )
-   {
-      if( nullptr != mp_server )
-         return;
-
-      mp_server = reinterpret_cast< const tServer* >( p_server );
       m_request_processor.server( mp_server );
       m_notification_processor.server( mp_server );
-
-      for( auto item : m_client_set )
-         item->connected( );
-
-      InterfaceEvent::Event::clear_notification( this, { service_name( ), eInterface::ServerConnected } );
-      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ServerDisconnected } );
-      InterfaceEvent::Event::create_send( { service_name( ), eInterface::ClientConnected }, { this }, TYPES::COMM_TYPE );
    }
 
    template< typename TYPES >
-   void TProxy< TYPES >::disconnected( const void* const p_server )
+   void TProxy< TYPES >::disconnected( )
    {
       m_request_processor.server( nullptr );
       m_notification_processor.server( nullptr );
-
-      mp_server = nullptr;
-      for( auto item : m_client_set )
-         item->disconnected( );
-
-      InterfaceEvent::Event::set_notification( this, { service_name( ), eInterface::ServerConnected } );
-      InterfaceEvent::Event::clear_notification( this, { service_name( ), eInterface::ServerDisconnected } );
    }
 
    template< typename TYPES >

@@ -17,10 +17,10 @@ class Component
    , public events::AppEvent::Consumer
 {
 public:
-   static base::IComponent::tSptr creator( base::IServiceThread::tSptr );
+   static base::IComponent::tSptr creator( base::IServiceThread& service );
 
 private:
-   Component( const base::IServiceThread::tSptr, const std::string& );
+   Component( base::IServiceThread& service, const std::string& );
 public:
    ~Component( ) override;
 
