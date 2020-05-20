@@ -4,6 +4,9 @@ version 1.7.0
    - TEvent splitted to TSignature and TGenerator.
    - Deleted old stuff from Event.hpp header with macros.
    - Server/Proxy/Client interfaces implemented.
+   - New timer concept ikntroduces.
+   - uuid generator implemented.
+   - Processing comman line start parameters implemented.
 
 version 1.6.2
    - Socket class implemented.

@@ -70,6 +70,8 @@
       <setting type="flag" value="-larmadillo" status="inactive"/>
       <setting type="flag" value="-lprotobuf" status="inactive"/>
       <setting type="flag" value="-fopenmp" status="inactive"/>
+      <setting type="flag" value="-lpthread" status="active"/>
+      <setting type="flag" value="-luuid" status="inactive"/>
       <setting type="flag" value="-lrt" status="conditions">
          <condition type="config" name="type" status="executable"/>
       </setting>

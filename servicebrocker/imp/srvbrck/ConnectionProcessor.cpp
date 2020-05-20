@@ -27,19 +27,19 @@ bool ConnectionProcessor::init( const int _socket_family, const int _socket_type
 {
    unlink( _server_address );
 
-   m_master_socket = base::socket::socket( _socket_family, _socket_type, _socket_protocole );
+   m_master_socket = base::os::linux::socket::socket( _socket_family, _socket_type, _socket_protocole );
    if( -1 == m_master_socket )
       return false;
 
-   if( false == base::socket::bind( m_master_socket, _socket_family, _server_address, _server_port ) )
+   if( false == base::os::linux::socket::bind( m_master_socket, _socket_family, _server_address, _server_port ) )
       return false;
 
    base::os::linux::set_nonblock( m_master_socket );
 
-   if( false == base::socket::listen( m_master_socket ) )
+   if( false == base::os::linux::socket::listen( m_master_socket ) )
       return false;
 
-   base::socket::info( m_master_socket, "Connection created" );
+   base::os::linux::socket::info( m_master_socket, "Connection created" );
 
    return true;
 }
@@ -56,10 +56,10 @@ void ConnectionProcessor::fd_set_reset( )
    FD_ZERO( &m_fd_set_except );
 }
 
-int ConnectionProcessor::fd_set_init( )
+base::os::linux::socket::tSocket ConnectionProcessor::fd_set_init( )
 {
    FD_SET( m_master_socket, &m_fd_set_read );
-   int max_socket = m_master_socket;
+   base::os::linux::socket::tSocket max_socket = m_master_socket;
    for( const auto& slave_socket : m_slave_sockets_set )
    {
       FD_SET( slave_socket, &m_fd_set_read );
@@ -75,46 +75,46 @@ void ConnectionProcessor::connection_loop( )
    {
       fd_set_reset( );
 
-      if( false == base::socket::select( fd_set_init( ), &m_fd_set_read ) )
+      if( false == base::os::linux::socket::select( fd_set_init( ), &m_fd_set_read ) )
          continue;
 
       process_slave_sockets( );
 
       if( FD_ISSET( m_master_socket, &m_fd_set_read ) )
       {
-         int slave_socket = base::socket::accept( m_master_socket );
+         base::os::linux::socket::tSocket slave_socket = base::os::linux::socket::accept( m_master_socket );
          base::os::linux::set_nonblock( slave_socket );
          m_slave_sockets_set.insert( slave_socket );
 
-         base::socket::info( slave_socket, "Host connected" );
+         base::os::linux::socket::info( slave_socket, "Host connected" );
       }
    }
 }
 
 void ConnectionProcessor::process_slave_sockets( )
 {
-   std::set< int > slave_sockets_to_remove_set;
+   std::set< base::os::linux::socket::tSocket > slave_sockets_to_remove_set;
    for( const auto& slave_socket : m_slave_sockets_set )
    {
       if( !FD_ISSET( slave_socket, &m_fd_set_read ) ) continue;
       if( eRead::DISCONNECTED == read_slave_socket( slave_socket ) )
       {
          slave_sockets_to_remove_set.insert( slave_socket );
-         base::socket::close( slave_socket );
+         base::os::linux::socket::close( slave_socket );
       }
    }
    for( const auto& slave_socket : slave_sockets_to_remove_set )
       m_slave_sockets_set.erase( slave_socket );
 }
 
-ConnectionProcessor::eRead ConnectionProcessor::read_slave_socket( const int slave_socket )
+ConnectionProcessor::eRead ConnectionProcessor::read_slave_socket( const base::os::linux::socket::tSocket slave_socket )
 {
-   ssize_t read_size = base::socket::recv( slave_socket, mp_buffer, s_buffer_size );
+   ssize_t read_size = base::os::linux::socket::recv( slave_socket, mp_buffer, s_buffer_size );
    if( 0 >= read_size )
    {
-      if( base::socket::error != EAGAIN )
+      if( base::os::linux::socket::error != EAGAIN )
       {
-         base::socket::info( slave_socket, "Host disconnected" );
+         base::os::linux::socket::info( slave_socket, "Host disconnected" );
          return eRead::DISCONNECTED;
       }
       return eRead::ERROR;
@@ -124,7 +124,7 @@ ConnectionProcessor::eRead ConnectionProcessor::read_slave_socket( const int sla
 
 
 
-   base::socket::send( slave_socket, mp_buffer, read_size );
+   base::os::linux::socket::send( slave_socket, mp_buffer, read_size );
 
    return eRead::OK;
 }

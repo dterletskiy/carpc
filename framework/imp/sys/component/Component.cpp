@@ -11,7 +11,7 @@ using namespace base;
 
 Component::Component( IServiceThread& service, const std::string& name )
    : m_name( name )
-   , m_id( tools::generate_id( "Component" ) )
+   , m_id( tools::id::generate( "Component" ) )
    , m_service( service )
    , m_performance( m_name )
 {

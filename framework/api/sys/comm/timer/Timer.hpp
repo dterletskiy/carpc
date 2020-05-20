@@ -9,11 +9,13 @@ namespace base {
 
 
 
-using TimerID = os::linux::timer::TimerID;
 class ITimerConsumer;
 
 class Timer
 {
+public:
+   using ID = os::linux::timer::TimerID;
+
 public:
    Timer( ITimerConsumer* );
    ~Timer( );
@@ -29,9 +31,9 @@ private:
    bool              m_is_running = false;
 
 public:
-   const TimerID id( ) const;
+   const ID id( ) const;
 private:
-   TimerID           m_id = nullptr;
+   ID                m_id = nullptr;
 
 public:
    long int nanoseconds( ) const;
@@ -46,7 +48,7 @@ private:
 
 struct TimerEventData
 {
-   TimerID id;
+   Timer::ID id;
 };
 DEFINE_EVENT( TimerEvent, TimerEventData, TSignatureID< size_t > );
 
@@ -59,7 +61,7 @@ public:
    ITimerConsumer( );
    virtual ~ITimerConsumer( );
 
-   virtual void process_timer( const TimerID ) = 0;
+   virtual void process_timer( const Timer::ID ) = 0;
 
 private:
    void process_event( const TimerEvent::Event& ) override;
@@ -68,3 +70,17 @@ private:
 
 
 } // namespace base
+
+
+
+namespace base::timer {
+
+   extern const size_t Infinite;
+
+   // This timer creates new thread and sleep it to some milliseconds. When thread is finished "callback" will be executed in context of service
+   // where this timer have been called.
+   // Performance of this timer is worse then base::Timer implementation.
+   // This timer can't be stopped.
+   ID start( const size_t milliseconds, const size_t count, std::function< void( const ID ) > callback, const bool asynchronous = true );
+
+} // namespace base::timer

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/oswrappers/Socket.hpp"
 #include "api/sys/oswrappers/ConditionVariable.hpp"
 #include "api/sys/comm/event/IAsync.hpp"
 #include "api/sys/component/IComponent.hpp"
@@ -51,7 +52,6 @@ private:
    void stop( ) override;
    bool started( ) const override;
    bool wait( ) override;
-
 private:
    bool start_send( );
    void stop_send( );
@@ -88,7 +88,11 @@ private:
 
 private:
    bool setup_connection( );
-   int                           m_master_socket = -1;
+   os::linux::socket::tSocket    m_master_socket = -1;
+
+public:
+   bool send( const int, ByteBuffer& ) const;
+   bool send( const int, const IAsync::tSptr ) const;
 };
 
 

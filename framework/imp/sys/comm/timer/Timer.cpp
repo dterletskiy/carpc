@@ -10,20 +10,20 @@
 
 
 
-namespace base {
+using namespace base;
 
 
 
 static base::os::Mutex mutex_consumer_map;
-static std::map< TimerID, IServiceThread::tWptr > consumer_map;
+static std::map< Timer::ID, IServiceThread::tWptr > consumer_map;
 
-// This convert method is used because Event::id could not have time TimerID (aka void*)
+// This convert method is used because Event::id could not have time Timer::ID (aka void*)
 const size_t convert( void* id )
 {
    return reinterpret_cast< size_t >( id );
 }
 
-void timer_processor( const TimerID timer_id )
+void timer_processor( const Timer::ID timer_id )
 {
    SYS_TRC( "%#lx: processing timer: %#lx", os::Thread::current_id( ), (long)timer_id );
 
@@ -46,7 +46,7 @@ void signal_handler( int signal, siginfo_t* si, void* uc )
    SYS_TRC( "signal: %d / si->si_signo: %d", signal, si->si_signo );
    SYS_TRC( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
 
-   TimerID* timer_id = (TimerID*)si->si_value.sival_ptr;
+   Timer::ID* timer_id = (Timer::ID*)si->si_value.sival_ptr;
    SYS_TRC( "timer id: %#lx", (long)(*timer_id) );
    timer_processor( *timer_id );
 }
@@ -181,7 +181,7 @@ bool Timer::is_running( ) const
    return m_is_running;
 }
 
-const TimerID Timer::id( ) const
+const Timer::ID Timer::id( ) const
 {
    return m_id;
 }
@@ -203,4 +203,50 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 
 
 
-} // namespace base
+
+
+
+
+#include <chrono>
+#include <functional>
+#include <thread>
+#include <limits>
+#include "api/sys/comm/event/Runnable.hpp"
+#include "api/sys/tools/Tools.hpp"
+
+namespace base::timer {
+
+   const size_t Infinite = std::numeric_limits< size_t >::max( );
+
+   ID start( const size_t milliseconds, const size_t count, std::function< void( const ID ) > callback, const bool asynchronous )
+   {
+      IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );
+      if( !p_service )
+         return 0;
+
+      const ID id = tools::id::generate( "timer" );
+      auto on_timer = [=]( ){ callback( id ); };
+
+      if( asynchronous )
+      {
+         std::thread(
+            [=]( )
+            {
+               for( size_t ticks = 0; ticks < count; ++ticks )
+               {
+                  std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
+                  base::Runnable::create_send_to_context( on_timer, p_service );
+               }
+            }
+         ).detach( );
+      }
+      else
+      {
+         std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
+         base::Runnable::create_send_to_context( on_timer, p_service );
+      }
+
+      return id;
+   }
+
+} // namespace base::timer

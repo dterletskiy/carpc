@@ -1,6 +1,157 @@
 #pragma once
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/select.h>
+#include <sys/ioctl.h>
+#include <net/if.h> 
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
 #include <string>
+#include <set>
+
+
+
+namespace base::os::linux::socket {
+
+   using tSocket = int;
+   using tSocketSet = std::set< tSocket >;
+
+   extern int error;
+
+   class socket_addr
+   {
+      public:
+         socket_addr( const int _domain, const char* const _address, const int _port );
+         socket_addr( const socket_addr& ) = delete;
+         ~socket_addr( );
+         socket_addr& operator=( const socket_addr& ) = delete;
+
+      public:
+         const sockaddr* const addr( ) const;
+         const socklen_t len( ) const;
+      private:
+         sockaddr* m_addr = nullptr;
+         socklen_t m_len = 0;
+   };
+
+   class fd
+   {
+   public:
+      enum class eType { READ, WRITE, EXCEPT };
+
+   public:
+      fd( );
+      ~fd( );
+
+      void set( const tSocket _socket, const eType type );
+      void set( const std::set< tSocket > socket_set, const std::set< eType > type_set );
+      void clear( const tSocket _socket, const eType type );
+      void clear( const std::set< tSocket > socket_set, const std::set< eType > type_set );
+      bool is_set( const tSocket _socket, const eType type );
+      void reset( );
+
+   private:
+      void set( tSocket _socket, std::set< fd_set* > p_fd_set );
+      void clear( tSocket _socket, std::set< fd_set* > p_fd_set );
+      fd_set* convert( const eType type ) const;
+      std::set< fd_set* > convert( const std::set< eType > type_set ) const;
+
+   public:
+      fd_set* const read( ) const;
+      fd_set* const write( ) const;
+      fd_set* const except( ) const;
+   private:
+      fd_set* mp_read = nullptr;
+      fd_set* mp_write = nullptr;
+      fd_set* mp_except = nullptr;
+   };
+
+} // namespace base::os::linux::socket
+
+
+
+namespace base::os::linux::socket {
+
+   void info( const tSocket _socket, const char* _message = "socket" );
+
+   const tSocket socket(
+                          const int _domain = AF_UNIX
+                        , const int _type = SOCK_STREAM
+                        , const int _protocole = 0
+   );
+
+   const bool bind(
+                          const tSocket _socket
+                        , const sockaddr* _address
+                        , const socklen_t _address_len
+   );
+
+   const bool bind(
+                          const tSocket _socket
+                        , const int _domain
+                        , const char* const _address
+                        , const int _port
+   );
+
+   const bool connect(
+                          const tSocket _socket
+                        , const sockaddr* _address
+                        , const socklen_t _address_len
+   );
+
+   const bool connect(
+                          const tSocket _socket
+                        , const int _domain
+                        , const char* const _address
+                        , const int _port
+   );
+
+   const bool listen(
+                          const tSocket _socket
+                        , const int _backlog = SOMAXCONN
+   );
+
+   const ssize_t send(
+                          const tSocket _socket
+                        , const void* _buffer
+                        , const size_t _size
+                        , const int _flags = 0
+   );
+
+   const ssize_t recv(
+                          const tSocket _socket
+                        , void* const _buffer
+                        , const size_t _size
+                        , const int _flags = 0
+   );
+
+   const int accept(
+                          const tSocket _socket
+                        , sockaddr* const _address = nullptr
+                        , socklen_t* const _address_len = nullptr
+   );
+
+   const bool select(
+                          const tSocket _max_socket
+                        , fd_set* const _fd_set_read
+                        , fd_set* const _fd_set_write = nullptr
+                        , fd_set* const _fd_set_except = nullptr
+                        , timeval* const _timeout = nullptr
+   );
+
+   const bool select(
+                          const tSocket _max_socket
+                        , fd& _fd
+                        , timeval* const _timeout = nullptr
+   );
+
+   void close( tSocket _socket );
+
+} // namespace base::os::linux::socket
 
 
 

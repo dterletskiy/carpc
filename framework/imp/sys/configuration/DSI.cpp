@@ -26,7 +26,7 @@ namespace base::configuration::dsi {
 
    const int server_port = 5000;
 
-   const size_t buffer_size = 2048;
+   const size_t buffer_size = 4096;
 
 }
 

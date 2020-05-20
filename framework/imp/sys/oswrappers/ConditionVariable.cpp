@@ -11,7 +11,7 @@ namespace base::os {
 
 
 ConditionVariable::ConditionVariable( )
-   : m_id( tools::generate_id( "cond_var" ) )
+   : m_id( tools::id::generate( "cond_var" ) )
 {
 }
 

@@ -76,7 +76,7 @@ void ServiceIpcThread::thread_loop_receive( )
    while( started_receive( ) )
    {
       memset( p_buffer, 0, sizeof( configuration::dsi::buffer_size ) );
-      ssize_t recv_size = base::socket::recv( m_master_socket, p_buffer, configuration::dsi::buffer_size );
+      ssize_t recv_size = os::linux::socket::recv( m_master_socket, p_buffer, configuration::dsi::buffer_size );
       if( 0 >= recv_size )
          continue;
 
@@ -103,14 +103,14 @@ void ServiceIpcThread::thread_loop_receive( )
 
 bool ServiceIpcThread::setup_connection( )
 {
-   m_master_socket = base::socket::socket( configuration::dsi::socket_family, configuration::dsi::socket_type, configuration::dsi::socket_protocole );
+   m_master_socket = os::linux::socket::socket( configuration::dsi::socket_family, configuration::dsi::socket_type, configuration::dsi::socket_protocole );
    if( -1 == m_master_socket )
       return false;
 
-   if( false == base::socket::connect( m_master_socket, configuration::dsi::socket_family, configuration::dsi::server_address, configuration::dsi::server_port ) )
+   if( false == os::linux::socket::connect( m_master_socket, configuration::dsi::socket_family, configuration::dsi::server_address, configuration::dsi::server_port ) )
       return false;
 
-   base::socket::info( m_master_socket, "Connection created" );
+   os::linux::socket::info( m_master_socket, "Connection created" );
 
    return true;
 }
@@ -230,12 +230,7 @@ void ServiceIpcThread::notify( const IAsync::tSptr p_event )
    {
       // In case if consumer was not found for event this means that this event must be sent via IPC.
       SYS_TRC( "'%s': sending event (%s) via IPC", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
-      ByteBufferT byte_buffer;
-      if( true == EventRegistry::instance( )->create_buffer( byte_buffer, std::static_pointer_cast< IEvent >( p_event ) ) )
-      {
-         // byte_buffer.dump( );
-         base::socket::send( m_master_socket, byte_buffer.buffer( ), byte_buffer.size( ) );
-      }
+      send( m_master_socket, p_event );
    }
    else
    {
@@ -328,4 +323,22 @@ bool ServiceIpcThread::is_subscribed( const IAsync::tSptr p_event )
       return true;
 
    return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );
+}
+
+bool ServiceIpcThread::send( const int socket, ByteBuffer& buffer ) const
+{
+   const ssize_t size = os::linux::socket::send( socket, buffer.buffer( ), buffer.size( ) );
+   return static_cast< size_t >( size ) == buffer.size( );
+}
+
+bool ServiceIpcThread::send( const int socket, const IAsync::tSptr p_event ) const
+{
+   ByteBufferT byte_buffer;
+   if( false == EventRegistry::instance( )->create_buffer( byte_buffer, std::static_pointer_cast< IEvent >( p_event ) ) )
+      return false;
+
+   // byte_buffer.dump( );
+   os::linux::socket::send( m_master_socket, byte_buffer.buffer( ), byte_buffer.size( ) );
+
+   return send( m_master_socket, byte_buffer );
 }

@@ -2,6 +2,8 @@
 
 
 
+#define TO_STRING( VALUE ) #VALUE
+
 #define BOOL_TO_STRING( value ) ( value ? "true" : "false" )
 
 #define CONCAT_STRINGS_2( STRING1, STRING2                                                ) STRING1 STRING2

@@ -28,7 +28,7 @@ private:
 
 // Timer
 private:
-   void process_timer( const base::TimerID ) override;
+   void process_timer( const base::Timer::ID ) override;
    struct TimerSeqID
    {
       std::string current_state;

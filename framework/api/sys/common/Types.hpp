@@ -34,6 +34,6 @@
 
 namespace base {
 
-   using ID = std::uint64_t;
+   using ID = size_t;
 
 } // namespace base

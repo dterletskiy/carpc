@@ -24,15 +24,15 @@ public:
 
 private:
    void process_slave_sockets( );
-   eRead read_slave_socket( const int );
+   eRead read_slave_socket( const base::os::linux::socket::tSocket );
 private:
-   int m_master_socket = -1;
-   std::set< int > m_slave_sockets_set;
-   int m_max_socket = -1;
+   base::os::linux::socket::tSocket m_master_socket = -1;
+   std::set< base::os::linux::socket::tSocket > m_slave_sockets_set;
+   base::os::linux::socket::tSocket m_max_socket = -1;
 
 private:
    void fd_set_reset( );
-   int fd_set_init( );
+   base::os::linux::socket::tSocket fd_set_init( );
 private:
    fd_set m_fd_set_read;
    fd_set m_fd_set_write;

@@ -112,6 +112,24 @@ void Component::boot( const std::string& command )
    DBG_MSG( "%s", command.c_str( ) );
    sleep(3);
 
+   const base::ID id = base::timer::start( 3000, 1, [ this ]( const base::ID id ){ on_timer( id ); } );
+   DBG_ERR( "started timer: %zu", id );
+}
+
+void Component::process_timer( const base::Timer::ID id )
+{
+   DBG_MSG( "Timer '%#lx' expired", (long)id );
+   if( id == m_timer.id( ) )
+   {
+      DBG_WRN( "Shutting down system" );
+      shutdown( );
+   }
+}
+
+void Component::on_timer( const base::ID id )
+{
+   DBG_ERR( "Timer expired: %zu", id );
+
    // s_event_test.execute( );
 
    auto operation = [ this ]( )
@@ -121,16 +139,6 @@ void Component::boot( const std::string& command )
       m_timer.start( 15000000000 );
    };
    base::Runnable::create_send( operation );
-}
-
-void Component::process_timer( const base::TimerID id )
-{
-   DBG_MSG( "Timer '%#lx' expired", (long)id );
-   if( id == m_timer.id( ) )
-   {
-      DBG_WRN( "Shutting down system" );
-      shutdown( );
-   }
 }
 
 

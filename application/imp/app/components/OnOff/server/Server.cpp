@@ -38,7 +38,7 @@ void Server::request_trigger_state( const std::string& state, const size_t delay
    // m_timers.emplace_back( TimerSeqID{ state, timer, 0 } );
 }
 
-void Server::process_timer( const base::TimerID id )
+void Server::process_timer( const base::Timer::ID id )
 {
    DBG_MSG( "%s: Timer '%#lx' expired", m_name.c_str( ), (long)id );
 
