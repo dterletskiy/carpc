@@ -1,19 +1,15 @@
 #pragma once
 
 #include <cstdlib>
+#include "api/sys/oswrappers/linux/socket.hpp"
 
 
 
 namespace base::configuration::dsi {
 
-   extern const int socket_family;
-   extern const int socket_type;
-   extern const int socket_protocole;
-
-   extern const int server_port;
-   extern const char* server_address;
-
    extern const size_t buffer_size;
 
-}
+   extern const os::linux::socket::configuration service_brocker;
+   extern const os::linux::socket::configuration application;
 
+}

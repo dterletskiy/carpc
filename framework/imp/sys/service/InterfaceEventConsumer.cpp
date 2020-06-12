@@ -1,4 +1,5 @@
-#include "api/sys/service/IServiceThread.hpp"
+#include "api/sys/dsi/Types.hpp"
+#include "api/sys/service/ServiceIpcThread.hpp"
 #include "imp/sys/service/InterfaceEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -9,7 +10,7 @@ using namespace base;
 
 
 
-InterfaceEventConsumer::InterfaceEventConsumer( IServiceThread& service )
+InterfaceEventConsumer::InterfaceEventConsumer( ServiceIpcThread& service )
    : m_service( service )
 {
    events::interface::Interface::Event::set_notification( this, { InvalidServiceName, events::interface::eID::ServerConnected } );
@@ -27,24 +28,30 @@ void InterfaceEventConsumer::process_event( const events::interface::Interface::
 {
    SYS_INF( "id = %s", events::interface::c_str( event.info( ).id( ) ) );
 
-   SYS_ERR( "serevice name: %s", event.info( ).service_name( ).c_str( ) );
+   const std::string& service_name = event.info( ).service_name( );
+   SYS_ERR( "serevice name: %s", service_name.c_str( ) );
 
+   dsi::eCommand command = dsi::eCommand::Undefined;
    switch( event.info( ).id( ) )
    {
       case events::interface::eID::ServerConnected:
       {
+         command = dsi::eCommand::RegisterServer;
          break;
       }
       case events::interface::eID::ServerDisconnected:
       {
+         command = dsi::eCommand::UnregisterServer;
          break;
       }
       case events::interface::eID::ClientConnected:
       {
+         command = dsi::eCommand::RegisterClient;
          break;
       }
       case events::interface::eID::ClientDisconnected:
       {
+         command = dsi::eCommand::UnregisterClient;
          break;
       }
       default:
@@ -52,4 +59,11 @@ void InterfaceEventConsumer::process_event( const events::interface::Interface::
          break;
       }
    }
+
+   dsi::Packet packet;
+   dsi::Package package( command, service_name );
+   packet.add_package( package );
+   ByteBufferT buffer;
+   buffer.push( packet );
+   m_service.send( buffer );
 }

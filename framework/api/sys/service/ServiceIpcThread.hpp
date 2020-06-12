@@ -52,6 +52,7 @@ private:
    void stop( ) override;
    bool started( ) const override;
    bool wait( ) override;
+
 private:
    bool start_send( );
    void stop_send( );
@@ -88,11 +89,16 @@ private:
 
 private:
    bool setup_connection( );
-   os::linux::socket::tSocket    m_master_socket = -1;
+   os::Socket                    m_socket_sb;
+   os::Socket                    m_socket_master;
+   os::Socket::tSptrList         m_sockets_slave;
+   os::linux::socket::fd         m_fd;
 
 public:
-   bool send( const int, ByteBuffer& ) const;
-   bool send( const int, const IAsync::tSptr ) const;
+   bool send( os::Socket&, const IAsync::tSptr );
+   bool send( const IAsync::tSptr );
+   bool send( os::Socket& _socket, const ByteBufferT& );
+   bool send( const ByteBufferT& );
 };
 
 

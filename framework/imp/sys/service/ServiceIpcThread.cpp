@@ -1,8 +1,10 @@
+#include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/oswrappers/Socket.hpp"
 #include "api/sys/configuration/DSI.hpp"
 #include "api/sys/comm/event/Event.hpp"
 #include "api/sys/service/ServiceIpcThread.hpp"
+#include "api/sys/dsi/Types.hpp"
 #include "imp/sys/service/ServiceEventConsumer.hpp"
 #include "imp/sys/service/InterfaceEventConsumer.hpp"
 
@@ -23,6 +25,8 @@ ServiceIpcThread::ServiceIpcThread( )
    , m_events( )
    , m_buffer_cond_var( )
    , m_event_consumers_map( )
+   , m_socket_sb( configuration::dsi::service_brocker, configuration::dsi::buffer_size )
+   , m_socket_master( configuration::dsi::application, configuration::dsi::buffer_size )
 {
    mp_thread_send = std::make_shared< base::os::Thread >( std::bind( &ServiceIpcThread::thread_loop_send, this ) );
    mp_thread_receive = std::make_shared< base::os::Thread >( std::bind( &ServiceIpcThread::thread_loop_receive, this ) );
@@ -33,6 +37,16 @@ ServiceIpcThread::ServiceIpcThread( )
 ServiceIpcThread::~ServiceIpcThread( )
 {
    SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
+}
+
+namespace { os::Mutex s_mutex; }
+ServiceIpcThread::tSptr ServiceIpcThread::instance( )
+{
+   base::os::MutexAutoLocker locker( s_mutex );
+   if( nullptr == mp_instance )
+      mp_instance.reset( new ServiceIpcThread( ) );
+
+   return mp_instance;
 }
 
 void ServiceIpcThread::thread_loop_send( )
@@ -53,66 +67,70 @@ void ServiceIpcThread::thread_loop_send( )
    SYS_INF( "'%s': exit", m_name.c_str( ) );
 }
 
-namespace { os::Mutex s_mutex; }
-ServiceIpcThread::tSptr ServiceIpcThread::instance( )
-{
-   base::os::MutexAutoLocker locker( s_mutex );
-   if( nullptr == mp_instance )
-      mp_instance.reset( new ServiceIpcThread( ) );
-
-   return mp_instance;
-}
-
 void ServiceIpcThread::thread_loop_receive( )
 {
    SYS_INF( "'%s': enter", m_name.c_str( ) );
    m_started_receive = true;
 
-   void* p_buffer = malloc( configuration::dsi::buffer_size );
-   if( nullptr == p_buffer )
-      return;
-
 
    while( started_receive( ) )
    {
-      memset( p_buffer, 0, sizeof( configuration::dsi::buffer_size ) );
-      ssize_t recv_size = os::linux::socket::recv( m_master_socket, p_buffer, configuration::dsi::buffer_size );
-      if( 0 >= recv_size )
+      m_fd.reset( );
+      m_fd.set( m_socket_sb.socket( ), os::linux::socket::fd::eType::READ );
+      os::linux::socket::tSocket max_socket = m_socket_sb.socket( );
+      m_fd.set( m_socket_master.socket( ), os::linux::socket::fd::eType::READ );
+      if( m_socket_master.socket( ) > max_socket )
+         max_socket = m_socket_master.socket( );
+      for( const auto& p_slave_socket : m_sockets_slave )
+      {
+         m_fd.set( p_slave_socket->socket( ), os::linux::socket::fd::eType::READ );
+         if( p_slave_socket->socket( ) > max_socket )
+            max_socket = p_slave_socket->socket( );
+      }
+      // SYS_INF( "max_socket = %d", max_socket );
+
+      if( false == os::linux::socket::select( max_socket, m_fd ) )
          continue;
 
-      ByteBufferT byte_buffer( p_buffer, recv_size );
-      // byte_buffer.dump( );
-
-      while( 0 < byte_buffer.size( ) )
+      if( true == m_fd.is_set( m_socket_sb.socket( ), os::linux::socket::fd::eType::READ ) )
       {
-         // @TDA: issue: in case of receiving several event all of them will be processed in reverce sequence
-         IEvent::tSptr p_event = EventRegistry::instance( )->create_event( byte_buffer );
-         if( nullptr == p_event )
+         if( os::Socket::eResult::OK == m_socket_sb.recv( ) )
          {
-            SYS_ERR( "'%s': lost received event", m_name.c_str( ) );
-            continue;
+            size_t recv_size = 0;
+            const void* const p_buffer = m_socket_sb.buffer( recv_size );
+            ByteBufferT byte_buffer( p_buffer, recv_size );
+            // byte_buffer.dump( );
+
+            while( 0 < byte_buffer.size( ) )
+            {
+               // @TDA: issue: in case of receiving several event all of them will be processed in reverce sequence
+               IEvent::tSptr p_event = EventRegistry::instance( )->create_event( byte_buffer );
+               if( nullptr == p_event )
+               {
+                  SYS_ERR( "'%s': lost received event", m_name.c_str( ) );
+                  continue;
+               }
+               SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
+               p_event->send( eCommType::ITC );
+            }
          }
-         SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
-         p_event->send( eCommType::ITC );
+      }
+
+      // process slave sockets
+
+
+      if( true == m_fd.is_set( m_socket_master.socket( ), os::linux::socket::fd::eType::READ ) )
+      {
+         if( auto p_socket = m_socket_master.accept( ) )
+         {
+            m_sockets_slave.push_back( p_socket );
+            p_socket->info( "Host connected" );
+            p_socket->unblock( );
+         }
       }
    }
 
-   free( p_buffer );
    SYS_INF( "'%s': exit", m_name.c_str( ) );
-}
-
-bool ServiceIpcThread::setup_connection( )
-{
-   m_master_socket = os::linux::socket::socket( configuration::dsi::socket_family, configuration::dsi::socket_type, configuration::dsi::socket_protocole );
-   if( -1 == m_master_socket )
-      return false;
-
-   if( false == os::linux::socket::connect( m_master_socket, configuration::dsi::socket_family, configuration::dsi::server_address, configuration::dsi::server_port ) )
-      return false;
-
-   os::linux::socket::info( m_master_socket, "Connection created" );
-
-   return true;
 }
 
 bool ServiceIpcThread::start( )
@@ -124,6 +142,27 @@ bool ServiceIpcThread::start( )
    bool result_receive = start_receive( );
 
    return result_send && result_receive;
+}
+
+bool ServiceIpcThread::setup_connection( )
+{
+   if( os::Socket::eResult::ERROR == m_socket_sb.create( ) )
+      return false;
+   if( os::Socket::eResult::ERROR == m_socket_sb.connect( ) )
+      return false;
+   m_socket_sb.unblock( );
+   m_socket_sb.info( "ServiceBrocker connection created" );
+
+   if( os::Socket::eResult::ERROR == m_socket_master.create( ) )
+      return false;
+   if( os::Socket::eResult::ERROR == m_socket_master.bind( ) )
+      return false;
+   m_socket_master.unblock( );
+   if( os::Socket::eResult::ERROR == m_socket_master.listen( ) )
+      return false;
+   m_socket_master.info( "Application connection created" );
+
+   return true;
 }
 
 bool ServiceIpcThread::start_send( )
@@ -230,7 +269,7 @@ void ServiceIpcThread::notify( const IAsync::tSptr p_event )
    {
       // In case if consumer was not found for event this means that this event must be sent via IPC.
       SYS_TRC( "'%s': sending event (%s) via IPC", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
-      send( m_master_socket, p_event );
+      send( m_socket_sb, p_event );
    }
    else
    {
@@ -325,20 +364,32 @@ bool ServiceIpcThread::is_subscribed( const IAsync::tSptr p_event )
    return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );
 }
 
-bool ServiceIpcThread::send( const int socket, ByteBuffer& buffer ) const
+bool ServiceIpcThread::send( os::Socket& _socket, const IAsync::tSptr p_event )
 {
-   const ssize_t size = os::linux::socket::send( socket, buffer.buffer( ), buffer.size( ) );
-   return static_cast< size_t >( size ) == buffer.size( );
-}
-
-bool ServiceIpcThread::send( const int socket, const IAsync::tSptr p_event ) const
-{
-   ByteBufferT byte_buffer;
-   if( false == EventRegistry::instance( )->create_buffer( byte_buffer, std::static_pointer_cast< IEvent >( p_event ) ) )
+   ByteBufferT event_buffer;
+   if( false == EventRegistry::instance( )->create_buffer( event_buffer, std::static_pointer_cast< IEvent >( p_event ) ) )
       return false;
 
-   // byte_buffer.dump( );
-   os::linux::socket::send( m_master_socket, byte_buffer.buffer( ), byte_buffer.size( ) );
+   // dsi::Packet packet;
+   // packet.add_package( dsi::eCommand::BroadcastEvent, event_buffer );
+   // ByteBufferT packet_buffer;
+   // packet_buffer.push( packet );
+   // return send( _socket, packet_buffer );
 
-   return send( m_master_socket, byte_buffer );
+   return send( _socket, event_buffer );
+}
+
+bool ServiceIpcThread::send( const IAsync::tSptr p_event )
+{
+   return send( m_socket_sb, p_event );
+}
+
+bool ServiceIpcThread::send( os::Socket& _socket, const ByteBufferT& byte_buffer )
+{
+   return os::Socket::eResult::OK == _socket.send( byte_buffer.buffer( ), byte_buffer.size( ) );
+}
+
+bool ServiceIpcThread::send( const ByteBufferT& byte_buffer )
+{
+   return send( m_socket_sb, byte_buffer );
 }

@@ -35,6 +35,7 @@ private:
 public:
    IEvent::tSptr create_event( ByteBufferT& ) const;
    bool create_buffer( ByteBufferT&, IEvent::tSptr ) const;
+   bool create_buffer( ByteBufferT&, const IEvent& ) const;
 
 public:
    bool register_event( const tAsyncTypeID&, EventCreator );

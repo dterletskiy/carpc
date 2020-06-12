@@ -60,21 +60,26 @@ IEvent::tSptr EventRegistry::create_event( ByteBufferT& buffer ) const
 
 bool EventRegistry::create_buffer( ByteBufferT& buffer, IEvent::tSptr p_event ) const
 {
-   if( m_registry.end( ) == m_registry.find( p_event->signature( )->type_id( ) ) )
+   return create_buffer( buffer, *p_event );
+}
+
+bool EventRegistry::create_buffer( ByteBufferT& buffer, const IEvent& event ) const
+{
+   if( m_registry.end( ) == m_registry.find( event.signature( )->type_id( ) ) )
    {
-      SYS_ERR( "event '%s' is not registered", p_event->signature( )->name( ).c_str( ) )
+      SYS_ERR( "event '%s' is not registered", event.signature( )->name( ).c_str( ) )
       return false;
    }
 
-   if( false == p_event->to_buffer( buffer ) )
+   if( false == event.to_buffer( buffer ) )
    {
-      SYS_ERR( "event '%s' serrialization error", p_event->signature( )->name( ).c_str( ) )
+      SYS_ERR( "event '%s' serrialization error", event.signature( )->name( ).c_str( ) )
       return false;
    }
 
-   if( false == buffer.push( p_event->signature( )->type_id( ) ) )
+   if( false == buffer.push( event.signature( )->type_id( ) ) )
    {
-      SYS_ERR( "event '%s' meta data serrialization error", p_event->signature( )->name( ).c_str( ) )
+      SYS_ERR( "event '%s' meta data serrialization error", event.signature( )->name( ).c_str( ) )
       return false;
    }
 

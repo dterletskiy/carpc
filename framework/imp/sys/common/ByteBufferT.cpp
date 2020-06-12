@@ -5,13 +5,17 @@
 
 
 
-namespace base {
+using namespace base;
 
 
 
 
 ByteBufferT::Transaction::Transaction( size_t& _size )
    : m_size( _size )
+{ }
+
+ByteBufferT::Transaction::Transaction( ByteBufferT& _buffer )
+   : m_size( _buffer.m_size )
 { }
 
 bool ByteBufferT::Transaction::start( const eType _type )
@@ -67,14 +71,20 @@ bool ByteBufferT::Transaction::error( )
 
 
 
-ByteBufferT::ByteBufferT( )
-   : ByteBuffer( )
+ByteBufferT::ByteBufferT( const size_t capacity )
+   : ByteBuffer( capacity )
    , m_transaction( m_size )
 {
 }
 
 ByteBufferT::ByteBufferT( const void* p_buffer, const size_t size )
    : ByteBuffer( p_buffer, size )
+   , m_transaction( m_size )
+{
+}
+
+ByteBufferT::ByteBufferT( const ByteBufferT& _buffer )
+   : ByteBuffer( _buffer.mp_buffer, _buffer.m_size )
    , m_transaction( m_size )
 {
 }
@@ -91,6 +101,11 @@ ByteBufferT::~ByteBufferT( )
  * Push buffer methods
  *
  ****************************************/
+bool ByteBufferT::push( void* p_buffer, const size_t size, const bool is_reallocate )
+{
+   return push( const_cast< const void* >( p_buffer ), size, is_reallocate );
+}
+
 bool ByteBufferT::push( const void* p_buffer, const size_t size, const bool is_reallocate )
 {
    if( false == m_transaction.start( Transaction::eType::push ) )
@@ -120,8 +135,33 @@ bool ByteBufferT::push( const std::string& string, const bool is_reallocate )
    if( false == m_transaction.start( Transaction::eType::push ) )
       return false;
 
-   const char* p_buffer = string.c_str( );
+   const void* p_buffer = static_cast< const void* >( string.c_str( ) );
    const size_t size = string.size( );
+
+   if( false == push_buffer_with_size( p_buffer, size, is_reallocate ) )
+      return m_transaction.error( );
+
+   return m_transaction.finish( );
+}
+
+bool ByteBufferT::push( const ByteBufferT& _buffer, const bool is_reallocate )
+{
+   if( false == m_transaction.start( Transaction::eType::push ) )
+      return false;
+
+   const void* p_buffer = _buffer.mp_buffer;
+   const size_t size = _buffer.m_size;
+
+   if( false == push_buffer_with_size( p_buffer, size, is_reallocate ) )
+      return m_transaction.error( );
+
+   return m_transaction.finish( );
+}
+
+bool ByteBufferT::push_buffer_with_size( const void* p_buffer, const size_t size, const bool is_reallocate )
+{
+   if( false == m_transaction.start( Transaction::eType::push ) )
+      return false;
 
    // Backup buffer state.
    size_t size_backup = m_size;
@@ -130,12 +170,12 @@ bool ByteBufferT::push( const std::string& string, const bool is_reallocate )
    if( ( m_capacity - m_size ) < ( size + sizeof( size ) ) && false == is_reallocate )
       return m_transaction.error( );
 
-   // Storing string content
-   if( false == push( static_cast< const void* >( p_buffer ), size, is_reallocate ) )
+   // Storing buffer content
+   if( false == push( p_buffer, size, is_reallocate ) )
       return m_transaction.error( );
 
-   // Storing size of string. In case of error prevoius buffer state will be restored.
-   // In this case stored string content will be deleted.
+   // Storing size of buffer. In case of error prevoius buffer state will be restored.
+   // In this case stored buffer content will be deleted.
    if( false == push( size, is_reallocate ) )
    {
       m_size = size_backup;
@@ -152,6 +192,11 @@ bool ByteBufferT::push( const std::string& string, const bool is_reallocate )
  * Pop buffer methods
  *
  ****************************************/
+bool ByteBufferT::pop( void* p_buffer, const size_t size )
+{
+   return pop( const_cast< const void* >( p_buffer ), size );
+}
+
 bool ByteBufferT::pop( const void* p_buffer, const size_t size )
 {
    if( false == m_transaction.start( Transaction::eType::pop ) )
@@ -202,7 +247,40 @@ bool ByteBufferT::pop( std::string& string )
    return m_transaction.finish( );
 }
 
+bool ByteBufferT::pop( ByteBufferT& _buffer )
+{
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
 
+   // Backup buffer state.
+   size_t size_backup = m_size;
 
+   size_t size = 0;
+   // Reading size of string content
+   if( false == pop( size ) )
+      return m_transaction.error( );
 
-} // namespace base
+   // Error in case of rest of data in buffer less then size to be read.
+   // push previously poped data to restore previous buffer state.
+   if( size > m_size )
+   {
+      m_size = size_backup;
+      return m_transaction.error( );
+   }
+
+   void* p_buffer = malloc( size );
+   if( false == pop( p_buffer, size ) )
+   {
+      free( p_buffer );
+      return m_transaction.error( );
+   }
+
+   if( false == _buffer.push( p_buffer, size ) )
+   {
+      free( p_buffer );
+      return m_transaction.error( );
+   }
+
+   free( p_buffer );
+   return m_transaction.finish( );
+}

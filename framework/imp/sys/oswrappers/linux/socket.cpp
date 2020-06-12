@@ -1,6 +1,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -10,6 +11,7 @@
 
 namespace base::os::linux::socket {
 
+   const tSocket InvalidSocket = -1;
    int error = 0;
 
 
@@ -198,6 +200,30 @@ namespace base::os::linux::socket {
       // printf( "\n" );
    }
 
+   const tSocket create_server( const configuration& _config )
+   {
+      tSocket _socket = base::os::linux::socket::socket( _config );
+      if( InvalidSocket == _socket )
+         return InvalidSocket;
+      if( false == base::os::linux::socket::bind( _socket, _config ) )
+         return InvalidSocket;
+      base::os::linux::set_nonblock( _socket );
+      if( false == base::os::linux::socket::listen( _socket ) )
+         return InvalidSocket;
+      return _socket;
+   }
+
+   const tSocket create_clint( const configuration& _config )
+   {
+      tSocket _socket = base::os::linux::socket::socket( _config );
+      if( InvalidSocket == _socket )
+         return InvalidSocket;
+      if( false == base::os::linux::socket::connect( _socket, _config ) )
+         return InvalidSocket;
+      base::os::linux::set_nonblock( _socket );
+      return _socket;
+   }
+
    const tSocket socket( const int _domain, const int _type, const int _protocole )
    {
       tSocket _socket = ::socket( _domain, _type, _protocole );
@@ -210,6 +236,11 @@ namespace base::os::linux::socket {
 
       SYS_MSG( "socket(%d)", _socket );
       return _socket;
+   }
+
+   const tSocket socket( const configuration _config )
+   {
+      return socket( _config.domain, _config.type, _config.protocole );
    }
 
    const bool bind( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
@@ -237,6 +268,11 @@ namespace base::os::linux::socket {
       return base::os::linux::socket::bind( _socket, sa.addr( ), sa.len( ) );
    }
 
+   const bool bind( const tSocket _socket, const configuration _config )
+   {
+      return base::os::linux::socket::bind( _socket, _config.domain, _config.address, _config.port );
+   }
+
    const bool connect( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
    {
       if( nullptr == _address )
@@ -260,6 +296,11 @@ namespace base::os::linux::socket {
    {
       socket_addr sa( _domain, _address, _port );
       return base::os::linux::socket::connect( _socket, sa.addr( ), sa.len( ) );
+   }
+
+   const bool connect( const tSocket _socket, const configuration _config )
+   {
+      return base::os::linux::socket::connect( _socket, _config.domain, _config.address, _config.port );
    }
 
    const bool listen( const tSocket _socket, const int _backlog )
@@ -313,9 +354,9 @@ namespace base::os::linux::socket {
       return size;
    }
 
-   const int accept( const tSocket _socket, sockaddr* const _address, socklen_t* const _address_len )
+   const tSocket accept( const tSocket _socket, sockaddr* const _address, socklen_t* const _address_len )
    {
-      int slave_socket = ::accept( _socket, _address, _address_len );
+      tSocket slave_socket = ::accept( _socket, _address, _address_len );
       error = errno;
       if( -1 == slave_socket )
       {
@@ -332,10 +373,10 @@ namespace base::os::linux::socket {
       error = errno;
       if( -1 == result )
       {
-         SYS_ERR( "select(%d) error: %d", _max_socket, error );
+         SYS_ERR( "select(%d) error: %d", _max_socket + 1, error );
          return false;
       }
-      SYS_MSG( "select(%d)", _max_socket );
+      SYS_MSG( "select(%d)", _max_socket + 1 );
       return true;
    }
 

@@ -1,10 +1,17 @@
+version 1.7.1
+   - Fixing double send in ServiceIpcThread.
+   - Updated Socket class implementation.
+   - Migrated servicebrocker to Socket class implementation.
+   - ByteBuffer extended.
+   - DSI/IPC protocole draft implementation started.
+
 version 1.7.0
    - ServiceBrockerThread (deleted) concept changed to ServiceIpcThread.
    - Updated shutdown logic.
    - TEvent splitted to TSignature and TGenerator.
    - Deleted old stuff from Event.hpp header with macros.
    - Server/Proxy/Client interfaces implemented.
-   - New timer concept ikntroduces.
+   - New timer concept introduces.
    - uuid generator implemented.
    - Processing comman line start parameters implemented.
 

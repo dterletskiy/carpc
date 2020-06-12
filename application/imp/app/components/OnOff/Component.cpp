@@ -110,10 +110,10 @@ Component::~Component( )
 void Component::boot( const std::string& command )
 {
    DBG_MSG( "%s", command.c_str( ) );
-   sleep(3);
+   // sleep(3);
 
    const base::ID id = base::timer::start( 3000, 1, [ this ]( const base::ID id ){ on_timer( id ); } );
-   DBG_ERR( "started timer: %zu", id );
+   DBG_MSG( "started timer: %zu", id );
 }
 
 void Component::process_timer( const base::Timer::ID id )
@@ -128,7 +128,7 @@ void Component::process_timer( const base::Timer::ID id )
 
 void Component::on_timer( const base::ID id )
 {
-   DBG_ERR( "Timer expired: %zu", id );
+   DBG_MSG( "Timer expired: %zu", id );
 
    // s_event_test.execute( );
 

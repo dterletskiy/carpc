@@ -20,7 +20,17 @@ namespace base::os::linux::socket {
    using tSocket = int;
    using tSocketSet = std::set< tSocket >;
 
+   extern const tSocket InvalidSocket;
    extern int error;
+
+   struct configuration
+   {
+      const int domain;
+      const int type;
+      const int protocole;
+      const char* address;
+      const int port;
+   };
 
    class socket_addr
    {
@@ -40,34 +50,34 @@ namespace base::os::linux::socket {
 
    class fd
    {
-   public:
-      enum class eType { READ, WRITE, EXCEPT };
+      public:
+         enum class eType { READ, WRITE, EXCEPT };
 
-   public:
-      fd( );
-      ~fd( );
+      public:
+         fd( );
+         ~fd( );
 
-      void set( const tSocket _socket, const eType type );
-      void set( const std::set< tSocket > socket_set, const std::set< eType > type_set );
-      void clear( const tSocket _socket, const eType type );
-      void clear( const std::set< tSocket > socket_set, const std::set< eType > type_set );
-      bool is_set( const tSocket _socket, const eType type );
-      void reset( );
+         void set( const tSocket _socket, const eType type );
+         void set( const std::set< tSocket > socket_set, const std::set< eType > type_set );
+         void clear( const tSocket _socket, const eType type );
+         void clear( const std::set< tSocket > socket_set, const std::set< eType > type_set );
+         bool is_set( const tSocket _socket, const eType type );
+         void reset( );
 
-   private:
-      void set( tSocket _socket, std::set< fd_set* > p_fd_set );
-      void clear( tSocket _socket, std::set< fd_set* > p_fd_set );
-      fd_set* convert( const eType type ) const;
-      std::set< fd_set* > convert( const std::set< eType > type_set ) const;
+      private:
+         void set( tSocket _socket, std::set< fd_set* > p_fd_set );
+         void clear( tSocket _socket, std::set< fd_set* > p_fd_set );
+         fd_set* convert( const eType type ) const;
+         std::set< fd_set* > convert( const std::set< eType > type_set ) const;
 
-   public:
-      fd_set* const read( ) const;
-      fd_set* const write( ) const;
-      fd_set* const except( ) const;
-   private:
-      fd_set* mp_read = nullptr;
-      fd_set* mp_write = nullptr;
-      fd_set* mp_except = nullptr;
+      public:
+         fd_set* const read( ) const;
+         fd_set* const write( ) const;
+         fd_set* const except( ) const;
+      private:
+         fd_set* mp_read = nullptr;
+         fd_set* mp_write = nullptr;
+         fd_set* mp_except = nullptr;
    };
 
 } // namespace base::os::linux::socket
@@ -78,12 +88,17 @@ namespace base::os::linux::socket {
 
    void info( const tSocket _socket, const char* _message = "socket" );
 
+   const tSocket create_server( const configuration& _config );
+   const tSocket create_clint( const configuration& _config );
+
    const tSocket socket(
                           const int _domain = AF_UNIX
                         , const int _type = SOCK_STREAM
                         , const int _protocole = 0
    );
 
+   const tSocket socket( const configuration _config );
+
    const bool bind(
                           const tSocket _socket
                         , const sockaddr* _address
@@ -97,6 +112,8 @@ namespace base::os::linux::socket {
                         , const int _port
    );
 
+   const bool bind( const tSocket _socket, const configuration _config );
+
    const bool connect(
                           const tSocket _socket
                         , const sockaddr* _address
@@ -109,6 +126,8 @@ namespace base::os::linux::socket {
                         , const char* const _address
                         , const int _port
    );
+
+   const bool connect( const tSocket _socket, const configuration _config );
 
    const bool listen(
                           const tSocket _socket
@@ -129,7 +148,7 @@ namespace base::os::linux::socket {
                         , const int _flags = 0
    );
 
-   const int accept(
+   const tSocket accept(
                           const tSocket _socket
                         , sockaddr* const _address = nullptr
                         , socklen_t* const _address_len = nullptr

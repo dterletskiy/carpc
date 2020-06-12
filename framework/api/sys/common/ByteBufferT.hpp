@@ -21,10 +21,14 @@ class ByteBufferT
 {
    class Transaction
    {
+      friend class ByteBuffer;
+      friend class ByteBufferT;
+
    public:
       enum class eType : size_t { push, pop, undefined };
 
       Transaction( size_t& );
+      Transaction( ByteBufferT& );
 
       bool start( const eType );
       bool finish( );
@@ -38,10 +42,11 @@ class ByteBufferT
    } m_transaction;
 
 public:
-   ByteBufferT( );
+   ByteBufferT( const size_t capacity = 1024 );
    ByteBufferT( const void*, const size_t );
    template< typename TYPE >
       ByteBufferT( const TYPE& );
+   ByteBufferT( const ByteBufferT& );
    ~ByteBufferT( );
 
    /*****************************************
@@ -50,9 +55,11 @@ public:
     *
     ****************************************/
 public:
+   bool push( void*, const size_t, const bool is_reallocate = true );
    bool push( const void*, const size_t, const bool is_reallocate = true );
    bool push( const void* const, const bool is_reallocate = true );
    bool push( const std::string&, const bool is_reallocate = true );
+   bool push( const ByteBufferT&, const bool is_reallocate = true );
    template< typename TYPE >
       bool push( const std::optional< TYPE >&, const bool is_reallocate = true );
    template< typename TYPE >
@@ -79,14 +86,10 @@ public:
          push( const TYPE&, const bool is_reallocate = true );
    // This method for multipl push
    template< typename ... TYPES >
-      bool push( const TYPES& ... values )
-         {
-            bool result = true;
-            (void)std::initializer_list< int >{ ( result &= push( values ), 0 )... };
-            return result;
-         }
+      bool push( const TYPES& ... values );
 
 private:
+   bool push_buffer_with_size( const void*, const size_t, const bool is_reallocate );
    template< typename TYPE_CONTAINER >
       bool push_stl_container( const TYPE_CONTAINER&, const bool is_reallocate );
    template< typename TYPE_CONTAINER >
@@ -98,9 +101,11 @@ private:
     *
     ****************************************/
 public:
+   bool pop( void*, const size_t );
    bool pop( const void*, const size_t );
    bool pop( const void*& );
    bool pop( std::string& );
+   bool pop( ByteBufferT& );
    template< typename TYPE >
       bool pop( std::optional< TYPE >& );
    template< typename TYPE >
@@ -127,18 +132,60 @@ public:
          pop( TYPE& );
    // This method for multipl push
    template< typename ... TYPES >
-      bool pop( TYPES& ... values )
-         {
-            bool result = true;
-            (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
-            return result;
-         }
+      bool pop( TYPES& ... values );
 
 private:
    template< typename TYPE_CONTAINER >
       bool pop_stl_container( TYPE_CONTAINER& );
    template< typename TYPE_CONTAINER >
       bool pop_stl_associative_container( TYPE_CONTAINER& );
+
+   /*****************************************
+    *
+    * Test buffer methods
+    *
+    ****************************************/
+public:
+   template< typename TYPE >
+      bool test( const TYPE& value, const size_t offset = 0 )
+      {
+         if( offset >= m_size )
+            return false;
+
+         size_t size_backup = m_size;
+         m_size -= offset;
+
+         TYPE buffer_value;
+         if( false == pop( buffer_value ) )
+         {
+            m_size = size_backup;
+            return false;
+         }
+
+         m_size = size_backup;
+         return value == buffer_value;
+      }
+
+   /*****************************************
+    *
+    * Get buffer methods
+    *
+    ****************************************/
+public:
+   template< typename TYPE >
+      bool get( TYPE& value, const size_t offset = 0 )
+      {
+         if( offset >= m_size )
+            return false;
+
+         size_t size_backup = m_size;
+         m_size -= offset;
+
+         bool result = pop( value );
+
+         m_size = size_backup;
+         return result;
+      }
 };
 
 
@@ -232,7 +279,21 @@ ByteBufferT::push( const TYPE& value, const bool is_reallocate )
       return false;
 
    if( false == value.to_buffer( *this ) )
-      m_transaction.error( );
+      return m_transaction.error( );
+   return m_transaction.finish( );
+}
+
+template< typename ... TYPES >
+bool ByteBufferT::push( const TYPES& ... values )
+{
+   if( false == m_transaction.start( Transaction::eType::push ) )
+      return false;
+
+   bool result = true;
+   (void)std::initializer_list< int >{ ( result &= push( values ), 0 )... };
+   if( false == result )
+      return m_transaction.error( );
+
    return m_transaction.finish( );
 }
 
@@ -348,7 +409,21 @@ ByteBufferT::pop( TYPE& value )
    if( false == m_transaction.start( Transaction::eType::pop ) )
       return false;
    if( false == value.from_buffer( *this ) )
-      m_transaction.error( );
+      return m_transaction.error( );
+   return m_transaction.finish( );
+}
+
+template< typename ... TYPES >
+bool ByteBufferT::pop( TYPES& ... values )
+{
+   if( false == m_transaction.start( Transaction::eType::pop ) )
+      return false;
+
+   bool result = true;
+   (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
+   if( false == result )
+      return m_transaction.error( );
+
    return m_transaction.finish( );
 }
 
@@ -362,7 +437,7 @@ ByteBufferT::pop( TYPE& value )
    using ENUM_TYPE = std::underlying_type_t< TYPE >;
    ENUM_TYPE _value;
    if( false == pop( _value ) )
-      m_transaction.error( );
+      return m_transaction.error( );
    value = static_cast< TYPE >( _value );
 
    return m_transaction.finish( );

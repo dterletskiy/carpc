@@ -5,7 +5,7 @@
 
 
 
-namespace base {
+using namespace base;
 
 
 
@@ -17,18 +17,38 @@ ByteBuffer::ByteBuffer( const size_t capacity )
 
 ByteBuffer::ByteBuffer( const void* p_buffer, const size_t size )
 {
-   if( true == allocate( size ) )
-   {
-      // memcpy( mp_buffer, p_buffer, m_size );
-      if( false == push( p_buffer, size ) )
-      {
-         SYS_ERR( "unable to fullfil buffer" );
-      }
-   }
-   else
+   if( false == allocate( size ) )
    {
       SYS_ERR( "unable to allocate %zu bytes", size );
+      return;
    }
+
+   if( false == push( p_buffer, size ) )
+   {
+      SYS_ERR( "unable to fullfil buffer" );
+      return;
+   }
+
+   // SYS_INF( "created: " );
+   // dump( );
+}
+
+ByteBuffer::ByteBuffer( const ByteBuffer& buffer )
+{
+   if( false == allocate( buffer.m_size ) )
+   {
+      SYS_ERR( "unable to allocate %zu bytes", buffer.m_size );
+      return;
+   }
+
+   if( false == push( buffer ) )
+   {
+      SYS_ERR( "unable to fullfil buffer" );
+      return;
+   }
+
+   // SYS_INF( "created: " );
+   // dump( );
 }
 
 ByteBuffer::~ByteBuffer( )
@@ -45,7 +65,7 @@ void ByteBuffer::dump( ) const
    // SYS_INF( "%s", ss.str( ).c_str( ) );
 
    for( size_t i = 0; i < m_size; ++i )
-      printf( "%#x ", mp_buffer[i] );
+      printf( "%#x ", static_cast< uint8_t* >( mp_buffer )[i] );
    printf( "\n" );
 }
 
@@ -67,7 +87,7 @@ bool ByteBuffer::allocate( const size_t capacity )
    // Buffer already allocated
    if( nullptr != mp_buffer ) return false;
 
-   mp_buffer = (uint8_t*)malloc( capacity );
+   mp_buffer = malloc( capacity );
 
    // Allocate error
    if( nullptr == mp_buffer ) return false;
@@ -94,7 +114,7 @@ bool ByteBuffer::reallocate( const size_t capacity, const bool is_store )
    if( true == is_store && m_size > capacity )
       return false;
 
-   uint8_t* p_buffer = (uint8_t*)malloc( capacity );
+   void* p_buffer = malloc( capacity );
 
    // Allocate error
    if( nullptr == p_buffer ) return false;
@@ -152,7 +172,7 @@ bool ByteBuffer::write( const void* p_buffer, const size_t size, const bool is_r
       else return false;
    }
 
-   memcpy( mp_buffer + m_size, p_buffer, size );
+   memcpy( static_cast< uint8_t* >( mp_buffer ) + m_size, p_buffer, size );
 
    return true;
 }
@@ -168,8 +188,7 @@ bool ByteBuffer::read( const void* p_buffer, const size_t size )
    // Buffer is not allocated
    if( nullptr == mp_buffer ) return false;
 
-   void* _p_buffer = const_cast< void* >( p_buffer );
-   memcpy( _p_buffer, mp_buffer + m_size - size, size );
+   memcpy( const_cast< void* >( p_buffer ), static_cast< uint8_t* >( mp_buffer ) + m_size - size, size );
 
    return true;
 }
@@ -181,6 +200,11 @@ bool ByteBuffer::read( const void* p_buffer, const size_t size )
  * Push buffer methods
  *
  ****************************************/
+bool ByteBuffer::push( void* p_buffer, const size_t size, const bool is_reallocate )
+{
+   return push( const_cast< const void* >( p_buffer ), size, is_reallocate );
+}
+
 bool ByteBuffer::push( const void* p_buffer, const size_t size, const bool is_reallocate )
 {
    if( false == write( p_buffer, size, is_reallocate ) )
@@ -201,9 +225,22 @@ bool ByteBuffer::push( const void* const p_buffer, const bool is_reallocate )
 
 bool ByteBuffer::push( const std::string& string, const bool is_reallocate )
 {
-   const char* p_buffer = string.c_str( );
+   const void* p_buffer = static_cast< const void* >( string.c_str( ) );
    const size_t size = string.size( );
 
+   return push_buffer_with_size( p_buffer, size, is_reallocate );
+}
+
+bool ByteBuffer::push( const ByteBuffer& _buffer, const bool is_reallocate )
+{
+   const void* p_buffer = _buffer.mp_buffer;
+   const size_t size = _buffer.m_size;
+
+   return push_buffer_with_size( p_buffer, size, is_reallocate );
+}
+
+bool ByteBuffer::push_buffer_with_size( const void* p_buffer, const size_t size, const bool is_reallocate )
+{
    // Backup buffer state.
    size_t size_backup = m_size;
 
@@ -211,12 +248,12 @@ bool ByteBuffer::push( const std::string& string, const bool is_reallocate )
    if( ( m_capacity - m_size ) < ( size + sizeof( size ) ) && false == is_reallocate )
       return false;
 
-   // Storing string content
-   if( false == push( static_cast< const void* >( p_buffer ), size, is_reallocate ) )
+   // Storing buffer content
+   if( false == push( p_buffer, size, is_reallocate ) )
       return false;
 
-   // Storing size of string. In case of error prevoius buffer state will be restored.
-   // In this case stored string content will be deleted.
+   // Storing size of buffer. In case of error prevoius buffer state will be restored.
+   // In this case stored buffer content will be deleted.
    if( false == push( size, is_reallocate ) )
    {
       m_size = size_backup;
@@ -233,6 +270,11 @@ bool ByteBuffer::push( const std::string& string, const bool is_reallocate )
  * Pop buffer methods
  *
  ****************************************/
+bool ByteBuffer::pop( void* p_buffer, const size_t size )
+{
+   return pop( const_cast< const void* >( p_buffer ), size );
+}
+
 bool ByteBuffer::pop( const void* p_buffer, const size_t size )
 {
    if( false == read( p_buffer, size ) )
@@ -265,7 +307,6 @@ bool ByteBuffer::pop( std::string& string )
    // push previously poped data to restore previous buffer state.
    if( size > m_size )
    {
-      // push( size );
       m_size = size_backup;
       return false;
    }
@@ -281,7 +322,37 @@ bool ByteBuffer::pop( std::string& string )
    return true;
 }
 
+bool ByteBuffer::pop( ByteBuffer& _buffer )
+{
+   // Backup buffer state.
+   size_t size_backup = m_size;
 
+   size_t size = 0;
+   // Reading size of string content
+   if( false == pop( size ) )
+      return false;
 
+   // Error in case of rest of data in buffer less then size to be read.
+   // push previously poped data to restore previous buffer state.
+   if( size > m_size )
+   {
+      m_size = size_backup;
+      return false;
+   }
 
-} // namespace base
+   void* p_buffer = malloc( size );
+   if( false == pop( p_buffer, size ) )
+   {
+      free( p_buffer );
+      return false;
+   }
+
+   if( false == _buffer.push( p_buffer, size ) )
+   {
+      free( p_buffer );
+      return false;
+   }
+
+   free( p_buffer );
+   return true;
+}

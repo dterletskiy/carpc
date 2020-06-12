@@ -10,23 +10,22 @@
 namespace base::configuration::dsi {
 
 #if defined UNIX_SOCKET
-   const int socket_family = AF_UNIX;
-   const char* server_address = "/tmp/9Lq7BNBnBycd6nxy.socket";
+
+   const os::linux::socket::configuration service_brocker = {
+      AF_UNIX, SOCK_STREAM, 0, "/tmp/servicebrocker.socket", 50000
+   };
+   const os::linux::socket::configuration application = {
+      AF_UNIX, SOCK_STREAM, 0, "/tmp/application.socket", 50001
+   };
+
 #elif defined INET_SOCKET
-   const int socket_family = AF_INET;
-   const char* server_address = "127.0.0.1";
-   // const char* server_address = "192.168.6.134";
+
+   const os::linux::socket::configuration service_brocker = {
+      AF_INET, SOCK_STREAM, 0, "127.0.0.1", 50000
+   };
+
 #endif
-
-   const int socket_type = SOCK_STREAM;
-   // const int socket_type = SOCK_SEQPACKET;
-
-   const int socket_protocole = 0;
-
-
-   const int server_port = 5000;
 
    const size_t buffer_size = 4096;
 
 }
-

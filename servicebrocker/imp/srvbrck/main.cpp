@@ -20,13 +20,7 @@ namespace memory {
 int main( int argc, char *argv[] )
 {
    ConnectionProcessor conn;
-   conn.init(
-                 base::configuration::dsi::socket_family
-               , base::configuration::dsi::socket_type
-               , base::configuration::dsi::socket_protocole
-               , base::configuration::dsi::server_address
-               , base::configuration::dsi::server_port
-            );
+   conn.init( );
    conn.connection_loop( );
 
 

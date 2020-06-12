@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <list>
+#include <functional>
+#include <memory>
+#include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
 
 
@@ -10,55 +14,89 @@ namespace base::os {
    class Socket
    {
    public:
-      struct Info
-      {
-         const int socket_family;
-         const int socket_type;
-         const int socket_protocole;
-         const char* server_address;
-         const int server_port;
-      };
-      using tSet = std::set< Socket >;
+      enum class eResult { OK, ERROR, DISCONNECTED };
+      const char* c_str( const eResult );
 
-   protected:
-      enum class eRead : size_t { OK, ERROR, DISCONNECTED };
+      using tSptr = std::shared_ptr< Socket >;
+      using tSptrList = std::list< tSptr >;
+      using tRecvCallback = std::function< void( void*, const size_t, const eResult ) >;
 
    public:
-      Socket( const Info&, const size_t );
+      Socket( const linux::socket::configuration&, const size_t );
       ~Socket( );
-   private:
+   protected:
       Socket( linux::socket::tSocket, const size_t );
 
-      bool create( );
-      bool bind( );
-      bool listen( );
-      Socket accept( );
-      bool connect( );
-      bool send( const void* p_buffer, const size_t size, const int flags = 0 );
-      bool recv( const int flags = 0 );
-      bool select( linux::socket::tSocket max_socket );
+   public:
+      const bool operator<( const Socket& ) const;
+
+   public:
+      eResult create( );
+      eResult bind( );
+      eResult listen( );
+      tSptr accept( );
+      eResult connect( );
+      eResult send( const void* p_buffer, const size_t size, const int flags = 0 );
+      eResult recv( const int flags = 0 );
+      eResult recv( tRecvCallback, const int flags = 0 );
       void close( );
       void info( const std::string& message ) const;
 
    public:
+      void block( ) const;
+      void unblock( ) const;
+
+   public:
       linux::socket::tSocket socket( ) const;
    protected:
-      linux::socket::tSocket  m_socket = -1;
+      linux::socket::tSocket        m_socket = -1;
 
    protected:
-      linux::socket::fd       m_fd;
-
-   protected:
-      Info                    m_info = { };
+      linux::socket::configuration  m_configuration = { };
 
    public:
       const void* const buffer( size_t& ) const;
    protected:
       void fill_buffer( const char symbol = 0 );
    protected:
-      void*                   mp_buffer = nullptr;
-      size_t                  m_buffer_capacity = 0;
-      size_t                  m_buffer_size = 0;
+      void*                         mp_buffer = nullptr;
+      size_t                        m_buffer_capacity = 0;
+      size_t                        m_buffer_size = 0;
+      size_t                        m_total_recv_size = 0;
+      size_t                        m_total_send_size = 0;
+   };
+
+
+
+
+   inline
+   linux::socket::tSocket Socket::socket( ) const
+   {
+      return m_socket;
+   }
+
+   inline
+   void Socket::block( ) const
+   {
+   }
+
+   inline
+   void Socket::unblock( ) const
+   {
+      linux::set_nonblock( m_socket );
+   }
+
+}
+
+
+
+namespace base::os {
+
+   class SocketClient: public Socket
+   {
+   public:
+      SocketClient( const linux::socket::configuration&, const size_t );
+      ~SocketClient( );
    };
 
 }
@@ -67,32 +105,37 @@ namespace base::os {
 
 namespace base::os {
 
-   class Client: public Socket
+   class SocketServer: public Socket
    {
    public:
-      Client( const Info&, const size_t );
-      ~Client( );
-   };
+      SocketServer( const linux::socket::configuration&, const size_t );
+      ~SocketServer( );
 
-}
-
-
-
-namespace base::os {
-
-   class Server: public Socket
-   {
    public:
-      Server( const Info&, const size_t );
-      ~Server( );
+      bool select( );
 
    private:
+      virtual void read_slave( tSptr );
       void fd_reset( );
       void fd_init( );
 
+   public:
+      linux::socket::tSocket max_socket( ) const;
    private:
-      tSet                       m_slave_sockets_set;
+      void calc_max( );
       linux::socket::tSocket     m_max_socket = -1;
+
+   private:
+      tSptrList                  m_slave_sockets;
+      linux::socket::fd          m_fd;
    };
+
+
+
+   inline
+   linux::socket::tSocket SocketServer::max_socket( ) const
+   {
+      return m_max_socket;
+   }
 
 }

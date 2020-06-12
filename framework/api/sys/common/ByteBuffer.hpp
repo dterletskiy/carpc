@@ -27,6 +27,7 @@ public:
    ByteBuffer( const void*, const size_t );
    template< typename TYPE >
       ByteBuffer( const TYPE& );
+   ByteBuffer( const ByteBuffer& );
    ~ByteBuffer( );
 
    /*****************************************
@@ -35,9 +36,11 @@ public:
     *
     ****************************************/
 public:
+   bool push( void*, const size_t, const bool is_reallocate = true );
    bool push( const void*, const size_t, const bool is_reallocate = true );
-   bool push( const void*, const bool is_reallocate = true );
+   bool push( const void* const, const bool is_reallocate = true );
    bool push( const std::string&, const bool is_reallocate = true );
+   bool push( const ByteBuffer&, const bool is_reallocate = true );
    template< typename TYPE >
       bool push( const std::optional< TYPE >&, const bool is_reallocate = true );
    template< typename TYPE >
@@ -64,14 +67,10 @@ public:
          push( const TYPE&, const bool is_reallocate = true );
    // This method for multipl push
    template< typename ... TYPES >
-      bool push( const TYPES& ... values )
-         {
-            bool result = true;
-            (void)std::initializer_list< int >{ ( result &= push( values ), 0 )... };
-            return result;
-         }
+      bool push( const TYPES& ... values, const bool is_reallocate = true );
 
 private:
+   bool push_buffer_with_size( const void*, const size_t, const bool is_reallocate );
    template< typename TYPE_CONTAINER >
       bool push_stl_container( const TYPE_CONTAINER&, const bool is_reallocate );
    template< typename TYPE_CONTAINER >
@@ -83,9 +82,11 @@ private:
     *
     ****************************************/
 public:
+   bool pop( void*, const size_t );
    bool pop( const void*, const size_t );
    bool pop( const void*& );
    bool pop( std::string& );
+   bool pop( ByteBuffer& );
    template< typename TYPE >
       bool pop( std::optional< TYPE >& );
    template< typename TYPE >
@@ -112,18 +113,60 @@ public:
          pop( TYPE& );
    // This method for multipl push
    template< typename ... TYPES >
-      bool pop( TYPES& ... values )
-         {
-            bool result = true;
-            (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
-            return result;
-         }
+      bool pop( TYPES& ... values );
 
 private:
    template< typename TYPE_CONTAINER >
       bool pop_stl_container( TYPE_CONTAINER& );
    template< typename TYPE_CONTAINER >
       bool pop_stl_associative_container( TYPE_CONTAINER& );
+
+   /*****************************************
+    *
+    * Test buffer methods
+    *
+    ****************************************/
+public:
+   template< typename TYPE >
+      bool test( const TYPE& value, const size_t offset = 0 )
+      {
+         if( offset >= m_size )
+            return false;
+
+         size_t size_backup = m_size;
+         m_size -= offset;
+
+         TYPE buffer_value;
+         if( false == pop( buffer_value ) )
+         {
+            m_size = size_backup;
+            return false;
+         }
+
+         m_size = size_backup;
+         return value == buffer_value;
+      }
+
+   /*****************************************
+    *
+    * Get buffer methods
+    *
+    ****************************************/
+public:
+   template< typename TYPE >
+      bool get( TYPE& value, const size_t offset = 0 )
+      {
+         if( offset >= m_size )
+            return false;
+
+         size_t size_backup = m_size;
+         m_size -= offset;
+
+         bool result = pop( value );
+
+         m_size = size_backup;
+         return result;
+      }
 
    /*****************************************
     *
@@ -147,9 +190,9 @@ public:
    void fill( const char symbol = 0 );
 
 public:
-   const uint8_t* const buffer( ) const;
+   const void* const buffer( ) const;
 protected:
-   uint8_t* mp_buffer = nullptr;
+   void* mp_buffer = nullptr;
 
 public:
    const size_t capacity( ) const;
@@ -176,7 +219,7 @@ ByteBuffer::ByteBuffer( const TYPE& data )
 }
 
 inline
-const uint8_t* const ByteBuffer::buffer( ) const
+const void* const ByteBuffer::buffer( ) const
 {
    return mp_buffer;
 }
@@ -281,6 +324,19 @@ ByteBuffer::push( const TYPE& value, const bool is_reallocate )
    return value.to_buffer( *this );
 }
 
+template< typename ... TYPES >
+bool ByteBuffer::push( const TYPES& ... values, const bool is_reallocate )
+{
+   size_t size_backup = m_size;
+
+   bool result = true;
+   (void)std::initializer_list< int >{ ( result &= push( values, is_reallocate ), 0 )... };
+   if( false == result )
+      m_size = size_backup;
+
+   return result;
+}
+
 template< typename TYPE >
 typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
 ByteBuffer::push( const TYPE& value, const bool is_reallocate )
@@ -379,6 +435,19 @@ typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
 ByteBuffer::pop( TYPE& value )
 {
    return value.from_buffer( *this );
+}
+
+template< typename ... TYPES >
+bool ByteBuffer::pop( TYPES& ... values )
+{
+   size_t size_backup = m_size;
+
+   bool result = true;
+   (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
+   if( false == result )
+      m_size = size_backup;
+
+   return result;
 }
 
 template< typename TYPE >

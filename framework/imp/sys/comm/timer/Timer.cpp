@@ -242,8 +242,11 @@ namespace base::timer {
       }
       else
       {
-         std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-         base::Runnable::create_send_to_context( on_timer, p_service );
+         for( size_t ticks = 0; ticks < count; ++ticks )
+         {
+            std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
+            base::Runnable::create_send_to_context( on_timer, p_service );
+         }
       }
 
       return id;
