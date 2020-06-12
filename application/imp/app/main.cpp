@@ -120,49 +120,101 @@ void boot( int argc, char** argv )
 
 
 
-
+#include "api/sys/common/CircularBuffer.hpp"
 #include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/dsi/Types.hpp"
-   #include "api/sys/helpers/macros/strings.hpp"
+#include "api/sys/helpers/macros/strings.hpp"
 using tBuffer = base::ByteBufferT;
 
 const bool test( int argc, char** argv )
 {
-   return true;
+   // return true;
 
 
-   base::ByteBufferT buffer;
-   base::dsi::Packet packet;
-   packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_one" ) );
-   packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_two" ) );
-   packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_two" ) );
-   buffer.push( packet );
-   buffer.dump( );
-   DBG_MSG( "%zu", buffer.size( ) );
 
-   packet = { };
-   bool result = packet.from_buffer( buffer );
-   DBG_MSG( "%s", BOOL_TO_STRING( result ) );
-   for( const base::dsi::Package& package : packet.packages( ) )
+
+
+
+
+   base::CircularBuffer cb( 10 );
+   cb.dump( );
+
    {
-      std::string service_name = "xxxxx";
-      base::dsi::eCommand command = base::dsi::eCommand::Undefined;
-      tBuffer data( package.data( ) );
-      data.pop( service_name );
-      DBG_MSG( "%s", service_name.c_str( ) );
+      size_t size = 5;
+      uint8_t* buffer = (uint8_t*)malloc( size );
+      for( size_t i = 0; i < size; ++i )
+         buffer[ i ] = 0xA0 + i;
+      cb.insert_data( (void*)buffer, size );
+      cb.dump( );
+   }
+
+   {
+      size_t size = 7;
+      uint8_t* buffer = (uint8_t*)malloc( size );
+      for( size_t i = 0; i < size; ++i )
+         buffer[ i ] = 0xB0 + i;
+      cb.insert_data( (void*)buffer, size );
+      cb.dump( );
+   }
+
+   {
+      size_t size = 3;
+      uint8_t* buffer = (uint8_t*)malloc( size );
+      cb.move_data( (void*)buffer, size );
+
+      for( size_t i = 0; i < size; ++i )
+         printf( "%#x ", static_cast< uint8_t* >( buffer )[i] );
+      printf( "\n" );
+
+      cb.dump( );
+   }
+
+   {
+      size_t size = 3;
+      uint8_t* buffer = (uint8_t*)malloc( size );
+      for( size_t i = 0; i < size; ++i )
+         buffer[ i ] = 0xC0 + i;
+      cb.insert_data( (void*)buffer, size );
+      cb.dump( );
+   }
+
+   {
+      size_t size = 8;
+      uint8_t* buffer = (uint8_t*)malloc( size );
+      for( size_t i = 0; i < size; ++i )
+         buffer[ i ] = 0xD0 + i;
+      cb.insert_data( (void*)buffer, size );
+      cb.dump( );
    }
 
 
+   #if 0
+      base::ByteBufferT buffer;
+      base::dsi::Packet packet;
+      packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_one" ) );
+      packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_two" ) );
+      packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_two" ) );
+      buffer.push( packet );
+      buffer.dump( );
+      DBG_MSG( "%zu", buffer.size( ) );
+
+      packet = { };
+      bool result = packet.from_buffer( buffer );
+      DBG_MSG( "%s", BOOL_TO_STRING( result ) );
+      for( const base::dsi::Package& package : packet.packages( ) )
+      {
+         std::string service_name = "xxxxx";
+         base::dsi::eCommand command = base::dsi::eCommand::Undefined;
+         tBuffer data( package.data( ) );
+         data.pop( service_name );
+         DBG_MSG( "%s", service_name.c_str( ) );
+      }
+   #endif
 
 
 
-   {
-      const char* string1 = "Hello ";
-      const char* string2 = "world!!!";
-      tBuffer buffer;
-      buffer.push( (const void*)string1, strlen( string1 ) );
-      buffer.push( (const void*)string2, strlen( string2 ) );
-   }
+
+
 
 
 
