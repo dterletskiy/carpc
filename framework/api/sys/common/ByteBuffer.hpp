@@ -53,7 +53,7 @@ public:
       bool push( const std::set< TYPE >&, const bool is_reallocate = true );
    template< typename TYPE_KEY, typename TYPE_VALUE >
       bool push( const std::map< TYPE_KEY, TYPE_VALUE >&, const bool is_reallocate = true );
-   // This method is for integral types and types with floating poing
+   // This method is for integral types and types with floating point
    template< typename TYPE >
       typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
          push( const TYPE&, const bool is_reallocate = true );

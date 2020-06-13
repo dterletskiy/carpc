@@ -121,10 +121,10 @@ void boot( int argc, char** argv )
 
 
 #include "api/sys/common/CircularBuffer.hpp"
+#include "api/sys/common/ByteStream.hpp"
 #include "api/sys/common/ByteBufferT.hpp"
 #include "api/sys/dsi/Types.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
-using tBuffer = base::ByteBufferT;
 
 const bool test( int argc, char** argv )
 {
@@ -135,60 +135,158 @@ const bool test( int argc, char** argv )
 
 
 
+   #if 1 // ByteStream test
+      using tBuffer = base::ByteStream;
 
-   base::CircularBuffer cb( 10 );
-   cb.dump( );
+      enum class eEnum { one, two, three };
 
-   {
-      size_t size = 5;
-      uint8_t* buffer = (uint8_t*)malloc( size );
-      for( size_t i = 0; i < size; ++i )
-         buffer[ i ] = 0xA0 + i;
-      cb.insert_data( (void*)buffer, size );
+      tBuffer stream( 64 );
+
+      {
+         size_t value_integral = 123;
+         eEnum value_enum = eEnum::three;
+         std::string value_string = "Hello world!";
+         std::optional< std::string > value_optional_string = "OptionalString";
+         std::vector< std::string > value_vector_string = { "one", "two", "three", "four", "five" };
+         std::map< size_t, std::string > value_map = { { 111, "one" }, { 222, "two" }, { 333, "three" }, { 444, "four" }, { 555, "five" } };
+         bool value_bool = true;
+         void* value_pointer = &value_integral;
+
+         stream.push( value_integral );
+         stream.dump( );
+         stream.push( value_enum );
+         stream.dump( );
+         stream.push( value_string );
+         stream.dump( );
+         stream.push( value_optional_string );
+         stream.dump( );
+         stream.push( value_vector_string );
+         stream.dump( );
+         stream.push( value_map );
+         stream.dump( );
+         stream.push( value_bool );
+         stream.dump( );
+         stream.push( value_pointer );
+         stream.dump( );
+
+
+
+         size_t test_value_integral = 0;
+         eEnum test_value_enum = eEnum::one;
+         std::string test_value_string = "";
+         std::optional< std::string > test_value_optional_string = "";
+         std::vector< std::string > test_value_vector_string;
+         std::map< size_t, std::string > test_value_map;
+         bool test_value_bool = false;
+         void* test_value_pointer = nullptr;
+
+         stream.pop( test_value_integral );
+         stream.dump( );
+         stream.pop( test_value_enum );
+         stream.dump( );
+         stream.pop( test_value_string );
+         stream.dump( );
+         stream.pop( test_value_optional_string );
+         stream.dump( );
+         stream.pop( test_value_vector_string );
+         stream.dump( );
+         stream.pop( test_value_map );
+         stream.dump( );
+         stream.pop( test_value_bool );
+         stream.dump( );
+         stream.pop( test_value_pointer );
+         stream.dump( );
+
+
+
+         DBG_MSG( "integral result: %s", BOOL_TO_STRING( value_integral == test_value_integral ) );
+         DBG_MSG( "enum result: %s", BOOL_TO_STRING( value_enum == test_value_enum ) );
+         DBG_MSG( "string result: %s", BOOL_TO_STRING( value_string == test_value_string ) );
+         DBG_MSG( "optional result: %s", BOOL_TO_STRING( value_optional_string == test_value_optional_string ) );
+         DBG_MSG( "vector result: %s", BOOL_TO_STRING( value_vector_string == test_value_vector_string ) );
+         DBG_MSG( "map result: %s", BOOL_TO_STRING( value_map == test_value_map ) );
+         DBG_MSG( "bool result: %s", BOOL_TO_STRING( value_bool == test_value_bool ) );
+         DBG_MSG( "bool result: %s", BOOL_TO_STRING( value_pointer == test_value_pointer ) );
+
+         DBG_MSG( "%p -> %p", value_pointer, test_value_pointer );
+      }
+   #endif
+
+
+
+   #if 0 // CircularBuffer test
+      base::CircularBuffer cb( 10 );
       cb.dump( );
-   }
 
-   {
-      size_t size = 7;
-      uint8_t* buffer = (uint8_t*)malloc( size );
-      for( size_t i = 0; i < size; ++i )
-         buffer[ i ] = 0xB0 + i;
-      cb.insert_data( (void*)buffer, size );
-      cb.dump( );
-   }
+      {
+         size_t size = 5;
+         uint8_t* buffer = (uint8_t*)malloc( size );
+         for( size_t i = 0; i < size; ++i )
+            buffer[ i ] = 0xA0 + i;
+         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
+         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
+         cb.dump( );
+      }
 
-   {
-      size_t size = 3;
-      uint8_t* buffer = (uint8_t*)malloc( size );
-      cb.move_data( (void*)buffer, size );
+      {
+         size_t size = 7;
+         uint8_t* buffer = (uint8_t*)malloc( size );
+         for( size_t i = 0; i < size; ++i )
+            buffer[ i ] = 0xB0 + i;
+         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
+         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
+         cb.dump( );
+      }
 
-      for( size_t i = 0; i < size; ++i )
-         printf( "%#x ", static_cast< uint8_t* >( buffer )[i] );
-      printf( "\n" );
+      {
+         size_t size = 3;
+         uint8_t* buffer = (uint8_t*)malloc( size );
+         cb.move_front( (void*)buffer, size );
 
-      cb.dump( );
-   }
+         for( size_t i = 0; i < size; ++i )
+            printf( "%#x ", static_cast< uint8_t* >( buffer )[i] );
+         printf( "\n" );
 
-   {
-      size_t size = 3;
-      uint8_t* buffer = (uint8_t*)malloc( size );
-      for( size_t i = 0; i < size; ++i )
-         buffer[ i ] = 0xC0 + i;
-      cb.insert_data( (void*)buffer, size );
-      cb.dump( );
-   }
+         cb.dump( );
+      }
 
-   {
-      size_t size = 8;
-      uint8_t* buffer = (uint8_t*)malloc( size );
-      for( size_t i = 0; i < size; ++i )
-         buffer[ i ] = 0xD0 + i;
-      cb.insert_data( (void*)buffer, size );
-      cb.dump( );
-   }
+      {
+         size_t size = 3;
+         uint8_t* buffer = (uint8_t*)malloc( size );
+         for( size_t i = 0; i < size; ++i )
+            buffer[ i ] = 0xC0 + i;
+         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
+         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
+         cb.dump( );
+      }
+
+      {
+         size_t size = 8;
+         uint8_t* buffer = (uint8_t*)malloc( size );
+         for( size_t i = 0; i < size; ++i )
+            buffer[ i ] = 0xD0 + i;
+         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size, true );
+         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
+         cb.dump( );
+      }
+
+      // {
+      //    cb.reallocate( 8 );
+      //    cb.dump( );
+      // }
+
+      {
+         const uint8_t buffer[] = { 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xC1 };
+         const bool result = cb.cmp( (void*)buffer, 6, 5 );
+         DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
+      }
+   #endif
 
 
-   #if 0
+
+   #if 0 // ByteBuffer test
+      using tBuffer = base::ByteBufferT;
+
       base::ByteBufferT buffer;
       base::dsi::Packet packet;
       packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_one" ) );

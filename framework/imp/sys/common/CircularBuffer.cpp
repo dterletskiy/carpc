@@ -14,6 +14,21 @@ void* const inc( void* const ptr, const size_t value )
    return static_cast< void* const >( static_cast< uint8_t* const >( ptr ) + value );
 }
 
+const void* const inc( const void* const ptr, const size_t value )
+{
+   return static_cast< const void* const >( static_cast< const uint8_t* const >( ptr ) + value );
+}
+
+void* const dec( void* const ptr, const size_t value )
+{
+   return static_cast< void* const >( static_cast< uint8_t* const >( ptr ) - value );
+}
+
+const void* const dec( const void* const ptr, const size_t value )
+{
+   return static_cast< const void* const >( static_cast< const uint8_t* const >( ptr ) - value );
+}
+
 ptrdiff_t diff( const void* const ptr1, const void* const ptr2 )
 {
    return static_cast< const uint8_t* const >( ptr1 ) - static_cast< const uint8_t* const >( ptr2 );
@@ -21,13 +36,27 @@ ptrdiff_t diff( const void* const ptr1, const void* const ptr2 )
 
 
 
-CircularBuffer::CircularBuffer( const size_t _capacity )
-   : m_capacity( _capacity )
+
+const char* CircularBuffer::c_str( const ePush result )
 {
-   mp_head = mp_begin = mp_end = malloc( m_capacity + 1 );
+   switch( result )
+   {
+      case ePush::OK:         return "ePush::OK";
+      case ePush::Realloc:    return "ePush::Realloc";
+      case ePush::Overlap:    return "ePush::Overlap";
+      case ePush::Error:      return "ePush::Error";
+   }
+   return "ePush::XXX";
+}
+
+CircularBuffer::CircularBuffer( const size_t capacity, const bool is_overlap_allowed, const bool is_reallocate_allowed )
+   : m_capacity( capacity )
+   , m_is_overlap_allowed( is_overlap_allowed )
+   , m_is_reallocate_allowed( is_reallocate_allowed )
+{
+   mp_head = malloc( m_capacity + 1 );
    mp_tail = inc( mp_head, m_capacity );
-   SYS_INF( "head / tail / begin / end = %p / %p / %p / %p", mp_head, mp_tail, mp_begin, mp_end );
-   SYS_INF( "capacity = %zu", m_capacity );
+   mp_begin = mp_end = mp_head;
 }
 
 CircularBuffer::~CircularBuffer( )
@@ -35,9 +64,38 @@ CircularBuffer::~CircularBuffer( )
    free( mp_head );
 }
 
+bool CircularBuffer::reallocate( size_t capacity )
+{
+   if( 0 == capacity )
+      capacity = 1.5 * m_capacity;
+
+   void* p_head = malloc( capacity + 1 );
+   if( nullptr == p_head )
+      return false;
+
+   front( p_head, std::min( capacity, m_size ) );
+   free( mp_head );
+   m_capacity = capacity;
+   m_size = std::min( capacity, m_size );
+   mp_head = p_head;
+   mp_tail = inc( mp_head, m_capacity );
+   mp_begin = mp_head;
+   mp_end = inc( mp_begin, m_size );
+   if( mp_tail == mp_end )
+      mp_end = mp_head;
+
+   return true;
+}
+
+void CircularBuffer::info( ) const
+{
+   SYS_INF( "head: %p / tail: %p / begin: %p / end: %p / capacity: %zu / size: %zu", mp_head, mp_tail, mp_begin, mp_end, m_capacity, m_size );
+}
+
 void CircularBuffer::dump( const eDump type ) const
 {
-   SYS_INF( "head / tail / begin / end = %p / %p / %p / %p", mp_head, mp_tail, mp_begin, mp_end );
+   SYS_INF( "--------------- Dump begin ---------------" );
+   info( );
    switch( type )
    {
       case eDump::Raw:
@@ -57,6 +115,7 @@ void CircularBuffer::dump( const eDump type ) const
          break;
       }
    }
+   SYS_INF( "---------------- Dump end ----------------" );
 }
 
 void CircularBuffer::dump_raw( ) const
@@ -88,29 +147,39 @@ void CircularBuffer::dump_logic( ) const
    printf( "\n" );
 }
 
-bool CircularBuffer::insert_data( void* const p_buffer, const size_t size )
+CircularBuffer::ePush CircularBuffer::push_back( const void* const p_buffer, const size_t size, const std::optional< bool > is_reallocate )
 {
+   if( nullptr == p_buffer )
+   {
+      SYS_ERR( "source buffer pointer is nullptr" );
+      return ePush::Error;
+   }
    if( size > m_capacity )
    {
       SYS_ERR( "buffer capacity(%zu) not enough", m_capacity );
-      return false;
+      return ePush::Error;
    }
-   if( size > free_space( ) )
+
+   ePush result = ( size > free_space( ) ) ? ePush::Overlap : ePush::OK;
+   if( ePush::Overlap == result && false == m_is_overlap_allowed )
    {
-      SYS_WRN( "buffer is full => overriding data" );
+      if( false == is_reallocate.value_or( m_is_reallocate_allowed ) )
+         return ePush::Error;
+
+      if( false == reallocate( 1.5 * ( m_size + size ) ) )
+         return ePush::Error;
+      result = ePush::Realloc;
    }
 
    const size_t part_size = static_cast< size_t >( diff( mp_tail, mp_end ) );
    if( size > part_size )
    {
-      SYS_WRN( "----- 1" );
       memcpy( mp_end, p_buffer, part_size );
       memcpy( mp_head, inc( p_buffer, part_size ), size - part_size );
       mp_end = inc( mp_head, size - part_size );
    }
    else
    {
-      SYS_WRN( "----- 2" );
       memcpy( mp_end, p_buffer, size );
       mp_end = inc( mp_end, size );
    }
@@ -128,13 +197,21 @@ bool CircularBuffer::insert_data( void* const p_buffer, const size_t size )
       m_size += size;
    }
 
-   return true;
+   return result;
 }
 
-bool CircularBuffer::move_data( void* const p_buffer, const size_t size )
+CircularBuffer::ePush CircularBuffer::push_back( const raw_buffer& buffer, const std::optional< bool > is_reallocate )
 {
-   if( false == copy_data( p_buffer, size ) )
-      return false;
+   return push_back( buffer.ptr, buffer.size, is_reallocate );
+}
+
+void CircularBuffer::pop_front( const size_t size )
+{
+   if( 0 == m_size )
+      return;
+
+   if( size >= m_size )
+      return reset( );
 
    const size_t part_size = static_cast< size_t >( diff( mp_tail, mp_begin ) );
    if( size > part_size )
@@ -150,12 +227,40 @@ bool CircularBuffer::move_data( void* const p_buffer, const size_t size )
       mp_begin = mp_head;
 
    m_size -= size;
-
-   return true;
 }
 
-bool CircularBuffer::copy_data( void* const p_buffer, const size_t size ) const
+void CircularBuffer::pop_back( const size_t size )
 {
+   if( 0 == m_size )
+      return;
+
+   if( size >= m_size )
+      return reset( );
+
+   const size_t part_size = static_cast< size_t >( diff( mp_head, mp_end ) );
+   if( size > part_size )
+   {
+      mp_end = dec( mp_tail, size - part_size );
+   }
+   else
+   {
+      mp_end = inc( mp_end, size );
+   }
+
+   if( mp_end == mp_tail )
+      mp_end = mp_head;
+
+   m_size -= size;
+
+}
+
+bool CircularBuffer::front( const void* p_buffer, const size_t size ) const
+{
+   if( nullptr == p_buffer )
+   {
+      SYS_ERR( "destination buffer pointer is nullptr" );
+      return false;
+   }
    if( 0 == m_size )
    {
       SYS_WRN( "buffer is empty" );
@@ -170,13 +275,53 @@ bool CircularBuffer::copy_data( void* const p_buffer, const size_t size ) const
    const size_t part_size = static_cast< size_t >( diff( mp_tail, mp_begin ) );
    if( size > part_size )
    {
-      memcpy( p_buffer, mp_begin, part_size );
-      memcpy( inc( p_buffer, part_size ), mp_head, size - part_size );
+      memcpy( const_cast< void* >( p_buffer ), mp_begin, part_size );
+      memcpy( inc( const_cast< void* >( p_buffer ), part_size ), mp_head, size - part_size );
    }
    else
    {
-      memcpy( p_buffer, mp_begin, size );
+      memcpy( const_cast< void* >( p_buffer ), mp_begin, size );
    }
 
    return true;
+}
+
+bool CircularBuffer::front( raw_buffer& buffer ) const
+{
+   return front( buffer.ptr, buffer.size );
+}
+
+bool CircularBuffer::move_front( const void* const p_buffer, const size_t size )
+{
+   if( false == front( p_buffer, size ) )
+      return false;
+
+   pop_front( size );
+
+   return true;
+}
+
+bool CircularBuffer::cmp( void* const p_buffer, const size_t size, const size_t offset ) const
+{
+   if( offset > m_size )
+      return false;
+   if( offset + size > m_size )
+      return false;
+
+   size_t part = static_cast< size_t >( diff( mp_tail, mp_begin ) );
+   if( offset >= part )
+   {
+      return 0 == memcmp( inc( mp_head, offset - part ), p_buffer, size );
+   }
+
+   if( offset + size > part )
+   {
+      size_t cmp_part = part - offset;
+      if( 0 != memcmp( inc( mp_begin, offset ), p_buffer, cmp_part ) )
+         return false;
+
+      return 0 == memcmp( mp_head, inc( p_buffer, cmp_part ), size - cmp_part );
+   }
+
+   return 0 == memcmp( inc( mp_begin, offset ), p_buffer, size );
 }

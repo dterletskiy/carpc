@@ -1,3 +1,7 @@
+version 1.7.3
+   - CircularBuffer implementation extended and API documented in comments (+ test).
+   - ByteStream implemented (+ test).
+
 version 1.7.2
    - CircularBuffer implemented (+ test).
 
