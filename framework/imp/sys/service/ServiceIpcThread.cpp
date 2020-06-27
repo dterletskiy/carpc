@@ -98,13 +98,14 @@ void ServiceIpcThread::thread_loop_receive( )
          {
             size_t recv_size = 0;
             const void* const p_buffer = m_socket_sb.buffer( recv_size );
-            ByteBufferT byte_buffer( p_buffer, recv_size );
-            // byte_buffer.dump( );
+            dsi::tByteStream stream;
+            stream.push( p_buffer, recv_size );
+            // stream.dump( );
 
-            while( 0 < byte_buffer.size( ) )
+            while( 0 < stream.size( ) )
             {
                // @TDA: issue: in case of receiving several event all of them will be processed in reverce sequence
-               IEvent::tSptr p_event = EventRegistry::instance( )->create_event( byte_buffer );
+               IEvent::tSptr p_event = IEvent::deserialize( stream );
                if( nullptr == p_event )
                {
                   SYS_ERR( "'%s': lost received event", m_name.c_str( ) );
@@ -366,17 +367,17 @@ bool ServiceIpcThread::is_subscribed( const IAsync::tSptr p_event )
 
 bool ServiceIpcThread::send( os::Socket& _socket, const IAsync::tSptr p_event )
 {
-   ByteBufferT event_buffer;
-   if( false == EventRegistry::instance( )->create_buffer( event_buffer, std::static_pointer_cast< IEvent >( p_event ) ) )
+   dsi::tByteStream stream;
+   if( false == IEvent::serialize( stream, std::static_pointer_cast< IEvent >( p_event ) ) )
       return false;
 
    // dsi::Packet packet;
-   // packet.add_package( dsi::eCommand::BroadcastEvent, event_buffer );
-   // ByteBufferT packet_buffer;
+   // packet.add_package( dsi::eCommand::BroadcastEvent, stream );
+   // dsi::tByteStream packet_buffer;
    // packet_buffer.push( packet );
    // return send( _socket, packet_buffer );
 
-   return send( _socket, event_buffer );
+   return send( _socket, stream );
 }
 
 bool ServiceIpcThread::send( const IAsync::tSptr p_event )
@@ -384,12 +385,22 @@ bool ServiceIpcThread::send( const IAsync::tSptr p_event )
    return send( m_socket_sb, p_event );
 }
 
-bool ServiceIpcThread::send( os::Socket& _socket, const ByteBufferT& byte_buffer )
+bool ServiceIpcThread::send( os::Socket& _socket, dsi::tByteStream& stream )
 {
-   return os::Socket::eResult::OK == _socket.send( byte_buffer.buffer( ), byte_buffer.size( ) );
+   size_t size = 0;
+   const void* buffer = nullptr;
+   if( false == stream.is_linear( buffer, size ) )
+   {
+      SYS_WRN( "stream is not linear" );
+      return false;
+   }
+
+   const bool result = os::Socket::eResult::OK == _socket.send( buffer, size );
+   stream.erase( size );
+   return result;
 }
 
-bool ServiceIpcThread::send( const ByteBufferT& byte_buffer )
+bool ServiceIpcThread::send( dsi::tByteStream& stream )
 {
-   return send( m_socket_sb, byte_buffer );
+   return send( m_socket_sb, stream );
 }

@@ -12,11 +12,11 @@ namespace application::events {
       AppEventData( ) { }
       AppEventData( const std::string& _message ) : message( _message ) { }
       AppEventData( const AppEventData& data ) : message( data.message ) { }
-      AppEventData( base::ByteBufferT& buffer ) { from_buffer( buffer ); }
+      AppEventData( base::dsi::tByteStream& stream ) { from_stream( stream ); }
       ~AppEventData( ) { }
 
-      bool to_buffer( base::ByteBufferT& buffer ) const { return buffer.push( message ); }
-      bool from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( message ); }
+      bool to_stream( base::dsi::tByteStream& stream ) const { return stream.push( message ); }
+      bool from_stream( base::dsi::tByteStream& stream ) { return stream.pop( message ); }
 
       std::string message = "";
    };
@@ -26,6 +26,6 @@ namespace application::events {
 
    using tAppEventSignature = base::TSignatureID< eAppEventID >;
 
-   DEFINE_EVENT( AppEvent, AppEventData, tAppEventSignature );
+   DEFINE_IPC_EVENT( AppEvent, AppEventData, tAppEventSignature );
 
 } // namespace application::events

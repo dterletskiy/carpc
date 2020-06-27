@@ -53,19 +53,27 @@ namespace base {
 
             return m_user_signature < static_cast< const tSignature& >( signature ).m_user_signature;
          }
-         const bool to_buffer( ByteBufferT& buffer ) const override
+         const bool to_stream( dsi::tByteStream& stream ) const override
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               return m_user_signature.to_buffer( buffer );
+               return stream.push( type_id( ), m_user_signature );
             }
             return false;
          }
-         const bool from_buffer( ByteBufferT& buffer ) override
+         const bool from_stream( dsi::tByteStream& stream ) override
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               return m_user_signature.from_buffer( buffer );
+               tAsyncTypeID type_id;
+               return stream.pop( type_id, m_user_signature );
+
+               // const bool result = stream.pop( type_id, m_user_signature );
+               // if( type_id( ) != type_id )
+               // {
+               //    SYS_ERR( "event type_id mismatch" );
+               // }
+               // return result;
             }
             return false;
          }
@@ -111,13 +119,13 @@ namespace base {
          {
             return m_id < signature.m_id;
          }
-         const bool to_buffer( base::ByteBufferT& buffer ) const
+         const bool to_stream( dsi::tByteStream& stream ) const
          {
-            return buffer.push( m_id );
+            return stream.push( m_id );
          }
-         const bool from_buffer( base::ByteBufferT& buffer )
+         const bool from_stream( dsi::tByteStream& stream )
          {
-            return buffer.pop( m_id );
+            return stream.pop( m_id );
          }
          const _ID id( ) const
          {
@@ -198,13 +206,13 @@ namespace base {
          }
 
       public:
-         const bool to_buffer( ByteBufferT& buffer ) const
+         const bool to_stream( dsi::tByteStream& stream ) const
          {
-            return buffer.push( m_service_name, m_id, mp_from_addr, mp_to_addr, m_seq_id, m_context );
+            return stream.push( m_service_name, m_id, mp_from_addr, mp_to_addr, m_seq_id, m_context );
          }
-         const bool from_buffer( ByteBufferT& buffer )
+         const bool from_stream( dsi::tByteStream& stream )
          {
-            return buffer.pop( m_context, m_seq_id, mp_to_addr, mp_from_addr, m_id, m_service_name );
+            return stream.pop( m_service_name, m_id, mp_from_addr, mp_to_addr, m_seq_id, m_context );
          }
 
       public:

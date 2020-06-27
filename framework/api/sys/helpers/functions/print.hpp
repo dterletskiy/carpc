@@ -12,6 +12,7 @@ namespace base {
     * 
     ***************************************************************************************************/
    void print( const void* p_buffer, const size_t size, const bool is_new_line = false );
+
    void print( const std::string& string, const bool is_new_line = false );
 
    template< typename TYPE >
@@ -19,76 +20,76 @@ namespace base {
    {
       std::cout << value;
 
-      if( is_new_line ) std::cout << std::endl;
+      if( is_new_line ) printf( "\n" );
    }
 
 
    template< typename TYPE >
    void print( const std::list< TYPE >& list, const bool is_new_line = false )
    {
-      std::cout << "{ " ;
+      printf( "{ " );
       for ( const auto& value : list )
       {
          print( value );
-         std::cout << " ";
+         printf( " " );
       }
-      std::cout << "}";
+      printf( "}" );
 
-      if( is_new_line ) std::cout << std::endl;
+      if( is_new_line ) printf( "\n" );
    }
 
    template< typename TYPE >
    void print( const std::vector< TYPE >& vector, const bool is_new_line = false )
    {
-      std::cout << "{ " ;
+      printf( "{ " );
       for ( const auto& value : vector )
       {
          print( value );
-         std::cout << " ";
+         printf( " " );
       }
-      std::cout << "}";
+      printf( "}" );
 
-      if( is_new_line ) std::cout << std::endl;
+      if( is_new_line ) printf( "\n" );
    }
 
    template< typename TYPE >
    void print( const std::set< TYPE >& set, const bool is_new_line = false )
    {
-      std::cout << "{ " ;
+      printf( "{ " );
       for ( const auto& value : set )
       {
          print( value );
-         std::cout << " ";
+         printf( " " );
       }
-      std::cout << "}";
+      printf( "}" );
 
-      if( is_new_line ) std::cout << std::endl;
+      if( is_new_line ) printf( "\n" );
    }
 
    template< typename TYPE_KEY, typename TYPE_VALUE >
    void print( const std::pair< TYPE_KEY, TYPE_VALUE >& pair, const bool is_new_line = false )
    {
-      std::cout << "{ " ;
+      printf( "{ " );
       print( pair.first );
-      std::cout << " => ";
+      printf( " => " );
       print( pair.second );
-      std::cout << " }";
+      printf( " }" );
 
-      if( is_new_line ) std::cout << std::endl;
+      if( is_new_line ) printf( "\n" );
    }
 
    template< typename TYPE_KEY, typename TYPE_VALUE >
    void print( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool is_new_line = false )
    {
-      std::cout << "{ " ;
+      printf( "{ " );
       for ( const auto& pair : map )
       {
          print( pair );
-         std::cout << " ";
+         printf( " " );
       }
-      std::cout << " }";
+      printf( "}" );
 
-      if( is_new_line ) std::cout << std::endl;
+      if( is_new_line ) printf( "\n" );
    }
 
 } // namespace base

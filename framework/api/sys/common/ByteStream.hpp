@@ -18,7 +18,31 @@ namespace base {
    class ByteStream
    {
       public:
+         template< typename TYPE >
+            ByteStream& operator << ( const TYPE& value );
+         template< typename TYPE >
+            ByteStream& operator >> ( TYPE& value );
+
+      public:
+         template< typename ... TYPES >
+         static RawBuffer serialize( const TYPES& ... args )
+         {
+            ByteStream stream( 1024, true );
+            stream.m_buffer.auto_free( false );
+            stream.push( args... );
+            return stream.m_buffer.buffer( );
+         }
+         template< typename ... TYPES >
+         static bool deserialize( const RawBuffer& buffer, TYPES& ... args )
+         {
+            ByteStream stream( buffer.size, true );
+            stream.push( buffer.ptr, buffer.size );
+            return stream.pop( args... );
+         }
+
+      public:
          ByteStream( const size_t capacity = 4096, const bool is_reallocate_allowed = true );
+         ByteStream( const ByteStream& stream );
          ~ByteStream( );
 
       /*****************************************
@@ -29,6 +53,7 @@ namespace base {
       public:
          bool push( const void* const buffer, const size_t size );
          bool push( void* const buffer, const size_t size );
+         bool push( const RawBuffer& buffer );
          bool push( const void* const pointer );
          bool push( void* const pointer );
          bool push( const std::string& string );
@@ -73,8 +98,9 @@ namespace base {
        *
        ****************************************/
       public:
+         bool pop( void* const buffer, const size_t size );
          bool pop( const void* buffer, const size_t size );
-         bool pop( void* buffer, const size_t size );
+         bool pop( RawBuffer& buffer );
          bool pop( const void*& pointer );
          bool pop( void*& pointer );
          bool pop( std::string& string );
@@ -113,22 +139,67 @@ namespace base {
          template< typename TYPE_CONTAINER >
             bool pop_stl_associative_container( TYPE_CONTAINER& );
 
+      /*****************************************
+       *
+       * Get methods
+       *
+       ****************************************/
+      public:
+         // This method for multipl get
+         template< typename ... TYPES >
+            bool get( TYPES& ... values );
+
+      private:
+         template< typename TYPE_CONTAINER >
+            bool get_stl_container( TYPE_CONTAINER& );
+         template< typename TYPE_CONTAINER >
+            bool get_stl_associative_container( TYPE_CONTAINER& );
+
+      /*****************************************
+       *
+       * Erase methods
+       *
+       ****************************************/
+      public:
+         void erase( const size_t size, const size_t offset = 0 );
+
       public:
          size_t size( ) const;
          size_t capacity( ) const;
          void dump( ) const;
+         bool is_linear( const void*& pointer, size_t& size ) const;
       private:
          CircularBuffer m_buffer;
    };
 
 
 
-
-   bool ByteStream::push( const bool value )
+   /*****************************************
+    *
+    * Operators
+    *
+    ****************************************/
+   template< typename TYPE >
+   ByteStream& ByteStream::operator << ( const TYPE& value )
    {
-      return push( static_cast< size_t >( value ? 1 : 0 ) );
+      push( value );
+      return *this;
    }
 
+   template< typename TYPE >
+   ByteStream& ByteStream::operator >> ( TYPE& value )
+   {
+      pop( value );
+      return *this;
+   }
+
+
+
+   /*****************************************
+    *
+    * Push methods
+    *
+    ****************************************/
    template< typename TYPE >
    bool ByteStream::push( const std::optional< TYPE >& optional )
    {
@@ -136,10 +207,8 @@ namespace base {
          return false;
 
       if( std::nullopt != optional )
-      {
          if( false == push( optional.value( ) ) )
             return false;
-      }
 
       return true;
    }
@@ -232,18 +301,11 @@ namespace base {
 
 
 
-
-
-   bool ByteStream::pop( bool& value )
-   {
-      size_t bool_value = false;
-      if( false == pop( bool_value ) )
-         return false;
-
-      value = 0 != bool_value;
-      return true;
-   }
-
+   /*****************************************
+    *
+    * Pop methods
+    *
+    ****************************************/
    template< typename TYPE >
    bool ByteStream::pop( std::optional< TYPE >& optional )
    {
@@ -346,7 +408,7 @@ namespace base {
          typename TYPE_CONTAINER::value_type value;
          if( false == pop( value ) )
             return false;
-         container.emplace_back( value );
+         container.emplace_back( std::move( value ) );
       }
 
       return true;
@@ -366,7 +428,7 @@ namespace base {
          if( false == pop( value ) )
             return false;
 
-         container.emplace( value );
+         container.emplace( std::move( value ) );
       }
 
       return true;
@@ -374,8 +436,29 @@ namespace base {
 
 
 
+   /*****************************************
+    *
+    * Get methods
+    *
+    ****************************************/
+   template< typename ... TYPES >
+   bool ByteStream::get( TYPES& ... values )
+   {
+      m_buffer.state_save( );
+      bool result = true;
+      (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
+      m_buffer.state_restore( );
+
+      return result;
+   }
 
 
+
+   /*****************************************
+    *
+    * Other methods
+    *
+    ****************************************/
    inline
    size_t ByteStream::size( ) const
    {
@@ -392,6 +475,18 @@ namespace base {
    void ByteStream::dump( ) const
    {
       return m_buffer.dump( );
+   }
+
+   inline
+   bool ByteStream::is_linear( const void*& pointer, size_t& size ) const
+   {
+      return m_buffer.is_linear( pointer, size );
+   }
+
+   inline
+   void ByteStream::erase( const size_t size, const size_t offset )
+   {
+      m_buffer.pop_front( size );
    }
 
 

@@ -97,8 +97,8 @@ private:
 public:
    bool send( os::Socket&, const IAsync::tSptr );
    bool send( const IAsync::tSptr );
-   bool send( os::Socket& _socket, const ByteBufferT& );
-   bool send( const ByteBufferT& );
+   bool send( os::Socket& _socket, dsi::tByteStream& );
+   bool send( dsi::tByteStream& );
 };
 
 

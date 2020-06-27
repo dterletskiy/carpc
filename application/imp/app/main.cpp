@@ -52,8 +52,9 @@ void boot( int argc, char** argv )
 
    base::tools::cmd::init( argc, argv );
 
+   REGISTER_EVENT( application::events::AppEvent );
    REGISTER_EVENT( api::onoff::ipc::OnOffEvent );
-   base::EventRegistry::instance( )->dump( );
+   DUMP_IPC_EVENTS;
 
    base::ServiceThread::Info::tVector services =
    {
@@ -126,16 +127,90 @@ void boot( int argc, char** argv )
 #include "api/sys/dsi/Types.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
 
+
+
+
+
+
+
 const bool test( int argc, char** argv )
 {
-   // return true;
+   return true;
 
 
 
 
+   // using tEvent = application::events::AppEvent::Event;
+
+   // base::dsi::tByteStream stream;
+   // auto event = tEvent::create( { application::events::eAppEventID::BOOT }, { "booting" }, base::eCommType::ITC );
+   // DBG_MSG( "%s", event->signature( )->type_id( ).c_str( ) );
+   // event->to_stream( stream );
+   // stream.dump( );
+
+   // // auto event_new = tEvent::create( );
+   // // event_new->from_stream( stream );
+   // // DBG_MSG( "%s", std::static_pointer_cast< tEvent >( event_new )->data( )->message.c_str( ) );
+
+   // base::tAsyncTypeID event_type;
+   // stream.get( event_type );
+   // DBG_WRN( "%s", event_type.c_str( ) );
+   // stream.dump( );
 
 
-   #if 1 // ByteStream test
+
+
+   #if 0
+      base::dsi::tByteStream stream;
+
+      {
+         base::dsi::Packet packet;
+         DBG_WRN( "adding package" );
+         packet.add_package( base::dsi::Package( base::dsi::eCommand::RegisterServer, std::string( "PackageOne" ), (size_t)111 ) );
+         DBG_WRN( "adding package" );
+         packet.add_package( base::dsi::eCommand::UnregisterServer, std::string( "PackageTwo" ), (size_t)222 );
+         DBG_WRN( "adding package" );
+         packet.add_package( base::dsi::eCommand::RegisterClient, std::string( "PackageThree" ), (size_t)333 );
+         DBG_WRN( "adding package" );
+         packet.add_package( base::dsi::eCommand::UnregisterClient, std::string( "PackageFour" ), (size_t)444 );
+         DBG_WRN( "serrialize packet" );
+         stream.push( packet );
+      }
+
+      {
+         base::dsi::Packet packet;
+         DBG_WRN( "deserrialize packet" );
+         stream.pop( packet );
+
+         std::string string( "NoNe" );
+         size_t value = 0;
+         bool result = false;
+
+         for( auto& pkg : packet.packages( ) )
+         {
+            DBG_WRN( "extracting package" );
+            result = pkg.data( string, value );
+            DBG_MSG( "command: %s / result: %s / string: %s / value: %zu", base::dsi::c_str( pkg.command( ) ), BOOL_TO_STRING( result ), string.c_str( ), value );
+         }
+      }
+
+      {
+         base::dsi::tByteStream stream;
+         stream.push( std::string( "One" ) );
+         stream.push( std::string( "Two" ) );
+         stream.push( std::string( "Three" ) );
+         stream.dump( );
+         std::string string = "";
+         stream.get( string );
+         DBG_WRN( "%s", string.c_str( ) );
+         stream.dump( );
+      }
+
+   #endif
+
+
+
+   #if 0 // ByteStream test
       using tBuffer = base::ByteStream;
 
       enum class eEnum { one, two, three };
@@ -217,57 +292,86 @@ const bool test( int argc, char** argv )
    #if 0 // CircularBuffer test
       base::CircularBuffer cb( 10 );
       cb.dump( );
+      printf( "\n\n" );
 
       {
          size_t size = 5;
          uint8_t* buffer = (uint8_t*)malloc( size );
+         DBG_MSG( "push_back %zu bytes", size );
          for( size_t i = 0; i < size; ++i )
             buffer[ i ] = 0xA0 + i;
          base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
          DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
          cb.dump( );
+         printf( "\n\n" );
       }
 
       {
-         size_t size = 7;
+         size_t size = 5;
          uint8_t* buffer = (uint8_t*)malloc( size );
+         DBG_MSG( "push_back %zu bytes", size );
          for( size_t i = 0; i < size; ++i )
             buffer[ i ] = 0xB0 + i;
          base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
          DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
          cb.dump( );
+         printf( "\n\n" );
       }
+
+      // {
+      //    size_t size = 3;
+      //    uint8_t* buffer = (uint8_t*)malloc( size );
+      //    DBG_MSG( "move_front %zu bytes", size );
+      //    cb.move_front( (void*)buffer, size );
+
+      //    for( size_t i = 0; i < size; ++i )
+      //       printf( "%#x ", static_cast< uint8_t* >( buffer )[i] );
+      //    printf( "\n" );
+
+      //    cb.dump( );
+      // }
 
       {
          size_t size = 3;
          uint8_t* buffer = (uint8_t*)malloc( size );
-         cb.move_front( (void*)buffer, size );
-
-         for( size_t i = 0; i < size; ++i )
-            printf( "%#x ", static_cast< uint8_t* >( buffer )[i] );
-         printf( "\n" );
-
-         cb.dump( );
-      }
-
-      {
-         size_t size = 3;
-         uint8_t* buffer = (uint8_t*)malloc( size );
+         DBG_MSG( "push_back %zu bytes", size );
          for( size_t i = 0; i < size; ++i )
             buffer[ i ] = 0xC0 + i;
          base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
          DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
          cb.dump( );
+         printf( "\n\n" );
       }
 
       {
          size_t size = 8;
          uint8_t* buffer = (uint8_t*)malloc( size );
+         DBG_MSG( "push_back %zu bytes", size );
          for( size_t i = 0; i < size; ++i )
             buffer[ i ] = 0xD0 + i;
          base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size, true );
          DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
          cb.dump( );
+         printf( "\n\n" );
+      }
+
+      {
+         size_t size = 1;
+         DBG_MSG( "pop_back %zu bytes", size );
+         cb.pop_back( size );
+         cb.dump( );
+      }
+
+      {
+         size_t size = 5;
+         uint8_t* buffer = (uint8_t*)malloc( size );
+         DBG_MSG( "push_back %zu bytes", size );
+         for( size_t i = 0; i < size; ++i )
+            buffer[ i ] = 0xE0 + i;
+         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size, true );
+         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
+         cb.dump( );
+         printf( "\n\n" );
       }
 
       // {
@@ -276,8 +380,8 @@ const bool test( int argc, char** argv )
       // }
 
       {
-         const uint8_t buffer[] = { 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xC1 };
-         const bool result = cb.cmp( (void*)buffer, 6, 5 );
+         const uint8_t buffer[] = { 0xD5, 0xD6, 0xE0 };
+         const bool result = cb.cmp( (void*)buffer, 3, 3 );
          DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
       }
    #endif

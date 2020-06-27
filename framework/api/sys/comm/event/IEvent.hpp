@@ -16,14 +16,15 @@ class IEvent
 {
 public:
    using tSptr = std::shared_ptr< IEvent >;
+   using tCreator = IEvent::tSptr(*)( );
 
 public:
    struct ISignature : public IAsync::ISignature
    {
       const eAsyncType type( ) const override final { return eAsyncType::EVENT; }
 
-      virtual const bool to_buffer( ByteBufferT& ) const = 0;
-      virtual const bool from_buffer( ByteBufferT& ) = 0;
+      virtual const bool to_stream( dsi::tByteStream& ) const = 0;
+      virtual const bool from_stream( dsi::tByteStream& ) = 0;
    };
 
    template< typename _EventType >
@@ -46,6 +47,12 @@ public:
    static const bool send( tSptr, const eCommType comm_type = eCommType::NONE );
    static const bool send_to_context( tSptr, IServiceThread::tWptr );
 
+   static bool check_in( const tAsyncTypeID&, tCreator );
+   static void dump( );
+   static bool serialize( dsi::tByteStream&, IEvent::tSptr );
+   static bool serialize( dsi::tByteStream&, const IEvent& );
+   static tSptr deserialize( dsi::tByteStream& );
+
 public:
    virtual const bool send( const eCommType comm_type = eCommType::NONE ) = 0;
    virtual const bool send_to_context( IServiceThread::tWptr ) = 0;
@@ -55,10 +62,10 @@ private:
    virtual void process_event( IAsync::IConsumer* ) const = 0;
 
 public:
-   // serrialization / deserrialization methods should
-   // serrialize / deserrialize all data exapt of type_id and communication type
-   virtual const bool to_buffer( ByteBufferT& ) const = 0;
-   virtual const bool from_buffer( ByteBufferT& ) = 0;
+   // serialization / deserialization methods should
+   // serialize / deserialize all data exapt of type_id and communication type
+   virtual const bool to_stream( dsi::tByteStream& ) const = 0;
+   virtual const bool from_stream( dsi::tByteStream& ) = 0;
 
 public:
    virtual const bool is_ipc( ) const = 0;
@@ -87,17 +94,5 @@ const eCommType& IEvent::comm_type( )
 }
 
 
-
-} // namespace base
-
-
-
-namespace base {
-
-   template< typename TYPE >
-   inline IEvent::tSptr create_event( )
-   {
-      return TYPE::create( eCommType::IPC );
-   }
 
 } // namespace base

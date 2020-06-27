@@ -26,8 +26,8 @@ namespace base::events {
 
       struct Data
       {
-         bool to_buffer( base::ByteBufferT& ) const;
-         bool from_buffer( base::ByteBufferT& );
+         bool to_stream( base::dsi::tByteStream& ) const;
+         bool from_stream( base::dsi::tByteStream& );
 
          const void* ptr = nullptr;
       };

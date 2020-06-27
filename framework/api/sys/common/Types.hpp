@@ -36,4 +36,19 @@ namespace base {
 
    using ID = size_t;
 
+
+   struct RawBuffer
+   {
+      static RawBuffer create( const size_t size );
+      static void destroy( RawBuffer& buffer );
+
+      bool alloc( const size_t size );
+      void free( );
+      void dump( ) const;
+
+      void* ptr = nullptr;
+      size_t size = 0;
+   };
+
+
 } // namespace base

@@ -59,11 +59,4 @@ void InterfaceEventConsumer::process_event( const events::interface::Interface::
          break;
       }
    }
-
-   dsi::Packet packet;
-   dsi::Package package( command, service_name );
-   packet.add_package( package );
-   ByteBufferT buffer;
-   buffer.push( packet );
-   m_service.send( buffer );
 }

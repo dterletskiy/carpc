@@ -1,7 +1,6 @@
 #pragma once
 
 #include "api/sys/comm/event/TGenerator.hpp"
-#include "api/sys/comm/event/EventRegistry.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 
 
@@ -30,4 +29,7 @@
    }
 
 #define REGISTER_EVENT( eventType ) \
-   base::EventRegistry::instance( )->register_event( eventType::Signature::build_type_id( ), base::create_event< eventType::Event > );
+   base::IEvent::check_in( eventType::Signature::build_type_id( ), eventType::Event::create );
+
+#define DUMP_IPC_EVENTS \
+   base::IEvent::dump( );

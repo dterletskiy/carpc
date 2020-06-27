@@ -28,10 +28,10 @@ namespace api::onoff::ipc {
 
 
 
-   tBaseDataPtr BaseData::create( base::ByteBufferT& buffer )
+   tBaseDataPtr BaseData::create( base::dsi::tByteStream& stream )
    {
       eOnOff id = eOnOff::Undefined;
-      if( false == buffer.pop( id ) )
+      if( false == stream.pop( id ) )
          return nullptr;
 
       tBaseDataPtr ptr = nullptr;
@@ -44,17 +44,17 @@ namespace api::onoff::ipc {
       }
 
       if( nullptr != ptr )
-         ptr->from_buffer( buffer );
+         ptr->from_stream( stream );
 
       return  ptr;
    }
 
-   bool BaseData::serrialize( base::ByteBufferT& buffer )
+   bool BaseData::serrialize( base::dsi::tByteStream& stream )
    {
-      if( false == to_buffer( buffer ) )
+      if( false == stream.push( id( ) ) )
          return false;
 
-      return buffer.push( id( ) );
+      return to_stream( stream );
    }
 
 
@@ -69,8 +69,8 @@ namespace api::onoff::ipc {
    const eOnOff RequestTriggerStateData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestTriggerStateData::id( ) const { return ID; }
 
-   bool RequestTriggerStateData::to_buffer( base::ByteBufferT& buffer ) { return buffer.push( state, delay ); }
-   bool RequestTriggerStateData::from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( delay, state ); }
+   bool RequestTriggerStateData::to_stream( base::dsi::tByteStream& stream ) { return stream.push( state, delay ); }
+   bool RequestTriggerStateData::from_stream( base::dsi::tByteStream& stream ) { return stream.pop( state, delay ); }
 
 
 
@@ -84,8 +84,8 @@ namespace api::onoff::ipc {
    const eOnOff ResponseTriggerStateData::ID = eOnOff::ResponseTriggerState;
    const eOnOff ResponseTriggerStateData::id( ) const { return ID; }
 
-   bool ResponseTriggerStateData::to_buffer( base::ByteBufferT& buffer ) { return buffer.push( result ); }
-   bool ResponseTriggerStateData::from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( result ); }
+   bool ResponseTriggerStateData::to_stream( base::dsi::tByteStream& stream ) { return stream.push( result ); }
+   bool ResponseTriggerStateData::from_stream( base::dsi::tByteStream& stream ) { return stream.pop( result ); }
 
 
 
@@ -96,8 +96,8 @@ namespace api::onoff::ipc {
    const eOnOff RequestStartData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestStartData::id( ) const { return ID; }
 
-   bool RequestStartData::to_buffer( base::ByteBufferT& buffer ) { return true; }
-   bool RequestStartData::from_buffer( base::ByteBufferT& buffer ) { return true; }
+   bool RequestStartData::to_stream( base::dsi::tByteStream& stream ) { return true; }
+   bool RequestStartData::from_stream( base::dsi::tByteStream& stream ) { return true; }
 
 
 
@@ -111,21 +111,21 @@ namespace api::onoff::ipc {
    const eOnOff NotificationCurrentStateData::ID = eOnOff::NotificationCurrentState;
    const eOnOff NotificationCurrentStateData::id( ) const { return ID; }
 
-   bool NotificationCurrentStateData::to_buffer( base::ByteBufferT& buffer ) { return buffer.push( state ); }
-   bool NotificationCurrentStateData::from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( state ); }
+   bool NotificationCurrentStateData::to_stream( base::dsi::tByteStream& stream ) { return stream.push( state ); }
+   bool NotificationCurrentStateData::from_stream( base::dsi::tByteStream& stream ) { return stream.pop( state ); }
 
 
 
    OnOffEventData::OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
 
-   bool OnOffEventData::to_buffer( base::ByteBufferT& buffer ) const
+   bool OnOffEventData::to_stream( base::dsi::tByteStream& stream ) const
    {
       if( nullptr == ptr ) return true;
-      return ptr->serrialize( buffer );
+      return ptr->serrialize( stream );
    }
-   bool OnOffEventData::from_buffer( base::ByteBufferT& buffer )
+   bool OnOffEventData::from_stream( base::dsi::tByteStream& stream )
    {
-      ptr = BaseData::create( buffer );
+      ptr = BaseData::create( stream );
       return nullptr != ptr;
    }
 

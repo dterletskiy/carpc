@@ -38,14 +38,14 @@ namespace base::events::interface {
       }
    }
 
-   bool Data::to_buffer( base::ByteBufferT& buffer ) const
+   bool Data::to_stream( base::dsi::tByteStream& stream ) const
    {
-      return buffer.push( ptr );
+      return stream.push( ptr );
    }
 
-   bool Data::from_buffer( base::ByteBufferT& buffer )
+   bool Data::from_stream( base::dsi::tByteStream& stream )
    {
-      return buffer.pop( ptr );
+      return stream.pop( ptr );
    }
 
 } // namespase base

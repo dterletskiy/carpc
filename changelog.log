@@ -1,3 +1,15 @@
+version 1.7.4
+   - IPC serializer/deserializer changed from ByteBufferT to ByteStream.
+   - ByteStream implementation extended and fixed.
+   - CircularBuffer fixes in pop_back.
+   - CircularBuffer implementation extended.
+   - DUM (based on curl) initial implementation.
+   - StackBuffer implemented.
+   - Creating event during deserialization changed. Templete method "create_event" removed.
+   - EventRegistry removed. Serializetion/deserialization event and IPC event registry implemented in IEvent.
+   - Event serialization/deserialization changed.
+   - DSI/IPC protocole packet and package implementation changed.
+
 version 1.7.3
    - CircularBuffer implementation extended and API documented in comments (+ test).
    - ByteStream implemented (+ test).

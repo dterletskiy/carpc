@@ -6,7 +6,7 @@
 #define CLASS_ABBR "IRunnable"
 
 
-namespace base {
+using namespace base;
 
 
 
@@ -41,7 +41,3 @@ void IRunnable::process( IAsync::IConsumer* p_consumer ) const
    if( nullptr == m_operation ) return;
    m_operation( );
 }
-
-
-
-} // namespace base

@@ -1,3 +1,4 @@
+#include "api/sys/helpers/macros/strings.hpp"
 #include "api/sys/common/CircularBuffer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -6,34 +7,6 @@
 
 
 using namespace base;
-
-
-
-void* const inc( void* const ptr, const size_t value )
-{
-   return static_cast< void* const >( static_cast< uint8_t* const >( ptr ) + value );
-}
-
-const void* const inc( const void* const ptr, const size_t value )
-{
-   return static_cast< const void* const >( static_cast< const uint8_t* const >( ptr ) + value );
-}
-
-void* const dec( void* const ptr, const size_t value )
-{
-   return static_cast< void* const >( static_cast< uint8_t* const >( ptr ) - value );
-}
-
-const void* const dec( const void* const ptr, const size_t value )
-{
-   return static_cast< const void* const >( static_cast< const uint8_t* const >( ptr ) - value );
-}
-
-ptrdiff_t diff( const void* const ptr1, const void* const ptr2 )
-{
-   return static_cast< const uint8_t* const >( ptr1 ) - static_cast< const uint8_t* const >( ptr2 );
-}
-
 
 
 
@@ -49,23 +22,46 @@ const char* CircularBuffer::c_str( const ePush result )
    return "ePush::XXX";
 }
 
-CircularBuffer::CircularBuffer( const size_t capacity, const bool is_overlap_allowed, const bool is_reallocate_allowed )
+CircularBuffer::CircularBuffer( const size_t capacity, const bool is_overlap_allowed, const bool is_reallocate_allowed, const bool auto_free )
    : m_capacity( capacity )
    , m_is_overlap_allowed( is_overlap_allowed )
    , m_is_reallocate_allowed( is_reallocate_allowed )
+   , m_auto_free( auto_free )
 {
    mp_head = malloc( m_capacity + 1 );
    mp_tail = inc( mp_head, m_capacity );
    mp_begin = mp_end = mp_head;
 }
 
+CircularBuffer::CircularBuffer( const CircularBuffer& cb )
+   : m_capacity( cb.m_capacity )
+   , m_is_overlap_allowed( cb.m_is_overlap_allowed )
+   , m_is_reallocate_allowed( cb.m_is_reallocate_allowed )
+   , m_auto_free( cb.m_auto_free )
+{
+   mp_head = malloc( m_capacity + 1 );
+   mp_tail = inc( mp_head, m_capacity );
+   mp_begin = mp_end = mp_head;
+
+   cb.front( mp_head, cb.size( ) );
+   mp_end = inc( mp_begin, cb.size( ) );
+}
+
 CircularBuffer::~CircularBuffer( )
 {
-   free( mp_head );
+   if( true == m_auto_free )
+      free( mp_head );
 }
 
 bool CircularBuffer::reallocate( size_t capacity )
 {
+   if( std::nullopt != m_state )
+   {
+      SYS_ERR( "restore saved state" );
+      return false;
+   }
+   state::locker locker( m_is_state_locked );
+
    if( 0 == capacity )
       capacity = 1.5 * m_capacity;
 
@@ -73,10 +69,11 @@ bool CircularBuffer::reallocate( size_t capacity )
    if( nullptr == p_head )
       return false;
 
-   front( p_head, std::min( capacity, m_size ) );
+   size_t size = std::min( capacity, m_size );
+   front( p_head, size );
    free( mp_head );
    m_capacity = capacity;
-   m_size = std::min( capacity, m_size );
+   m_size = size;
    mp_head = p_head;
    mp_tail = inc( mp_head, m_capacity );
    mp_begin = mp_head;
@@ -89,7 +86,10 @@ bool CircularBuffer::reallocate( size_t capacity )
 
 void CircularBuffer::info( ) const
 {
-   SYS_INF( "head: %p / tail: %p / begin: %p / end: %p / capacity: %zu / size: %zu", mp_head, mp_tail, mp_begin, mp_end, m_capacity, m_size );
+   SYS_INF( "head: %p / tail: %p", mp_head, mp_tail );
+   SYS_INF( "begin: %p / end: %p", mp_begin, mp_end );
+   SYS_INF( "capacity: %zu / size: %zu", m_capacity, m_size );
+   SYS_INF( "linear: %s", BOOL_TO_STRING( is_linear( ) ) );
 }
 
 void CircularBuffer::dump( const eDump type ) const
@@ -149,6 +149,13 @@ void CircularBuffer::dump_logic( ) const
 
 CircularBuffer::ePush CircularBuffer::push_back( const void* const p_buffer, const size_t size, const std::optional< bool > is_reallocate )
 {
+   if( std::nullopt != m_state )
+   {
+      SYS_ERR( "restore saved state" );
+      return ePush::Error;
+   }
+   state::locker locker( m_is_state_locked );
+
    if( nullptr == p_buffer )
    {
       SYS_ERR( "source buffer pointer is nullptr" );
@@ -200,13 +207,15 @@ CircularBuffer::ePush CircularBuffer::push_back( const void* const p_buffer, con
    return result;
 }
 
-CircularBuffer::ePush CircularBuffer::push_back( const raw_buffer& buffer, const std::optional< bool > is_reallocate )
+CircularBuffer::ePush CircularBuffer::push_back( const RawBuffer& buffer, const std::optional< bool > is_reallocate )
 {
    return push_back( buffer.ptr, buffer.size, is_reallocate );
 }
 
 void CircularBuffer::pop_front( const size_t size )
 {
+   state::locker locker( m_is_state_locked );
+
    if( 0 == m_size )
       return;
 
@@ -216,10 +225,21 @@ void CircularBuffer::pop_front( const size_t size )
    const size_t part_size = static_cast< size_t >( diff( mp_tail, mp_begin ) );
    if( size > part_size )
    {
+      // zeroing (should be before updating mp_begin)
+      if( std::nullopt == m_state )
+      {
+         memset( mp_begin, 0, part_size );
+         memset( mp_head, 0, size - part_size );
+      }
+
       mp_begin = inc( mp_head, size - part_size );
    }
    else
    {
+      // zeroing (should be before updating mp_begin)
+      if( std::nullopt == m_state )
+         memset( mp_begin, 0, size );
+
       mp_begin = inc( mp_begin, size );
    }
 
@@ -231,6 +251,8 @@ void CircularBuffer::pop_front( const size_t size )
 
 void CircularBuffer::pop_back( const size_t size )
 {
+   state::locker locker( m_is_state_locked );
+
    if( 0 == m_size )
       return;
 
@@ -241,20 +263,30 @@ void CircularBuffer::pop_back( const size_t size )
    if( size > part_size )
    {
       mp_end = dec( mp_tail, size - part_size );
+
+      // zeroing (should be after updating mp_end)
+      if( std::nullopt == m_state )
+      {
+         memset( mp_head, 0, part_size );
+         memset( mp_end, 0, size - part_size );
+      }
    }
    else
    {
-      mp_end = inc( mp_end, size );
+      mp_end = dec( mp_end, size );
+
+      // zeroing (should be after updating mp_end)
+      if( std::nullopt == m_state )
+         memset( mp_end, 0, size );
    }
 
    if( mp_end == mp_tail )
       mp_end = mp_head;
 
    m_size -= size;
-
 }
 
-bool CircularBuffer::front( const void* p_buffer, const size_t size ) const
+bool CircularBuffer::front( void* const p_buffer, const size_t size ) const
 {
    if( nullptr == p_buffer )
    {
@@ -275,23 +307,23 @@ bool CircularBuffer::front( const void* p_buffer, const size_t size ) const
    const size_t part_size = static_cast< size_t >( diff( mp_tail, mp_begin ) );
    if( size > part_size )
    {
-      memcpy( const_cast< void* >( p_buffer ), mp_begin, part_size );
-      memcpy( inc( const_cast< void* >( p_buffer ), part_size ), mp_head, size - part_size );
+      memcpy( p_buffer, mp_begin, part_size );
+      memcpy( inc( p_buffer, part_size ), mp_head, size - part_size );
    }
    else
    {
-      memcpy( const_cast< void* >( p_buffer ), mp_begin, size );
+      memcpy( p_buffer, mp_begin, size );
    }
 
    return true;
 }
 
-bool CircularBuffer::front( raw_buffer& buffer ) const
+bool CircularBuffer::front( RawBuffer& buffer ) const
 {
    return front( buffer.ptr, buffer.size );
 }
 
-bool CircularBuffer::move_front( const void* const p_buffer, const size_t size )
+bool CircularBuffer::move_front( void* const p_buffer, const size_t size )
 {
    if( false == front( p_buffer, size ) )
       return false;
@@ -299,6 +331,11 @@ bool CircularBuffer::move_front( const void* const p_buffer, const size_t size )
    pop_front( size );
 
    return true;
+}
+
+bool CircularBuffer::move_front( RawBuffer& buffer )
+{
+   return move_front( buffer.ptr, buffer.size );
 }
 
 bool CircularBuffer::cmp( void* const p_buffer, const size_t size, const size_t offset ) const
@@ -324,4 +361,27 @@ bool CircularBuffer::cmp( void* const p_buffer, const size_t size, const size_t 
    }
 
    return 0 == memcmp( inc( mp_begin, offset ), p_buffer, size );
+}
+
+bool CircularBuffer::cmp( const RawBuffer& buffer, const size_t offset ) const
+{
+   return cmp( buffer.ptr, buffer.size, offset );
+}
+
+ssize_t CircularBuffer::find( void* const p_buffer, const size_t size, const size_t offset ) const
+{
+   if( offset > m_size )
+      return -1;
+   if( offset + size > m_size )
+      return -1;
+
+   // size_t part = static_cast< size_t >( diff( mp_tail, mp_begin ) );
+   // if( offset >=part )
+
+   return 0;
+}
+
+ssize_t CircularBuffer::find( const RawBuffer& buffer, const size_t offset ) const
+{
+   return find( buffer.ptr, buffer.size, offset );
 }

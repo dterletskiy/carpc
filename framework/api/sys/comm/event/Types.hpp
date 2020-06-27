@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/common/Types.hpp"
-#include "api/sys/common/ByteBufferT.hpp"
+#include "api/sys/dsi/Types.hpp"
 #include "api/sys/helpers/functions/format.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -23,13 +23,13 @@ namespace base_v1 {
          ~TBaseAsyncTypeID( ) = default;
 
       public:
-         const bool operator==( const TBaseAsyncTypeID< TYPE >& type_id ) const { return m_value == type_id.m_value; }
-         const bool operator!=( const TBaseAsyncTypeID< TYPE >& type_id ) const { return m_value != type_id.m_value; }
-         const bool operator<( const TBaseAsyncTypeID< TYPE >& type_id ) const { return m_value < type_id.m_value; }
+         bool operator==( const TBaseAsyncTypeID< TYPE >& type_id ) const { return m_value == type_id.m_value; }
+         bool operator!=( const TBaseAsyncTypeID< TYPE >& type_id ) const { return m_value != type_id.m_value; }
+         bool operator<( const TBaseAsyncTypeID< TYPE >& type_id ) const { return m_value < type_id.m_value; }
 
       public:
-         const bool to_buffer( base::ByteBufferT& buffer ) const { return buffer.push( m_value ); }
-         const bool from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( m_value ); }
+         const bool to_stream( base::dsi::tByteStream& stream ) const { return stream.push( m_value ); }
+         const bool from_stream( base::dsi::tByteStream& stream ) { return stream.pop( m_value ); }
 
       public:
          const TYPE& value( ) const { return m_value; }
@@ -116,13 +116,13 @@ namespace base_v2 {
       public:
          // void operator=( const T& _value ) { m_value = _value; }
          // void operator=( const TAsyncTypeID< T >& type_id ) { m_value = type_id.m_value; }
-         const bool operator==( const TAsyncTypeID< T >& type_id ) const { return m_value == type_id.m_value; }
-         const bool operator!=( const TAsyncTypeID< T >& type_id ) const { return m_value != type_id.m_value; }
-         const bool operator<( const TAsyncTypeID< T >& type_id ) const { return m_value < type_id.m_value; }
+         bool operator==( const TAsyncTypeID< T >& type_id ) const { return m_value == type_id.m_value; }
+         bool operator!=( const TAsyncTypeID< T >& type_id ) const { return m_value != type_id.m_value; }
+         bool operator<( const TAsyncTypeID< T >& type_id ) const { return m_value < type_id.m_value; }
 
       public:
-         const bool to_buffer( base::ByteBufferT& buffer ) const { return buffer.push( m_value ); }
-         const bool from_buffer( base::ByteBufferT& buffer ) { return buffer.pop( m_value ); }
+         const bool to_stream( base::dsi::tByteStream& stream ) const { return stream.push( m_value ); }
+         const bool from_stream( base::dsi::tByteStream& stream ) { return stream.pop( m_value ); }
 
       public:
          template< typename TYPE >

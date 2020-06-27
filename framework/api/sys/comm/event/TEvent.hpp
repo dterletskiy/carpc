@@ -54,6 +54,12 @@ namespace base {
             return IEvent::clear_all_notifications( p_consumer, tSignature( ) );
          }
 
+         // This "create" static function is used only for creating concrete event type with all empty data what should be filled during serialization.
+         static IEvent::tSptr create( )
+         {
+            return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), eCommType::IPC ) );
+         }
+
          static std::shared_ptr< tEvent > create( const tUserSignature& signature, const eCommType comm_type = eCommType::NONE )
          {
             return std::shared_ptr< tEvent >( new tEvent( signature, comm_type ) );
@@ -81,15 +87,6 @@ namespace base {
             return create( signature, data )->send_to_context( pw_service );
          }
 
-      private:
-         // This "create" static function is used only for creating concrete event type with all empty data what should be filled during serrialization.
-         // This function could be called only by "create_event" from "EventRegistry" and this is the reason why it is private.
-         template< typename T > friend IEvent::tSptr create_event( );
-         static std::shared_ptr< tEvent > create( const eCommType comm_type = eCommType::NONE )
-         {
-            return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), comm_type ) );
-         }
-
       // virual function
       public:
          const bool send( const eCommType comm_type = eCommType::NONE ) override
@@ -107,38 +104,39 @@ namespace base {
 
       // serialization / deserialization
       public:
-         const bool to_buffer( ByteBufferT& buffer ) const override final
+         const bool to_stream( dsi::tByteStream& stream ) const override final
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( mp_data )
-               {
-                  if( false == buffer.push( *mp_data ) )
-                     return false;
-               }
-
-               if( false == buffer.push( ( nullptr != mp_data ) ) )
+               if( false == stream.push( m_signature ) )
                   return false;
 
-               return buffer.push( m_signature );
+               if( false == stream.push( ( nullptr != mp_data ) ) )
+                  return false;
+
+               if( mp_data )
+                  if( false == stream.push( *mp_data ) )
+                     return false;
+
+               return true;
             }
 
             return false;
          }
-         const bool from_buffer( ByteBufferT& buffer ) override final
+         const bool from_stream( dsi::tByteStream& stream ) override final
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( false == buffer.pop( m_signature ) )
+               if( false == stream.pop( m_signature ) )
                   return false;
 
                bool is_data = false;
-               if( false == buffer.pop( is_data ) )
+               if( false == stream.pop( is_data ) )
                   return false;
                if( false == is_data )
                   return true;
                mp_data = std::make_shared< tData >( );
-               return buffer.pop( *mp_data );
+               return stream.pop( *mp_data );
             }
 
             return false;

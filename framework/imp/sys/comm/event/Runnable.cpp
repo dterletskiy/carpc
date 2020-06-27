@@ -5,7 +5,7 @@
 #define CLASS_ABBR "Runnable"
 
 
-namespace base {
+using namespace base;
 
 
 
@@ -24,7 +24,3 @@ const bool Runnable::create_send_to_context( const tOperation operation, IServic
 {
    return create( operation )->send_to_context( pw_service );
 }
-
-
-
-} // namespace base
