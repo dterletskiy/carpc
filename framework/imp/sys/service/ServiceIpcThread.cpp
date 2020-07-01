@@ -104,7 +104,6 @@ void ServiceIpcThread::thread_loop_receive( )
 
             while( 0 < stream.size( ) )
             {
-               // @TDA: issue: in case of receiving several event all of them will be processed in reverce sequence
                IEvent::tSptr p_event = IEvent::deserialize( stream );
                if( nullptr == p_event )
                {

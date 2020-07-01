@@ -42,6 +42,14 @@ bool ByteStream::push( const void* const buffer, const size_t size )
    return CircularBuffer::ePush::Error != m_buffer.push_back( buffer, size );
 }
 
+bool ByteStream::push( const CircularBuffer& buffer )
+{
+   if( false == push( buffer.size( ) ) )
+      return false;
+
+   return CircularBuffer::ePush::Error != m_buffer.push_back( buffer );
+}
+
 bool ByteStream::push( void* const buffer, const size_t size )
 {
    return push( const_cast< const void* const >( buffer ), size );
@@ -63,6 +71,11 @@ bool ByteStream::push( const RawBuffer& buffer )
       return false;
 
    return push( buffer.ptr, buffer.size );
+}
+
+bool ByteStream::push( const ByteStream& stream )
+{
+   return push( stream.m_buffer );
 }
 
 bool ByteStream::push( const bool value )
@@ -97,6 +110,18 @@ bool ByteStream::pop( void* const buffer, const size_t size )
    return m_buffer.move_front( buffer, size );
 }
 
+bool ByteStream::pop( CircularBuffer& buffer )
+{
+   RawBuffer rb;
+   if( false == pop( rb ) )
+      return false;
+
+   bool result = CircularBuffer::ePush::Error != buffer.push_back( rb );
+   rb.free( );
+
+   return result;
+}
+
 bool ByteStream::pop( const void* buffer, const size_t size )
 {
    return pop( const_cast< void* const >( buffer ), size );
@@ -114,12 +139,19 @@ bool ByteStream::pop( void*& pointer )
 
 bool ByteStream::pop( RawBuffer& buffer )
 {
+   if( nullptr != buffer.ptr )
+      return false;
+
    if( false == pop( buffer.size ) )
       return false;
 
-   if( nullptr == buffer.ptr )
-      buffer.alloc( buffer.size );
+   buffer.alloc( buffer.size );
    return pop( buffer.ptr, buffer.size );
+}
+
+bool ByteStream::pop( ByteStream& stream )
+{
+   return pop( stream.m_buffer );
 }
 
 bool ByteStream::pop( bool& value )

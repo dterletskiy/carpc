@@ -27,6 +27,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <limits>
 
 #pragma once
 
@@ -34,21 +35,7 @@
 
 namespace base {
 
-   using ID = size_t;
-
-
-   struct RawBuffer
-   {
-      static RawBuffer create( const size_t size );
-      static void destroy( RawBuffer& buffer );
-
-      bool alloc( const size_t size );
-      void free( );
-      void dump( ) const;
-
-      void* ptr = nullptr;
-      size_t size = 0;
-   };
-
+   using ID = std::size_t;
+   extern const ID InvalidID;
 
 } // namespace base

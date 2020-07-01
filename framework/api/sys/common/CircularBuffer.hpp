@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/sys/common/Types.hpp"
+#include "api/sys/common/RawBuffer.hpp"
 #include "api/sys/helpers/functions/pointer.hpp"
 
 
@@ -77,6 +78,7 @@ namespace base {
        *****************************************************************************/
       ePush push_back( const void* const buffer, const size_t size, const std::optional< bool > is_reallocate = std::nullopt );
       ePush push_back( const RawBuffer& buffer, const std::optional< bool > is_reallocate = std::nullopt );
+      ePush push_back( const CircularBuffer& buffer, const std::optional< bool > is_reallocate = std::nullopt );
 
       /******************************************************************************
        *
@@ -106,6 +108,7 @@ namespace base {
        *****************************************************************************/
       bool front( void* const buffer, const size_t size ) const;
       bool front( RawBuffer& buffer ) const;
+      bool front( CircularBuffer& buffer ) const;
 
       /******************************************************************************
        *
@@ -117,6 +120,7 @@ namespace base {
        *****************************************************************************/
       bool move_front( void* const buffer, const size_t size );
       bool move_front( RawBuffer& buffer );
+      bool move_front( CircularBuffer& buffer );
 
       /******************************************************************************
        *
@@ -290,31 +294,6 @@ namespace base {
 
       pointer = mp_begin;
       size = m_size;
-      return true;
-   }
-
-   inline
-   bool CircularBuffer::state_save( )
-   {
-      if( true == m_is_state_locked )
-         return false;
-
-      m_state = { mp_begin, mp_end, m_size };
-      return true;
-   }
-
-   inline
-   bool CircularBuffer::state_restore( )
-   {
-      if( true == m_is_state_locked )
-         return false;
-      if( std::nullopt == m_state )
-         return false;
-
-      mp_begin = m_state.value( ).mp_begin;
-      mp_end = m_state.value( ).mp_end;
-      m_size = m_state.value( ).m_size;
-      m_state = std::nullopt;
       return true;
    }
 

@@ -285,105 +285,86 @@ const bool test( int argc, char** argv )
 
          DBG_MSG( "%p -> %p", value_pointer, test_value_pointer );
       }
+
+      stream.push( 0xAAAAAAAA, std::string( "string" ), 0xBBBBBBBB );
+
+      tBuffer stream_new( 1024 );
+      stream_new.push( stream, 0xCCCCCCCC );
+      stream.reset( );
+
+      DBG_WRN( "--------------------------------------------------------------" );
+      stream_new.dump( );
+      DBG_WRN( "--------------------------------------------------------------" );
+      stream_new.pop( stream );
+      stream.dump( );
+      DBG_WRN( "--------------------------------------------------------------" );
+      stream_new.dump( );
+      DBG_WRN( "--------------------------------------------------------------" );
+
    #endif
 
 
 
    #if 0 // CircularBuffer test
-      base::CircularBuffer cb( 10 );
-      cb.dump( );
-      printf( "\n\n" );
 
+      auto push_back = [ ]( base::CircularBuffer& cb, const size_t size, const size_t marker )
       {
-         size_t size = 5;
-         uint8_t* buffer = (uint8_t*)malloc( size );
          DBG_MSG( "push_back %zu bytes", size );
-         for( size_t i = 0; i < size; ++i )
-            buffer[ i ] = 0xA0 + i;
-         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
+         base::RawBuffer rb;
+         rb.alloc( size );
+         rb.fill( marker, 1 );
+         const base::CircularBuffer::ePush result = cb.push_back( rb );
          DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
          cb.dump( );
          printf( "\n\n" );
-      }
+      };
 
+      auto move_front = [ ]( base::CircularBuffer& cb, const size_t size )
       {
-         size_t size = 5;
-         uint8_t* buffer = (uint8_t*)malloc( size );
-         DBG_MSG( "push_back %zu bytes", size );
-         for( size_t i = 0; i < size; ++i )
-            buffer[ i ] = 0xB0 + i;
-         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
-         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
+         DBG_MSG( "move_front %zu bytes", size );
+         base::RawBuffer rb;
+         rb.alloc( size );
+         const bool result = cb.move_front( rb );
+         rb.dump( );
+         DBG_WRN( "result: %s", BOOL_TO_STRING( result ) );
          cb.dump( );
          printf( "\n\n" );
-      }
+      };
 
-      // {
-      //    size_t size = 3;
-      //    uint8_t* buffer = (uint8_t*)malloc( size );
-      //    DBG_MSG( "move_front %zu bytes", size );
-      //    cb.move_front( (void*)buffer, size );
-
-      //    for( size_t i = 0; i < size; ++i )
-      //       printf( "%#x ", static_cast< uint8_t* >( buffer )[i] );
-      //    printf( "\n" );
-
-      //    cb.dump( );
-      // }
-
+      auto pop_back = [ ]( base::CircularBuffer& cb, const size_t size )
       {
-         size_t size = 3;
-         uint8_t* buffer = (uint8_t*)malloc( size );
-         DBG_MSG( "push_back %zu bytes", size );
-         for( size_t i = 0; i < size; ++i )
-            buffer[ i ] = 0xC0 + i;
-         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size );
-         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
-         cb.dump( );
-         printf( "\n\n" );
-      }
-
-      {
-         size_t size = 8;
-         uint8_t* buffer = (uint8_t*)malloc( size );
-         DBG_MSG( "push_back %zu bytes", size );
-         for( size_t i = 0; i < size; ++i )
-            buffer[ i ] = 0xD0 + i;
-         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size, true );
-         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
-         cb.dump( );
-         printf( "\n\n" );
-      }
-
-      {
-         size_t size = 1;
          DBG_MSG( "pop_back %zu bytes", size );
          cb.pop_back( size );
          cb.dump( );
-      }
-
-      {
-         size_t size = 5;
-         uint8_t* buffer = (uint8_t*)malloc( size );
-         DBG_MSG( "push_back %zu bytes", size );
-         for( size_t i = 0; i < size; ++i )
-            buffer[ i ] = 0xE0 + i;
-         base::CircularBuffer::ePush result = cb.push_back( (void*)buffer, size, true );
-         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
-         cb.dump( );
          printf( "\n\n" );
-      }
+      };
 
-      // {
-      //    cb.reallocate( 8 );
-      //    cb.dump( );
-      // }
 
-      {
-         const uint8_t buffer[] = { 0xD5, 0xD6, 0xE0 };
-         const bool result = cb.cmp( (void*)buffer, 3, 3 );
-         DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
-      }
+
+      base::CircularBuffer cb( 10, false, true );
+      cb.dump( );
+      printf( "\n\n" );
+
+      push_back( cb, 5, 0xA0 );
+      push_back( cb, 5, 0xB0 );
+      move_front( cb, 3 );
+      push_back( cb, 3, 0xC0 );
+      push_back( cb, 8, 0xD0 );
+      pop_back( cb, 1 );
+      push_back( cb, 5, 0xE0 );
+
+      base::CircularBuffer cb_new( cb );
+      cb_new.dump( );
+
+      DBG_WRN( "--------------------------------------------------------------" );
+      cb.push_back( cb_new );
+      cb.dump( );
+      cb_new.dump( );
+      DBG_WRN( "--------------------------------------------------------------" );
+      cb.move_front( cb_new );
+      cb.dump( );
+      cb_new.dump( );
+
    #endif
 
 

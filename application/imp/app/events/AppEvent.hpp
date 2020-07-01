@@ -26,6 +26,6 @@ namespace application::events {
 
    using tAppEventSignature = base::TSignatureID< eAppEventID >;
 
-   DEFINE_IPC_EVENT( AppEvent, AppEventData, tAppEventSignature );
+   DEFINE_EVENT( AppEvent, AppEventData, tAppEventSignature );
 
 } // namespace application::events

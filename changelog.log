@@ -1,3 +1,6 @@
+version 1.7.5
+   - Refactoring and improvement: RawBuffer, CircularBuffer, ByteStream.
+
 version 1.7.4
    - IPC serializer/deserializer changed from ByteBufferT to ByteStream.
    - ByteStream implementation extended and fixed.

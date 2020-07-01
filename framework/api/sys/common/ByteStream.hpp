@@ -54,6 +54,8 @@ namespace base {
          bool push( const void* const buffer, const size_t size );
          bool push( void* const buffer, const size_t size );
          bool push( const RawBuffer& buffer );
+         bool push( const CircularBuffer& buffer );
+         bool push( const ByteStream& stream );
          bool push( const void* const pointer );
          bool push( void* const pointer );
          bool push( const std::string& string );
@@ -101,6 +103,8 @@ namespace base {
          bool pop( void* const buffer, const size_t size );
          bool pop( const void* buffer, const size_t size );
          bool pop( RawBuffer& buffer );
+         bool pop( CircularBuffer& buffer );
+         bool pop( ByteStream& stream );
          bool pop( const void*& pointer );
          bool pop( void*& pointer );
          bool pop( std::string& string );
@@ -167,6 +171,7 @@ namespace base {
          size_t size( ) const;
          size_t capacity( ) const;
          void dump( ) const;
+         void reset( );
          bool is_linear( const void*& pointer, size_t& size ) const;
       private:
          CircularBuffer m_buffer;
@@ -475,6 +480,12 @@ namespace base {
    void ByteStream::dump( ) const
    {
       return m_buffer.dump( );
+   }
+
+   inline
+   void ByteStream::reset( )
+   {
+      m_buffer.reset( );
    }
 
    inline
