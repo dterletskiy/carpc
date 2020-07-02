@@ -87,7 +87,7 @@ void ServiceIpcThread::thread_loop_receive( )
          if( p_slave_socket->socket( ) > max_socket )
             max_socket = p_slave_socket->socket( );
       }
-      // SYS_INF( "max_socket = %d", max_socket );
+      SYS_INF( "max_socket = %d", max_socket );
 
       if( false == os::linux::socket::select( max_socket, m_fd ) )
          continue;
@@ -100,18 +100,12 @@ void ServiceIpcThread::thread_loop_receive( )
             const void* const p_buffer = m_socket_sb.buffer( recv_size );
             dsi::tByteStream stream;
             stream.push( p_buffer, recv_size );
-            // stream.dump( );
 
             while( 0 < stream.size( ) )
             {
-               IEvent::tSptr p_event = IEvent::deserialize( stream );
-               if( nullptr == p_event )
-               {
-                  SYS_ERR( "'%s': lost received event", m_name.c_str( ) );
-                  continue;
-               }
-               SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
-               p_event->send( eCommType::ITC );
+               dsi::Packet packet;
+               stream.pop( packet );
+               process_packet( packet );
             }
          }
       }
@@ -364,26 +358,6 @@ bool ServiceIpcThread::is_subscribed( const IAsync::tSptr p_event )
    return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );
 }
 
-bool ServiceIpcThread::send( os::Socket& _socket, const IAsync::tSptr p_event )
-{
-   dsi::tByteStream stream;
-   if( false == IEvent::serialize( stream, std::static_pointer_cast< IEvent >( p_event ) ) )
-      return false;
-
-   // dsi::Packet packet;
-   // packet.add_package( dsi::eCommand::BroadcastEvent, stream );
-   // dsi::tByteStream packet_buffer;
-   // packet_buffer.push( packet );
-   // return send( _socket, packet_buffer );
-
-   return send( _socket, stream );
-}
-
-bool ServiceIpcThread::send( const IAsync::tSptr p_event )
-{
-   return send( m_socket_sb, p_event );
-}
-
 bool ServiceIpcThread::send( os::Socket& _socket, dsi::tByteStream& stream )
 {
    size_t size = 0;
@@ -402,4 +376,58 @@ bool ServiceIpcThread::send( os::Socket& _socket, dsi::tByteStream& stream )
 bool ServiceIpcThread::send( dsi::tByteStream& stream )
 {
    return send( m_socket_sb, stream );
+}
+
+bool ServiceIpcThread::send( os::Socket& _socket, const IAsync::tSptr p_event )
+{
+   dsi::Packet packet;
+   packet.add_package( dsi::eCommand::BroadcastEvent, *(std::static_pointer_cast< IEvent >( p_event )) );
+   dsi::tByteStream stream;
+   stream.push( packet );
+
+   return send( _socket, stream );
+}
+
+bool ServiceIpcThread::send( const IAsync::tSptr p_event )
+{
+   return send( m_socket_sb, p_event );
+}
+
+bool ServiceIpcThread::process_packet( dsi::Packet& packet )
+{
+   bool result = true;
+   for( dsi::Package& package : packet.packages( ) )
+      result &= process_package( package );
+
+   return result;
+}
+
+bool ServiceIpcThread::process_package( dsi::Package& package )
+{
+   SYS_TRC( "Processing package '%s'", package.c_str( ) );
+
+   switch( package.command( ) )
+   {
+      case dsi::eCommand::BroadcastEvent:
+      {
+         base::IEvent::tSptr p_event = base::IEvent::deserialize( package.data( ) );
+         if( nullptr == p_event )
+         {
+            SYS_ERR( "'%s': lost received event", m_name.c_str( ) );
+         }
+         else
+         {
+            SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
+            p_event->send( eCommType::ITC );
+         }
+         break;
+      }
+      default:
+      {
+         SYS_WRN( "Unknown package command" );
+         break;
+      }
+   }
+
+   return true;
 }

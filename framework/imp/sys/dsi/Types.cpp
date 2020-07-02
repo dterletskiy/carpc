@@ -34,15 +34,12 @@ Package::Package( )
 
 Package::Package( Package&& pkg )
    : m_command( pkg.m_command )
+   , m_data( pkg.m_data )
 {
-   SYS_WRN( "move" );
-   m_data = pkg.m_data;
-   pkg.m_data = { };
 }
 
 Package::~Package( )
 {
-   m_data.free( );
 }
 
 bool Package::to_stream( tByteStream& _stream ) const
@@ -61,6 +58,10 @@ Packet::Packet( )
 {
 }
 
+Packet::~Packet( )
+{
+}
+
 bool Packet::to_stream( tByteStream& _stream ) const
 {
    // here will be calculated CRC
@@ -69,7 +70,7 @@ bool Packet::to_stream( tByteStream& _stream ) const
 
 bool Packet::from_stream( tByteStream& _stream )
 {
-   if( false == test_buffer( _stream ) )
+   if( false == test_stream( _stream ) )
       return false;
 
    size_t begin_sign = 0;
@@ -77,7 +78,7 @@ bool Packet::from_stream( tByteStream& _stream )
    return _stream.pop( begin_sign, m_size, m_packages, m_crc, end_sign );
 }
 
-bool Packet::test_buffer( tByteStream& _stream ) const
+bool Packet::test_stream( tByteStream& _stream ) const
 {
    // if( false == _stream.test( m_begin_sign ) )
    // {
@@ -102,9 +103,4 @@ void Packet::add_package( Package&& _package )
 {
    m_packages.emplace_back( std::move( _package ) );
    m_size += _package.size( );
-}
-
-const Package::tVector& Packet::packages( ) const
-{
-   return m_packages;
 }

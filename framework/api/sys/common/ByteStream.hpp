@@ -153,12 +153,6 @@ namespace base {
          template< typename ... TYPES >
             bool get( TYPES& ... values );
 
-      private:
-         template< typename TYPE_CONTAINER >
-            bool get_stl_container( TYPE_CONTAINER& );
-         template< typename TYPE_CONTAINER >
-            bool get_stl_associative_container( TYPE_CONTAINER& );
-
       /*****************************************
        *
        * Erase methods

@@ -39,15 +39,16 @@ namespace base::dsi {
 
       public:
          size_t size( ) const;
+         const char* const c_str( ) const;
 
       public:
          eCommand command( ) const;
-         const RawBuffer& data( ) const;
+         tByteStream& data( );
          template< typename ... TYPES >
-            bool data( TYPES& ... args ) const;
+            bool data( TYPES& ... args );
       private:
          eCommand       m_command = eCommand::Undefined;
-         RawBuffer      m_data;
+         tByteStream    m_data;
    };
 
 
@@ -55,15 +56,21 @@ namespace base::dsi {
    template< typename ... TYPES >
    Package::Package( const eCommand command, const TYPES& ... args )
       : m_command( command )
-      , m_data( tByteStream::serialize( args... ) )
+      , m_data( )
    {
-      m_data.dump( );
+      m_data.push( args... );
    }
 
    inline
    size_t Package::size( ) const
    {
-      return sizeof( eCommand ) + m_data.size + sizeof( size_t );
+      return sizeof( eCommand ) + m_data.size( ) + sizeof( size_t );
+   }
+
+   inline
+   const char* const Package::c_str( ) const
+   {
+      return dsi::c_str( m_command );
    }
 
    inline
@@ -73,15 +80,15 @@ namespace base::dsi {
    }
 
    inline
-   const RawBuffer& Package::data( ) const
+   tByteStream& Package::data( )
    {
       return m_data;
    }
 
    template< typename ... TYPES >
-   bool Package::data( TYPES& ... args ) const
+   bool Package::data( TYPES& ... args )
    {
-      return tByteStream::deserialize( m_data, args... );
+      return m_data.pop( args... );
    }
 
 }
@@ -97,11 +104,12 @@ namespace base::dsi {
 
       public:
          Packet( );
+         ~Packet( );
 
       public:
          bool to_stream( tByteStream& ) const;
          bool from_stream( tByteStream& );
-         bool test_buffer( tByteStream& ) const;
+         bool test_stream( tByteStream& ) const;
 
       public:
          void add_package( Package&& );
@@ -111,7 +119,7 @@ namespace base::dsi {
                m_packages.emplace_back(  _command, _values... );
                m_size += m_packages.back( ).size( );
             }
-         const Package::tVector& packages( ) const;
+         Package::tVector& packages( );
 
       private:
          static constexpr size_t    m_begin_sign = 0xAABBCCDD;
@@ -123,5 +131,13 @@ namespace base::dsi {
          size_t                     m_crc;
          static constexpr size_t    m_end_sign = 0xFFEEDDCC;
    };
+
+
+
+   inline
+   Package::tVector& Packet::packages( )
+   {
+      return m_packages;
+   }
 
 }

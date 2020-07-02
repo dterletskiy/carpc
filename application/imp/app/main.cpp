@@ -140,25 +140,6 @@ const bool test( int argc, char** argv )
 
 
 
-   // using tEvent = application::events::AppEvent::Event;
-
-   // base::dsi::tByteStream stream;
-   // auto event = tEvent::create( { application::events::eAppEventID::BOOT }, { "booting" }, base::eCommType::ITC );
-   // DBG_MSG( "%s", event->signature( )->type_id( ).c_str( ) );
-   // event->to_stream( stream );
-   // stream.dump( );
-
-   // // auto event_new = tEvent::create( );
-   // // event_new->from_stream( stream );
-   // // DBG_MSG( "%s", std::static_pointer_cast< tEvent >( event_new )->data( )->message.c_str( ) );
-
-   // base::tAsyncTypeID event_type;
-   // stream.get( event_type );
-   // DBG_WRN( "%s", event_type.c_str( ) );
-   // stream.dump( );
-
-
-
 
    #if 0
       base::dsi::tByteStream stream;
@@ -166,15 +147,19 @@ const bool test( int argc, char** argv )
       {
          base::dsi::Packet packet;
          DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::Package( base::dsi::eCommand::RegisterServer, std::string( "PackageOne" ), (size_t)111 ) );
+         packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "PackageOne" ), (size_t)0xAAAAAAAA );
          DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::eCommand::UnregisterServer, std::string( "PackageTwo" ), (size_t)222 );
+         packet.add_package( base::dsi::eCommand::UnregisterServer, std::string( "PackageTwo" ), (size_t)0xBBBBBBBB );
          DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::eCommand::RegisterClient, std::string( "PackageThree" ), (size_t)333 );
+         packet.add_package( base::dsi::eCommand::RegisterClient, std::string( "PackageThree" ), (size_t)0xCCCCCCCC );
          DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::eCommand::UnregisterClient, std::string( "PackageFour" ), (size_t)444 );
+         packet.add_package( base::dsi::eCommand::UnregisterClient, std::string( "PackageFour" ), (size_t)0xDDDDDDDD );
+         DBG_WRN( "adding package" );
+         auto event = tEvent::create( { application::events::eAppEventID::BOOT }, { "booting system" }, base::eCommType::ITC );
+         packet.add_package( base::dsi::eCommand::BroadcastEvent, *event, (size_t)0xEEEEEEEE );
          DBG_WRN( "serrialize packet" );
          stream.push( packet );
+         stream.dump( );
       }
 
       {
@@ -182,28 +167,25 @@ const bool test( int argc, char** argv )
          DBG_WRN( "deserrialize packet" );
          stream.pop( packet );
 
-         std::string string( "NoNe" );
-         size_t value = 0;
-         bool result = false;
 
          for( auto& pkg : packet.packages( ) )
          {
-            DBG_WRN( "extracting package" );
-            result = pkg.data( string, value );
-            DBG_MSG( "command: %s / result: %s / string: %s / value: %zu", base::dsi::c_str( pkg.command( ) ), BOOL_TO_STRING( result ), string.c_str( ), value );
-         }
-      }
+            std::string string( "NoNe" );
+            size_t value = 0;
+            bool result = false;
 
-      {
-         base::dsi::tByteStream stream;
-         stream.push( std::string( "One" ) );
-         stream.push( std::string( "Two" ) );
-         stream.push( std::string( "Three" ) );
-         stream.dump( );
-         std::string string = "";
-         stream.get( string );
-         DBG_WRN( "%s", string.c_str( ) );
-         stream.dump( );
+            DBG_WRN( "extracting package" );
+            if( base::dsi::eCommand::BroadcastEvent == pkg.command( ) )
+            {
+               base::IEvent::tSptr p_event = base::IEvent::deserialize( pkg.data( ) );
+               DBG_MSG( "event: %s", std::static_pointer_cast< tEvent >( p_event )->data( )->message.c_str( ) );
+            }
+            else
+            {
+               result = pkg.data( string, value );
+               DBG_MSG( "command: %s / result: %s / string: %s / value: %zX", base::dsi::c_str( pkg.command( ) ), BOOL_TO_STRING( result ), string.c_str( ), value );
+            }
+         }
       }
 
    #endif

@@ -99,6 +99,10 @@ public:
    bool send( const IAsync::tSptr );
    bool send( os::Socket& _socket, dsi::tByteStream& );
    bool send( dsi::tByteStream& );
+
+private:
+   bool process_packet( dsi::Packet& );
+   bool process_package( dsi::Package& );
 };
 
 

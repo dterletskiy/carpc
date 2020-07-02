@@ -1,3 +1,6 @@
+version 1.7.6
+   - DSI/IPC protocole introduced to ServiceIpcThread for IPC communication.
+
 version 1.7.5
    - Refactoring and improvement: RawBuffer, CircularBuffer, ByteStream.
 
