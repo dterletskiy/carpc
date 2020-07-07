@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>22</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Begin
+signature
+
+bg=cyan</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>737</x>
+      <y>385</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>770</x>
+      <y>385</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>803</x>
+      <y>385</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1287</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+CRC
+
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1419</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+End
+signature
+
+bg=cyan</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>583</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Data
+
+bg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>319</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Package
+Header
+
+bg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>451</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Command
+
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>154</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Packet
+Header
+
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>297</x>
+      <y>286</y>
+      <w>429</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>Package 1
+layer=-1
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1122</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Data
+
+bg=blue
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>858</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Package
+Header
+
+bg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>990</x>
+      <y>319</y>
+      <w>121</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>type=actclass
+Command
+
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>836</x>
+      <y>286</y>
+      <w>429</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>Package N
+layer=-1
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>396</x>
+      <y>594</y>
+      <w>154</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>Command size
+Data size
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>352</x>
+      <y>462</y>
+      <w>66</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;120.0</additional_attributes>
+  </element>
+</diagram>

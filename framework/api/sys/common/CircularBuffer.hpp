@@ -100,7 +100,17 @@ namespace base {
 
       /******************************************************************************
        *
-       * Copying data to the buffer.
+       * Copying data from offset position to the buffer.
+       * Parameters:
+       *    buffer - external buffer pointer.
+       *    size - size of data to be read.
+       *
+       *****************************************************************************/
+      bool get( void* const buffer, const size_t size, const size_t offset = 0 ) const;
+
+      /******************************************************************************
+       *
+       * Copying data from begining to the buffer.
        * Parameters:
        *    buffer - external buffer pointer.
        *    size - size of data to be read.
@@ -112,7 +122,7 @@ namespace base {
 
       /******************************************************************************
        *
-       * Moving data to the buffer.
+       * Moving data from begining to the buffer.
        * Equivalent to:
        *    from( buffer, size );
        *    pop_front( size );

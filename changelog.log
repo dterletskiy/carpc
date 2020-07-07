@@ -1,3 +1,7 @@
+version 1.7.6a
+   - Some minor changes.
+   - Added protocole documentaion.
+
 version 1.7.6
    - DSI/IPC protocole introduced to ServiceIpcThread for IPC communication.
 

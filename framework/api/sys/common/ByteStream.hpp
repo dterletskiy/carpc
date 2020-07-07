@@ -13,6 +13,8 @@ namespace base {
    #define __ENUM_TYPE__( TYPE )             std::is_enum_v< TYPE >
    #define __REST_TYPES__( TYPE )            !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE > && !std::is_enum_v< TYPE >
 
+   using tBool = char;
+
 
 
    class ByteStream
@@ -51,6 +53,11 @@ namespace base {
        *
        ****************************************/
       public:
+         // This method for multipl push
+         template< typename ... TYPES >
+            bool push( const TYPES& ... values );
+
+      public:
          bool push( const void* const buffer, const size_t size );
          bool push( void* const buffer, const size_t size );
          bool push( const RawBuffer& buffer );
@@ -84,9 +91,6 @@ namespace base {
          template< typename TYPE >
             typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
                push( const TYPE& value );
-         // This method for multipl push
-         template< typename ... TYPES >
-            bool push( const TYPES& ... values );
 
       private:
          template< typename TYPE_CONTAINER >
@@ -99,6 +103,11 @@ namespace base {
        * Pop methods
        *
        ****************************************/
+      public:
+         // This method for multipl push
+         template< typename ... TYPES >
+            bool pop( TYPES& ... values );
+
       public:
          bool pop( void* const buffer, const size_t size );
          bool pop( const void* buffer, const size_t size );
@@ -133,9 +142,6 @@ namespace base {
          template< typename TYPE >
             typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
                pop( TYPE& value );
-         // This method for multipl push
-         template< typename ... TYPES >
-            bool pop( TYPES& ... values );
 
       private:
          template< typename TYPE_CONTAINER >
@@ -199,6 +205,15 @@ namespace base {
     * Push methods
     *
     ****************************************/
+   template< typename ... TYPES >
+   bool ByteStream::push( const TYPES& ... values )
+   {
+      bool result = true;
+      (void)std::initializer_list< int >{ ( result &= push( values ), 0 )... };
+
+      return result;
+   }
+
    template< typename TYPE >
    bool ByteStream::push( const std::optional< TYPE >& optional )
    {
@@ -269,15 +284,6 @@ namespace base {
       return value.to_stream( *this );
    }
 
-   template< typename ... TYPES >
-   bool ByteStream::push( const TYPES& ... values )
-   {
-      bool result = true;
-      (void)std::initializer_list< int >{ ( result &= push( values ), 0 )... };
-
-      return result;
-   }
-
    template< typename TYPE_CONTAINER >
    bool ByteStream::push_stl_container( const TYPE_CONTAINER& container )
    {
@@ -305,6 +311,15 @@ namespace base {
     * Pop methods
     *
     ****************************************/
+   template< typename ... TYPES >
+   bool ByteStream::pop( TYPES& ... values )
+   {
+      bool result = true;
+      (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
+
+      return result;
+   }
+
    template< typename TYPE >
    bool ByteStream::pop( std::optional< TYPE >& optional )
    {
@@ -386,15 +401,6 @@ namespace base {
       return value.from_stream( *this );
    }
 
-   template< typename ... TYPES >
-   bool ByteStream::pop( TYPES& ... values )
-   {
-      bool result = true;
-      (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
-
-      return result;
-   }
-
    template< typename TYPE_CONTAINER >
    bool ByteStream::pop_stl_container( TYPE_CONTAINER& container )
    {
@@ -443,6 +449,7 @@ namespace base {
    template< typename ... TYPES >
    bool ByteStream::get( TYPES& ... values )
    {
+      // Current implementation has some big issues during serialization/deserialization user classes
       m_buffer.state_save( );
       bool result = true;
       (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
@@ -493,10 +500,5 @@ namespace base {
    {
       m_buffer.pop_front( size );
    }
-
-
-
-
-
 
 } // namespace base

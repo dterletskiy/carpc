@@ -317,7 +317,7 @@ void CircularBuffer::pop_back( const size_t size )
    m_size -= size;
 }
 
-bool CircularBuffer::front( void* const p_buffer, const size_t size ) const
+bool CircularBuffer::get( void* const p_buffer, const size_t size, const size_t offset ) const
 {
    if( nullptr == p_buffer )
    {
@@ -329,24 +329,36 @@ bool CircularBuffer::front( void* const p_buffer, const size_t size ) const
       SYS_WRN( "buffer is empty" );
       return false;
    }
-   if( size > m_size )
+   if( size + offset > m_size )
    {
-      SYS_WRN( "buffer size %zu less then requested size %zu", m_size, size );
+      SYS_WRN( "buffer size %zu less then requested size %zu + offset %zu", m_size, size, offset );
       return false;
    }
 
-   const size_t part_size = static_cast< size_t >( diff( mp_tail, mp_begin ) );
-   if( size > part_size )
+   const size_t part_size_1 = static_cast< size_t >( diff( mp_tail, mp_begin ) );
+   const void* p_start = mp_begin;
+   if( offset > part_size_1 )
+      p_start = inc( mp_head, offset - part_size_1 );
+   else if( 0 < offset )
+      p_start = inc( p_start, offset );
+
+   const size_t part_size_2 = static_cast< size_t >( diff( mp_tail, p_start ) );
+   if( size > part_size_2 )
    {
-      memcpy( p_buffer, mp_begin, part_size );
-      memcpy( inc( p_buffer, part_size ), mp_head, size - part_size );
+      memcpy( p_buffer, p_start, part_size_2 );
+      memcpy( inc( p_buffer, part_size_2 ), mp_head, size - part_size_2 );
    }
    else
    {
-      memcpy( p_buffer, mp_begin, size );
+      memcpy( p_buffer, p_start, size );
    }
 
    return true;
+}
+
+bool CircularBuffer::front( void* const p_buffer, const size_t size ) const
+{
+   return get( p_buffer, size, 0 );
 }
 
 bool CircularBuffer::front( RawBuffer& buffer ) const

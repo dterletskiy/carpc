@@ -70,8 +70,8 @@ bool Packet::to_stream( tByteStream& _stream ) const
 
 bool Packet::from_stream( tByteStream& _stream )
 {
-   if( false == test_stream( _stream ) )
-      return false;
+   // if( false == test_stream( _stream ) )
+   //    return false;
 
    size_t begin_sign = 0;
    size_t end_sign = 0;
@@ -80,17 +80,32 @@ bool Packet::from_stream( tByteStream& _stream )
 
 bool Packet::test_stream( tByteStream& _stream ) const
 {
-   // if( false == _stream.test( m_begin_sign ) )
+   // size_t begin_sign = 0;
+   // if( false == _stream.get( 0, begin_sign ) )
+   // {
+   //    SYS_ERR( "begin signature read error" );
+   //    return false;
+   // }
+   // if( m_begin_sign != begin_sign )
    // {
    //    SYS_ERR( "begin signature mismatch" );
    //    return false;
    // }
 
    // size_t size = 0;
-   // if( false == _stream.get( size, sizeof( m_begin_sign ) ) )
+   // if( false == _stream.get( sizeof( m_begin_sign ), size ) )
+   // {
+   //    SYS_ERR( "size read error" );
    //    return false;
+   // }
 
-   // if( false == _stream.test( m_end_sign, sizeof( m_begin_sign ) + size ) )
+   // size_t end_sign = 0;
+   // if( false == _stream.get( sizeof( m_begin_sign ) + size, end_sign ) )
+   // {
+   //    SYS_ERR( "end signature read error" );
+   //    return false;
+   // }
+   // if( m_end_sign != end_sign )
    // {
    //    SYS_ERR( "end signature mismatch" );
    //    return false;

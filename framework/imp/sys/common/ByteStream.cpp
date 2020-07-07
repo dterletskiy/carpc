@@ -80,7 +80,7 @@ bool ByteStream::push( const ByteStream& stream )
 
 bool ByteStream::push( const bool value )
 {
-   return push( static_cast< size_t >( value ? 1 : 0 ) );
+   return push( static_cast< tBool >( value ? 1 : 0 ) );
 }
 
 bool ByteStream::push( const std::string& string )
@@ -107,7 +107,13 @@ bool ByteStream::pop( void* const buffer, const size_t size )
    // SYS_TRC( "buffer: %p / size: %zu", buffer, size );
    // SYS_TRC( "---------------- PUSH END ----------------" );
 
-   return m_buffer.move_front( buffer, size );
+   if( false == m_buffer.front( buffer, size ) )
+      return false;
+
+   m_buffer.pop_front( size );
+   return true;
+
+   // return m_buffer.move_front( buffer, size );
 }
 
 bool ByteStream::pop( CircularBuffer& buffer )
@@ -156,7 +162,7 @@ bool ByteStream::pop( ByteStream& stream )
 
 bool ByteStream::pop( bool& value )
 {
-   size_t bool_value = false;
+   tBool bool_value = false;
    if( false == pop( bool_value ) )
       return false;
 
