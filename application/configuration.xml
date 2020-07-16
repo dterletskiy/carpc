@@ -12,12 +12,15 @@
    <settings type="compilation">
       <setting type="include" value="/home/scorpion/Source/RPC/application" status="active"/>
       <setting type="include" value="/home/scorpion/Source/RPC/framework" status="active"/>
+      <setting type="flag" value="-fopenmp" status="active"/>
    </settings>
 
    <settings type="link">
       <setting type="flag" value="-ldl" status="active"/>
       <setting type="include" value="/home/scorpion/Source/RPC/framework_product/lib" status="active"/>
       <setting type="flag" value="-lframework" status="active"/>
+      <setting type="flag" value="-fopenmp" status="active"/>
+      <setting type="flag" value="-ltbb" status="active"/>
    </settings>
 
 </project>

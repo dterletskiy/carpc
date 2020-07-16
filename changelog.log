@@ -1,3 +1,8 @@
+version 1.7.7
+   - Test folder introduced in framework.
+   - Some tests added.
+   - TMatrix class implemented.
+
 version 1.7.6a
    - Some minor changes.
    - Added protocole documentaion.

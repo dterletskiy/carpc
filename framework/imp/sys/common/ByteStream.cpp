@@ -1,7 +1,7 @@
 #include "api/sys/common/ByteStream.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "S_BUFFER"
+#define CLASS_ABBR "STREAM"
 
 
 

@@ -121,13 +121,188 @@ void boot( int argc, char** argv )
 
 
 
-#include "api/sys/common/CircularBuffer.hpp"
-#include "api/sys/common/ByteStream.hpp"
-#include "api/sys/common/ByteBufferT.hpp"
-#include "api/sys/dsi/Types.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
 
+#include <stdio.h>
+#include <omp.h>
+#include <time.h>
 
+#include <tbb/tbb.h>
+#include <tbb/task_scheduler_init.h>
+
+
+
+
+
+
+struct hello : public tbb::task
+{
+   task* execute ( )
+   {
+      DBG_WRN( "Hello, world!" );
+      return nullptr;
+   }
+};
+
+template< typename TYPE >
+void print_range( tbb::blocked_range< TYPE >& range )
+{
+   for( TYPE index = range.begin( ); index != range.end( ); ++index )
+      std::cout << index << " ";
+   std::cout << std::endl << std::endl;
+}
+
+
+
+
+
+double VectorsMultiplication( const double *a, const double *b, size_t size )
+{
+   double result = 0.0;
+   for( size_t i = 0; i < size; ++i )
+      result += a[i] * b[i];
+   return result;
+}
+
+class VectorsMultiplicator
+{
+   private:
+      const double* matrix;
+      const double* vector;
+      double* const result;
+      size_t const columns;
+
+   public:
+      VectorsMultiplicator( double* _matrix, double* _vector, double* _result, size_t _columns )
+         : matrix( _matrix )
+         , vector( _vector )
+         , result( _result )
+         , columns( _columns )
+      { }
+
+      void operator( )( const tbb::blocked_range< size_t >& range ) const
+      {
+         // DBG_MSG( );
+         for( size_t i = range.begin( ); i != range.end( ); ++i )
+            result[ i ] = VectorsMultiplication( &( matrix[ i * columns ] ), vector, columns );
+      }
+};
+
+
+
+template< typename T >
+T* allocate( const size_t rows, const size_t columns )
+{
+   if( 0 == rows && 0 == columns )
+      return nullptr;
+
+   if( 0 == rows )
+      return (T*)malloc( sizeof( T* ) * columns ) ;
+
+   if( 0 == columns )
+      return (T*)malloc( sizeof( T* ) * rows );
+
+   return (T*)malloc( sizeof( T* ) * rows * columns );
+}
+
+template< typename T >
+void deallocate( T* vector )
+{
+   if( nullptr != vector )
+      free( vector );
+}
+
+const size_t s_value = 12;
+template< typename T >
+void init( T* vector, const size_t rows, const size_t columns )
+{
+   if( 0 == rows && 0 == columns )
+      return;
+
+   if( 0 == rows )
+   {
+      for( size_t j = 0; j < columns; ++j )
+         vector[ j ] = s_value;//j;
+      return;
+   }
+
+   if( 0 == columns )
+   {
+      for( size_t j = 0; j < rows; ++j )
+         vector[ j ] = s_value;//j;
+      return;
+   }
+
+   for( size_t i = 0; i < rows; ++i )
+   {
+      for( size_t j = 0; j < columns; ++j )
+         vector[ i * columns + j ] = s_value;//i + j;
+   }
+}
+
+const bool sNoDebug = true;
+
+template< typename T >
+void print( T* vector, const size_t rows, const size_t columns )
+{
+   if( sNoDebug )
+      return;
+
+   DBG_MSG( "--------------- DUMP BEGIN ---------------" );
+   DBG_MSG( "rows: %zu", rows );
+   DBG_MSG( "columns: %zu", columns );
+
+   if( 0 == rows && 0 == columns )
+   {
+      return;
+   }
+   if( 0 == rows )
+   {
+      for( size_t j = 0; j < columns; ++j )
+         std::cout << vector[ j ] << " ";
+      std::cout << std::endl;
+      return;
+   }
+   if( 0 == columns )
+   {
+      for( size_t j = 0; j < rows; ++j )
+         std::cout << vector[ j ] << " ";
+      std::cout << std::endl;
+      return;
+   }
+   else
+   {
+      for( size_t i = 0; i < rows; ++i )
+      {
+         for( size_t j = 0; j < columns; ++j )
+            std::cout << vector[ i * columns + j ] << " ";
+         std::cout << std::endl;
+      }
+   }
+   std::cout << std::endl;
+
+   DBG_MSG( "---------------- DUMP END ----------------" );
+}
+
+void matrix_vector_product_omp( double* a, double* b, double* c, int m, int n )
+{
+   #pragma omp parallel num_threads( 4 )
+   {
+      int nthreads = 4;//omp_get_num_threads( );
+      int threadid = omp_get_thread_num( );
+      // DBG_MSG( "Hello, multithreaded world: thread %d of %d", threadid, nthreads );
+
+      int items_per_thread= m / nthreads;
+      int lb= threadid* items_per_thread;
+      int ub= ( threadid == nthreads - 1 ) ? ( m - 1 ) : ( lb + items_per_thread - 1 );
+      for( int i= lb; i <= ub; i++ )
+      {
+         c[i] = 0.0;
+         for( int j = 0; j < n; j++ )
+            c[i] += a[i * n + j] * b[j];
+      }
+   }
+}
 
 
 
@@ -135,294 +310,181 @@ void boot( int argc, char** argv )
 
 const bool test( int argc, char** argv )
 {
-   return true;
+   // return true;
    SYS_ERR( "--------------- MARKER ---------------" );
 
 
 
+   #if 0 // OMP
 
-
-   #if 0
-      using tEvent = application::events::AppEvent::Event;
-      REGISTER_EVENT( application::events::AppEvent );
-
-      base::dsi::tByteStream stream;
-
+      auto matrix_vector_product = [ ]( double* a, double* b, double* c, size_t m, size_t n ) -> void
       {
-         base::dsi::Packet packet;
-         DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "PackageOne" ), (size_t)0xAAAAAAAA );
-         DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::eCommand::UnregisterServer, std::string( "PackageTwo" ), (size_t)0xBBBBBBBB );
-         DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::eCommand::RegisterClient, std::string( "PackageThree" ), (size_t)0xCCCCCCCC );
-         DBG_WRN( "adding package" );
-         packet.add_package( base::dsi::eCommand::UnregisterClient, std::string( "PackageFour" ), (size_t)0xDDDDDDDD );
-         DBG_WRN( "adding package" );
-         auto event = tEvent::create( { application::events::eAppEventID::BOOT }, { "booting system" }, base::eCommType::ITC );
-         packet.add_package( base::dsi::eCommand::BroadcastEvent, *event, (size_t)0xEEEEEEEE );
-         DBG_WRN( "serrialize packet" );
-         stream.push( packet );
-         stream.dump( );
-      }
-
-      {
-         base::dsi::Packet packet;
-         DBG_WRN( "deserrialize packet" );
-         stream.pop( packet );
-
-
-         for( auto& pkg : packet.packages( ) )
+         for( size_t i = 0; i < m; i++ )
          {
-            std::string string( "NoNe" );
-            size_t value = 0;
-            bool result = false;
-
-            DBG_WRN( "extracting package" );
-            if( base::dsi::eCommand::BroadcastEvent == pkg.command( ) )
-            {
-               base::IEvent::tSptr p_event = base::IEvent::deserialize( pkg.data( ) );
-               if( nullptr == p_event )
-               {
-                  DBG_ERR( "event null pointer" );
-               }
-               if( nullptr == std::static_pointer_cast< tEvent >( p_event )->data( ) )
-               {
-                  DBG_ERR( "event data null pointer" );
-               }
-               else
-               {
-                  DBG_MSG( "event: %s", std::static_pointer_cast< tEvent >( p_event )->data( )->message.c_str( ) );
-               }
-            }
-            else
-            {
-               result = pkg.data( string, value );
-               DBG_MSG( "command: %s / result: %s / string: %s / value: %zX", base::dsi::c_str( pkg.command( ) ), BOOL_TO_STRING( result ), string.c_str( ), value );
-            }
+            c[ i ] = 0.0;
+            for( size_t j = 0; j < n; ++j )
+               c[ i ] += a[ i * n + j ] * b[ j ];
          }
-      }
+      };
+
+      auto run_serial = [ ]( const size_t m, const size_t n ) -> void
+      {
+         // Allocate memory for 2-d array a[m, n]
+         double* a = (double*)malloc( sizeof( *a ) * m * n );
+         double* b = (double*)malloc( sizeof( *b ) * n ) ;
+         double* c = (double*)malloc( sizeof( *c ) * m );
+
+         for( size_t i = 0; i < m; ++i )
+         {
+            for( size_t j = 0; j < n; ++j )
+               a[ i * n + j ] = i + j;
+         }
+
+         for( size_t j = 0; j < n; ++j )
+            b[ j ] = j;
+
+         base::tools::Performance performance( "serial" );
+         performance.start( );
+         matrix_vector_product( a, b, c, m, n );
+         performance.stop( );
+
+         free( a );
+         free( b );
+         free( c );
+      };
+
+      const size_t m = 10000;
+      const size_t n = 10000;
+
+      DBG_MSG( "Matrix-vector product (c[m] = a[m, n] * b[n]; m = %zu, n = %zu)", m, n );
+      DBG_MSG( "Memory used: %"PRIu64 " MiB", ((m * n + m + n) * sizeof(double)) >> 20 );
+
+      run_serial( m, n );
 
    #endif
 
 
 
-   #if 0 // ByteStream test
-      enum class eEnum { one, two, three };
+   #if 0 // TBB vs OMP
 
-      base::dsi::tByteStream stream( 64 );
+      tbb::task_scheduler_init tsi( 4 );
 
+
+
+
+
+      const size_t rows = 30000;
+      const size_t columns = 30000;
+      const size_t grainsize = 25000;
+
+      double* matrix = allocate< double >( rows, columns );
+      double* vector = allocate< double >( 0, columns );
+      double* result = allocate< double >( rows, 0 );
+
+      init( matrix, rows, columns );
+      init( vector, 0, columns );
+
+
+
+      long int TBB = 0, OMP_1 = 0, OMP_2 = 0;
+      const size_t count = 10;
+      for( size_t iteration = 0; iteration < count; ++iteration )
       {
-         size_t value_integral = 0xAAAAAAAA;
-         eEnum value_enum = eEnum::three;
-         std::string value_string = "Hello world!";
-         std::optional< std::string > value_optional_string = "OptionalString";
-         std::vector< std::string > value_vector_string = { "one", "two", "three", "four", "five" };
-         std::map< size_t, std::string > value_map = { { 0xAAAAAAAA, "one" }, { 0xBBBBBBBB, "two" }, { 0xCCCCCCCC, "three" }, { 0xDDDDDDDD, "four" }, { 0xEEEEEEEE, "five" } };
-         bool value_bool = true;
-         void* value_pointer = &value_integral;
-
-         stream.push( value_integral );
-         stream.dump( );
-         stream.push( value_enum );
-         stream.dump( );
-         stream.push( value_string );
-         stream.dump( );
-         stream.push( value_optional_string );
-         stream.dump( );
-         stream.push( value_vector_string );
-         stream.dump( );
-         stream.push( value_map );
-         stream.dump( );
-         stream.push( value_bool );
-         stream.dump( );
-         stream.push( value_pointer );
-         stream.dump( );
-
-
+         DBG_WRN( "---------------------------------------------------- %zu ----------------------------------------------------", iteration );
 
          {
-            size_t test_value_integral = 0;
-            eEnum test_value_enum = eEnum::one;
-            std::string test_value_string = "";
-            std::optional< std::string > test_value_optional_string = "";
-            std::vector< std::string > test_value_vector_string;
-            std::map< size_t, std::string > test_value_map;
-            bool test_value_bool = false;
-            void* test_value_pointer = nullptr;
+            SYS_ERR( "--------------- TBB ---------------" );
 
-            stream.get( sizeof( size_t ) + sizeof( eEnum ), test_value_string );
-            DBG_WRN( "string: %s", test_value_string.c_str( ) );
+            print( matrix, rows, columns );
+            print( vector, 0, columns );
+            print( result, rows, 0 );
 
-            stream.get( 0, test_value_integral, test_value_enum, test_value_string, test_value_optional_string, test_value_vector_string
-               , test_value_map, test_value_bool, test_value_pointer
-            );
+            base::tools::Performance performance( "TBB" );
+            performance.start( "start" );
+            tbb::parallel_for( tbb::blocked_range< size_t >( 0, rows, grainsize ), VectorsMultiplicator( matrix, vector, result, columns ) );
+            performance.stop( "stop" );
+            TBB += performance.info( );
 
-            DBG_MSG( "integral result: %s", BOOL_TO_STRING( value_integral == test_value_integral ) );
-            DBG_MSG( "enum result: %s", BOOL_TO_STRING( value_enum == test_value_enum ) );
-            DBG_MSG( "string result: %s", BOOL_TO_STRING( value_string == test_value_string ) );
-            DBG_MSG( "optional result: %s", BOOL_TO_STRING( value_optional_string == test_value_optional_string ) );
-            DBG_MSG( "vector result: %s", BOOL_TO_STRING( value_vector_string == test_value_vector_string ) );
-            DBG_MSG( "map result: %s", BOOL_TO_STRING( value_map == test_value_map ) );
-            DBG_MSG( "bool result: %s", BOOL_TO_STRING( value_bool == test_value_bool ) );
-            DBG_MSG( "bool result: %s", BOOL_TO_STRING( value_pointer == test_value_pointer ) );
-            DBG_MSG( "%p -> %p", value_pointer, test_value_pointer );
+            print( result, rows, 0 );
          }
 
          {
-            size_t test_value_integral = 0;
-            eEnum test_value_enum = eEnum::one;
-            std::string test_value_string = "";
-            std::optional< std::string > test_value_optional_string = "";
-            std::vector< std::string > test_value_vector_string;
-            std::map< size_t, std::string > test_value_map;
-            bool test_value_bool = false;
-            void* test_value_pointer = nullptr;
+            SYS_ERR( "--------------- OMP ---------------" );
 
-            stream.pop( test_value_integral );
-            stream.dump( );
-            stream.pop( test_value_enum );
-            stream.dump( );
-            stream.pop( test_value_string );
-            stream.dump( );
-            stream.pop( test_value_optional_string );
-            stream.dump( );
-            stream.pop( test_value_vector_string );
-            stream.dump( );
-            stream.pop( test_value_map );
-            stream.dump( );
-            stream.pop( test_value_bool );
-            stream.dump( );
-            stream.pop( test_value_pointer );
-            stream.dump( );
+            print( matrix, rows, columns );
+            print( vector, 0, columns );
+            print( result, rows, 0 );
 
-            DBG_MSG( "integral result: %s", BOOL_TO_STRING( value_integral == test_value_integral ) );
-            DBG_MSG( "enum result: %s", BOOL_TO_STRING( value_enum == test_value_enum ) );
-            DBG_MSG( "string result: %s", BOOL_TO_STRING( value_string == test_value_string ) );
-            DBG_MSG( "optional result: %s", BOOL_TO_STRING( value_optional_string == test_value_optional_string ) );
-            DBG_MSG( "vector result: %s", BOOL_TO_STRING( value_vector_string == test_value_vector_string ) );
-            DBG_MSG( "map result: %s", BOOL_TO_STRING( value_map == test_value_map ) );
-            DBG_MSG( "bool result: %s", BOOL_TO_STRING( value_bool == test_value_bool ) );
-            DBG_MSG( "bool result: %s", BOOL_TO_STRING( value_pointer == test_value_pointer ) );
-            DBG_MSG( "%p -> %p", value_pointer, test_value_pointer );
+            base::tools::Performance performance( "OMP" );
+            performance.start( "start" );
+            #pragma omp parallel for schedule( dynamic, grainsize )
+               for( size_t i = 0; i < rows; ++i )
+                  result[i] = VectorsMultiplication( &( matrix[ i * columns ] ), vector, columns );
+            performance.stop( "stop" );
+            OMP_1 += performance.info( );
+
+            print( result, rows, 0 );
          }
 
+         {
+            SYS_ERR( "--------------- OMP ---------------" );
 
+            print( matrix, rows, columns );
+            print( vector, 0, columns );
+            print( result, rows, 0 );
 
+            base::tools::Performance performance( "OMP" );
+            performance.start( "start" );
+            matrix_vector_product_omp( matrix, vector, result, rows, columns );
+            performance.stop( "stop" );
+            OMP_2 += performance.info( );
+
+            print( result, rows, 0 );
+         }
+
+         DBG_WRN( "--------------------------------------------------------------------------------------------------------\n\n\n" );
       }
 
-      stream.push( 0xAAAAAAAA, std::string( "string" ), 0xBBBBBBBB );
+      deallocate( matrix );
+      deallocate( vector );
+      deallocate( result );
 
-      base::dsi::tByteStream stream_new( 1024 );
-      stream_new.push( stream, 0xCCCCCCCC );
-      stream.reset( );
-
-      DBG_WRN( "--------------------------------------------------------------" );
-      stream_new.dump( );
-      DBG_WRN( "--------------------------------------------------------------" );
-      stream_new.pop( stream );
-      stream.dump( );
-      DBG_WRN( "--------------------------------------------------------------" );
-      stream_new.dump( );
-      DBG_WRN( "--------------------------------------------------------------" );
-
-   #endif
+      DBG_TRC( "TBB: %ld / TBB / count: %ld", TBB, TBB / count );
+      DBG_TRC( "OMP_1: %ld / OMP_1 / count: %ld", OMP_1, OMP_1 / count );
+      DBG_TRC( "OMP_2: %ld / OMP_2 / count: %ld", OMP_2, OMP_2 / count );
 
 
 
-   #if 0 // CircularBuffer test
 
-      auto push_back = [ ]( base::CircularBuffer& cb, const size_t size, const size_t marker )
-      {
-         DBG_MSG( "push_back %zu bytes", size );
-         base::RawBuffer rb;
-         rb.alloc( size );
-         rb.fill( marker, 1 );
-         const base::CircularBuffer::ePush result = cb.push_back( rb );
-         DBG_WRN( "result: %s", base::CircularBuffer::c_str( result ) );
-         cb.dump( );
-         printf( "\n\n" );
-      };
 
-      auto move_front = [ ]( base::CircularBuffer& cb, const size_t size )
-      {
-         DBG_MSG( "move_front %zu bytes", size );
-         base::RawBuffer rb;
-         rb.alloc( size );
-         const bool result = cb.move_front( rb );
-         rb.dump( );
-         DBG_WRN( "result: %s", BOOL_TO_STRING( result ) );
-         cb.dump( );
-         printf( "\n\n" );
-      };
+      // tbb::blocked_range< size_t > range_a( 0, 100 );
+      // print_range( range_a );
 
-      auto pop_back = [ ]( base::CircularBuffer& cb, const size_t size )
-      {
-         DBG_MSG( "pop_back %zu bytes", size );
-         cb.pop_back( size );
-         cb.dump( );
-         printf( "\n\n" );
-      };
+      // tbb::blocked_range< size_t > range_b( range_a, tbb::split( ) );
+      // print_range( range_a );
+      // print_range( range_b );
+
+      // tbb::blocked_range< size_t > range_c( range_b, tbb::split( ) );
+      // print_range( range_a );
+      // print_range( range_b );
+      // print_range( range_c );
 
 
 
-      base::CircularBuffer cb( 10, false, true );
-      cb.dump( );
-      printf( "\n\n" );
 
-      push_back( cb, 5, 0xA0 );
-      push_back( cb, 5, 0xB0 );
-      move_front( cb, 3 );
-      push_back( cb, 3, 0xC0 );
-      push_back( cb, 8, 0xD0 );
-      pop_back( cb, 1 );
-      push_back( cb, 5, 0xE0 );
 
-      base::CircularBuffer cb_new( cb );
-      cb_new.dump( );
 
-      DBG_WRN( "--------------------------------------------------------------" );
-      cb.push_back( cb_new );
-      cb.dump( );
-      cb_new.dump( );
-      DBG_WRN( "--------------------------------------------------------------" );
-      cb.move_front( cb_new );
-      cb.dump( );
-      cb_new.dump( );
+
+      // hello& t = *new( tbb::task::allocate_root( ) ) hello;
+      // tbb::task::spawn_root_and_wait( t );
+
+      // auto function = [ ]( size_t index ) -> void
+      // {
+      //    DBG_WRN( "index: %zu", index );
+      // };
+      // tbb::parallel_for( 0, 1000, function );
 
    #endif
-
-
-
-   #if 0 // ByteBuffer test
-      using tBuffer = base::ByteBufferT;
-
-      base::ByteBufferT buffer;
-      base::dsi::Packet packet;
-      packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_one" ) );
-      packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_two" ) );
-      packet.add_package( base::dsi::eCommand::RegisterServer, std::string( "service_two" ) );
-      buffer.push( packet );
-      buffer.dump( );
-      DBG_MSG( "%zu", buffer.size( ) );
-
-      packet = { };
-      bool result = packet.from_buffer( buffer );
-      DBG_MSG( "%s", BOOL_TO_STRING( result ) );
-      for( const base::dsi::Package& package : packet.packages( ) )
-      {
-         std::string service_name = "xxxxx";
-         base::dsi::eCommand command = base::dsi::eCommand::Undefined;
-         tBuffer data( package.data( ) );
-         data.pop( service_name );
-         DBG_MSG( "%s", service_name.c_str( ) );
-      }
-   #endif
-
-
-
-
-
 
 
 

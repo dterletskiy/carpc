@@ -25,6 +25,21 @@ namespace base {
 
 
    template< typename TYPE >
+   void print( const TYPE* array, const size_t size, const bool is_new_line = false )
+   {
+      printf( "{ " );
+      for ( size_t index = 0; index < size; ++index )
+      {
+         print( array[ index ] );
+         printf( " " );
+      }
+      printf( "}" );
+
+      if( is_new_line ) printf( "\n" );
+   }
+
+
+   template< typename TYPE >
    void print( const std::list< TYPE >& list, const bool is_new_line = false )
    {
       printf( "{ " );
