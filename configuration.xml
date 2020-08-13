@@ -51,7 +51,7 @@
       <setting type="flag" value="-g3" status="inactive"/>
       <setting type="flag" value="-ggdb" status="inactive"/>
       <setting type="flag" value="-rdynamic" status="inactive"/>
-      <setting type="flag" value="-fopenmp" status="inactive"/>
+      <setting type="flag" value="-fopenmp" status="active"/>
       <setting type="flag" value="-time" status="inactive"/>
       <setting type="flag" value="-finstrument-functions" status="conditions">
          <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
@@ -69,8 +69,8 @@
       <setting type="flag" value="-lm" status="inactive"/>
       <setting type="flag" value="-larmadillo" status="inactive"/>
       <setting type="flag" value="-lprotobuf" status="inactive"/>
-      <setting type="flag" value="-fopenmp" status="inactive"/>
-      <setting type="flag" value="-ltbb" status="inactive"/>
+      <setting type="flag" value="-fopenmp" status="active"/>
+      <setting type="flag" value="-ltbb" status="active"/>
       <setting type="flag" value="-lpthread" status="active"/>
       <setting type="flag" value="-luuid" status="inactive"/>
       <setting type="flag" value="-lrt" status="conditions">

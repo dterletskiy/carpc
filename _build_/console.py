@@ -114,6 +114,9 @@ Format            = AnsiFormat( )
 
 
 class AnsiDebug:
+   def __init__( self, is_colored: bool = True ):
+      self.__is_colored = is_colored
+
    def header( self, *arguments ):
       self.write( Format.HEADER, *arguments )
 
@@ -139,15 +142,30 @@ class AnsiDebug:
       self.write( Format.ERROR, *arguments )
 
    def write( self, ansi_format, *arguments ):
-      string: str = ansi_format
+      string: str = ""
+      if True == self.__is_colored:
+         string: str = ansi_format
+
       for argument in arguments:
          string += str( argument )
-      string += Format.RESET
+
+      if True == self.__is_colored:
+         string += Format.RESET
       print( string )
 
    def promt( self, string: str ):
-      return input( Format.PROMT + string + Format.RESET )
+      if True == self.__is_colored:
+         return input( Format.PROMT + string + Format.RESET )
+      else:
+         return input( string )
 
-debug             = AnsiDebug( )
+   def colored( self, is_colored: bool ):
+      _is_colored = self.__is_colored
+      self.__is_colored = is_colored
+      return _is_colored
+
+   __is_colored: bool = True
+
+debug             = AnsiDebug( True )
 
 

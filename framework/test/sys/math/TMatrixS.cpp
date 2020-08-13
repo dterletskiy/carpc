@@ -1,12 +1,13 @@
 #include "api/sys/helpers/macros/strings.hpp"
-#include "api/sys/math/Matrix.hpp"
+#include "api/sys/math/TMatrixS.hpp"
+#include "test/sys/math/TMatrixS.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "TEST:MATH:MATRIX"
+#define CLASS_ABBR "TEST:MATH:TMATRIX"
 
 
 
-namespace base::math::matrix::test {
+namespace base::math::tmatrixs::test {
 
    bool run( )
    {
@@ -15,22 +16,22 @@ namespace base::math::matrix::test {
          {
             SYS_ERR( "--------------- math::c2a ---------------" );
 
-            base::math::tMatrix< size_t, base::math::tRow{ 3 }, base::math::tColumn{ 4 } > matrix_34( "matrix_34", {
+            base::math::tTMatrixS< size_t, base::math::tRow{ 3 }, base::math::tColumn{ 4 } > matrix_34( "matrix_34", {
                                                                         10, 11, 12, 13,
                                                                         20, 21, 22, 23,
                                                                         30, 31, 32, 33
                                                 } );
             matrix_34.print( );
-            base::math::tMatrix< size_t, base::math::tRow{ 4 }, base::math::tColumn{ 5 } > matrix_45( "matrix_45", {
+            base::math::tTMatrixS< size_t, base::math::tRow{ 4 }, base::math::tColumn{ 5 } > matrix_45( "matrix_45", {
                                                                         10, 11, 12, 13, 14,
                                                                         20, 21, 22, 23, 24,
                                                                         30, 31, 32, 33, 34,
                                                                         40, 41, 42, 43, 44,
                                                 } );
             matrix_45.print( );
-            base::math::tVectorCV< size_t, base::math::tColumn{ 4 } > vector_14( "vector_14", { 100, 200, 300, 400 } );
+            base::math::tTVectorSCV< size_t, base::math::tColumn{ 4 } > vector_14( "vector_14", { 100, 200, 300, 400 } );
             vector_14.print( );
-            base::math::tVectorCTV< size_t, base::math::tRow{ 4 } > vector_41( "vector_41", {
+            base::math::tTVectorSCTV< size_t, base::math::tRow{ 4 } > vector_41( "vector_41", {
                                                                      100,
                                                                      200,
                                                                      300,
@@ -47,14 +48,14 @@ namespace base::math::matrix::test {
          {
             SYS_ERR( "--------------- math ---------------" );
 
-            base::math::tMatrix< size_t, 3, 4 > matrix_34( "matrix_34", {
+            base::math::tTMatrixS< size_t, 3, 4 > matrix_34( "matrix_34", {
                                                                         10, 11, 12, 13,
                                                                         20, 21, 22, 23,
                                                                         30, 31, 32, 33
                                                 } );
 
             matrix_34.print( );
-            base::math::tMatrix< size_t, 4, 5 > matrix_45( "matrix_45", {
+            base::math::tTMatrixS< size_t, 4, 5 > matrix_45( "matrix_45", {
                                                                         10, 11, 12, 13, 14,
                                                                         20, 21, 22, 23, 24,
                                                                         30, 31, 32, 33, 34,
@@ -62,9 +63,9 @@ namespace base::math::matrix::test {
 
                                                 } );
             matrix_45.print( );
-            base::math::tVectorCV< size_t, 4 > vector_14( "vector_14", { 100, 200, 300, 400 } );
+            base::math::tTVectorSCV< size_t, 4 > vector_14( "vector_14", { 100, 200, 300, 400 } );
             vector_14.print( );
-            base::math::tVectorCTV< size_t, 4 > vector_41( "vector_41", {
+            base::math::tTVectorSCTV< size_t, 4 > vector_41( "vector_41", {
                                                                      100,
                                                                      200,
                                                                      300,

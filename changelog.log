@@ -1,3 +1,8 @@
+version 1.7.8
+   - TMatrix template static and dynamic implemented.
+   - Matrix functionality extended.
+   - Neural network test example added based on TMatrix.
+
 version 1.7.7
    - Test folder introduced in framework.
    - Some tests added.

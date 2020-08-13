@@ -21,6 +21,7 @@
       <setting type="flag" value="-lframework" status="active"/>
       <setting type="flag" value="-fopenmp" status="active"/>
       <setting type="flag" value="-ltbb" status="active"/>
+      <setting type="flag" value="-lprotobuf" status="active"/>
    </settings>
 
 </project>
