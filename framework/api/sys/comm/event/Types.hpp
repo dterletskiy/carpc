@@ -19,7 +19,7 @@ namespace base_v1 {
       public:
          TBaseAsyncTypeID( ) = default;
          TBaseAsyncTypeID( const TYPE& _value ) : m_value( _value ) { }
-         TBaseAsyncTypeID( const TBaseAsyncTypeID< TYPE >& _typeid ) : m_value( _typeid.m_value ) { }
+         TBaseAsyncTypeID( const TBaseAsyncTypeID< TYPE >& _other ) : m_value( _other.m_value ) { }
          ~TBaseAsyncTypeID( ) = default;
 
       public:
@@ -52,8 +52,8 @@ namespace base_v1 {
          TAsyncTypeID( const TYPE& _value )
             : TBaseAsyncTypeID< TYPE >( _value )
          { }
-         TAsyncTypeID( const TAsyncTypeID< TYPE >& _typeid )
-            : TBaseAsyncTypeID< TYPE >( _typeid.m_value )
+         TAsyncTypeID( const TAsyncTypeID< TYPE >& _other )
+            : TBaseAsyncTypeID< TYPE >( _other.m_value )
          { }
          ~TAsyncTypeID( ) = default;
 
@@ -76,17 +76,21 @@ namespace base_v1 {
             : TBaseAsyncTypeID< TYPE >( _value )
             , m_name( base::format_string( _value ) )
          { }
-         TAsyncTypeID( const TAsyncTypeID< TYPE >& _typeid )
-            : TBaseAsyncTypeID< TYPE >( _typeid.m_value )
-            , m_name( base::format_string( _typeid.m_value ) )
+         TAsyncTypeID( const TAsyncTypeID< TYPE >& _other )
+            : TBaseAsyncTypeID< TYPE >( _other.m_value )
+            , m_name( base::format_string( _other.m_value ) )
          { }
          ~TAsyncTypeID( ) = default;
+
+      public:
+         const bool to_stream( base::dsi::tByteStream& stream ) const { return stream.push( TAsyncTypeID< TYPE >::m_value, m_name ); }
+         const bool from_stream( base::dsi::tByteStream& stream ) { return stream.pop( TAsyncTypeID< TYPE >::m_value, m_name ); }
 
       public:
          template< typename T >
             static std::size_t generate( )
             {
-               const std::string _name = typeid( T ).name( );
+               const std::string _name = base::format_string( std::hex, typeid( T ).name( ) );
                const std::size_t _hash_code = typeid( T ).hash_code( );
                SYS_MSG( "async typeid: %zu => %s", _hash_code, _name.c_str( ) );
                return typeid( T ).hash_code( );
@@ -110,7 +114,7 @@ namespace base_v2 {
       public:
          TAsyncTypeID( ) = default;
          TAsyncTypeID( const T& _value ) : m_value( _value ) { }
-         TAsyncTypeID( const TAsyncTypeID< T >& _typeid ) : m_value( _typeid.m_value ) { }
+         TAsyncTypeID( const TAsyncTypeID< T >& _other ) : m_value( _other.m_value ) { }
          ~TAsyncTypeID( ) = default;
 
       public:
@@ -156,17 +160,17 @@ namespace base_v2 {
 namespace base {
 
    // using tAsyncTypeID = std::string;
-   // using tAsyncTypeID = TAsyncTypeID< std::size_t >;
-   using tAsyncTypeID = base_v1::TAsyncTypeID< std::string >;
+   using tAsyncTypeID = base_v1::TAsyncTypeID< std::size_t >;
+   // using tAsyncTypeID = base_v1::TAsyncTypeID< std::string >;
 
    using NoServiceType = void;
    #define IS_IPC_EVENT ( false == std::is_same_v< tService, NoServiceType > )
 
-   using tSequenceID = size_t;
-   extern const tSequenceID InvalidSequenceID;
+   using tSequenceID = ID;
+   const tSequenceID InvalidSequenceID = InvalidID;
 
    using tServiceName = std::string;
-   extern const tServiceName InvalidServiceName;
+   const tServiceName InvalidServiceName = "NoName";
 
    enum class eAsyncType : size_t { EVENT, RUNNABLE, UNDEFINED };
    const char* c_str( const eAsyncType );

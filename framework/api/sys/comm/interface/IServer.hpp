@@ -1,28 +1,28 @@
 #pragma once
 
-#include "api/sys/comm/interface/IInterface.hpp"
+#include "api/sys/comm/interface/IConnection.hpp"
 
 
 
-namespace base {
+namespace base::interface {
 
-   class IServer : public IInterface
+   class IServer : public IConnection
    {
       public:
-         IServer( const std::string&, const std::string&, const eCommType );
+         IServer( const tAsyncTypeID&, const std::string&, const bool );
          ~IServer( ) override;
 
       private:
-         void connected( const void* const ) override final;
-         void disconnected( const void* const ) override final;
+         void connected( const Address& ) override final;
+         void disconnected( const Address& ) override final;
          void connected( ) override = 0;
          void disconnected( ) override = 0;
 
-      protected:
+      public:
          const bool is_connected( ) const override final;
       protected:
-         std::set< const void* > mp_proxy_set;
+         Address::tSet m_proxy_set;
 
    };
 
-} // namespace base
+} // namespace base::interface

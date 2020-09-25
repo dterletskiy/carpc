@@ -1,30 +1,29 @@
-// Application
-#include "Data.hpp"
+#include "api/sys/onoff/Data.hpp"
 
 
 
-namespace api::onoff {
+namespace base::onoff {
 
-   const std::string interface_name = data::OnOffEvent::Signature::build_type_id( ).name( );
+   const base::tAsyncTypeID interface_type_id = data::OnOffEvent::Signature::build_type_id( );
 
-   const std::vector< base::RequestResponseIDs< eOnOff > > s_rr = {
+   const std::vector< base::interface::RequestResponseIDs< eOnOff > > s_rr = {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState },
-      { eOnOff::RequestStart, eOnOff::Undefined, eOnOff::Undefined }
+      { eOnOff::RequestStart, eOnOff::RequestStartBusy, eOnOff::Undefined }
    };
 
-   const std::vector< base::NotificationIDs< eOnOff > > s_n = {
+   const std::vector< base::interface::NotificationIDs< eOnOff > > s_n = {
       { eOnOff::SubscribeCurrentState, eOnOff::UnsubscribeCurrentState, eOnOff::NotificationCurrentState }
    };
 
-} // namespace api::onoff
+} // namespace base::onoff
 
 
 
-namespace api::onoff::ipc {
+namespace base::onoff::ipc {
 
    const base::eCommType BaseTypes::COMM_TYPE = base::eCommType::IPC;
-   const std::vector< base::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
-   const std::vector< base::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
+   const std::vector< base::interface::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
+   const std::vector< base::interface::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
 
 
 
@@ -91,7 +90,7 @@ namespace api::onoff::ipc {
 
    const eOnOff RequestStartData::REQUEST = eOnOff::RequestStart;
    const eOnOff RequestStartData::RESPONSE = eOnOff::Undefined;
-   const eOnOff RequestStartData::BUSY = eOnOff::Undefined;
+   const eOnOff RequestStartData::BUSY = eOnOff::RequestStartBusy;
 
    const eOnOff RequestStartData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestStartData::id( ) const { return ID; }
@@ -129,15 +128,15 @@ namespace api::onoff::ipc {
       return nullptr != ptr;
    }
 
-} // namespace api::onoff::ipc
+} // namespace base::onoff::ipc
 
 
 
-namespace api::onoff::no_ipc {
+namespace base::onoff::no_ipc {
 
    const base::eCommType BaseTypes::COMM_TYPE = base::eCommType::ITC;
-   const std::vector< base::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
-   const std::vector< base::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
+   const std::vector< base::interface::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
+   const std::vector< base::interface::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
 
 
 
@@ -161,7 +160,7 @@ namespace api::onoff::no_ipc {
 
    const eOnOff RequestStartData::REQUEST = eOnOff::RequestStart;
    const eOnOff RequestStartData::RESPONSE = eOnOff::Undefined;
-   const eOnOff RequestStartData::BUSY = eOnOff::Undefined;
+   const eOnOff RequestStartData::BUSY = eOnOff::RequestStartBusy;
 
 
 
@@ -176,4 +175,4 @@ namespace api::onoff::no_ipc {
 
    OnOffEventData::OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
 
-} // namespace api::onoff::no_ipc
+} // namespace base::onoff::no_ipc

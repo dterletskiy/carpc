@@ -54,7 +54,6 @@ namespace base::tools::cmd {
 
 
 
-   using tCmdLineMap = std::map< std::string, std::string >;
    tCmdLineMap s_cmd_line_map;
    std::string s_delimiter = "=";
 
@@ -84,7 +83,89 @@ namespace base::tools::cmd {
       return iterator->second;
    }
 
+   const tCmdLineMap& map( )
+   {
+      return s_cmd_line_map;
+   }
+
+   void print( )
+   {
+      DBG_INF( "Command line parameters:" );
+      for( auto pair : s_cmd_line_map )
+      {
+         DBG_TRC( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
+      }
+   }
+
 } // namespace base::tools::cmd
+
+
+
+namespace base::tools::cfg {
+
+   tCfgLineMap s_cfg_line_map;
+   std::string s_delimiter = "=";
+   std::string s_file;
+
+   void init( const std::string& file )
+   {
+      if( false == s_cfg_line_map.empty( ) )
+         return;
+
+      s_file = file;
+
+      std::ifstream file_stream;
+      file_stream.open( s_file.c_str( ) );
+      // std::cout << file_stream.rdbuf( ) << std::endl;
+
+      if( false == file_stream.is_open( ) )
+      {
+         DBG_WRN( "configuration file '%s' can't be found", s_file.c_str( ) );
+         return;
+      }
+
+      while( file_stream )
+      {
+         std::string line;
+         std::getline( file_stream, line, '\n' );
+
+         if( true == line.empty( ) )
+            continue;
+
+         size_t position = line.find( s_delimiter );
+         if( std::string::npos == position )
+            s_cfg_line_map.emplace( line, std::string("") );
+         else
+            s_cfg_line_map.emplace( line.substr( 0, position ), line.substr( position + 1 ) );
+      }
+
+      file_stream.close( );
+   }
+
+   tCfgParamValue argument( const std::string& parameter )
+   {
+      const auto iterator = s_cfg_line_map.find( parameter );
+      if( s_cfg_line_map.end( ) == iterator )
+         return std::nullopt;
+
+      return iterator->second;
+   }
+
+   const tCfgLineMap& map( )
+   {
+      return s_cfg_line_map;
+   }
+
+   void print( )
+   {
+      DBG_INF( "Configuration file parameters (%s):", s_file.c_str( ) );
+      for( auto pair : s_cfg_line_map )
+      {
+         DBG_TRC( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
+      }
+   }
+
+} // namespace base::tools::cfg
 
 
 

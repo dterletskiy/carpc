@@ -91,6 +91,8 @@ namespace base {
       public:
          const bool send( const eCommType comm_type = eCommType::NONE ) override
          {
+            if( eCommType::NONE == comm_type )
+               return IEvent::send( TEvent< _Generator >::shared_from_this( ), this->comm_type( ) );
             return IEvent::send( TEvent< _Generator >::shared_from_this( ), comm_type );
          }
          const bool send_to_context( IServiceThread::tWptr pw_service ) override

@@ -216,8 +216,6 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 
 namespace base::timer {
 
-   const size_t Infinite = std::numeric_limits< size_t >::max( );
-
    ID start( const size_t milliseconds, const size_t count, std::function< void( const ID ) > callback, const bool asynchronous )
    {
       IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );

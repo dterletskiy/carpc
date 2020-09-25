@@ -8,6 +8,4 @@
 
 namespace base {
 
-   const ID InvalidID = std::numeric_limits< std::size_t >::max( );
-
 }

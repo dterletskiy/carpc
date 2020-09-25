@@ -12,9 +12,11 @@ namespace base::dsi {
    enum class eCommand : size_t
    {
       RegisterServer,
-      RegisterClient,
       UnregisterServer,
+      RegisterClient,
       UnregisterClient,
+      DetectedServer,
+      DetectedClient,
       BroadcastEvent,
       Undefined
    };

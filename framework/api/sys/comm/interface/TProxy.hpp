@@ -10,7 +10,7 @@
 
 
 
-namespace base {
+namespace base::interface {
 
    template< typename TYPES >
       class TServer;
@@ -23,7 +23,7 @@ namespace base {
 
 
 
-namespace base {
+namespace base::interface {
 
    template< typename TYPES >
    struct RequestDB
@@ -45,7 +45,7 @@ namespace base {
 
       public:
          RequestProcessor( tProxy* );
-         void server( const void* const p_server );
+         void server( const Address::tOpt& );
 
       public:
          template< typename tRequestData, typename... Args >
@@ -55,7 +55,7 @@ namespace base {
       private:
          tSequenceID                                        m_seq_id = 0;
          std::map< typename TYPES::tEventID, tRequestDB >   m_map;
-         const void*                                        mp_server = nullptr;
+         Address::tOpt                                      m_server = std::nullopt;
          tProxy*                                            mp_proxy = nullptr;
    };
 
@@ -72,9 +72,9 @@ namespace base {
    }
 
    template< typename TYPES >
-   void RequestProcessor< TYPES >::server( const void* const p_server )
+   void RequestProcessor< TYPES >::server( const Address::tOpt& server )
    {
-      mp_server = p_server;
+      m_server = server;
       for( auto item : m_map )
          item.second = tRequestDB{ };
    }
@@ -97,8 +97,24 @@ namespace base {
          // In case if count for current request id is zero this means current proxy is not subscribed for corresponding responses of mentioned request
          if( 0 == count )
          {
-            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::RESPONSE, mp_server, mp_proxy ) );
-            TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tRequestData::BUSY, mp_server, mp_proxy ) );
+            TYPES::tEvent::set_notification(
+               mp_proxy,
+               typename TYPES::tSignature(
+                  mp_proxy->signature( ).role( ),
+                  tRequestData::RESPONSE,
+                  mp_proxy->server( ).value( ),
+                  Address{ mp_proxy }
+               )
+            );
+            TYPES::tEvent::set_notification(
+               mp_proxy,
+               typename TYPES::tSignature(
+                  mp_proxy->signature( ).role( ),
+                  tRequestData::BUSY,
+                  mp_proxy->server( ).value( ),
+                  Address{ mp_proxy }
+               )
+            );
          }
          ++count;
 
@@ -114,8 +130,15 @@ namespace base {
          }
       }
 
+      typename TYPES::tSignature event_signature(
+            mp_proxy->signature( ).role( ),
+            tRequestData::REQUEST,
+            Address{ mp_proxy },
+            mp_proxy->server( ).value( ),
+            m_seq_id
+         );
       typename TYPES::tEventData data( std::make_shared< tRequestData >( args... ) );
-      TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tRequestData::REQUEST, mp_proxy, mp_server, m_seq_id ), data, TYPES::COMM_TYPE );
+      TYPES::tEvent::create_send( event_signature, data, TYPES::COMM_TYPE );
 
       return m_seq_id;
    }
@@ -144,8 +167,26 @@ namespace base {
          if( 0 == count )
          {
             if( TYPES::tEventID::Undefined != item.response )
-               TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.response, mp_server, mp_proxy ) );
-            TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), item.busy, mp_server, mp_proxy ) );
+            {
+               TYPES::tEvent::clear_notification(
+                     mp_proxy,
+                     typename TYPES::tSignature(
+                        mp_proxy->signature( ).role( ),
+                        item.response,
+                        mp_proxy->server( ).value( ),
+                        Address{ mp_proxy }
+                     )
+                  );
+            }
+            TYPES::tEvent::clear_notification(
+                  mp_proxy,
+                  typename TYPES::tSignature(
+                     mp_proxy->signature( ).role( ),
+                     item.busy,
+                     mp_proxy->server( ).value( ),
+                     Address{ mp_proxy }
+                  )
+               );
          }
 
          auto& client_map = event_id_iterator->second.m_client_map;
@@ -169,7 +210,7 @@ namespace base {
 
 
 
-namespace base {
+namespace base::interface {
 
    template< typename TYPES >
    struct NotificationDB
@@ -193,7 +234,7 @@ namespace base {
 
       public:
          NotificationProcessor( tProxy* );
-         void server( const void* const p_server );
+         void server( const Address::tOpt& );
 
       public:
          template< typename tNotificationData >
@@ -204,7 +245,7 @@ namespace base {
 
       private:
          std::map< typename TYPES::tEventID, tNotificationDB > m_map;
-         const void*                                           mp_server = nullptr;
+         Address::tOpt                                         m_server = std::nullopt;
          tProxy*                                               mp_proxy = nullptr;
    };
 
@@ -221,9 +262,9 @@ namespace base {
    }
 
    template< typename TYPES >
-   void NotificationProcessor< TYPES >::server( const void* const p_server )
+   void NotificationProcessor< TYPES >::server( const Address::tOpt& server )
    {
-      mp_server = p_server;
+      m_server = server;
       for( auto item : m_map )
          item.second = tNotificationDB{ };
    }
@@ -242,8 +283,24 @@ namespace base {
       tClientsSet& clients_set = event_id_iterator->second.m_client_set;
       if( clients_set.empty( ) )
       {
-         TYPES::tEvent::set_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, mp_server, mp_proxy ) );
-         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::SUBSCRIBE, mp_proxy, mp_server ), TYPES::COMM_TYPE );
+         TYPES::tEvent::set_notification(
+               mp_proxy,
+               typename TYPES::tSignature(
+                  mp_proxy->signature( ).role( ),
+                  tNotificationData::NOTIFICATION,
+                  mp_proxy->server( ).value( ),
+                  Address{ mp_proxy }
+               )
+            );
+         TYPES::tEvent::create_send(
+               typename TYPES::tSignature(
+                  mp_proxy->signature( ).role( ),
+                  tNotificationData::SUBSCRIBE,
+                  Address{ mp_proxy },
+                  mp_proxy->server( ).value( )
+               ),
+               TYPES::COMM_TYPE
+            );
       }
       clients_set.emplace( p_client );
 
@@ -251,7 +308,14 @@ namespace base {
       {
          SYS_TRC( "having cached attribute event" );
 
-         auto p_event = TYPES::tEvent::create( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION ) );
+         auto p_event = TYPES::tEvent::create(
+               typename TYPES::tSignature(
+                     mp_proxy->signature( ).role( ),
+                     tNotificationData::NOTIFICATION,
+                     Address{ nullptr },
+                     Address{ nullptr }
+                  )
+            );
          p_event->data( event_id_iterator->second.m_event_data.value( ) );
          auto operation = [ p_client, p_event ]( ){ p_client->process_notification_event( *p_event ); };
          Runnable::create_send( operation );
@@ -275,8 +339,24 @@ namespace base {
       clients_set.erase( p_client );
       if( clients_set.empty( ) )
       {
-         TYPES::tEvent::clear_notification( mp_proxy, typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::NOTIFICATION, mp_server, mp_proxy ) );
-         TYPES::tEvent::create_send( typename TYPES::tSignature( mp_proxy->role( ), tNotificationData::UNSUBSCRIBE, mp_proxy, mp_server ), TYPES::COMM_TYPE );
+         TYPES::tEvent::clear_notification(
+            mp_proxy,
+            typename TYPES::tSignature(
+                  mp_proxy->signature( ).role( ),
+                  tNotificationData::NOTIFICATION,
+                  mp_proxy->server( ).value( ),
+                  Address{ mp_proxy }
+               )
+         );
+         TYPES::tEvent::create_send(
+            typename TYPES::tSignature(
+               mp_proxy->signature( ).role( ),
+               tNotificationData::UNSUBSCRIBE,
+               Address{ mp_proxy },
+               mp_proxy->server( ).value( )
+            ),
+            TYPES::COMM_TYPE
+         );
          event_id_iterator->second.m_event_data = std::nullopt;
       }
 
@@ -305,7 +385,7 @@ namespace base {
 
 
 
-namespace base {
+namespace base::interface {
 
    template< typename TYPES >
    class TProxy
@@ -319,11 +399,11 @@ namespace base {
       using tAttributeMap = std::map< typename TYPES::tEventID, typename TYPES::tEvent >;
 
       private:
-         TProxy( const std::string&, const std::string& );
+         TProxy( const tAsyncTypeID&, const std::string&, const bool );
          static std::map< TID, tProxy* > s_proxy_map;
       public:
          ~TProxy( ) override;
-         static tProxy* create( const std::string&, const std::string& );
+         static tProxy* create( const tAsyncTypeID&, const std::string&, const bool );
 
       private:
          void connected( ) override final;
@@ -351,8 +431,8 @@ namespace base {
 
 
    template< typename TYPES >
-   TProxy< TYPES >::TProxy( const std::string& name, const std::string& role_name )
-      : IProxy( name, role_name, TYPES::COMM_TYPE )
+   TProxy< TYPES >::TProxy( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+      : IProxy( interface_type_id, role_name, is_import )
       , TYPES::tEventConsumer( )
       , m_request_processor( this )
       , m_notification_processor( this )
@@ -369,7 +449,7 @@ namespace base {
    std::map< TID, TProxy< TYPES >* > TProxy< TYPES >::s_proxy_map;
 
    template< typename TYPES >
-   TProxy< TYPES >* TProxy< TYPES >::create( const std::string& name, const std::string& role_name )
+   TProxy< TYPES >* TProxy< TYPES >::create( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    {
       TID tid = ServiceProcess::instance( )->current_service( )->id( );
       os::Mutex mutex( true );
@@ -381,7 +461,7 @@ namespace base {
          return iterator->second;
       }
 
-      tProxy* p_proxy = new tProxy( name, role_name );
+      tProxy* p_proxy = new tProxy( interface_type_id, role_name, is_import );
       if( nullptr == p_proxy )
       {
          SYS_ERR( "unable create proxy" );
@@ -401,23 +481,23 @@ namespace base {
    template< typename TYPES >
    void TProxy< TYPES >::connected( )
    {
-      m_request_processor.server( mp_server );
-      m_notification_processor.server( mp_server );
+      m_request_processor.server( m_server );
+      m_notification_processor.server( m_server );
    }
 
    template< typename TYPES >
    void TProxy< TYPES >::disconnected( )
    {
-      m_request_processor.server( nullptr );
-      m_notification_processor.server( nullptr );
+      m_request_processor.server( std::nullopt );
+      m_notification_processor.server( std::nullopt );
    }
 
    template< typename TYPES >
    void TProxy< TYPES >::process_event( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const void* p_from_addr = event.info( ).from_addr( );
-      const void* p_to_addr = event.info( ).to_addr( );
+      const Address& from_addr = event.info( ).from_addr( );
+      const Address& to_addr = event.info( ).to_addr( );
       const tSequenceID seq_id = event.info( ).seq_id( );
 
       SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
@@ -470,7 +550,7 @@ namespace base {
       return static_cast< tResponseData* >( event.data( )->ptr.get( ) );
    }
 
-} // namespace base
+} // namespace base::interface
 
 
 

@@ -9,63 +9,63 @@ namespace base {
 
 
 
-class ITimerConsumer;
+   class ITimerConsumer;
 
-class Timer
-{
-public:
-   using ID = os::linux::timer::TimerID;
+   class Timer
+   {
+      public:
+         using ID = os::linux::timer::TimerID;
 
-public:
-   Timer( ITimerConsumer* );
-   ~Timer( );
+      public:
+         Timer( ITimerConsumer* );
+         ~Timer( );
 
-   const bool operator<( const Timer& ) const;
+         const bool operator<( const Timer& ) const;
 
-   bool start( const long int nanoseconds );
-   bool stop( );
+         bool start( const long int nanoseconds );
+         bool stop( );
 
-public:
-   bool is_running( ) const;
-private:
-   bool              m_is_running = false;
+      public:
+         bool is_running( ) const;
+      private:
+         bool              m_is_running = false;
 
-public:
-   const ID id( ) const;
-private:
-   ID                m_id = nullptr;
+      public:
+         const ID id( ) const;
+      private:
+         ID                m_id = nullptr;
 
-public:
-   long int nanoseconds( ) const;
-private:
-   long int          m_nanoseconds = 0;
+      public:
+         long int nanoseconds( ) const;
+      private:
+         long int          m_nanoseconds = 0;
 
-private:
-   ITimerConsumer*   mp_consumer = nullptr;
-};
-
-
-
-struct TimerEventData
-{
-   Timer::ID id;
-};
-DEFINE_EVENT( TimerEvent, TimerEventData, TSignatureID< size_t > );
+      private:
+         ITimerConsumer*   mp_consumer = nullptr;
+   };
 
 
 
-class ITimerConsumer
-   : public TimerEvent::Consumer
-{
-public:
-   ITimerConsumer( );
-   virtual ~ITimerConsumer( );
+   struct TimerEventData
+   {
+      Timer::ID id;
+   };
+   DEFINE_EVENT( TimerEvent, TimerEventData, TSignatureID< size_t > );
 
-   virtual void process_timer( const Timer::ID ) = 0;
 
-private:
-   void process_event( const TimerEvent::Event& ) override;
-};
+
+   class ITimerConsumer
+      : public TimerEvent::Consumer
+   {
+      public:
+         ITimerConsumer( );
+         virtual ~ITimerConsumer( );
+
+         virtual void process_timer( const Timer::ID ) = 0;
+
+      private:
+         void process_event( const TimerEvent::Event& ) override;
+   };
 
 
 
@@ -75,7 +75,7 @@ private:
 
 namespace base::timer {
 
-   extern const size_t Infinite;
+   const std::size_t Infinite = std::numeric_limits< size_t >::max( );
 
    // This timer creates new thread and sleep it to some milliseconds. When thread is finished "callback" will be executed in context of service
    // where this timer have been called.

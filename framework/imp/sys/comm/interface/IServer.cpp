@@ -1,3 +1,4 @@
+#include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/comm/interface/IServer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -5,45 +6,49 @@
 
 
 
-using namespace base;
+namespace ev_i = base::events::interface;
+using namespace base::interface;
 
 
 
-IServer::IServer( const std::string& name, const std::string& role, const eCommType comm_type )
-   : IInterface( name, role, comm_type )
+IServer::IServer( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
+   : IConnection( interface_type_id, role_name, is_export )
 {
-   events::interface::Interface::Event::set_notification( this, { service_name( ), events::interface::eID::ClientConnected } );
-   events::interface::Interface::Event::set_notification( this, { service_name( ), events::interface::eID::ClientDisconnected } );
-   events::interface::Interface::Event::create_send( { service_name( ), events::interface::eID::ServerConnected }, { this }, m_comm_type );
+   ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ClientConnected } );
+   ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ClientDisconnected } );
+
+   auto result = ServiceProcess::instance( )->connection_db( ).register_server( signature( ), Address( this ) );
+   // Send IPC notification information about registered server to ServiceBrocker
+   if( true == is_external( ) )
+      ev_i::Action::Event::create_send( { ev_i::eAction::RegisterServer }, { signature( ), this }, eCommType::IPC );
 }
 
 IServer::~IServer( )
 {
-   events::interface::Interface::Event::clear_all_notifications( this );
-   events::interface::Interface::Event::create_send( { service_name( ), events::interface::eID::ServerDisconnected }, { this }, m_comm_type );
+   auto result = ServiceProcess::instance( )->connection_db( ).unregister_server( signature( ), Address( this ) );
+   // Send IPC notification information about registered server to ServiceBrocker
+   if( true == is_external( ) )
+      ev_i::Action::Event::create_send( { ev_i::eAction::UnregisterServer }, { signature( ), this }, eCommType::IPC );
 }
 
-void IServer::connected( const void* const p_proxy )
+void IServer::connected( const Address& proxy )
 {
    // Check if current proxy was connected previously
-   auto iterator = mp_proxy_set.find( p_proxy );
-   if( mp_proxy_set.end( ) != iterator )
+   auto iterator = m_proxy_set.find( proxy );
+   if( m_proxy_set.end( ) != iterator )
       return;
 
-   // Send event to all consumers (just connected proxy) that server is connected
-   events::interface::Interface::Event::create_send( { service_name( ), events::interface::eID::ServerConnected }, { this }, m_comm_type );
-
-   mp_proxy_set.emplace( p_proxy );
+   m_proxy_set.emplace( proxy );
    connected( );
 }
 
-void IServer::disconnected( const void* const p_proxy )
+void IServer::disconnected( const Address& proxy )
 {
-   mp_proxy_set.erase( p_proxy );
-   disconnected( );
+   if( 0 != m_proxy_set.erase( proxy ) )
+      disconnected( );
 }
 
 const bool IServer::is_connected( ) const
 {
-   return false == mp_proxy_set.empty( );
+   return false == m_proxy_set.empty( );
 }

@@ -10,7 +10,6 @@ using namespace base;
 
 
 
-
 const bool IRunnable::send( )
 {
    IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );

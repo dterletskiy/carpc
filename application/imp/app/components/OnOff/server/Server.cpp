@@ -6,12 +6,12 @@
 
 
 
-namespace application::components::onoff {
+using namespace application::components::onoff;
 
 
 
 Server::Server( const std::string& role_name, const std::string& name )
-   : api::onoff::Server( role_name )
+   : base::onoff::Server( role_name )
    , m_name( name )
 {
    DBG_MSG( "%s: created", m_name.c_str( ) );
@@ -52,7 +52,3 @@ void Server::process_timer( const base::Timer::ID id )
    current_state( iterator->current_state );
    m_timers.erase( iterator );
 }
-
-
-
-} // namespace application::components::onoff

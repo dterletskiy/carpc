@@ -1,3 +1,15 @@
+version 1.8.0
+   - IInterface renamed to IConnection.
+   - namespace interface introduced.
+   - Interface server proxy connection handling moved to ServiceIpcThread.
+   - Processing configuration file for application.
+   - Huge refactoring in IPC communication.
+   - Fixed bug in TSignatureService copy constructor.
+   - Interface signature introduced.
+   - Inteface registration logic changed.
+   - Test applications "core" and "controller" implemented.
+   - OnOff interface moved to framework.
+
 version 1.7.8
    - TMatrix template static and dynamic implemented.
    - Matrix functionality extended.

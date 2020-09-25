@@ -15,6 +15,11 @@ namespace base {
     * Building formated string
     * 
     ***************************************************************************************************/
+
+   const auto DEC = std::dec;
+   const auto HEX = std::hex;
+   const auto OCT = std::oct;
+
    template< typename ... TYPES >
    const std::string format_string( const TYPES& ... args )
    {

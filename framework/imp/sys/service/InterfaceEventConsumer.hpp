@@ -1,7 +1,6 @@
 #pragma once
 
 #include "api/sys/events/Events.hpp"
-#include "api/sys/comm/interface/IServer.hpp"
 
 
 
@@ -9,7 +8,7 @@ namespace base {
 
    class ServiceIpcThread;
 
-   class InterfaceEventConsumer : public events::interface::Interface::Consumer
+   class InterfaceEventConsumer : public events::interface::Action::Consumer
    {
       public:
          InterfaceEventConsumer( ServiceIpcThread& );
@@ -19,16 +18,10 @@ namespace base {
          InterfaceEventConsumer& operator=( const InterfaceEventConsumer& ) = delete;
 
       private:
-         void process_event( const events::interface::Interface::Event& ) override;
+         void process_event( const events::interface::Action::Event& ) override;
 
       private:
          ServiceIpcThread& m_service;
-
-      private:
-         std::list< std::string > m_local_servers;
-         std::list< std::string > m_external_servers;
-         std::list< std::string > m_local_clients;
-         std::list< std::string > m_external_clients;
    };
 
 } // namespace base

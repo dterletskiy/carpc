@@ -11,10 +11,14 @@
 
 namespace base::os::linux::socket {
 
-   const tSocket InvalidSocket = -1;
    int error = 0;
 
 
+
+   void configuration::print( const std::string& _message ) const
+   {
+      SYS_INF( "%s => domain: %d / type: %d / protocole: %d / address: %s / port: %d", _message.c_str( ), domain, type, protocole, address.c_str( ), port );
+   }
 
    socket_addr::socket_addr( const int _domain, const char* const _address, const int _port )
    {
@@ -52,6 +56,8 @@ namespace base::os::linux::socket {
          case AF_INET6:
          default:          break;
       }
+
+      print( m_addr );
    }
 
    socket_addr::~socket_addr( )
@@ -186,18 +192,81 @@ namespace base::os::linux::socket {
 
 namespace base::os::linux::socket {
 
+   void print( const sockaddr* sa )
+   {
+      char* c_address = nullptr;
+      std::string domain( "Unknown AF" );
+
+      switch( sa->sa_family )
+      {
+         case AF_UNIX:
+         {
+            domain = "AF_UNIX";
+            const size_t maxlen = 256;
+            c_address = (char*)malloc( maxlen );
+            struct sockaddr_un* addr_un = (struct sockaddr_un*)sa;
+            strncpy( c_address, addr_un->sun_path, maxlen );
+            break;
+         }
+
+         case AF_INET:
+         {
+            domain = "AF_INET";
+            const size_t maxlen = INET_ADDRSTRLEN;
+            c_address = (char*)malloc( maxlen );
+            struct sockaddr_in* addr_in = (struct sockaddr_in*)sa;
+            inet_ntop( AF_INET, &(addr_in->sin_addr), c_address, maxlen );
+            break;
+         }
+
+         case AF_INET6:
+         {
+            domain = "AF_INET6";
+            const size_t maxlen = INET6_ADDRSTRLEN;
+            c_address = (char*)malloc( maxlen );
+            struct sockaddr_in6* addr_in6 = (struct sockaddr_in6*)sa;
+            inet_ntop( AF_INET6, &(addr_in6->sin6_addr), c_address, maxlen );
+            break;
+         }
+
+         default:
+         {
+            const size_t maxlen = 256;
+            c_address = (char*)malloc( maxlen );
+            strncpy( c_address, "Unknown AF", maxlen );
+            break;
+         }
+      }
+
+      SYS_INF( "sockaddr: %p / domain: %s / address: %s", sa, domain.c_str( ), c_address );
+      free( c_address );
+   }
+
    void info( const tSocket _socket, const char* _message )
    {
       struct sockaddr_in address;
       socklen_t addrlen = sizeof( address );
 
-      getpeername( _socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
+      // getpeername( _socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
+      getsockname( _socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
       SYS_INF( "%s, ip:port/socket - %s:%d/%d ", _message, inet_ntoa(address.sin_addr), ntohs(address.sin_port), _socket );
 
       // printf( "%hd / %hu / %u / ", address.sin_family, address.sin_port, address.sin_addr.s_addr );
       // for( size_t i = 0; i < 8; ++i )
       //    printf( "%#x ", address.sin_zero[i] );
       // printf( "\n" );
+   }
+
+   void info( const tSocket _socket, configuration& _config )
+   {
+      struct sockaddr_in address;
+      socklen_t addrlen = sizeof( address );
+
+      // getpeername( _socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
+      getsockname( _socket , (struct sockaddr*)&address , (socklen_t*)&addrlen );
+      _config.address = inet_ntoa(address.sin_addr);
+      _config.port = ntohs(address.sin_port);
+
    }
 
    const tSocket create_server( const configuration& _config )
@@ -270,7 +339,7 @@ namespace base::os::linux::socket {
 
    const bool bind( const tSocket _socket, const configuration _config )
    {
-      return base::os::linux::socket::bind( _socket, _config.domain, _config.address, _config.port );
+      return base::os::linux::socket::bind( _socket, _config.domain, _config.address.c_str( ), _config.port );
    }
 
    const bool connect( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
@@ -300,7 +369,7 @@ namespace base::os::linux::socket {
 
    const bool connect( const tSocket _socket, const configuration _config )
    {
-      return base::os::linux::socket::connect( _socket, _config.domain, _config.address, _config.port );
+      return base::os::linux::socket::connect( _socket, _config.domain, _config.address.c_str( ), _config.port );
    }
 
    const bool listen( const tSocket _socket, const int _backlog )
@@ -340,7 +409,7 @@ namespace base::os::linux::socket {
       if( nullptr == _buffer )
       {
          SYS_ERR( "recv(%d): buffer is nullptr", _socket );
-         return false;
+         return 0;
       }
 
       ssize_t size = ::recv( _socket, _buffer, _size, _flags );

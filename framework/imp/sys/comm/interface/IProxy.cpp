@@ -1,3 +1,4 @@
+#include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/comm/interface/IProxy.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -5,39 +6,53 @@
 
 
 
-using namespace base;
+namespace ev_i = base::events::interface;
+using namespace base::interface;
 
 
 
-IProxy::IProxy( const std::string& name, const std::string& role, const eCommType comm_type )
-   : IInterface( name, role, comm_type )
+IProxy::IProxy( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+   : IConnection( interface_type_id, role_name, is_import )
 {
-   events::interface::Interface::Event::set_notification( this, { service_name( ), events::interface::eID::ServerConnected } );
-   events::interface::Interface::Event::create_send( { service_name( ), events::interface::eID::ClientConnected }, { this }, m_comm_type );
+   ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ServerConnected } );
+
+   auto result = ServiceProcess::instance( )->connection_db( ).register_client( signature( ), Address( this ) );
+   // Send IPC notification information about registered client to ServiceBrocker
+   // in case of there is no registered server with current service name and client could
+   // export interface
+   if( interface::ConnectionDB::eResult::OK_NotPaired == result )
+   {
+      if( true == is_external( ) )
+         ev_i::Action::Event::create_send( { ev_i::eAction::RegisterClient }, { signature( ), this }, eCommType::IPC );
+   }
 }
 
 IProxy::~IProxy( )
 {
-   events::interface::Interface::Event::clear_all_notifications( this );
-   events::interface::Interface::Event::create_send( { service_name( ), events::interface::eID::ClientDisconnected }, { this }, m_comm_type );
+   auto result = ServiceProcess::instance( )->connection_db( ).unregister_client( signature( ), Address( this ) );
+   // Send IPC notification information about registered client to ServiceBrocker
+   // in case of there client could exports interface
+   if( interface::ConnectionDB::eResult::OK_NotPaired == result )
+   {
+      ev_i::Action::Event::create_send( { ev_i::eAction::UnregisterClient }, { signature( ), this }, eCommType::IPC );
+   }
 }
 
-void IProxy::connected( const void* const p_server )
+void IProxy::connected( const Address& server )
 {
-   if( nullptr != mp_server )
+   if( std::nullopt != m_server )
    {
-      if( p_server != mp_server )
+      if( server != m_server )
       {
-         SYS_ERR( "Current connected server: %p. Newly connected server: %p", mp_server, p_server );
+         SYS_ERR( "Current connected server: %p. Newly connected server: %p", m_server.value( ).ptr( ), server.ptr( ) );
       }
       return;
    }
 
-   events::interface::Interface::Event::clear_notification( this, { service_name( ), events::interface::eID::ServerConnected } );
-   events::interface::Interface::Event::set_notification( this, { service_name( ), events::interface::eID::ServerDisconnected } );
-   events::interface::Interface::Event::create_send( { service_name( ), events::interface::eID::ClientConnected }, { this }, m_comm_type );
+   ev_i::Status::Event::clear_notification( this, { signature( ), ev_i::eStatus::ServerConnected } );
+   ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ServerDisconnected } );
 
-   mp_server = p_server;
+   m_server = server;
 
    for( auto item : m_client_set )
       item->connected( );
@@ -45,12 +60,12 @@ void IProxy::connected( const void* const p_server )
    connected( );
 }
 
-void IProxy::disconnected( const void* const p_server )
+void IProxy::disconnected( const Address& server )
 {
-   events::interface::Interface::Event::set_notification( this, { service_name( ), events::interface::eID::ServerConnected } );
-   events::interface::Interface::Event::clear_notification( this, { service_name( ), events::interface::eID::ServerDisconnected } );
+   ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ServerConnected } );
+   ev_i::Status::Event::clear_notification( this, { signature( ), ev_i::eStatus::ServerDisconnected } );
 
-   mp_server = nullptr;
+   m_server.reset( );
 
    for( auto item : m_client_set )
       item->disconnected( );
@@ -60,7 +75,7 @@ void IProxy::disconnected( const void* const p_server )
 
 const bool IProxy::is_connected( ) const
 {
-   return nullptr != mp_server;
+   return std::nullopt != m_server;
 }
 
 void IProxy::register_client( IClient* p_client )

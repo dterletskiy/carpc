@@ -7,12 +7,12 @@
 
 
 
-namespace application::clients::onoff {
+using namespace application::clients::onoff;
 
 
 
 Client::Client( const std::string& role_name, const std::string& name, tConnectedCallback connected_callback )
-   : api::onoff::Client( role_name )
+   : base::onoff::Client( role_name )
    , m_name( name )
    , m_connected_callback( connected_callback )
 {
@@ -41,7 +41,7 @@ void Client::disconnected( )
 void Client::request_start( )
 {
    DBG_MSG( "%s", m_name.c_str( ) );
-   api::onoff::Client::request_start( );
+   base::onoff::Client::request_start( );
 }
 
 
@@ -53,7 +53,7 @@ void Client::response_trigger_state( const bool result )
 void Client::request_trigger_state( const std::string& state, const size_t delay )
 {
    DBG_MSG( "%s: state: %s / delay: %zu", m_name.c_str( ), state.c_str( ), delay );
-   api::onoff::Client::request_trigger_state( state, delay );
+   base::onoff::Client::request_trigger_state( state, delay );
 }
 
 void Client::request_trigger_state_failed( )
@@ -65,7 +65,3 @@ void Client::on_current_state( const std::string& state )
 {
    DBG_MSG( "%s: current state changed to '%s'", m_name.c_str( ), state.c_str( ) );
 }
-
-
-
-} // namespace application::clients::onoff

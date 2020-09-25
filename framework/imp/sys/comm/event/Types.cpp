@@ -25,7 +25,4 @@ namespace base {
       }
    }
 
-   const tSequenceID InvalidSequenceID = 0;
-   const tServiceName InvalidServiceName = "NoName";
-
 }

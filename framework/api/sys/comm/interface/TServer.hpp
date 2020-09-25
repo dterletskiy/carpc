@@ -7,7 +7,7 @@
 
 
 
-namespace base {
+namespace base::interface {
 
    template< typename TYPES >
       class TProxy;
@@ -16,7 +16,7 @@ namespace base {
 
 
 
-namespace base {
+namespace base::interface {
 
    enum class eRequestStatus : size_t { BUSY, READY };
 
@@ -25,7 +25,7 @@ namespace base {
       RequestInfo( const tSequenceID _server_seq_id )
          : server_seq_id( _server_seq_id )
       { }
-      RequestInfo( const tSequenceID _server_seq_id, const tSequenceID _client_seq_id, const void* _client_addr )
+      RequestInfo( const tSequenceID _server_seq_id, const tSequenceID _client_seq_id, const Address _client_addr )
          : server_seq_id( _server_seq_id )
          , client_seq_id( _client_seq_id )
          , client_addr( _client_addr )
@@ -34,7 +34,7 @@ namespace base {
 
       tSequenceID server_seq_id = InvalidSequenceID;
       tSequenceID client_seq_id = InvalidSequenceID;
-      const void* client_addr = nullptr;
+      const Address client_addr;
    };
 
    struct RequestStatus
@@ -48,7 +48,7 @@ namespace base {
 
 
 
-namespace base {
+namespace base::interface {
 
    template< typename TYPES >
    struct NotificationStatus
@@ -61,7 +61,7 @@ namespace base {
 
 
 
-namespace base {
+namespace base::interface {
 
    template< typename TYPES >
    class TServer
@@ -74,7 +74,7 @@ namespace base {
       using tAttributeStatusMap = std::map< typename TYPES::tEventID, tNotificationStatus >;
 
       public:
-         TServer( const std::string&, const std::string& );
+         TServer( const tAsyncTypeID&, const std::string&, const bool );
          ~TServer( ) override;
 
       protected:
@@ -111,20 +111,29 @@ namespace base {
 
 
    template< typename TYPES >
-   TServer< TYPES >::TServer( const std::string& name, const std::string& role_name )
-      : IServer( name, role_name, TYPES::COMM_TYPE )
+   TServer< TYPES >::TServer( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
+      : IServer( interface_type_id, role_name, is_export )
       , TYPES::tEventConsumer( )
    {
       for( auto rr_item : TYPES::RR )
       {
          m_request_status_map.emplace( rr_item, RequestStatus{ } );
-         TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), rr_item.request, nullptr, this ) );
+         TYPES::tEvent::set_notification(
+            this,
+            typename TYPES::tSignature( signature( ).role( ), rr_item.request, Address{ nullptr }, Address{ this } )
+         );
       }
       for( auto n_item : TYPES::N )
       {
          m_attribute_status_map.emplace( n_item.notification, tNotificationStatus{ } );
-         TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), n_item.subscribe, nullptr, this ) );
-         TYPES::tEvent::set_notification( this, typename TYPES::tSignature( role( ), n_item.unsubscribe, nullptr, this ) );
+         TYPES::tEvent::set_notification(
+            this,
+            typename TYPES::tSignature( signature( ).role( ), n_item.subscribe, Address{ nullptr }, Address{ this } )
+         );
+         TYPES::tEvent::set_notification(
+            this,
+            typename TYPES::tSignature( signature( ).role( ), n_item.unsubscribe, Address{ nullptr }, Address{ this } )
+         );
       }
    }
 
@@ -159,7 +168,7 @@ namespace base {
    bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const void* p_from_addr = event.info( ).from_addr( );
+      const Address& from_addr = event.info( ).from_addr( );
       const tSequenceID seq_id = event.info( ).seq_id( );
 
       // Find request event_id in request status map
@@ -182,7 +191,9 @@ namespace base {
       {
          SYS_WRN( "request busy: %s", to_string( event_id ).c_str( ) );
          // Sending event with request busy id
-         TYPES::tEvent::create_send( typename TYPES::tSignature( role( ), rrIDs.busy, this, p_from_addr, seq_id ), TYPES::COMM_TYPE );
+         TYPES::tEvent::create_send(
+            typename TYPES::tSignature( signature( ).role( ), rrIDs.busy, Address{ this }, from_addr, seq_id ), TYPES::COMM_TYPE
+         );
          return false;
       }
 
@@ -191,7 +202,7 @@ namespace base {
       // Increment common sequence ID and set it's value to current processing sequence ID for current request ID
       request_status.processing_server_seq_id = ++m_seq_id;
       // Store RequestInfo structure to request info set 
-      request_status.info_set.emplace( m_seq_id, seq_id, p_from_addr );
+      request_status.info_set.emplace( m_seq_id, seq_id, from_addr );
       return true;
    }
 
@@ -263,18 +274,18 @@ namespace base {
       if( std::nullopt == request_info )
          return;
 
-      typename TYPES::tEventData data( std::make_shared< tResponseData >( args... ) );
-      TYPES::tEvent::create_send(
-         typename TYPES::tSignature( role( ), tResponseData::RESPONSE, this, request_info.value( ).client_addr, request_info.value( ).client_seq_id )
-         , data, TYPES::COMM_TYPE
+      typename TYPES::tSignature event_signature(
+         signature( ).role( ), tResponseData::RESPONSE, this, request_info.value( ).client_addr, request_info.value( ).client_seq_id
       );
+      typename TYPES::tEventData data( std::make_shared< tResponseData >( args... ) );
+      TYPES::tEvent::create_send( event_signature, data, TYPES::COMM_TYPE );
    }
 
    template< typename TYPES >
    bool TServer< TYPES >::process_subscription( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const void* p_from_addr = event.info( ).from_addr( );
+      const Address& from_addr = event.info( ).from_addr( );
 
       for( auto& item : TYPES::N )
       {
@@ -295,11 +306,9 @@ namespace base {
 
          if( notification_status.is_subscribed && notification_status.data )
          {
+            typename TYPES::tSignature event_signature( signature( ).role( ), item.notification, Address{ this }, from_addr );
             typename TYPES::tEventData data( notification_status.data );
-            TYPES::tEvent::create_send(
-               typename TYPES::tSignature( role( ), item.notification, this, p_from_addr )
-               , data, TYPES::COMM_TYPE
-            );
+            TYPES::tEvent::create_send( event_signature, data, TYPES::COMM_TYPE );
          }
 
          return true;
@@ -325,11 +334,11 @@ namespace base {
 
       if( true == iterator->second.is_subscribed )
       {
-         typename TYPES::tEventData data( p_base_data );
-         TYPES::tEvent::create_send(
-            typename TYPES::tSignature( role( ), tNotificationData::NOTIFICATION, this, nullptr )
-            , data, TYPES::COMM_TYPE
+         typename TYPES::tSignature event_signature(
+            signature( ).role( ), tNotificationData::NOTIFICATION, Address{ this }, Address{ nullptr }
          );
+         typename TYPES::tEventData data( p_base_data );
+         TYPES::tEvent::create_send( event_signature, data, TYPES::COMM_TYPE );
       }
    }
 
@@ -354,7 +363,7 @@ namespace base {
       return static_cast< tRequestData* >( event.data( )->ptr.get( ) );
    }
 
-} // namespace base
+} // namespace base::interface
 
 
 

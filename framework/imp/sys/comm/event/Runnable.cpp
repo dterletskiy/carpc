@@ -9,7 +9,6 @@ using namespace base;
 
 
 
-
 Runnable::tSptr Runnable::create( const tOperation operation )
 {
    return std::make_shared< Runnable >( operation );

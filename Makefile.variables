@@ -78,11 +78,6 @@ PROJECT_FRAMEWORK_DIR        := $(ROOT_DIR)/$(PROJECT_FRAMEWORK_NAME)
 PRODUCT_FRAMEWORK_DIR        := $(PROJECT_FRAMEWORK_DIR)_product
 FRAMEWORK_MAKE_PARAMS        := PROJECT_NAME=$(PROJECT_FRAMEWORK_NAME) PROJECT_DIR=$(PROJECT_FRAMEWORK_DIR) PRODUCT_DIR=$(PRODUCT_FRAMEWORK_DIR)
 
-PROJECT_APPLICATION_NAME     := application
-PROJECT_APPLICATION_DIR      := $(ROOT_DIR)/$(PROJECT_APPLICATION_NAME)
-PRODUCT_APPLICATION_DIR      := $(PROJECT_APPLICATION_DIR)_product
-APPLICATION_MAKE_PARAMS      := PROJECT_NAME=$(PROJECT_APPLICATION_NAME) PROJECT_DIR=$(PROJECT_APPLICATION_DIR) PRODUCT_DIR=$(PRODUCT_APPLICATION_DIR)
-
 PROJECT_SERVICEBROCKER_NAME  := servicebrocker
 PROJECT_SERVICEBROCKER_DIR   := $(ROOT_DIR)/$(PROJECT_SERVICEBROCKER_NAME)
 PRODUCT_SERVICEBROCKER_DIR   := $(PROJECT_SERVICEBROCKER_DIR)_product
@@ -92,6 +87,21 @@ PROJECT_HOOKS_NAME           := hooks
 PROJECT_HOOKS_DIR            := $(ROOT_DIR)/$(PROJECT_HOOKS_NAME)
 PRODUCT_HOOKS_DIR            := $(PROJECT_HOOKS_DIR)_product
 HOOKS_MAKE_PARAMS            := PROJECT_NAME=$(PROJECT_HOOKS_NAME) PROJECT_DIR=$(PROJECT_HOOKS_DIR) PRODUCT_DIR=$(PRODUCT_HOOKS_DIR)
+
+PROJECT_APPLICATION_NAME     := application
+PROJECT_APPLICATION_DIR      := $(ROOT_DIR)/$(PROJECT_APPLICATION_NAME)
+PRODUCT_APPLICATION_DIR      := $(PROJECT_APPLICATION_DIR)_product
+APPLICATION_MAKE_PARAMS      := PROJECT_NAME=$(PROJECT_APPLICATION_NAME) PROJECT_DIR=$(PROJECT_APPLICATION_DIR) PRODUCT_DIR=$(PRODUCT_APPLICATION_DIR)
+
+PROJECT_CORE_NAME            := core
+PROJECT_CORE_DIR             := $(ROOT_DIR)/$(PROJECT_CORE_NAME)
+PRODUCT_CORE_DIR             := $(PROJECT_CORE_DIR)_product
+CORE_MAKE_PARAMS             := PROJECT_NAME=$(PROJECT_CORE_NAME) PROJECT_DIR=$(PROJECT_CORE_DIR) PRODUCT_DIR=$(PRODUCT_CORE_DIR)
+
+PROJECT_CONTROLLER_NAME      := controller
+PROJECT_CONTROLLER_DIR       := $(ROOT_DIR)/$(PROJECT_CONTROLLER_NAME)
+PRODUCT_CONTROLLER_DIR       := $(PROJECT_CONTROLLER_DIR)_product
+CONTROLLER_MAKE_PARAMS       := PROJECT_NAME=$(PROJECT_CONTROLLER_NAME) PROJECT_DIR=$(PROJECT_CONTROLLER_DIR) PRODUCT_DIR=$(PRODUCT_CONTROLLER_DIR)
 
 
 
@@ -109,13 +119,13 @@ CONSTANTS    := -DLINUX=0 -DANDROID=1 -DWINDOWS=2 -DSTD=3 -DOS=LINUX
 
 CCONFIG      := -DCOLORED_TRACE
 ifeq ($(MEMORY_HOOK),1)
-	CCONFIG += -DHOOK_MEMORY_ALLOCATOR
+   CCONFIG += -DHOOK_MEMORY_ALLOCATOR
 endif
 ifeq ($(ACTIVE_SYS_TRACE),1)
-	CCONFIG += -DSYS_TRACE
+   CCONFIG += -DSYS_TRACE
 endif
 ifeq ($(ACTIVE_DBG_TRACE),1)
-	CCONFIG += -DDBG_TRACE
+   CCONFIG += -DDBG_TRACE
 endif
 
 CFLAGS       += $(CXXFLAGS)
@@ -133,7 +143,7 @@ LDFLAGS      += -lrt -ldl -v
 # LDFLAGS      += -larmadillo
 # LDFLAGS      += -lprotobuf
 ifeq ($(MEMORY_HOOK),1)
-	LDFLAGS += -L$(PRODUCT_HOOKS_DIR)/lib -lhooks
+   LDFLAGS += -L$(PRODUCT_HOOKS_DIR)/lib -lhooks
 endif
 
 
@@ -144,75 +154,75 @@ endif
 #                                         #
 ###########################################
 define create_directories
-	@echo "Create directories: " $(1)
-	@mkdir -p $(1)
+   @echo "Create directories: " $(1)
+   @mkdir -p $(1)
 endef
 
 define delete_directories
-	@echo "Delete directories: " $(1)
-	@rm -rf $(1)
+   @echo "Delete directories: " $(1)
+   @rm -rf $(1)
 endef
 
 define compile
-	@echo "---------------------------------------------------------"
-	@echo "Compiling..."
-	@echo "   Compiler:   " $(1)
-	@echo "   Flags:      " $(2)
-	@echo "   Includes:   " $(3)
-	@echo "   Object:     " $(4)
-	@echo "   Source:     " $(5)
-	$(call create_directories,$(dir $(4)))
-	$(1) $(2) $(3) -c -o $(4) $(5)
-	@echo "---------------------------------------------------------"
+   @echo "---------------------------------------------------------"
+   @echo "Compiling..."
+   @echo "   Compiler:   " $(1)
+   @echo "   Flags:      " $(2)
+   @echo "   Includes:   " $(3)
+   @echo "   Object:     " $(4)
+   @echo "   Source:     " $(5)
+   $(call create_directories,$(dir $(4)))
+   $(1) $(2) $(3) -c -o $(4) $(5)
+   @echo "---------------------------------------------------------"
 endef
 
 define generate
-	@echo "---------------------------------------------------------"
-	@echo "Generating..."
-	@echo "   Compiler:   " $(1)
-	@echo "   Flags:      " $(2)
-	@echo "   Includes:   " $(3)
-	@echo "   Object:     " $(4)
-	@echo "   Source:     " $(5)
-	$(call create_directories,$(dir $(4)))
-	$(1) $(2) $(3) -E -o $(4) $(5)
-	@echo "---------------------------------------------------------"
+   @echo "---------------------------------------------------------"
+   @echo "Generating..."
+   @echo "   Compiler:   " $(1)
+   @echo "   Flags:      " $(2)
+   @echo "   Includes:   " $(3)
+   @echo "   Object:     " $(4)
+   @echo "   Source:     " $(5)
+   $(call create_directories,$(dir $(4)))
+   $(1) $(2) $(3) -E -o $(4) $(5)
+   @echo "---------------------------------------------------------"
 endef
 
 define link
-	@echo "---------------------------------------------------------"
-	@echo "Linkin..."
-	@echo "   Compiler:   " $(1)
-	@echo "   Flags:      " $(2)
-	@echo "   Executeble: " $(3)
-	@echo "   Objects:    " $(4)
-	$(1) -o $(3) $(4) $(2)
-	@echo "---------------------------------------------------------"
+   @echo "---------------------------------------------------------"
+   @echo "Linkin..."
+   @echo "   Compiler:   " $(1)
+   @echo "   Flags:      " $(2)
+   @echo "   Executeble: " $(3)
+   @echo "   Objects:    " $(4)
+   $(1) -o $(3) $(4) $(2)
+   @echo "---------------------------------------------------------"
 endef
 
 define build_source_list
 endef
 
 define print_info
-	@echo "###########################################################"
-	@echo "#                                                       '#'"
-	@echo "            information:  '$(1)'"
-	@echo "#                                                       '#'"
-	@echo "###########################################################"
-	@echo PROJECT_NAME: $(1)
-	@echo PROJECT_DIR: $(2)
-	@echo PRODUCT_DIR: $(3)
-	@echo --------------- Source files ---------------
-	@echo $(4)
-	@echo -------------- Generated files -------------
-	@echo $(5)
-	@echo --------------- Object files ---------------
-	@echo $(6)
-	@echo ------------- Object PIC files -------------
-	@echo $(7)
-	@echo --------------------------------------------
+   @echo "###########################################################"
+   @echo "#                                                       '#'"
+   @echo "            information:  '$(1)'"
+   @echo "#                                                       '#'"
+   @echo "###########################################################"
+   @echo PROJECT_NAME: $(1)
+   @echo PROJECT_DIR: $(2)
+   @echo PRODUCT_DIR: $(3)
+   @echo --------------- Source files ---------------
+   @echo $(4)
+   @echo -------------- Generated files -------------
+   @echo $(5)
+   @echo --------------- Object files ---------------
+   @echo $(6)
+   @echo ------------- Object PIC files -------------
+   @echo $(7)
+   @echo --------------------------------------------
 endef
 
 define test
-	$(1) := 111
+   $(1) := 111
 endef

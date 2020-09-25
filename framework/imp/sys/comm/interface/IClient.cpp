@@ -5,14 +5,4 @@
 
 
 
-using namespace base;
-
-
-
-IClient::IClient( )
-{
-}
-
-IClient::~IClient( )
-{
-}
+using namespace base::interface;

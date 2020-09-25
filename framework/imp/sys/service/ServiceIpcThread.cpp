@@ -1,10 +1,11 @@
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/oswrappers/Socket.hpp"
-#include "api/sys/configuration/DSI.hpp"
 #include "api/sys/comm/event/Event.hpp"
-#include "api/sys/service/ServiceIpcThread.hpp"
 #include "api/sys/dsi/Types.hpp"
+#include "api/sys/comm/interface/Types.hpp"
+#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/service/ServiceIpcThread.hpp"
 #include "imp/sys/service/ServiceEventConsumer.hpp"
 #include "imp/sys/service/InterfaceEventConsumer.hpp"
 
@@ -13,11 +14,10 @@
 
 
 
+namespace ev_i = base::events::interface;
 using namespace base;
 
 
-
-ServiceIpcThread::tSptr ServiceIpcThread::mp_instance;
 
 ServiceIpcThread::ServiceIpcThread( )
    : m_name( "IPC" )
@@ -25,8 +25,8 @@ ServiceIpcThread::ServiceIpcThread( )
    , m_events( )
    , m_buffer_cond_var( )
    , m_event_consumers_map( )
-   , m_socket_sb( configuration::dsi::service_brocker, configuration::dsi::buffer_size )
-   , m_socket_master( configuration::dsi::application, configuration::dsi::buffer_size )
+   , m_socket_sb( ServiceProcess::instance( )->configuration( ).ipc_sb, ServiceProcess::instance( )->configuration( ).ipc_sb_buffer_size )
+   , m_socket_master( ServiceProcess::instance( )->configuration( ).ipc_app, ServiceProcess::instance( )->configuration( ).ipc_app_buffer_size )
 {
    mp_thread_send = std::make_shared< base::os::Thread >( std::bind( &ServiceIpcThread::thread_loop_send, this ) );
    mp_thread_receive = std::make_shared< base::os::Thread >( std::bind( &ServiceIpcThread::thread_loop_receive, this ) );
@@ -39,23 +39,13 @@ ServiceIpcThread::~ServiceIpcThread( )
    SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
 }
 
-namespace { os::Mutex s_mutex; }
-ServiceIpcThread::tSptr ServiceIpcThread::instance( )
-{
-   base::os::MutexAutoLocker locker( s_mutex );
-   if( nullptr == mp_instance )
-      mp_instance.reset( new ServiceIpcThread( ) );
-
-   return mp_instance;
-}
-
 void ServiceIpcThread::thread_loop_send( )
 {
    SYS_INF( "'%s': enter", m_name.c_str( ) );
    m_started_send = true;
 
-   ServiceEventConsumer service_event_consumer( *this );
-   // InterfaceEventConsumer interface_event_consumer( *this );
+   mp_service_event_consumer = std::make_shared< ServiceEventConsumer >( *this );
+   mp_interface_event_consumer = std::make_shared< InterfaceEventConsumer >( *this );
 
    while( started_send( ) )
    {
@@ -63,6 +53,9 @@ void ServiceIpcThread::thread_loop_send( )
       SYS_TRC( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       notify( p_event );
    }
+
+   mp_service_event_consumer.reset( );
+   mp_interface_event_consumer.reset( );
 
    SYS_INF( "'%s': exit", m_name.c_str( ) );
 }
@@ -72,29 +65,43 @@ void ServiceIpcThread::thread_loop_receive( )
    SYS_INF( "'%s': enter", m_name.c_str( ) );
    m_started_receive = true;
 
+   os::linux::socket::fd fd_set;
+   os::linux::socket::tSocket max_socket = os::linux::socket::InvalidSocket;
 
    while( started_receive( ) )
    {
-      m_fd.reset( );
-      m_fd.set( m_socket_sb.socket( ), os::linux::socket::fd::eType::READ );
-      os::linux::socket::tSocket max_socket = m_socket_sb.socket( );
-      m_fd.set( m_socket_master.socket( ), os::linux::socket::fd::eType::READ );
+      fd_set.reset( );
+      fd_set.set( m_socket_sb.socket( ), os::linux::socket::fd::eType::READ );
+      max_socket = m_socket_sb.socket( );
+      fd_set.set( m_socket_master.socket( ), os::linux::socket::fd::eType::READ );
       if( m_socket_master.socket( ) > max_socket )
          max_socket = m_socket_master.socket( );
       for( const auto& p_slave_socket : m_sockets_slave )
       {
-         m_fd.set( p_slave_socket->socket( ), os::linux::socket::fd::eType::READ );
+         fd_set.set( p_slave_socket->socket( ), os::linux::socket::fd::eType::READ );
          if( p_slave_socket->socket( ) > max_socket )
             max_socket = p_slave_socket->socket( );
       }
+      for( const auto& p_client_socket : m_sockets_client )
+      {
+         fd_set.set( p_client_socket->socket( ), os::linux::socket::fd::eType::READ );
+         if( p_client_socket->socket( ) > max_socket )
+            max_socket = p_client_socket->socket( );
+      }
       SYS_INF( "max_socket = %d", max_socket );
 
-      if( false == os::linux::socket::select( max_socket, m_fd ) )
+      if( false == os::linux::socket::select( max_socket, fd_set ) )
          continue;
 
-      if( true == m_fd.is_set( m_socket_sb.socket( ), os::linux::socket::fd::eType::READ ) )
+      // process service brocker sockets
+      if( true == fd_set.is_set( m_socket_sb.socket( ), os::linux::socket::fd::eType::READ ) )
       {
-         if( os::Socket::eResult::OK == m_socket_sb.recv( ) )
+         const os::Socket::eResult result = m_socket_sb.recv( );
+         if( os::Socket::eResult::DISCONNECTED == result )
+         {
+            m_socket_sb.info( "Host disconnected" );
+         }
+         else if( os::Socket::eResult::OK == result )
          {
             size_t recv_size = 0;
             const void* const p_buffer = m_socket_sb.buffer( recv_size );
@@ -105,15 +112,73 @@ void ServiceIpcThread::thread_loop_receive( )
             {
                dsi::Packet packet;
                stream.pop( packet );
-               process_packet( packet );
+               process_packet( packet, m_socket_sb );
             }
          }
       }
 
       // process slave sockets
+      for( auto iterator = m_sockets_slave.begin( ); iterator != m_sockets_slave.end( ); ++iterator )
+      {
+         if( false == fd_set.is_set( (*iterator)->socket( ), os::linux::socket::fd::eType::READ ) )
+            continue;
 
+         const os::Socket::eResult result = (*iterator)->recv( );
+         if( os::Socket::eResult::DISCONNECTED == result )
+         {
+            (*iterator)->info( "Host disconnected" );
+            iterator = m_sockets_slave.erase( iterator );
+            if( m_sockets_slave.end( ) == iterator )
+               break;
+         }
+         else if( os::Socket::eResult::OK == result )
+         {
+            size_t recv_size = 0;
+            const void* const p_buffer = (*iterator)->buffer( recv_size );
+            dsi::tByteStream stream;
+            stream.push( p_buffer, recv_size );
 
-      if( true == m_fd.is_set( m_socket_master.socket( ), os::linux::socket::fd::eType::READ ) )
+            while( 0 < stream.size( ) )
+            {
+               dsi::Packet packet;
+               stream.pop( packet );
+               process_packet( packet, *(*iterator) );
+            }
+         }
+      }
+
+      // process client sockets
+      for( auto iterator = m_sockets_client.begin( ); iterator != m_sockets_client.end( ); ++iterator )
+      {
+         if( false == fd_set.is_set( (*iterator)->socket( ), os::linux::socket::fd::eType::READ ) )
+            continue;
+
+         const os::Socket::eResult result = (*iterator)->recv( );
+         if( os::Socket::eResult::DISCONNECTED == result )
+         {
+            (*iterator)->info( "Host disconnected" );
+            iterator = m_sockets_client.erase( iterator );
+            if( m_sockets_client.end( ) == iterator )
+               break;
+         }
+         else if( os::Socket::eResult::OK == result )
+         {
+            size_t recv_size = 0;
+            const void* const p_buffer = (*iterator)->buffer( recv_size );
+            dsi::tByteStream stream;
+            stream.push( p_buffer, recv_size );
+
+            while( 0 < stream.size( ) )
+            {
+               dsi::Packet packet;
+               stream.pop( packet );
+               process_packet( packet, *(*iterator) );
+            }
+         }
+      }
+
+      // process master sockets
+      if( true == fd_set.is_set( m_socket_master.socket( ), os::linux::socket::fd::eType::READ ) )
       {
          if( auto p_socket = m_socket_master.accept( ) )
          {
@@ -393,16 +458,16 @@ bool ServiceIpcThread::send( const IAsync::tSptr p_event )
    return send( m_socket_sb, p_event );
 }
 
-bool ServiceIpcThread::process_packet( dsi::Packet& packet )
+bool ServiceIpcThread::process_packet( dsi::Packet& packet, os::Socket& socket )
 {
    bool result = true;
    for( dsi::Package& package : packet.packages( ) )
-      result &= process_package( package );
+      result &= process_package( package, socket );
 
    return result;
 }
 
-bool ServiceIpcThread::process_package( dsi::Package& package )
+bool ServiceIpcThread::process_package( dsi::Package& package, os::Socket& socket )
 {
    SYS_TRC( "Processing package '%s'", package.c_str( ) );
 
@@ -422,6 +487,75 @@ bool ServiceIpcThread::process_package( dsi::Package& package )
          }
          break;
       }
+      case dsi::eCommand::DetectedServer:
+      {
+         interface::Signature service_signature;
+         const void* ptr = nullptr;
+         std::string address;
+         int port;
+         if( false == package.data( service_signature, ptr, address, port ) )
+         {
+            SYS_ERR( "parce package error" );
+            break;
+         }
+         SYS_INF( "Detected server for service signature: '%s' (%p) (%s:%d)", service_signature.name( ).c_str( ), ptr, address.c_str( ), port );
+
+         os::Socket::tSptr p_client_socket =
+                  std::make_shared< os::Socket >(
+                        os::linux::socket::configuration{ AF_UNIX, SOCK_STREAM, 0, address, port },
+                        ServiceProcess::instance( )->configuration( ).ipc_app_buffer_size
+                     );
+         if( os::Socket::eResult::ERROR == p_client_socket->create( ) )
+            break;
+         if( os::Socket::eResult::ERROR == p_client_socket->connect( ) )
+            break;
+         p_client_socket->unblock( );
+         p_client_socket->info( "Client connection created" );
+         m_sockets_client.push_back( p_client_socket );
+
+         const auto& clients = ServiceProcess::instance( )->connection_db( ).clients( service_signature );
+         for( const auto& client : clients )
+         {
+            dsi::Packet packet;
+            packet.add_package(
+                  dsi::eCommand::DetectedClient, service_signature, client.ptr( ),
+                  ServiceProcess::instance( )->configuration( ).ipc_app.address,
+                  ServiceProcess::instance( )->configuration( ).ipc_app.port
+               );
+            dsi::tByteStream stream;
+            stream.push( packet );
+            send( *p_client_socket, stream );
+         }
+
+         auto result = ServiceProcess::instance( )->connection_db( ).register_server(
+               service_signature, base::interface::Address( ptr, p_client_socket->id( ) )
+            );
+
+         break;
+      }
+      case dsi::eCommand::DetectedClient:
+      {
+         interface::Signature service_signature;
+         const void* ptr = nullptr;
+         std::string address;
+         int port;
+         if( false == package.data( service_signature, ptr, address, port ) )
+         {
+            SYS_ERR( "parce package error" );
+            break;
+         }
+         SYS_INF( "Detected client for service signature: '%s' (%p) (%s:%d)", service_signature.name( ).c_str( ), ptr, address.c_str( ), port );
+
+         auto result = ServiceProcess::instance( )->connection_db( ).register_client(
+               service_signature, base::interface::Address( ptr, socket.id( ) )
+            );
+
+         break;
+      }
+      case dsi::eCommand::RegisterServer:
+      case dsi::eCommand::UnregisterServer:
+      case dsi::eCommand::RegisterClient:
+      case dsi::eCommand::UnregisterClient:
       default:
       {
          SYS_WRN( "Unknown package command" );

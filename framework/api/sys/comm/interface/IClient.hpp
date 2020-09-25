@@ -2,13 +2,13 @@
 
 
 
-namespace base {
+namespace base::interface {
 
    class IClient
    {
       public:
-         IClient( );
-         virtual ~IClient( );
+         IClient( ) = default;
+         virtual ~IClient( ) = default;
 
       public:
          virtual void connected( ) = 0;
@@ -16,4 +16,4 @@ namespace base {
    };
 
 
-} // namespace base
+} // namespace base::interface

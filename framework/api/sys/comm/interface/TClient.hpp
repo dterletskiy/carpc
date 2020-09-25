@@ -8,7 +8,7 @@
 
 
 
-namespace base {
+namespace base::interface {
 
 
 
@@ -18,7 +18,7 @@ namespace base {
       using tProxy = TProxy< TYPES >;
 
       public:
-         TClient( const std::string&, const std::string& );
+         TClient( const tAsyncTypeID&, const std::string&, const bool );
          ~TClient( ) override;
 
       public:
@@ -32,9 +32,9 @@ namespace base {
 
 
    template< typename TYPES >
-   TClient< TYPES >::TClient( const std::string& interface_name, const std::string& role_name )
+   TClient< TYPES >::TClient( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    {
-      mp_proxy = tProxy::create( interface_name, role_name );
+      mp_proxy = tProxy::create( interface_type_id, role_name, is_import );
       mp_proxy->register_client( this );
    }
 
@@ -46,7 +46,7 @@ namespace base {
    }
 
 
-} // namespace base
+} // namespace base::interface
 
 
 

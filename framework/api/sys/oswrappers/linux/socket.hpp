@@ -20,16 +20,18 @@ namespace base::os::linux::socket {
    using tSocket = int;
    using tSocketSet = std::set< tSocket >;
 
-   extern const tSocket InvalidSocket;
+   const tSocket InvalidSocket = -1;
    extern int error;
 
    struct configuration
    {
-      const int domain;
-      const int type;
-      const int protocole;
-      const char* address;
-      const int port;
+      void print( const std::string& _message = "" ) const;
+
+      int         domain;
+      int         type;
+      int         protocole;
+      std::string address;
+      int         port;
    };
 
    class socket_addr
@@ -86,7 +88,10 @@ namespace base::os::linux::socket {
 
 namespace base::os::linux::socket {
 
+   void print( const sockaddr* _sa );
+
    void info( const tSocket _socket, const char* _message = "socket" );
+   void info( const tSocket _socket, configuration& _config );
 
    const tSocket create_server( const configuration& _config );
    const tSocket create_clint( const configuration& _config );
@@ -179,3 +184,48 @@ namespace base::os::linux {
    bool get_mac( const std::string& connection_name, std::string& connection_mac );
 
 } // namespace base::os::linux
+
+
+
+
+
+
+
+
+// struct addrinfo
+// {
+//    int              ai_flags;
+//    int              ai_family;
+//    int              ai_socktype;
+//    int              ai_protocol;
+//    socklen_t        ai_addrlen;
+//    struct sockaddr *ai_addr;
+//    char            *ai_canonname;
+//    struct addrinfo *ai_next;
+// };
+
+// struct sockaddr
+// {
+//    sa_family_t sa_family;
+//    char        sa_data[14];
+// };
+
+// #define UNIX_PATH_MAX   108
+// struct sockaddr_un
+// {
+//    sa_family_t    sun_family;                   /* address family: AF_UNIX */
+//    char           sun_path[ UNIX_PATH_MAX ];    /* path */
+// };
+
+// struct sockaddr_in
+// {
+//    sa_family_t    sin_family; /* address family: AF_INET */
+//    in_port_t      sin_port;   /* port in network byte order, e.g. htons(3490) */
+//    struct in_addr sin_addr;   /* internet address */
+// };
+
+// /* Internet address. */
+// struct in_addr
+// {
+//    uint32_t       s_addr;     /* address in network byte order, load with inet_aton() */
+// };

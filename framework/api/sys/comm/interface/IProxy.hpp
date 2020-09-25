@@ -1,35 +1,41 @@
 #pragma once
 
-#include "api/sys/comm/interface/IInterface.hpp"
+#include "api/sys/comm/interface/IConnection.hpp"
 #include "api/sys/comm/interface/IClient.hpp"
 
 
 
-namespace base {
+namespace base::interface {
 
-   class IProxy : public IInterface
+   class IProxy : public IConnection
    {
       public:
-         IProxy( const std::string&, const std::string&, const eCommType );
+         IProxy( const tAsyncTypeID&, const std::string&, const bool );
          ~IProxy( ) override;
 
       private:
-         void connected( const void* const ) override final;
-         void disconnected( const void* const ) override final;
+         void connected( const Address& ) override final;
+         void disconnected( const Address& ) override final;
          void connected( ) override = 0;
          void disconnected( ) override = 0;
 
-      protected:
+      public:
+         const Address::tOpt& server( ) const;
          const bool is_connected( ) const override;
       protected:
-         const void* mp_server = nullptr;
+         Address::tOpt m_server = std::nullopt;
 
       public:
          void register_client( IClient* );
          void unregister_client( IClient* );
       protected:
          std::set< IClient* > m_client_set;
-
    };
 
-} // namespace base
+   inline
+   const Address::tOpt& IProxy::server( ) const
+   {
+      return m_server;
+   }
+
+} // namespace base::interface

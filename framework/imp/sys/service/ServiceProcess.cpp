@@ -3,6 +3,7 @@
 #include "api/sys/service/ServiceIpcThread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
 #include "api/sys/events/Events.hpp"
+#include "api/sys/tools/Tools.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvcProc"
@@ -40,8 +41,27 @@ ServiceProcess::tSptr ServiceProcess::mp_instance = nullptr;
 
 ServiceProcess::ServiceProcess( )
    : m_service_list( )
+   , m_connection_db( )
 {
    SYS_TRC( "created" );
+
+   m_configuration.ipc_sb = os::linux::socket::configuration {
+      AF_UNIX,
+      SOCK_STREAM,
+      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_protocole" ).value( ) ) ),
+      base::tools::cfg::argument( "ipc_servicebrocker_address" ).value( ),
+      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_port" ).value( ) ) )
+   };
+   m_configuration.ipc_sb_buffer_size = static_cast< size_t >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_buffer_size" ).value( ) ) );
+
+   m_configuration.ipc_app = os::linux::socket::configuration {
+      AF_UNIX,
+      SOCK_STREAM,
+      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_application_protocole" ).value( ) ) ),
+      base::tools::cfg::argument( "ipc_application_address" ).value( ),
+      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_application_port" ).value( ) ) )
+   };
+   m_configuration.ipc_app_buffer_size = static_cast< size_t >( std::stoll( base::tools::cfg::argument( "ipc_application_buffer_size" ).value( ) ) );
 }
 
 ServiceProcess::~ServiceProcess( )
@@ -52,7 +72,7 @@ ServiceProcess::~ServiceProcess( )
 namespace { os::Mutex s_mutex; }
 ServiceProcess::tSptr ServiceProcess::instance( )
 {
-   base::os::MutexAutoLocker locker( s_mutex );
+   os::MutexAutoLocker locker( s_mutex );
    if( nullptr == mp_instance )
       mp_instance.reset( new ServiceProcess( ) );
 
@@ -89,17 +109,10 @@ IServiceThread::tSptr ServiceProcess::current_service( ) const
    return nullptr;
 }
 
-IServiceThread::tSptrList ServiceProcess::service_list( ) const
-{
-   return m_service_list;
-}
-
 bool ServiceProcess::start( const ServiceThread::Info::tVector& service_infos )
 {
-   REGISTER_EVENT( base::events::interface::Interface );
-
    // Creating service brocker thread
-   mp_service_ipc = ServiceIpcThread::instance( );
+   mp_service_ipc = std::make_shared< ServiceIpcThread >( );
    if( nullptr == mp_service_ipc )
       return false;
    // Creating service threads
@@ -155,6 +168,7 @@ void ServiceProcess::boot( )
       p_service->wait( );
    SYS_MSG( "All services are stopped" );
 
+   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::IPC );
    mp_service_ipc->wait( );
    SYS_MSG( "IPC service is stopped" );
 

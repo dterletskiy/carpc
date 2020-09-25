@@ -1,3 +1,4 @@
+#include "api/sys/tools/Tools.hpp"
 #include "api/sys/oswrappers/Socket.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -8,6 +9,8 @@
 using namespace base::os;
 
 
+
+const Socket::tID Socket::InvalidID = InvalidID;
 
 const char* Socket::c_str( const eResult comm_type )
 {
@@ -21,7 +24,8 @@ const char* Socket::c_str( const eResult comm_type )
 }
 
 Socket::Socket( const linux::socket::configuration& configuration, const size_t buffer_capacity )
-   : m_configuration( configuration )
+   : m_id( tools::id::generate( "Socket" ) )
+   , m_configuration( configuration )
    , m_buffer_capacity( buffer_capacity )
 {
    mp_buffer = malloc( m_buffer_capacity );
@@ -29,9 +33,26 @@ Socket::Socket( const linux::socket::configuration& configuration, const size_t 
 
 Socket::Socket( linux::socket::tSocket socket, const size_t buffer_capacity )
    : m_socket( socket )
+   , m_id( tools::id::generate( "Socket" ) )
    , m_buffer_capacity( buffer_capacity )
 {
    mp_buffer = malloc( m_buffer_capacity );
+
+   linux::socket::info( m_socket, m_configuration );
+}
+
+Socket::Socket( Socket&& other )
+   : m_socket( other.m_socket )
+   , m_id( other.m_id )
+   , m_configuration( other.m_configuration )
+   , mp_buffer( other.mp_buffer )
+   , m_buffer_capacity( other.m_buffer_capacity )
+   , m_buffer_size( other.m_buffer_size )
+   , m_total_recv_size( other.m_total_recv_size )
+   , m_total_send_size( other.m_total_send_size )
+{
+   other.m_socket = linux::socket::InvalidSocket;
+   other.mp_buffer = nullptr;
 }
 
 Socket::~Socket( )
@@ -42,9 +63,32 @@ Socket::~Socket( )
    SYS_INF( "total send size: %zu", m_total_send_size );
 }
 
-const bool Socket::operator<( const Socket& socket ) const
+const bool Socket::operator<( const Socket& other ) const
 {
-   return m_socket < socket.m_socket;
+   return m_id < other.m_id;
+}
+
+Socket& Socket::operator=( Socket&& other )
+{
+   if( this == &other )
+      return *this;
+
+   m_socket = other.m_socket;
+   m_id = other.m_id;
+   m_configuration = other.m_configuration;
+   close( );
+   free( mp_buffer );
+   mp_buffer = other.mp_buffer;
+   m_buffer_capacity = other.m_buffer_capacity;
+   m_buffer_size = other.m_buffer_size;
+   m_total_recv_size = other.m_total_recv_size;
+   m_total_send_size = other.m_total_send_size;
+
+   other.m_socket = linux::socket::InvalidSocket;
+   other.m_id = InvalidID;
+   other.mp_buffer = nullptr;
+
+   return *this;
 }
 
 void Socket::close( )
@@ -65,7 +109,7 @@ Socket::eResult Socket::create( )
 
 Socket::eResult Socket::bind( )
 {
-   unlink( m_configuration.address );
+   unlink( m_configuration.address.c_str( ) );
    return linux::socket::bind( m_socket, m_configuration ) ? eResult::OK : eResult::ERROR;
 }
 
@@ -76,9 +120,15 @@ Socket::eResult Socket::listen( )
 
 Socket::tSptr Socket::accept( )
 {
-   linux::socket::tSocket socket = linux::socket::accept( m_socket );
+   sockaddr sa;
+   unsigned int len = sizeof( sa );
+
+   linux::socket::tSocket socket = linux::socket::accept( m_socket, &sa, &len );
    if( linux::socket::InvalidSocket == socket )
       return nullptr;
+
+   linux::socket::print( &sa );
+
    return tSptr( new Socket( socket, m_buffer_capacity ) );
 }
 

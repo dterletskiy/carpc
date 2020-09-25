@@ -1,39 +1,38 @@
-// Application
-#include "Server.hpp"
+#include "api/sys/onoff/Server.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOffServerBase"
 
 
 
-namespace api::onoff {
+using namespace base::onoff;
 
 
 
 Server::Server( const std::string& role_name )
-   : base::TServer< data::Types >( api::onoff::interface_name, role_name )
+   : base::interface::TServer< data::Types >( base::onoff::interface_type_id, role_name, true )
 {
-   // DBG_TRC( "Created" );
+   SYS_TRC( "Created" );
 }
 
 Server::~Server( )
 {
-   // DBG_TRC( "Destroyed" );
+   SYS_TRC( "Destroyed" );
 }
 
 void Server::connected( )
 {
-   DBG_TRC( );
+   SYS_TRC( );
 }
 
 void Server::disconnected( )
 {
-   DBG_TRC( );
+   SYS_TRC( );
 }
 
 void Server::response_trigger_state( const bool result )
 {
-   DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
+   SYS_MSG( "result: %s", BOOL_TO_STRING( result ) );
 
    response< data::ResponseTriggerStateData >( result );
 }
@@ -53,7 +52,7 @@ void Server::process_request_event( const data::OnOffEvent::Event& event )
          const data::RequestTriggerStateData* request_data = get_event_data< data::RequestTriggerStateData >( event );
          if( nullptr == request_data )
          {
-            DBG_ERR( "missing tequest data for request ID: %s", to_string( event_id ).c_str( ) );
+            SYS_ERR( "missing tequest data for request ID: %s", to_string( event_id ).c_str( ) );
          }
          else
          {
@@ -80,7 +79,3 @@ const std::string& Server::current_state( ) const
    }
    return p_data->state;
 }
-
-
-
-} // namespace api::onoff

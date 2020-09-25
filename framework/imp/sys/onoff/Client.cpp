@@ -1,58 +1,56 @@
-// Framework
-// Application
-#include "Client.hpp"
+#include "api/sys/onoff/Client.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOffClientBase"
 
 
 
-namespace api::onoff {
+using namespace base::onoff;
 
 
 
 Client::Client( const std::string& role_name )
-   : base::TClient< data::Types >( api::onoff::interface_name, role_name )
+   : base::interface::TClient< data::Types >( base::onoff::interface_type_id, role_name, true )
 {
-   // DBG_TRC( "Created" );
+   SYS_TRC( "Created" );
 }
 
 Client::~Client( )
 {
-   // DBG_TRC( "Destroyed" );
+   SYS_TRC( "Destroyed" );
 }
 
 void Client::connected( )
 {
-   DBG_MSG( );
+   SYS_MSG( );
 }
 
 void Client::disconnected( )
 {
-   DBG_MSG( );
+   SYS_MSG( );
 }
 
 void Client::request_start( )
 {
-   DBG_TRC( );
+   SYS_TRC( );
    mp_proxy->request< data::RequestStartData >( this );
 }
 
 const size_t Client::request_trigger_state( const std::string& state, const size_t delay )
 {
-   DBG_TRC( "state: %s / delay: %zu", state.c_str( ), delay );
+   SYS_TRC( "state: %s / delay: %zu", state.c_str( ), delay );
    return mp_proxy->request< data::RequestTriggerStateData >( this, state, delay );
 }
 
 void Client::subscribe_current_state( )
 {
-   DBG_TRC( );
+   SYS_TRC( );
    mp_proxy->subscribe< data::NotificationCurrentStateData >( this );
 }
 
 void Client::unsubscribe_current_state( )
 {
-   DBG_TRC( );
+   SYS_TRC( );
    mp_proxy->unsubscribe< data::NotificationCurrentStateData >( this );
 }
 
@@ -69,6 +67,7 @@ void Client::process_response_event( const data::OnOffEvent::Event& event )
       case eOnOff::RequestTriggerStateBusy:
       {
          request_trigger_state_failed( );
+         break;
       }
       default: break;
    }
@@ -87,7 +86,3 @@ void Client::process_notification_event( const data::OnOffEvent::Event& event )
       default: break;
    }
 }
-
-
-
-} // namespace api::onoff

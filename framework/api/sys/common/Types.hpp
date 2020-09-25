@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <iomanip>
 #include <type_traits>
 
@@ -36,6 +37,6 @@
 namespace base {
 
    using ID = std::size_t;
-   extern const ID InvalidID;
+   const ID InvalidID = std::numeric_limits< std::size_t >::max( );
 
 } // namespace base

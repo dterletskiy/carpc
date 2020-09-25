@@ -1,27 +1,26 @@
 #pragma once
 
-// Framework
 #include "api/sys/comm/event/Event.hpp"
 #include "api/sys/comm/interface/Types.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
 
 
 
-namespace api::onoff {
+namespace base::onoff {
 
    DEFINE_ENUM( eOnOff, size_t
       , RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState
-      , RequestStart
+      , RequestStart, RequestStartBusy
       , SubscribeCurrentState, UnsubscribeCurrentState, NotificationCurrentState
       , Undefined // Must present always for all interfaces
    );
-   using tSignature = base::TSignatureRR< eOnOff >;
+   using tSignature = base::interface::TSignatureRR< eOnOff >;
 
-} // namespace api::onoff
+} // namespace base::onoff
 
 
 
-namespace api::onoff::ipc {
+namespace base::onoff::ipc {
 
    struct BaseData;
    using tBaseDataPtr = std::shared_ptr< BaseData >;
@@ -39,7 +38,7 @@ namespace api::onoff::ipc {
       bool to_stream( base::dsi::tByteStream& ) const;
       bool from_stream( base::dsi::tByteStream& );
    };
-   DEFINE_IPC_EVENT( OnOffEvent, OnOffEventData, api::onoff::tSignature );
+   DEFINE_IPC_EVENT( OnOffEvent, OnOffEventData, base::onoff::tSignature );
 
 
 
@@ -47,14 +46,18 @@ namespace api::onoff::ipc {
    {
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
-      using tSignature = api::onoff::tSignature;
-      using tEventID = api::onoff::eOnOff;
+      using tSignature = base::onoff::tSignature;
+      using tEventID = base::onoff::eOnOff;
       using tBaseData = BaseData;
       using tEventData = OnOffEventData;
 
       static const base::eCommType COMM_TYPE;
-      static const std::vector< base::RequestResponseIDs< tEventID > >& RR;
-      static const std::vector< base::NotificationIDs< tEventID > >& N;
+      static const std::vector< base::interface::RequestResponseIDs< tEventID > >& RR;
+      static const std::vector< base::interface::NotificationIDs< tEventID > >& N;
+   };
+
+   struct Types : public BaseTypes
+   {
    };
 
 
@@ -156,15 +159,11 @@ namespace api::onoff::ipc {
       static const eOnOff ID;
    };
 
-   struct Types : public BaseTypes
-   {
-   };
-
-} // namespace api::onoff::ipc
+} // namespace base::onoff::ipc
 
 
 
-namespace api::onoff::no_ipc {
+namespace base::onoff::no_ipc {
 
    struct BaseData;
    using tBaseDataPtr = std::shared_ptr< BaseData >;
@@ -178,7 +177,7 @@ namespace api::onoff::no_ipc {
 
       tBaseDataPtr ptr = nullptr;
    };
-   DEFINE_EVENT( OnOffEvent, OnOffEventData, api::onoff::tSignature );
+   DEFINE_EVENT( OnOffEvent, OnOffEventData, base::onoff::tSignature );
 
 
 
@@ -186,14 +185,18 @@ namespace api::onoff::no_ipc {
    {
       using tEvent = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
-      using tSignature = api::onoff::tSignature;
-      using tEventID = api::onoff::eOnOff;
+      using tSignature = base::onoff::tSignature;
+      using tEventID = base::onoff::eOnOff;
       using tBaseData = BaseData;
       using tEventData = OnOffEventData;
 
       static const base::eCommType COMM_TYPE;
-      static const std::vector< base::RequestResponseIDs< tEventID > >& RR;
-      static const std::vector< base::NotificationIDs< tEventID > >& N;
+      static const std::vector< base::interface::RequestResponseIDs< tEventID > >& RR;
+      static const std::vector< base::interface::NotificationIDs< tEventID > >& N;
+   };
+
+   struct Types : public BaseTypes
+   {
    };
 
 
@@ -262,18 +265,14 @@ namespace api::onoff::no_ipc {
       std::string state = "";
    };
 
-   struct Types : public BaseTypes
-   {
-   };
-
-} // namespace api::onoff::no_ipc
+} // namespace base::onoff::no_ipc
 
 
 
-namespace api::onoff {
+namespace base::onoff {
 
-   namespace data = api::onoff::ipc;
+   namespace data = base::onoff::ipc;
 
-   extern const std::string interface_name;
+   extern const base::tAsyncTypeID interface_type_id;
 
-} // namespace api::onoff
+} // namespace base::onoff

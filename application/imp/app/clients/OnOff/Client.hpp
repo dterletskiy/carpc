@@ -1,42 +1,37 @@
 #pragma once
 
 #include <functional>
-// Interface
-#include "api/app/onoff/Client.hpp"
+#include "api/sys/onoff/Client.hpp"
 
 
 
 namespace application::clients::onoff {
 
+   class Client
+      : public base::onoff::Client
+   {
+      using tConnectedCallback = std::function< void( void ) >;
 
+      public:
+         Client( const std::string&, const std::string& name, tConnectedCallback );
+         ~Client( );
 
-class Client
-   : public api::onoff::Client
-{
-   using tConnectedCallback = std::function< void( void ) >;
+      private:
+         void connected( ) override;
+         void disconnected( ) override;
 
-public:
-   Client( const std::string&, const std::string& name, tConnectedCallback );
-   ~Client( );
+      private:
+         void response_trigger_state( const bool ) override;
+         void request_trigger_state_failed( ) override;
+         void on_current_state( const std::string& ) override;
 
-private:
-   void connected( ) override;
-   void disconnected( ) override;
+      public:
+         void request_start( );
+         void request_trigger_state( const std::string&, const size_t );
 
-private:
-   void response_trigger_state( const bool ) override;
-   void request_trigger_state_failed( ) override;
-   void on_current_state( const std::string& ) override;
-
-public:
-   void request_start( );
-   void request_trigger_state( const std::string&, const size_t );
-
-private:
-   const std::string m_name = { };
-   tConnectedCallback m_connected_callback;
-};
-
-
+      private:
+         const std::string m_name = { };
+         tConnectedCallback m_connected_callback;
+   };
 
 } // namespace application::clients::onoff
