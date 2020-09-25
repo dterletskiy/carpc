@@ -11,7 +11,7 @@ using namespace base::interface;
 
 
 
-IProxy::IProxy( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+IProxy::IProxy( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    : IConnection( interface_type_id, role_name, is_import )
 {
    ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ServerConnected } );
@@ -23,7 +23,7 @@ IProxy::IProxy( const tAsyncTypeID& interface_type_id, const std::string& role_n
    if( interface::ConnectionDB::eResult::OK_NotPaired == result )
    {
       if( true == is_external( ) )
-         ev_i::Action::Event::create_send( { ev_i::eAction::RegisterClient }, { signature( ), this }, eCommType::IPC );
+         ev_i::Action::Event::create_send( { ev_i::eAction::RegisterClient }, { signature( ), this }, base::async::eCommType::IPC );
    }
 }
 
@@ -34,7 +34,7 @@ IProxy::~IProxy( )
    // in case of there client could exports interface
    if( interface::ConnectionDB::eResult::OK_NotPaired == result )
    {
-      ev_i::Action::Event::create_send( { ev_i::eAction::UnregisterClient }, { signature( ), this }, eCommType::IPC );
+      ev_i::Action::Event::create_send( { ev_i::eAction::UnregisterClient }, { signature( ), this }, base::async::eCommType::IPC );
    }
 }
 

@@ -51,7 +51,7 @@ namespace base::onoff::ipc {
       using tBaseData = BaseData;
       using tEventData = OnOffEventData;
 
-      static const base::eCommType COMM_TYPE;
+      static const base::async::eCommType COMM_TYPE;
       static const std::vector< base::interface::RequestResponseIDs< tEventID > >& RR;
       static const std::vector< base::interface::NotificationIDs< tEventID > >& N;
    };
@@ -190,7 +190,7 @@ namespace base::onoff::no_ipc {
       using tBaseData = BaseData;
       using tEventData = OnOffEventData;
 
-      static const base::eCommType COMM_TYPE;
+      static const base::async::eCommType COMM_TYPE;
       static const std::vector< base::interface::RequestResponseIDs< tEventID > >& RR;
       static const std::vector< base::interface::NotificationIDs< tEventID > >& N;
    };
@@ -273,6 +273,6 @@ namespace base::onoff {
 
    namespace data = base::onoff::ipc;
 
-   extern const base::tAsyncTypeID interface_type_id;
+   extern const base::async::tAsyncTypeID interface_type_id;
 
 } // namespace base::onoff

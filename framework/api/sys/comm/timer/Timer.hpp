@@ -50,7 +50,7 @@ namespace base {
    {
       Timer::ID id;
    };
-   DEFINE_EVENT( TimerEvent, TimerEventData, TSignatureID< size_t > );
+   DEFINE_EVENT( TimerEvent, TimerEventData, base::async::TSignatureID< size_t > );
 
 
 

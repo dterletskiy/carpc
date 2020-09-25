@@ -8,7 +8,7 @@
 #define CLASS_ABBR "IEvent"
 
 
-using namespace base;
+using namespace base::async;
 
 
 

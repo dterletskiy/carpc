@@ -6,7 +6,7 @@
 
 
 
-namespace base {
+namespace base::async {
 
    class IEvent
       : public IAsync
@@ -93,4 +93,4 @@ namespace base {
 
 
 
-} // namespace base
+} // namespace base::async

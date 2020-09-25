@@ -6,7 +6,7 @@
 
 
 
-namespace base {
+namespace base::async {
 
    class IRunnable
       : public IAsync
@@ -81,4 +81,4 @@ namespace base {
       return &m_signature;
    }
 
-} // namespace base
+} // namespace base::async

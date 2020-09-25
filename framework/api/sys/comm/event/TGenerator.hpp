@@ -5,7 +5,7 @@
 
 
 
-namespace base {
+namespace base::async {
 
    template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
    class TGenerator
@@ -25,4 +25,4 @@ namespace base {
          };
    };
 
-} // namespace base
+} // namespace base::async

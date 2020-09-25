@@ -27,6 +27,6 @@ void RootComponent::boot( const std::string& message )
 
 void RootComponent::shutdown( const std::string& message )
 {
-   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::ITC );
-   // events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::IPC );
+   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, base::async::eCommType::ITC );
+   // events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, base::async::eCommType::IPC );
 }

@@ -318,7 +318,7 @@ namespace base::interface {
             );
          p_event->data( event_id_iterator->second.m_event_data.value( ) );
          auto operation = [ p_client, p_event ]( ){ p_client->process_notification_event( *p_event ); };
-         Runnable::create_send( operation );
+         base::async::Runnable::create_send( operation );
       }
 
       return true;
@@ -399,11 +399,11 @@ namespace base::interface {
       using tAttributeMap = std::map< typename TYPES::tEventID, typename TYPES::tEvent >;
 
       private:
-         TProxy( const tAsyncTypeID&, const std::string&, const bool );
+         TProxy( const base::async::tAsyncTypeID&, const std::string&, const bool );
          static std::map< TID, tProxy* > s_proxy_map;
       public:
          ~TProxy( ) override;
-         static tProxy* create( const tAsyncTypeID&, const std::string&, const bool );
+         static tProxy* create( const base::async::tAsyncTypeID&, const std::string&, const bool );
 
       private:
          void connected( ) override final;
@@ -431,7 +431,7 @@ namespace base::interface {
 
 
    template< typename TYPES >
-   TProxy< TYPES >::TProxy( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+   TProxy< TYPES >::TProxy( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
       : IProxy( interface_type_id, role_name, is_import )
       , TYPES::tEventConsumer( )
       , m_request_processor( this )
@@ -449,7 +449,7 @@ namespace base::interface {
    std::map< TID, TProxy< TYPES >* > TProxy< TYPES >::s_proxy_map;
 
    template< typename TYPES >
-   TProxy< TYPES >* TProxy< TYPES >::create( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+   TProxy< TYPES >* TProxy< TYPES >::create( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    {
       TID tid = ServiceProcess::instance( )->current_service( )->id( );
       os::Mutex mutex( true );

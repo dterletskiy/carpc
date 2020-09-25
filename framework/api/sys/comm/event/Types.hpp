@@ -157,7 +157,7 @@ namespace base_v2 {
 
 }
 
-namespace base {
+namespace base::async {
 
    // using tAsyncTypeID = std::string;
    using tAsyncTypeID = base_v1::TAsyncTypeID< std::size_t >;
@@ -166,12 +166,6 @@ namespace base {
    using NoServiceType = void;
    #define IS_IPC_EVENT ( false == std::is_same_v< tService, NoServiceType > )
 
-   using tSequenceID = ID;
-   const tSequenceID InvalidSequenceID = InvalidID;
-
-   using tServiceName = std::string;
-   const tServiceName InvalidServiceName = "NoName";
-
    enum class eAsyncType : size_t { EVENT, RUNNABLE, UNDEFINED };
    const char* c_str( const eAsyncType );
 
@@ -179,7 +173,47 @@ namespace base {
    const char* c_str( const eCommType );
 
 
-} // namespace base
+
+   struct Address
+   {
+      public:
+         using tOpt = std::optional< Address >;
+         using tSet = std::set< Address >;
+
+      public:
+         Address( ) = default;
+         Address( const base::ID&, const base::ID& external_id = base::InvalidID );
+         Address( const Address& );
+         ~Address( ) = default;
+
+      public:
+         bool to_stream( base::dsi::tByteStream& ) const;
+         bool from_stream( base::dsi::tByteStream& );
+
+      public:
+         Address& operator=( const Address& );
+         bool operator==( const Address& ) const;
+         bool operator!=( const Address& ) const;
+         bool operator<( const Address& ) const;
+         operator bool( ) const;
+
+      public:
+         const std::string name( ) const;
+
+      public:
+         bool is_local( ) const;
+         bool is_external( ) const;
+
+      public:
+         const base::ID& external_id( ) const;
+         const base::ID& internal_id( ) const;
+      private:
+         base::ID m_internal_id = base::InvalidID;
+         base::ID m_external_id = base::InvalidID;
+   };
+
+
+} // namespace base::async
 
 
 

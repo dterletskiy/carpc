@@ -36,7 +36,7 @@ namespace {
       }
    }
 
-   using tAppEventSignature = base::TSignatureID< eAppEventID >;
+   using tAppEventSignature = base::async::TSignatureID< eAppEventID >;
 
    DEFINE_EVENT( AppEvent, AppEventData, tAppEventSignature );
 
@@ -64,7 +64,7 @@ namespace base::dsi::types::test {
          DBG_WRN( "adding package" );
          packet.add_package( base::dsi::eCommand::UnregisterClient, std::string( "PackageFour" ), (size_t)0xDDDDDDDD );
          DBG_WRN( "adding package" );
-         auto event = tEvent::create( { eAppEventID::BOOT }, { "booting system" }, base::eCommType::ITC );
+         auto event = tEvent::create( { eAppEventID::BOOT }, { "booting system" }, base::async::eCommType::ITC );
          packet.add_package( base::dsi::eCommand::BroadcastEvent, *event, (size_t)0xEEEEEEEE );
          DBG_WRN( "serrialize packet" );
          stream.push( packet );
@@ -86,7 +86,7 @@ namespace base::dsi::types::test {
             DBG_WRN( "extracting package" );
             if( base::dsi::eCommand::BroadcastEvent == pkg.command( ) )
             {
-               base::IEvent::tSptr p_event = base::IEvent::deserialize( pkg.data( ) );
+               base::async::IEvent::tSptr p_event = base::async::IEvent::deserialize( pkg.data( ) );
                if( nullptr == p_event )
                {
                   DBG_ERR( "event null pointer" );

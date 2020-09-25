@@ -42,10 +42,10 @@ public:
    virtual void shutdown( const std::string& ) = 0;
 
 public:
-   virtual void set_notification( const IAsync::ISignature&, IAsync::IConsumer* ) = 0;
-   virtual void clear_notification( const IAsync::ISignature&, IAsync::IConsumer* ) = 0;
-   virtual void clear_all_notifications( const IAsync::ISignature&, IAsync::IConsumer* ) = 0;
-   virtual bool insert_event( const IAsync::tSptr ) = 0;
+   virtual void set_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) = 0;
+   virtual void clear_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) = 0;
+   virtual void clear_all_notifications( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) = 0;
+   virtual bool insert_event( const base::async::IAsync::tSptr ) = 0;
 
 public:
    virtual const size_t wd_timeout( ) const = 0;

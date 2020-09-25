@@ -74,7 +74,7 @@ namespace base::interface {
       using tAttributeStatusMap = std::map< typename TYPES::tEventID, tNotificationStatus >;
 
       public:
-         TServer( const tAsyncTypeID&, const std::string&, const bool );
+         TServer( const base::async::tAsyncTypeID&, const std::string&, const bool );
          ~TServer( ) override;
 
       protected:
@@ -111,7 +111,7 @@ namespace base::interface {
 
 
    template< typename TYPES >
-   TServer< TYPES >::TServer( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
+   TServer< TYPES >::TServer( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
       : IServer( interface_type_id, role_name, is_export )
       , TYPES::tEventConsumer( )
    {

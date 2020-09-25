@@ -89,7 +89,7 @@ const void* Address::ptr( ) const
 
 
 
-Signature::Signature( const base::tAsyncTypeID& type_id, const std::string& role )
+Signature::Signature( const base::async::tAsyncTypeID& type_id, const std::string& role )
    : m_type_id( type_id )
    , m_role( role )
 { }
@@ -143,7 +143,7 @@ const std::string Signature::name( ) const
    return m_type_id.name( ) + "." + m_role;
 }
 
-const base::tAsyncTypeID& Signature::type_id( ) const
+const base::async::tAsyncTypeID& Signature::type_id( ) const
 {
    return m_type_id;
 }

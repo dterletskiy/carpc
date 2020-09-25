@@ -15,7 +15,7 @@ namespace base::interface {
    class IConnection : public events::interface::Status::Consumer
    {
       public:
-         IConnection( const tAsyncTypeID&, const std::string&, const bool );
+         IConnection( const base::async::tAsyncTypeID&, const std::string&, const bool );
          virtual ~IConnection( );
 
       public:

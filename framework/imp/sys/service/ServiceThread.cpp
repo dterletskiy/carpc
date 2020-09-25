@@ -43,7 +43,7 @@ void ServiceThread::thread_loop( )
 
    while( started( ) )
    {
-      IAsync::tSptr p_event = get_event( );
+      base::async::IAsync::tSptr p_event = get_event( );
       SYS_TRC( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       notify( p_event );
    }
@@ -86,7 +86,7 @@ void ServiceThread::shutdown( const std::string& message )
    stop( );
 }
 
-bool ServiceThread::insert_event( const IAsync::tSptr p_event )
+bool ServiceThread::insert_event( const base::async::IAsync::tSptr p_event )
 {
    if( false == started( ) )
    {
@@ -109,7 +109,7 @@ bool ServiceThread::insert_event( const IAsync::tSptr p_event )
    return true;
 }
 
-IAsync::tSptr ServiceThread::get_event( )
+base::async::IAsync::tSptr ServiceThread::get_event( )
 {
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )
@@ -117,7 +117,7 @@ IAsync::tSptr ServiceThread::get_event( )
       SYS_TRC( "'%s': waiting for event...", m_name.c_str( ) );
       m_buffer_cond_var.wait( );
    }
-   IAsync::tSptr p_event = m_events.front( );
+   base::async::IAsync::tSptr p_event = m_events.front( );
    m_events.pop_front( );
    ++m_processed_events;
    SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
@@ -126,10 +126,10 @@ IAsync::tSptr ServiceThread::get_event( )
    return p_event;
 }
 
-void ServiceThread::notify( const IAsync::tSptr p_event )
+void ServiceThread::notify( const base::async::IAsync::tSptr p_event )
 {
    // Processing runnable IAsync object
-   if( eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
+   if( base::async::eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
    {
       m_process_started = time( nullptr );
       SYS_TRC( "'%s': start processing runnable at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
@@ -148,7 +148,7 @@ void ServiceThread::notify( const IAsync::tSptr p_event )
    // for example, during calling "clear_notification" from "process_event".
    auto consumers_set = iterator->second;
    SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
-   for( IAsync::IConsumer* p_consumer : consumers_set )
+   for( base::async::IAsync::IConsumer* p_consumer : consumers_set )
    {
       m_process_started = time( nullptr );
       SYS_TRC( "'%s': start processing event at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
@@ -158,7 +158,7 @@ void ServiceThread::notify( const IAsync::tSptr p_event )
    m_process_started.reset( );
 }
 
-void ServiceThread::set_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void ServiceThread::set_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -170,7 +170,9 @@ void ServiceThread::set_notification( const IAsync::ISignature& signature, IAsyn
       // So we should create a copy of this signature in a heap and store its pointer to consumers map.
       // Later on when number of consumers for this signature becase zero we must delete object by this pointer and remove poinetr from this map.
       auto p_signature = signature.create_copy( );
-      m_event_consumers_map.emplace( std::pair< const IAsync::ISignature*, std::set< IAsync::IConsumer* > >( p_signature, { p_consumer } ) );
+      m_event_consumers_map.emplace(
+         std::pair< const base::async::IAsync::ISignature*, std::set< base::async::IAsync::IConsumer* > >( p_signature, { p_consumer } )
+      );
    }
    else
    {
@@ -178,7 +180,7 @@ void ServiceThread::set_notification( const IAsync::ISignature& signature, IAsyn
    }
 }
 
-void ServiceThread::clear_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void ServiceThread::clear_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -197,7 +199,7 @@ void ServiceThread::clear_notification( const IAsync::ISignature& signature, IAs
    }
 }
 
-void ServiceThread::clear_all_notifications( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void ServiceThread::clear_all_notifications( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -225,9 +227,9 @@ void ServiceThread::clear_all_notifications( const IAsync::ISignature& signature
    }
 }
 
-bool ServiceThread::is_subscribed( const IAsync::tSptr p_event )
+bool ServiceThread::is_subscribed( const base::async::IAsync::tSptr p_event )
 {
-   if( eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
+   if( base::async::eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
       return true;
 
    return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );

@@ -233,7 +233,7 @@ namespace base::timer {
                for( size_t ticks = 0; ticks < count; ++ticks )
                {
                   std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-                  base::Runnable::create_send_to_context( on_timer, p_service );
+                  base::async::Runnable::create_send_to_context( on_timer, p_service );
                }
             }
          ).detach( );
@@ -243,7 +243,7 @@ namespace base::timer {
          for( size_t ticks = 0; ticks < count; ++ticks )
          {
             std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-            base::Runnable::create_send_to_context( on_timer, p_service );
+            base::async::Runnable::create_send_to_context( on_timer, p_service );
          }
       }
 

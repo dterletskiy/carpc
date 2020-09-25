@@ -7,7 +7,7 @@
 
 
 
-namespace base {
+namespace base::async {
 
    template< typename _Generator >
    class TSignature : public IEvent::ISignature
@@ -86,7 +86,7 @@ namespace base {
          tUserSignature m_user_signature;
    };
 
-} // namespace base
+} // namespace base::async
 
 
 
@@ -94,7 +94,7 @@ namespace base {
 
 
 
-namespace base {
+namespace base::async {
 
    template< typename _ID >
    class TSignatureID
@@ -133,4 +133,4 @@ namespace base {
          _ID m_id = { };
    };
 
-}
+} // namespace base::async

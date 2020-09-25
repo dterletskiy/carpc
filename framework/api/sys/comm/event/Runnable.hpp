@@ -4,7 +4,7 @@
 
 
 
-namespace base {
+namespace base::async {
 
    class Runnable : public IRunnable
    {
@@ -26,4 +26,4 @@ namespace base {
    {
    }
 
-} // namespace base
+} // namespace base::async

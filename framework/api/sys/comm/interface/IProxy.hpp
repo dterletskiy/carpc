@@ -10,7 +10,7 @@ namespace base::interface {
    class IProxy : public IConnection
    {
       public:
-         IProxy( const tAsyncTypeID&, const std::string&, const bool );
+         IProxy( const base::async::tAsyncTypeID&, const std::string&, const bool );
          ~IProxy( ) override;
 
       private:

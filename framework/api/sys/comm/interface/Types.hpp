@@ -92,7 +92,7 @@ namespace base::interface {
    {
       public:
          Signature( ) = default;
-         Signature( const base::tAsyncTypeID&, const std::string& );
+         Signature( const base::async::tAsyncTypeID&, const std::string& );
          Signature( const Signature& );
          ~Signature( ) = default;
 
@@ -110,12 +110,20 @@ namespace base::interface {
          const std::string name( ) const;
 
       public:
-         const base::tAsyncTypeID& type_id( ) const;
+         const base::async::tAsyncTypeID& type_id( ) const;
          const std::string role( ) const;
       private:
-         base::tAsyncTypeID m_type_id;
+         base::async::tAsyncTypeID m_type_id;
          std::string m_role;
    };
+
+
+
+   using tServiceName = std::string;
+   const tServiceName InvalidServiceName = "NoName";
+
+   using tSequenceID = ID;
+   const tSequenceID InvalidSequenceID = InvalidID;
 
 
 

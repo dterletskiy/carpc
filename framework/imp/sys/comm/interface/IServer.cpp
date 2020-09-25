@@ -11,7 +11,7 @@ using namespace base::interface;
 
 
 
-IServer::IServer( const tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
+IServer::IServer( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
    : IConnection( interface_type_id, role_name, is_export )
 {
    ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ClientConnected } );
@@ -20,7 +20,7 @@ IServer::IServer( const tAsyncTypeID& interface_type_id, const std::string& role
    auto result = ServiceProcess::instance( )->connection_db( ).register_server( signature( ), Address( this ) );
    // Send IPC notification information about registered server to ServiceBrocker
    if( true == is_external( ) )
-      ev_i::Action::Event::create_send( { ev_i::eAction::RegisterServer }, { signature( ), this }, eCommType::IPC );
+      ev_i::Action::Event::create_send( { ev_i::eAction::RegisterServer }, { signature( ), this }, base::async::eCommType::IPC );
 }
 
 IServer::~IServer( )
@@ -28,7 +28,7 @@ IServer::~IServer( )
    auto result = ServiceProcess::instance( )->connection_db( ).unregister_server( signature( ), Address( this ) );
    // Send IPC notification information about registered server to ServiceBrocker
    if( true == is_external( ) )
-      ev_i::Action::Event::create_send( { ev_i::eAction::UnregisterServer }, { signature( ), this }, eCommType::IPC );
+      ev_i::Action::Event::create_send( { ev_i::eAction::UnregisterServer }, { signature( ), this }, base::async::eCommType::IPC );
 }
 
 void IServer::connected( const Address& proxy )

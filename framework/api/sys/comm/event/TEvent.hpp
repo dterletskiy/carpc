@@ -7,7 +7,7 @@
 
 
 
-namespace base {
+namespace base::async {
 
 
 
@@ -165,7 +165,7 @@ namespace base {
 
 
 
-} // namespace base
+} // namespace base::async
 
 
 

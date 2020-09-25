@@ -11,7 +11,7 @@ using namespace base::interface;
 
 
 
-IConnection::IConnection( const tAsyncTypeID& interface_type_id, const std::string& role, const bool is_external )
+IConnection::IConnection( const base::async::tAsyncTypeID& interface_type_id, const std::string& role, const bool is_external )
    : m_is_external( is_external )
    , m_signature( interface_type_id, role )
 {

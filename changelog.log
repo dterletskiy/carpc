@@ -1,3 +1,6 @@
+version 1.8.1
+   - Moved all Async objects to async namespace.
+
 version 1.8.0
    - IInterface renamed to IConnection.
    - namespace interface introduced.

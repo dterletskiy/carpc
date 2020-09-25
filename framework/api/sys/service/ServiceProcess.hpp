@@ -10,8 +10,6 @@
 
 namespace base {
 
-
-
    class ServiceProcess
       : public std::enable_shared_from_this< ServiceProcess >
    {

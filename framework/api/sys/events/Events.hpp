@@ -17,7 +17,7 @@ namespace base::events {
       {
          std::string message;
       };
-      DEFINE_EVENT( Service, Data, TSignatureID< eID > );
+      DEFINE_EVENT( Service, Data, base::async::TSignatureID< eID > );
 
    }
 
@@ -41,7 +41,7 @@ namespace base::events {
          base::interface::Signature    signature;
          const void*                   ptr = nullptr;
       };
-      DEFINE_IPC_EVENT( Action, ActionData, TSignatureID< eAction > );
+      DEFINE_IPC_EVENT( Action, ActionData, base::async::TSignatureID< eAction > );
 
 
 

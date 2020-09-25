@@ -47,7 +47,7 @@ namespace {
       {
          if( 0 == m_iteration )
          {
-            m_performance.start( base::format_string( "Sending ", m_count, " ", base::c_str( *m_parameter ), " events..." ) );
+            m_performance.start( base::format_string( "Sending ", m_count, " ", base::async::c_str( *m_parameter ), " events..." ) );
          }
 
          if( m_count >= ++m_iteration )
@@ -57,7 +57,7 @@ namespace {
             return true;
          }
 
-         m_performance.stop( base::format_string( "... done ", m_count, " ", base::c_str( *m_parameter ), " events" ) );
+         m_performance.stop( base::format_string( "... done ", m_count, " ", base::async::c_str( *m_parameter ), " events" ) );
          DBG_MSG( "microseconds per event: %f", static_cast< float >( m_performance.info( ) ) / m_count );
 
          if( m_parameters.end( ) == ++m_parameter )
@@ -82,8 +82,13 @@ namespace {
       base::tools::Performance   m_performance;
    };
    static size_t s_count = 1000000;
-   auto send_event = [ ]( const base::eCommType _type ) { events::AppEvent::Event::create_send( events::eAppEventID::PING, { base::c_str( _type ) }, _type ); };
-   Test< base::eCommType > s_event_test( send_event, { base::eCommType::ETC, base::eCommType::ITC, base::eCommType::IPC }, s_count );
+   auto send_event = [ ]( const base::async::eCommType _type )
+   {
+      events::AppEvent::Event::create_send( events::eAppEventID::PING, { base::async::c_str( _type ) }, _type );
+   };
+   Test< base::async::eCommType > s_event_test(
+         send_event, { base::async::eCommType::ETC, base::async::eCommType::ITC, base::async::eCommType::IPC }, s_count
+      );
 
 }
 
@@ -135,10 +140,10 @@ void Component::on_timer( const base::ID id )
    auto operation = [ this ]( )
    {
       DBG_MSG( "operation" );
-      events::AppEvent::Event::create_send( { events::eAppEventID::BOOT }, { "booting" }, base::eCommType::ITC );
+      events::AppEvent::Event::create_send( { events::eAppEventID::BOOT }, { "booting" }, base::async::eCommType::ITC );
       m_timer.start( 15000000000 );
    };
-   base::Runnable::create_send( operation );
+   base::async::Runnable::create_send( operation );
 }
 
 

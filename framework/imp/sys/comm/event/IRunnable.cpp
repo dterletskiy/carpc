@@ -6,7 +6,7 @@
 #define CLASS_ABBR "IRunnable"
 
 
-using namespace base;
+using namespace base::async;
 
 
 

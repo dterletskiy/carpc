@@ -4,7 +4,7 @@
 
 
 
-namespace base {
+namespace base::async {
 
    class IAsync
    {
@@ -43,5 +43,5 @@ namespace base {
          virtual const ISignature* const signature( ) const = 0;
    };
 
-} // namespace base
+} // namespace base::async
 

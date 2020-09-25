@@ -161,14 +161,14 @@ void ServiceProcess::boot( )
 {
    SYS_MSG( "booting..." );
 
-   events::service::Service::Event::create_send( { events::service::eID::boot }, { "booting application" }, eCommType::ITC );
-   events::service::Service::Event::create_send( { events::service::eID::boot }, { "booting application" }, eCommType::IPC );
+   events::service::Service::Event::create_send( { events::service::eID::boot }, { "booting application" }, base::async::eCommType::ITC );
+   events::service::Service::Event::create_send( { events::service::eID::boot }, { "booting application" }, base::async::eCommType::IPC );
 
    for( auto& p_service : m_service_list )
       p_service->wait( );
    SYS_MSG( "All services are stopped" );
 
-   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, eCommType::IPC );
+   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, base::async::eCommType::IPC );
    mp_service_ipc->wait( );
    SYS_MSG( "IPC service is stopped" );
 

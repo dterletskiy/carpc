@@ -65,11 +65,11 @@ ConnectionDB::eResult ConnectionDB::register_server( const Signature& signature,
       return eResult::OK_NotPaired;
 
    // Send notification event to clients about registered server with current signature
-   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerConnected }, address, eCommType::ITC );
+   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerConnected }, address, base::async::eCommType::ITC );
 
    // Send notification events to server about each registered client with current signature
    for( const auto& address_client : connection.clients )
-      ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address_client, eCommType::ITC );
+      ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address_client, base::async::eCommType::ITC );
 
    return eResult::OK_Paired;
 }
@@ -102,7 +102,7 @@ ConnectionDB::eResult ConnectionDB::unregister_server( const Signature& signatur
       return eResult::OK_NotPaired;
 
    // Send notification event to clients about registered server with current signature
-   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerDisconnected }, address, eCommType::ITC );
+   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerDisconnected }, address, base::async::eCommType::ITC );
 
    return eResult::OK_Paired;
 }
@@ -138,9 +138,9 @@ ConnectionDB::eResult ConnectionDB::register_client( const Signature& signature,
       return eResult::OK_NotPaired;
 
    // Send notification event to server about registered client with current signature
-   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address, eCommType::ITC );
+   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address, base::async::eCommType::ITC );
    // Send notification events to client about registered server with current signature
-   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerConnected }, connection.server.value( ), eCommType::ITC );
+   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerConnected }, connection.server.value( ), base::async::eCommType::ITC );
 
    return eResult::OK_Paired;
 }
@@ -172,7 +172,7 @@ ConnectionDB::eResult ConnectionDB::unregister_client( const Signature& signatur
       return eResult::OK_NotPaired;
 
    // Send notification event about unregistered client with current signature
-   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientDisconnected }, address, eCommType::ITC );
+   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientDisconnected }, address, base::async::eCommType::ITC );
 
    return eResult::OK_Paired;
 }

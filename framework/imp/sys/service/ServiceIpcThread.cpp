@@ -49,7 +49,7 @@ void ServiceIpcThread::thread_loop_send( )
 
    while( started_send( ) )
    {
-      IAsync::tSptr p_event = get_event( );
+      base::async::IAsync::tSptr p_event = get_event( );
       SYS_TRC( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       notify( p_event );
    }
@@ -275,7 +275,7 @@ void ServiceIpcThread::shutdown( const std::string& message )
    stop( );
 }
 
-bool ServiceIpcThread::insert_event( const IAsync::tSptr p_event )
+bool ServiceIpcThread::insert_event( const base::async::IAsync::tSptr p_event )
 {
    if( false == started( ) )
    {
@@ -292,7 +292,7 @@ bool ServiceIpcThread::insert_event( const IAsync::tSptr p_event )
    return true;
 }
 
-IAsync::tSptr ServiceIpcThread::get_event( )
+base::async::IAsync::tSptr ServiceIpcThread::get_event( )
 {
    m_buffer_cond_var.lock( );
    if( true == m_events.empty( ) )
@@ -300,7 +300,7 @@ IAsync::tSptr ServiceIpcThread::get_event( )
       SYS_TRC( "'%s': waiting for event...", m_name.c_str( ) );
       m_buffer_cond_var.wait( );
    }
-   IAsync::tSptr p_event = m_events.front( );
+   base::async::IAsync::tSptr p_event = m_events.front( );
    m_events.pop_front( );
    ++m_processed_events;
    SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
@@ -309,10 +309,10 @@ IAsync::tSptr ServiceIpcThread::get_event( )
    return p_event;
 }
 
-void ServiceIpcThread::notify( const IAsync::tSptr p_event )
+void ServiceIpcThread::notify( const base::async::IAsync::tSptr p_event )
 {
    // Processing runnable IAsync object
-   if( eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
+   if( base::async::eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
    {
       m_process_started = time( nullptr );
       SYS_TRC( "'%s': start processing runnable at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
@@ -336,7 +336,7 @@ void ServiceIpcThread::notify( const IAsync::tSptr p_event )
       // for example, during calling "clear_notification" from "process_event".
       auto consumers_set = iterator->second;
       SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
-      for( IAsync::IConsumer* p_consumer : consumers_set )
+      for( base::async::IAsync::IConsumer* p_consumer : consumers_set )
       {
          m_process_started = time( nullptr );
          SYS_TRC( "'%s': start processing event at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
@@ -348,7 +348,7 @@ void ServiceIpcThread::notify( const IAsync::tSptr p_event )
    m_process_started.reset( );
 }
 
-void ServiceIpcThread::set_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void ServiceIpcThread::set_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -360,7 +360,9 @@ void ServiceIpcThread::set_notification( const IAsync::ISignature& signature, IA
       // So we should create a copy of this signature in a heap and store its pointer to consumers map.
       // Later on when number of consumers for this signature becase zero we must delete object by this pointer and remove poinetr from this map.
       auto p_signature = signature.create_copy( );
-      m_event_consumers_map.emplace( std::pair< const IAsync::ISignature*, std::set< IAsync::IConsumer* > >( p_signature, { p_consumer } ) );
+      m_event_consumers_map.emplace(
+         std::pair< const base::async::IAsync::ISignature*, std::set< base::async::IAsync::IConsumer* > >( p_signature, { p_consumer } )
+      );
    }
    else
    {
@@ -368,7 +370,7 @@ void ServiceIpcThread::set_notification( const IAsync::ISignature& signature, IA
    }
 }
 
-void ServiceIpcThread::clear_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void ServiceIpcThread::clear_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -387,7 +389,7 @@ void ServiceIpcThread::clear_notification( const IAsync::ISignature& signature, 
    }
 }
 
-void ServiceIpcThread::clear_all_notifications( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void ServiceIpcThread::clear_all_notifications( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
@@ -415,9 +417,9 @@ void ServiceIpcThread::clear_all_notifications( const IAsync::ISignature& signat
    }
 }
 
-bool ServiceIpcThread::is_subscribed( const IAsync::tSptr p_event )
+bool ServiceIpcThread::is_subscribed( const base::async::IAsync::tSptr p_event )
 {
-   if( eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
+   if( base::async::eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
       return true;
 
    return m_event_consumers_map.end( ) != m_event_consumers_map.find( p_event->signature( ) );
@@ -443,17 +445,17 @@ bool ServiceIpcThread::send( dsi::tByteStream& stream )
    return send( m_socket_sb, stream );
 }
 
-bool ServiceIpcThread::send( os::Socket& _socket, const IAsync::tSptr p_event )
+bool ServiceIpcThread::send( os::Socket& _socket, const base::async::IAsync::tSptr p_event )
 {
    dsi::Packet packet;
-   packet.add_package( dsi::eCommand::BroadcastEvent, *(std::static_pointer_cast< IEvent >( p_event )) );
+   packet.add_package( dsi::eCommand::BroadcastEvent, *(std::static_pointer_cast< base::async::IEvent >( p_event )) );
    dsi::tByteStream stream;
    stream.push( packet );
 
    return send( _socket, stream );
 }
 
-bool ServiceIpcThread::send( const IAsync::tSptr p_event )
+bool ServiceIpcThread::send( const base::async::IAsync::tSptr p_event )
 {
    return send( m_socket_sb, p_event );
 }
@@ -475,7 +477,7 @@ bool ServiceIpcThread::process_package( dsi::Package& package, os::Socket& socke
    {
       case dsi::eCommand::BroadcastEvent:
       {
-         base::IEvent::tSptr p_event = base::IEvent::deserialize( package.data( ) );
+         base::async::IEvent::tSptr p_event = base::async::IEvent::deserialize( package.data( ) );
          if( nullptr == p_event )
          {
             SYS_ERR( "'%s': lost received event", m_name.c_str( ) );
@@ -483,7 +485,7 @@ bool ServiceIpcThread::process_package( dsi::Package& package, os::Socket& socke
          else
          {
             SYS_TRC( "'%s': received event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
-            p_event->send( eCommType::ITC );
+            p_event->send( base::async::eCommType::ITC );
          }
          break;
       }

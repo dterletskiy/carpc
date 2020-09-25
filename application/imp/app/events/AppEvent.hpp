@@ -24,7 +24,7 @@ namespace application::events {
    enum class eAppEventID { BOOT, SHUTDOWN, PING, UNDEFINED };
    const char* c_str( const eAppEventID );
 
-   using tAppEventSignature = base::TSignatureID< eAppEventID >;
+   using tAppEventSignature = base::async::TSignatureID< eAppEventID >;
 
    DEFINE_EVENT( AppEvent, AppEventData, tAppEventSignature );
 

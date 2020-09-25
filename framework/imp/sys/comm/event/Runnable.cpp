@@ -5,7 +5,7 @@
 #define CLASS_ABBR "Runnable"
 
 
-using namespace base;
+using namespace base::async;
 
 
 
