@@ -1,3 +1,6 @@
+version 1.8.2a
+   - Minor change in base::TID.
+
 version 1.8.2
    - IDs for Timer, Thread, ServiceProcess and ServiceThreads introduced or reimplemented to common type base::ID.
    - Timer code improvement.
