@@ -1,7 +1,8 @@
-#include "api/sys/tools/Tools.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 
-namespace base::os {
+
+
+using namespace base::os;
 
 
 
@@ -51,7 +52,3 @@ MutexAutoLocker::~MutexAutoLocker( )
 {
    m_mutex.unlock( );
 }
-
-
-
-} // namespace base::os

@@ -32,20 +32,19 @@ void Server::request_trigger_state( const std::string& state, const size_t delay
    DBG_MSG( "state: %s / delay: %zu", state.c_str( ), delay );
 
    std::shared_ptr< base::Timer > timer = std::make_shared< base::Timer >( this );
-   timer->start( delay );
+   timer->start( delay, 1 );
    m_timers.emplace_back( TimerSeqID{ state, timer, unblock_request( ) } );
    // m_timers.emplace_back( TimerSeqID{ state, timer, 0 } );
 }
 
-void Server::process_timer( const base::Timer::ID id )
+void Server::process_timer( const base::ID id )
 {
-   DBG_MSG( "timer '%#lx' expired", (long)id );
+   DBG_MSG( "timer '%zu' expired", id );
 
    auto iterator = std::find_if( m_timers.begin( ), m_timers.end( ), [ id ]( const TimerSeqID& element ){ return element.timer->id( ) == id; } );
    if( m_timers.end( ) == iterator )
       return;
 
-   iterator->timer->stop( );
    prepare_response( iterator->seq_id );
    response_trigger_state( true );
    current_state( iterator->current_state );

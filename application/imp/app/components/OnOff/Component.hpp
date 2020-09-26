@@ -32,7 +32,7 @@ private:
 
 // Timer
 private:
-   void process_timer( const base::Timer::ID ) override;
+   void process_timer( const base::ID ) override;
    base::Timer m_timer;
 
 public:

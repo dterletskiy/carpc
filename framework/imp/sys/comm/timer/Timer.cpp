@@ -3,6 +3,7 @@
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/tools/Tools.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -15,17 +16,11 @@ using namespace base;
 
 
 static base::os::Mutex mutex_consumer_map;
-static std::map< Timer::ID, IServiceThread::tWptr > consumer_map;
+static std::map< base::os::linux::timer::tID, Timer* > consumer_map;
 
-// This convert method is used because Event::id could not have time Timer::ID (aka void*)
-const size_t convert( void* id )
+void timer_processor( const base::os::linux::timer::tID timer_id )
 {
-   return reinterpret_cast< size_t >( id );
-}
-
-void timer_processor( const Timer::ID timer_id )
-{
-   SYS_TRC( "%#lx: processing timer: %#lx", os::Thread::current_id( ), (long)timer_id );
+   SYS_TRC( "processing timer: %#lx", (long)timer_id );
 
    mutex_consumer_map.lock( );
    auto iterator = consumer_map.find( timer_id );
@@ -35,10 +30,10 @@ void timer_processor( const Timer::ID timer_id )
       SYS_ERR( "Timer has not been found" );
       return;
    }
-   IServiceThread::tWptr pw_service = iterator->second;
+   Timer* p_timer = iterator->second;
    mutex_consumer_map.unlock( );
 
-   TimerEvent::Event::create_send_to_context( { convert( timer_id ) }, { timer_id }, pw_service );
+   p_timer->process( timer_id );
 }
 
 void signal_handler( int signal, siginfo_t* si, void* uc )
@@ -46,7 +41,7 @@ void signal_handler( int signal, siginfo_t* si, void* uc )
    SYS_TRC( "signal: %d / si->si_signo: %d", signal, si->si_signo );
    SYS_TRC( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
 
-   Timer::ID* timer_id = (Timer::ID*)si->si_value.sival_ptr;
+   base::os::linux::timer::tID* timer_id = (base::os::linux::timer::tID*)si->si_value.sival_ptr;
    SYS_TRC( "timer id: %#lx", (long)(*timer_id) );
    timer_processor( *timer_id );
 }
@@ -59,7 +54,9 @@ void event_handler( union sigval sv )
 
 
 Timer::Timer( ITimerConsumer* p_consumer )
-   : mp_consumer( p_consumer )
+   : m_id( tools::id::generate( "timer" ) )
+   , mp_consumer( p_consumer )
+   , mp_service( ServiceProcess::instance( )->current_service( ) )
 {
    if( nullptr == mp_consumer )
    {
@@ -67,7 +64,7 @@ Timer::Timer( ITimerConsumer* p_consumer )
       return;
    }
 
-   IServiceThread::tSptr p_service = ServiceProcess::instance( )->service( os::Thread::current_id( ) );
+   IServiceThread::tSptr p_service = mp_service.lock( );
    if( nullptr == p_service )
    {
       SYS_ERR( "ServiceThread has not been found. Creating timer not in service thread" );
@@ -75,35 +72,35 @@ Timer::Timer( ITimerConsumer* p_consumer )
    }
 
    os::linux::signals::set_handler( SIGRTMIN, signal_handler );
-   if( false == os::linux::timer::create( m_id, SIGRTMIN ) )
+   if( false == os::linux::timer::create( m_timer_id, SIGRTMIN ) )
    {
       SYS_ERR( "create timer error" );
       return;
    }
 
    mutex_consumer_map.lock( );
-   const auto [iterator, success] = consumer_map.insert( { m_id, p_service } );
+   const auto [iterator, success] = consumer_map.insert( { m_timer_id, this } );
    mutex_consumer_map.unlock( );
    if( false == success )
    {
       SYS_ERR( "insert error" );
-      if( false == os::linux::timer::remove( m_id ) )
+      if( false == os::linux::timer::remove( m_timer_id ) )
       {
          SYS_ERR( "remove timer error" );
       }
       return;
    }
 
-   SYS_TRC( "created timer: %#lx", (long) m_id );
-   TimerEvent::Event::set_notification( mp_consumer, { convert( m_id ) } );
+   SYS_TRC( "created timer: %zu -> %#lx", m_id, (long) m_timer_id );
+   TimerEvent::Event::set_notification( mp_consumer, { m_id } );
 }
 
 Timer::~Timer( )
 {
-   TimerEvent::Event::clear_notification( mp_consumer, { convert( m_id ) } );
+   TimerEvent::Event::clear_notification( mp_consumer, { m_id } );
 
    mutex_consumer_map.lock( );
-   const size_t result = consumer_map.erase( m_id );
+   const size_t result = consumer_map.erase( m_timer_id );
    mutex_consumer_map.unlock( );
    if( 0 == result )
    {
@@ -114,13 +111,13 @@ Timer::~Timer( )
       SYS_WRN( "%zu timers have been founded", result );
    }
 
-   if( false == os::linux::timer::remove( m_id ) )
+   if( false == os::linux::timer::remove( m_timer_id ) )
    {
       SYS_ERR( "remove timer error" );
    }
    else
    {
-      SYS_TRC( "removed timer: %#lx", (long) m_id );
+      SYS_TRC( "removed timer: %zu -> %#lx", m_id, (long) m_timer_id );
    }
 }
 
@@ -129,7 +126,7 @@ const bool Timer::operator<( const Timer& timer ) const
    return m_id < timer.m_id;
 }
 
-bool Timer::start( const long int nanoseconds )
+bool Timer::start( const std::size_t nanoseconds, const std::size_t count )
 {
    if( true == m_is_running )
    {
@@ -137,20 +134,24 @@ bool Timer::start( const long int nanoseconds )
       return false;
    }
 
-   if( 0 >= nanoseconds )
+   if( 0 == nanoseconds )
    {
-      SYS_ERR( "Invalid period value: %ld", nanoseconds );
+      SYS_ERR( "Zero period value" );
       return false;
    }
 
    m_nanoseconds = nanoseconds;
-   if( false == os::linux::timer::start( m_id, nanoseconds, os::linux::timer::eTimerType::continious ) )
+   m_count = count;
+   m_ticks = 0;
+   os::linux::timer::eTimerType type = os::linux::timer::eTimerType::single;
+   if( CONTINIOUS == m_count ) type = os::linux::timer::eTimerType::continious;
+   if( false == os::linux::timer::start( m_timer_id, (long int)m_nanoseconds, type ) )
    {
       SYS_ERR( "start timer error" );
       return false;
    }
 
-   SYS_TRC( "started timer: %#lx", (long) m_id );
+   SYS_TRC( "started timer: %zu -> %#lx", m_id, (long) m_timer_id );
    m_is_running = true;
    return true;  
 }
@@ -165,25 +166,34 @@ bool Timer::stop( )
 
    m_is_running = false;
    m_nanoseconds = 0;
+   m_count = 0;
+   m_ticks = 0;
 
-   if( false == os::linux::timer::stop( m_id ) )
+   if( false == os::linux::timer::stop( m_timer_id ) )
    {
       SYS_ERR( "stop timer error" );
       return false;
    }
 
-   SYS_TRC( "stoped timer: %#lx", (long) m_id );
+   SYS_TRC( "stoped timer: %zu -> %#lx", m_id, (long) m_timer_id );
    return true;  
 }
 
-bool Timer::is_running( ) const
+void Timer::process( const base::os::linux::timer::tID id )
 {
-   return m_is_running;
-}
+   if( id != m_timer_id )
+   {
+      SYS_ERR( "Timer id mismatch" );
+      return;
+   }
 
-const Timer::ID Timer::id( ) const
-{
-   return m_id;
+   ++m_ticks;
+   if( m_ticks == m_count )
+      stop( );
+   else if( m_ticks > m_count )
+      return;
+
+   TimerEvent::Event::create_send_to_context( m_id, { m_id }, mp_service );
 }
 
 
@@ -212,7 +222,6 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 #include <thread>
 #include <limits>
 #include "api/sys/comm/event/Runnable.hpp"
-#include "api/sys/tools/Tools.hpp"
 
 namespace base::timer {
 

@@ -21,7 +21,7 @@ namespace controller::components::onoff {
 
       // Timer
       private:
-         void process_timer( const base::Timer::ID ) override;
+         void process_timer( const base::ID ) override;
          struct TimerSeqID
          {
             std::string current_state;

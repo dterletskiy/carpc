@@ -40,7 +40,8 @@ using namespace base;
 ServiceProcess::tSptr ServiceProcess::mp_instance = nullptr;
 
 ServiceProcess::ServiceProcess( )
-   : m_service_list( )
+   : m_id( tools::id::generate( "srv_proc" ) )
+   , m_service_list( )
    , m_connection_db( )
 {
    SYS_TRC( "created" );
@@ -84,7 +85,7 @@ IServiceThread::tSptr ServiceProcess::service_ipc( ) const
    return mp_service_ipc;
 }
 
-IServiceThread::tSptr ServiceProcess::service( const TID& id ) const
+IServiceThread::tSptr ServiceProcess::service( const ID& id ) const
 {
    for( auto& p_service : m_service_list )
    {
@@ -99,11 +100,11 @@ IServiceThread::tSptr ServiceProcess::current_service( ) const
 {
    for( auto& p_service : m_service_list )
    {
-      if( os::Thread::current_id( ) == p_service->id( ) )
+      if( os::Thread::current_id( ) == p_service->thread( ).id( ) )
          return p_service;
    }
 
-   if( os::Thread::current_id( ) == mp_service_ipc->id( ) )
+   if( os::Thread::current_id( ) == mp_service_ipc->thread( ).id( ) )
       return mp_service_ipc;
 
    return nullptr;

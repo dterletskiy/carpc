@@ -1,3 +1,8 @@
+version 1.8.2
+   - IDs for Timer, Thread, ServiceProcess and ServiceThreads introduced or reimplemented to common type base::ID.
+   - Timer code improvement.
+   - Special class base::TID implemented for the future distinguish IDs for different types.
+
 version 1.8.1
    - Moved all Async objects to async namespace.
 

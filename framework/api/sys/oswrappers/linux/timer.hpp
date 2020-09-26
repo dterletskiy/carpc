@@ -13,14 +13,14 @@ namespace base::os::linux::timer {
 
    enum class eTimerType : size_t { single = 0, continious };
 
-   using TimerID = timer_t;
+   using tID = timer_t;
    using tEventHandler = void(*)( union sigval );
 
-   bool create( TimerID& timer_id, int signal );
-   bool create( TimerID& timer_id, tEventHandler callback, void* p_attributes = nullptr );
-   bool remove( const TimerID& timer_id );
-   bool start( const TimerID& timer_id, long int freq_nanosecs, eTimerType type = eTimerType::single );
-   bool stop( const TimerID& timer_id );
+   bool create( tID& timer_id, int signal );
+   bool create( tID& timer_id, tEventHandler callback, void* p_attributes = nullptr );
+   bool remove( const tID& timer_id );
+   bool start( const tID& timer_id, long int freq_nanosecs, eTimerType type = eTimerType::single );
+   bool stop( const tID& timer_id );
 
 } // namespace base::os::linux::timer
 
@@ -33,7 +33,7 @@ using tSignalHandler = void(*)( int, siginfo_t*, void* );
 void signal_handler( int sig, siginfo_t* si, void* uc )
 {
    DBG_TRC( "Signal %d", sig );
-   TimerID* timer_id = static_cast< TimerID* >( si->si_value.sival_ptr );
+   tID* timer_id = static_cast< tID* >( si->si_value.sival_ptr );
    DBG_MSG( "Elapsed timer with ID: %#lx", (long) *timer_id );
 
    // signal( sig, SIG_IGN );
@@ -42,7 +42,7 @@ void signal_handler( int sig, siginfo_t* si, void* uc )
 void event_handler( union sigval sv )
 {
    DBG_TRC( "Event" );
-   TimerID* timer_id = static_cast< TimerID* >( sv.sival_ptr );
+   tID* timer_id = static_cast< tID* >( sv.sival_ptr );
    DBG_MSG( "Elapsed timer with ID: %#lx", (long) *timer_id );
 }
 
@@ -68,7 +68,7 @@ void thread_loop_1( )
 {
    DBG_MSG( );
 
-   TimerID timer_id;
+   tID timer_id;
    if( false == base::os::linux::timer::create( timer_id, SIGRTMIN ) )
       return;
    DBG_MSG( "Timer ID: %#lx", (long) timer_id );
@@ -84,7 +84,7 @@ void thread_loop_2( )
 {
    DBG_MSG( );
 
-   TimerID timer_id;
+   tID timer_id;
    if( false == base::os::linux::timer::create( timer_id, event_handler ) )
       return;
    DBG_MSG( "Timer ID: %#lx", (long) timer_id );

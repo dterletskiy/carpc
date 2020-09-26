@@ -39,17 +39,6 @@ namespace base {
          ServiceIpcThread& operator=( const ServiceIpcThread& ) = delete;
 
       private:
-         const TID id( ) const override;
-         const std::string& name( ) const override;
-         std::string                   m_name;
-
-      private:
-         const size_t wd_timeout( ) const override;
-         const std::optional< time_t > process_started( ) const override;
-         size_t                        m_wd_timeout = 0;
-         std::optional< time_t >       m_process_started = std::nullopt;
-
-      private:
          void boot( const std::string& ) override;
          void shutdown( const std::string& ) override;
 
@@ -65,8 +54,9 @@ namespace base {
          bool started_send( ) const;
          bool wait_send( );
          void thread_loop_send( );
-         os::ThreadPtr                 mp_thread_send;
-         bool                          m_started_send = false;
+         const base::os::Thread& thread( ) const override;
+         os::Thread                                   m_thread_send;
+         bool                                         m_started_send = false;
 
       private:
          bool start_receive( );
@@ -74,8 +64,8 @@ namespace base {
          bool started_receive( ) const;
          bool wait_receive( );
          void thread_loop_receive( );
-         os::ThreadPtr                 mp_thread_receive;
-         bool                          m_started_receive = false;
+         os::Thread                                   m_thread_receive;
+         bool                                         m_started_receive = false;
 
       private:
          bool insert_event( const base::async::IAsync::tSptr ) override;
@@ -114,33 +104,15 @@ namespace base {
 
 
    inline
-   const std::string& ServiceIpcThread::name( ) const
+   const base::os::Thread& ServiceIpcThread::thread( ) const
    {
-      return m_name;
-   }
-
-   inline
-   const TID ServiceIpcThread::id( ) const
-   {
-      return mp_thread_send ? mp_thread_send->id( ) : 0;
-   }
-
-   inline
-   const size_t ServiceIpcThread::wd_timeout( ) const
-   {
-      return m_wd_timeout;
+      return m_thread_send;
    }
 
    inline
    const uint64_t ServiceIpcThread::processed_events( ) const
    {
       return m_processed_events;
-   }
-
-   inline
-   const std::optional< time_t > ServiceIpcThread::process_started( ) const
-   {
-      return m_process_started;
    }
 
    inline
@@ -164,7 +136,7 @@ namespace base {
    inline
    bool ServiceIpcThread::wait_send( )
    {
-      m_started_send = mp_thread_send->join( );
+      m_started_send = m_thread_send.join( );
       return !m_started_send;
    }
 
@@ -177,7 +149,7 @@ namespace base {
    inline
    bool ServiceIpcThread::wait_receive( )
    {
-      m_started_receive = mp_thread_receive->join( );
+      m_started_receive = m_thread_receive.join( );
       return !m_started_receive;
    }
 

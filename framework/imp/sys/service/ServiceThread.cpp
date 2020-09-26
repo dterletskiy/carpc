@@ -12,15 +12,15 @@ using namespace base;
 
 
 ServiceThread::ServiceThread( const Info& info )
-   : m_name( info.m_name )
-   , m_wd_timeout( info.m_wd_timeout )
+   : IServiceThread( info.m_name, info.m_wd_timeout )
+   , m_thread( std::bind( &ServiceThread::thread_loop, this ) )
    , m_events( )
    , m_buffer_cond_var( )
    , m_event_consumers_map( )
    , m_components( )
    , m_component_creators( info.m_component_creators )
 {
-   mp_thread = std::make_shared< base::os::Thread >( std::bind( &ServiceThread::thread_loop, this ) );
+   ;
 
    SYS_TRC( "'%s': created", m_name.c_str( ) );
 }
@@ -57,7 +57,7 @@ void ServiceThread::thread_loop( )
 bool ServiceThread::start( )
 {
    SYS_INF( "'%s': starting", m_name.c_str( ) );
-   bool result = mp_thread->run( );
+   bool result = m_thread.run( );
    if( false == result )
    {
       SYS_ERR( "'%s': can't be started", m_name.c_str( ) );

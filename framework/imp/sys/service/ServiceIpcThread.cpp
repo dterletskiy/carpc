@@ -20,17 +20,15 @@ using namespace base;
 
 
 ServiceIpcThread::ServiceIpcThread( )
-   : m_name( "IPC" )
-   , m_wd_timeout( 10 )
+   : IServiceThread( "IPC", 10 )
+   , m_thread_send( std::bind( &ServiceIpcThread::thread_loop_send, this ) )
+   , m_thread_receive( std::bind( &ServiceIpcThread::thread_loop_receive, this ) )
    , m_events( )
    , m_buffer_cond_var( )
    , m_event_consumers_map( )
    , m_socket_sb( ServiceProcess::instance( )->configuration( ).ipc_sb, ServiceProcess::instance( )->configuration( ).ipc_sb_buffer_size )
    , m_socket_master( ServiceProcess::instance( )->configuration( ).ipc_app, ServiceProcess::instance( )->configuration( ).ipc_app_buffer_size )
 {
-   mp_thread_send = std::make_shared< base::os::Thread >( std::bind( &ServiceIpcThread::thread_loop_send, this ) );
-   mp_thread_receive = std::make_shared< base::os::Thread >( std::bind( &ServiceIpcThread::thread_loop_receive, this ) );
-
    SYS_TRC( "'%s': created", m_name.c_str( ) );
 }
 
@@ -227,7 +225,7 @@ bool ServiceIpcThread::setup_connection( )
 bool ServiceIpcThread::start_send( )
 {
    SYS_INF( "'%s': starting send thread", m_name.c_str( ) );
-   if( false == mp_thread_send->run( ) )
+   if( false == m_thread_send.run( ) )
    {
       SYS_ERR( "'%s': send thread can't be started", m_name.c_str( ) );
       return false;
@@ -238,7 +236,7 @@ bool ServiceIpcThread::start_send( )
 bool ServiceIpcThread::start_receive( )
 {
    SYS_INF( "'%s': starting recieve thread", m_name.c_str( ) );
-   if( false == mp_thread_receive->run( ) )
+   if( false == m_thread_receive.run( ) )
    {
       SYS_ERR( "'%s': receive thread can't be started", m_name.c_str( ) );
       return false;

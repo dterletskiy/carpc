@@ -7,7 +7,21 @@
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OS_THREAD"
 
-namespace base::os {
+
+
+using namespace base::os;
+
+
+
+namespace {
+
+   using tRegistry = std::map< pthread_t, base::ID >;
+   tRegistry s_registry;
+
+   base::os::Mutex s_registry_mutex;
+   base::os::Mutex thread_loop_mutex;
+
+}
 
 
 
@@ -15,9 +29,7 @@ Thread::Thread( FunctionThread&& p_function )
    : mp_function( p_function )
 {
    SYS_INF( );
-   pthread_attr_init( &m_attr );
-   pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
-   pthread_attr_setscope( &m_attr,PTHREAD_SCOPE_PROCESS );
+   init( );
 }
 
 Thread::~Thread( )
@@ -25,36 +37,49 @@ Thread::~Thread( )
    SYS_INF( );
    // Not supported by Android
    // if( true == m_created ) pthread_cancel( m_created );
+   os::MutexAutoLocker locker( s_registry_mutex );
+   s_registry.erase( m_thread_id );
 }
 
-const TID Thread::current_id( )
+void Thread::init( )
 {
-   return pthread_self( );
+   m_id = tools::id::generate( "thread" );
+
+   pthread_attr_init( &m_attr );
+   pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
+   pthread_attr_setscope( &m_attr, PTHREAD_SCOPE_PROCESS );
+
 }
 
-const std::uint64_t Thread::convert( const TID& tid )
+const base::ID Thread::current_id( )
 {
-   std::uint64_t uint64_id = 0;//static_cast< std::uint64_t >( id );
-   memcpy( &uint64_id, &tid, std::min( sizeof(uint64_id), sizeof(tid) ) );
+   os::MutexAutoLocker locker( s_registry_mutex );
+   const auto iterator = s_registry.find( pthread_self( ) );
+   if( s_registry.end( ) == iterator )
+      return InvalidID;
 
-   return uint64_id;
+   return iterator->second;
 }
 
-Mutex mutex;
 void* Thread::thread_loop( void* parameters )
 {
-   mutex.lock( );
+   thread_loop_mutex.lock( );
    Thread* p_thread = (Thread*)parameters;
 
    pthread_t id = pthread_self( );
    SYS_INF( "Thread: %#lx. Enter", id );
-   if( id != p_thread->m_id )
+   if( id != p_thread->m_thread_id )
    {
-      SYS_ERR( "Thread ID mistmach: %#lx != %#lx", id, p_thread->m_id );
-      mutex.unlock( );
+      SYS_ERR( "Thread ID mistmach: %#lx != %#lx", id, p_thread->m_thread_id );
+      thread_loop_mutex.unlock( );
       pthread_exit( nullptr );
    }
-   mutex.unlock( );
+   thread_loop_mutex.unlock( );
+
+   SYS_INF( "%lx -> %zu", p_thread->m_thread_id, p_thread->m_id );
+   s_registry_mutex.lock( );
+   s_registry.emplace( std::make_pair( p_thread->m_thread_id, p_thread->m_id ) );
+   s_registry_mutex.unlock( );
 
    p_thread->mp_function( );
    return static_cast< void* >( p_thread );
@@ -64,14 +89,14 @@ bool Thread::run( )
 {
    if( true == m_created )
    {
-      SYS_WRN( "Thread: %#lx. Already created", m_id );
+      SYS_WRN( "Thread: %#lx. Already created", m_thread_id );
       return false;
    }
 
-   int result = pthread_create( &m_id, &m_attr, thread_loop, this );
+   int result = pthread_create( &m_thread_id, &m_attr, thread_loop, this );
    if( 0 == result )
    {
-      SYS_INF( "Thread: %#lx. Created", m_id );
+      SYS_INF( "Thread: %#lx. Created", m_thread_id );
       m_created = true;
    }
    else
@@ -91,20 +116,16 @@ bool Thread::join( )
    }
 
    void** status = nullptr;
-   int result = pthread_join( m_id, status );
+   int result = pthread_join( m_thread_id, status );
    if( 0 == result )
    {
-      SYS_INF( "Thread: %#lx. Joined with status: %p", m_id, ((int**)status) );
+      SYS_INF( "Thread: %#lx. Joined with status: %p", m_thread_id, ((int**)status) );
       m_created = false;
    }
    else
    {
-      SYS_ERR( "Thread: %#lx. Was not joined. Error: %d", m_id, result );
+      SYS_ERR( "Thread: %#lx. Was not joined. Error: %d", m_thread_id, result );
    }
 
    return !m_created;
 }
-
-
-
-} // namespace base::os

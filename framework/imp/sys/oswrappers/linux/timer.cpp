@@ -9,7 +9,7 @@ namespace base::os::linux::timer {
 
 
 
-   bool create( TimerID& timer_id, int signal )
+   bool create( tID& timer_id, int signal )
    {
       struct sigevent sev;
       memset( &sev, 0, sizeof(struct sigevent) );
@@ -29,7 +29,7 @@ namespace base::os::linux::timer {
       return 0 == result;
    }
 
-   bool create( TimerID& timer_id, tEventHandler callback, void* p_attributes )
+   bool create( tID& timer_id, tEventHandler callback, void* p_attributes )
    {
       struct sigevent sev;
       memset( &sev, 0, sizeof(struct sigevent) );
@@ -50,7 +50,7 @@ namespace base::os::linux::timer {
       return 0 == result;
    }
 
-   bool remove( const TimerID& timer_id )
+   bool remove( const tID& timer_id )
    {
       int result = timer_delete( timer_id );
       if( -1 == result )
@@ -63,7 +63,7 @@ namespace base::os::linux::timer {
       return 0 == result;
    }
 
-   bool start( const TimerID& timer_id, long int freq_nanosecs, eTimerType type )
+   bool start( const tID& timer_id, long int freq_nanosecs, eTimerType type )
    {
       struct itimerspec its;
       memset( &its, 0, sizeof(struct itimerspec) );
@@ -86,7 +86,7 @@ namespace base::os::linux::timer {
       return 0 == result;
    }
 
-   bool stop( const TimerID& timer_id )
+   bool stop( const tID& timer_id )
    {
       struct itimerspec its;
       memset( &its, 0, sizeof(struct itimerspec) );

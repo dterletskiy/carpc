@@ -40,26 +40,20 @@ namespace base {
          ServiceThread& operator=( const ServiceThread& ) = delete;
 
       private:
-         const TID id( ) const override;
-         const std::string& name( ) const override;
-         std::string                   m_name;
-
-      private:
-         const size_t wd_timeout( ) const override;
-         const std::optional< time_t > process_started( ) const override;
-         size_t                        m_wd_timeout = 0;
-         std::optional< time_t >       m_process_started = std::nullopt;
+         void boot( const std::string& ) override;
+         void shutdown( const std::string& ) override;
 
       private:
          bool start( ) override;
          void stop( ) override;
          bool started( ) const override;
          bool wait( ) override;
-         void boot( const std::string& ) override;
-         void shutdown( const std::string& ) override;
+
+      private:
+         const base::os::Thread& thread( ) const override;
          void thread_loop( );
-         os::ThreadPtr                 mp_thread;
-         bool                          m_started = false;
+         base::os::Thread                             m_thread;
+         bool                                         m_started = false;
 
       private:
          bool insert_event( const base::async::IAsync::tSptr ) override;
@@ -85,33 +79,15 @@ namespace base {
 
 
    inline
-   const std::string& ServiceThread::name( ) const
+   const base::os::Thread& ServiceThread::thread( ) const
    {
-      return m_name;
-   }
-
-   inline
-   const TID ServiceThread::id( ) const
-   {
-      return mp_thread ? mp_thread->id( ) : 0;
-   }
-
-   inline
-   const size_t ServiceThread::wd_timeout( ) const
-   {
-      return m_wd_timeout;
+      return m_thread;
    }
 
    inline
    const uint64_t ServiceThread::processed_events( ) const
    {
       return m_processed_events;
-   }
-
-   inline
-   const std::optional< time_t > ServiceThread::process_started( ) const
-   {
-      return m_process_started;
    }
 
    inline
@@ -123,7 +99,7 @@ namespace base {
    inline
    bool ServiceThread::wait( )
    {
-      m_started = mp_thread->join( );
+      m_started = m_thread.join( );
       return !m_started;
    }
 

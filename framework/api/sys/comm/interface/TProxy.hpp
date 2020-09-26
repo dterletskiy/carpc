@@ -400,7 +400,7 @@ namespace base::interface {
 
       private:
          TProxy( const base::async::tAsyncTypeID&, const std::string&, const bool );
-         static std::map< TID, tProxy* > s_proxy_map;
+         static std::map< ID, tProxy* > s_proxy_map;
       public:
          ~TProxy( ) override;
          static tProxy* create( const base::async::tAsyncTypeID&, const std::string&, const bool );
@@ -446,12 +446,12 @@ namespace base::interface {
    }
 
    template< typename TYPES >
-   std::map< TID, TProxy< TYPES >* > TProxy< TYPES >::s_proxy_map;
+   std::map< ID, TProxy< TYPES >* > TProxy< TYPES >::s_proxy_map;
 
    template< typename TYPES >
    TProxy< TYPES >* TProxy< TYPES >::create( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    {
-      TID tid = ServiceProcess::instance( )->current_service( )->id( );
+      ID tid = ServiceProcess::instance( )->current_service( )->id( );
       os::Mutex mutex( true );
 
       auto iterator = s_proxy_map.find( tid );

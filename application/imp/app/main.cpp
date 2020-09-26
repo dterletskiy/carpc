@@ -163,11 +163,7 @@ const bool test( int argc, char** argv )
 
 
 
-   const void* ptr = (void*) malloc( sizeof(int) );
-   const std::size_t value = std::numeric_limits< std::size_t >::max( );
 
-   std::string string = base::format_string( (void*)value, ".", ptr );
-   DBG_INF( "string: %s", string.c_str( ) );
 
 
    // base::math::tmatrixd::test::run( );

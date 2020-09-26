@@ -6,7 +6,9 @@
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OS_CONDVAR"
 
-namespace base::os {
+
+
+using namespace base::os;
 
 
 
@@ -39,8 +41,3 @@ void ConditionVariable::notify( const bool all )
    if( all )   pthread_cond_broadcast( &m_cond_var );
    else        pthread_cond_signal( &m_cond_var );
 }
-
-
-
-
-} // namespace base::os

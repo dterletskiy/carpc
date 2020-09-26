@@ -121,9 +121,9 @@ void Component::boot( const std::string& command )
    DBG_MSG( "started timer: %zu", id );
 }
 
-void Component::process_timer( const base::Timer::ID id )
+void Component::process_timer( const base::ID id )
 {
-   DBG_MSG( "Timer '%#lx' expired", (long)id );
+   DBG_MSG( "Timer '%zu' expired", id );
    if( id == m_timer.id( ) )
    {
       DBG_WRN( "Shutting down system" );

@@ -34,12 +34,19 @@ namespace base {
          void boot( );
 
       public:
+         const ID& id( ) const;
+         const std::string& name( ) const;
+      private:
+         ID             m_id = InvalidID;
+         std::string    m_name = "NoName";
+
+      public:
          IServiceThread::tSptr service_ipc( ) const;
       private:
          IServiceThread::tSptr   mp_service_ipc = nullptr;
 
       public:
-         IServiceThread::tSptr service( const TID& ) const;
+         IServiceThread::tSptr service( const ID& ) const;
          IServiceThread::tSptr current_service( ) const;
          IServiceThread::tSptrList service_list( ) const;
       private:
@@ -51,7 +58,7 @@ namespace base {
          interface::ConnectionDB    m_connection_db;
 
       private:
-         os::linux::timer::TimerID  m_timer_id;
+         os::linux::timer::tID      m_timer_id;
 
       public:
          struct Configuration
@@ -68,6 +75,18 @@ namespace base {
    };
 
 
+
+   inline
+   const std::string& ServiceProcess::name( ) const
+   {
+      return m_name;
+   }
+
+   inline
+   const ID& ServiceProcess::id( ) const
+   {
+      return m_id;
+   }
 
    inline
    IServiceThread::tSptrList ServiceProcess::service_list( ) const
