@@ -3,9 +3,10 @@
 #include <set>
 
 #include "api/sys/oswrappers/Socket.hpp"
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/Includes.hpp"
+#include "api/sys/comm/service/Address.hpp"
+#include "api/sys/comm/service/Signature.hpp"
 #include "api/sys/dsi/Types.hpp"
-#include "api/sys/comm/interface/Types.hpp"
 
 
 
@@ -17,9 +18,9 @@ struct Connection
    bool operator<( const Connection& other ) const { return socket < other.socket; }
 
    base::os::Socket::tSptr socket = nullptr;
-   const void*             ptr = nullptr;
-   std::string             address;
-   int                     port;
+   base::service::Address  service_address;
+   std::string             inet_address;
+   int                     inet_port;
    // base::os::linux::socket::configuration;
 };
 
@@ -54,5 +55,5 @@ class ConnectionProcessor : public base::os::SocketServer
       void unregister_client( base::os::Socket::tSptr p_socket, base::dsi::Package& package );
 
    private:
-      std::map< base::interface::Signature, ServiceConnection > m_service_map;
+      std::map< base::service::Signature, ServiceConnection > m_service_map;
 };

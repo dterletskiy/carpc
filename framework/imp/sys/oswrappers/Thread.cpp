@@ -15,7 +15,7 @@ using namespace base::os;
 
 namespace {
 
-   using tRegistry = std::map< pthread_t, base::ID >;
+   using tRegistry = std::map< pthread_t, Thread::ID >;
    tRegistry s_registry;
 
    base::os::Mutex s_registry_mutex;
@@ -43,7 +43,7 @@ Thread::~Thread( )
 
 void Thread::init( )
 {
-   m_id = tools::id::generate( "thread" );
+   m_id = ID::generate( );
 
    pthread_attr_init( &m_attr );
    pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
@@ -51,12 +51,12 @@ void Thread::init( )
 
 }
 
-const base::ID Thread::current_id( )
+const Thread::ID Thread::current_id( )
 {
    os::MutexAutoLocker locker( s_registry_mutex );
    const auto iterator = s_registry.find( pthread_self( ) );
    if( s_registry.end( ) == iterator )
-      return InvalidID;
+      return ID::invalid( );
 
    return iterator->second;
 }
@@ -76,7 +76,7 @@ void* Thread::thread_loop( void* parameters )
    }
    thread_loop_mutex.unlock( );
 
-   SYS_INF( "%lx -> %zu", p_thread->m_thread_id, p_thread->m_id );
+   SYS_INF( "%lx -> %s", p_thread->m_thread_id, p_thread->m_id.name( ).c_str( ) );
    s_registry_mutex.lock( );
    s_registry.emplace( std::make_pair( p_thread->m_thread_id, p_thread->m_id ) );
    s_registry_mutex.unlock( );

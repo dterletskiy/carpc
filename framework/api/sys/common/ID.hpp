@@ -19,7 +19,7 @@ namespace base {
    {
       public:
          using tID = TID< T >;
-         using TYPE = tValueID;
+         using VALUE_TYPE = tValueID;
 
          static const tID generate( )
          {
@@ -31,9 +31,14 @@ namespace base {
             static tID id;
             return id;
          }
+         static const tID& zero( )
+         {
+            static tID id( 0 );
+            return id;
+         }
 
       public:
-         TID( const tValueID& value = ValueInvalidID ) : m_value( value ) { }
+         TID( const VALUE_TYPE& value = ValueInvalidID ) : m_value( value ) { }
          TID( const tID& other ) : m_value( other.m_value ) { }
          ~TID( ) = default;
 
@@ -50,22 +55,29 @@ namespace base {
          bool operator<=( const tID& other ) const { return m_value <= other.m_value; }
          bool operator>=( const tID& other ) const { return m_value >= other.m_value; }
 
-         tID operator++( ) { return tID( ++m_value ); }
+         tID operator++( ) { ++m_value; return *this; }
          tID operator++( int ) { return tID( m_value++ ); }
          tID operator--( ) { return tID( --m_value ); }
          tID operator--( int ) { return tID( m_value-- ); }
 
-         operator tValueID( ) const { return m_value; }
+         tID operator+( const VALUE_TYPE& value ) const { return tID( m_value + value ); }
+         tID operator-( const VALUE_TYPE& value ) const { return tID( m_value - value ); }
+
+         // operator VALUE_TYPE( ) const { return m_value; }
 
       public:
-         const tValueID& value( ) const { return m_value; }
+         const VALUE_TYPE& value( ) const { return m_value; }
          bool is_valid( ) const { return m_value != ValueInvalidID; }
+         bool is_invalid( ) const { return m_value == ValueInvalidID; }
          const std::string name( ) const { return base::format_string( "0x", std::hex, m_value ); }
       private:
-         tValueID m_value = ValueInvalidID;
-
-      public:
+         VALUE_TYPE m_value = ValueInvalidID;
    };
+
+
+   struct Object { using ID = TID< Object >; };
+   using tID = Object::ID;
+
 
 } // namespace base
 

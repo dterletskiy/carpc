@@ -1,7 +1,8 @@
 #pragma once
 
 #include "api/sys/oswrappers/linux/thread.hpp"
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/Includes.hpp"
+#include "api/sys/common/ID.hpp"
 
 
 
@@ -9,6 +10,9 @@ namespace base::os {
 
    class ConditionVariable
    {
+      public:
+         using ID = base::TID< ConditionVariable >;
+
       public:
          ConditionVariable( );
          ConditionVariable( const ConditionVariable& ) = delete;
@@ -32,7 +36,7 @@ namespace base::os {
 
 
    inline
-   const ID ConditionVariable::id( ) const
+   const ConditionVariable::ID ConditionVariable::id( ) const
    {
       return m_id;
    }

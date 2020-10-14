@@ -1,6 +1,7 @@
 #pragma once
 
-#include "api/sys/comm/interface/TServer.hpp"
+#include "api/sys/comm/service/fast/TServer.hpp"
+#include "api/sys/comm/service/secure/TServer.hpp"
 #include "api/sys/onoff/Data.hpp"
 
 
@@ -8,8 +9,11 @@
 namespace base::onoff {
 
    class Server
-      : public base::interface::TServer< data::Types >
+      : public base::service::SERVICE_NAMESPACE::TServer< data::Types >
    {
+      public:
+         using tSptr = std::shared_ptr< Server >;
+
       public:
          Server( const std::string& );
          virtual ~Server( );

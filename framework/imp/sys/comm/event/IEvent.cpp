@@ -1,7 +1,8 @@
 #include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/service/ServiceIpcThread.hpp"
-#include "api/sys/service/ServiceThread.hpp"
-#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/application/ThreadIPC.hpp"
+#include "api/sys/application/Thread.hpp"
+#include "api/sys/application/Process.hpp"
+#include "api/sys/application/Context.hpp"
 #include "api/sys/comm/event/IEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -86,104 +87,113 @@ IEvent::tSptr IEvent::deserialize( dsi::tByteStream& stream )
 
 const bool IEvent::set_notification( IAsync::IConsumer* p_consumer, const ISignature& signature )
 {
-   IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );
-   if( nullptr == p_service )
+   application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
+   if( nullptr == p_thread )
    {
-      SYS_ERR( "subscribe on event not from service thread" );
+      SYS_ERR( "subscribe on event not from application thread" );
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / service: %s", signature.name( ).c_str( ), p_consumer, p_service->name( ).c_str( ) );
-   p_service->set_notification( signature, p_consumer );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", signature.name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   p_thread->set_notification( signature, p_consumer );
 
    return true;
 }
 
 const bool IEvent::clear_notification( IAsync::IConsumer* p_consumer, const ISignature& signature )
 {
-   IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );
-   if( nullptr == p_service )
+   application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
+   if( nullptr == p_thread )
    {
-      SYS_ERR( "unsubscribe from event not from service thread" );
+      SYS_ERR( "unsubscribe from event not from application thread" );
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / service: %s", signature.name( ).c_str( ), p_consumer, p_service->name( ).c_str( ) );
-   p_service->clear_notification( signature, p_consumer );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", signature.name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   p_thread->clear_notification( signature, p_consumer );
 
    return true;
 }
 
 const bool IEvent::clear_all_notifications( IAsync::IConsumer* p_consumer, const ISignature& signature )
 {
-   IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );
-   if( nullptr == p_service )
+   application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
+   if( nullptr == p_thread )
    {
-      SYS_ERR( "unsubscribe from event not from service thread" );
+      SYS_ERR( "unsubscribe from event not from application thread" );
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / service: %s", signature.name( ).c_str( ), p_consumer, p_service->name( ).c_str( ) );
-   p_service->clear_all_notifications( signature, p_consumer );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", signature.name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   p_thread->clear_all_notifications( signature, p_consumer );
 
    return true;
 }
 
-const bool IEvent::send( tSptr p_event, const eCommType comm_type )
+const bool IEvent::send( tSptr p_event, const application::Context& to_context )
 {
    if( !p_event ) return false;
+   if( !( p_event->signature( ) ) ) return false;
 
-   const eCommType type = comm_type == eCommType::NONE ? p_event->comm_type( ) : comm_type;
-   switch( type )
+   SYS_TRC( "event: %s", p_event->signature( )->name( ).c_str( ) );
+
+   if( to_context.is_external( ) )
    {
-      case eCommType::ETC:
+      SYS_INF( "sending IPC event" );
+      application::IThread::tSptr p_thread_ipc = application::Process::instance( )->thread_ipc( );
+      if( nullptr == p_thread_ipc )
       {
-         IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );
-         if( nullptr == p_service )
-         {
-            SYS_ERR( "sending ETC event not from service thread" );
-            return false;
-         }
+         SYS_ERR( "application IPC thread is not started" );
+         return false;
+      }
 
-         return p_service->insert_event( p_event );
-      }
-      case eCommType::ITC:
-      {
-         bool result = true;
-         IServiceThread::tSptrList service_list = base::ServiceProcess::instance( )->service_list( );
-         for( auto p_service : service_list )
-            result &= p_service->insert_event( p_event );
-         return result;
-      }
-      case eCommType::IPC:
-      {
-         IServiceThread::tSptr p_service_ipc = ServiceProcess::instance( )->service_ipc( );
-         if( nullptr == p_service_ipc )
-         {
-            SYS_ERR( "ServiceIpcThread is not started" );
-            return false;
-         }
+      return std::static_pointer_cast< application::ThreadIPC >( p_thread_ipc )->insert_ipc_event( p_event, to_context );
+   }
+   else if( application::Context::thread::broadcast == to_context.tid( ) )
+   {
+      SYS_INF( "sending broadcast event to all application threads" );
+      bool result = true;
 
-         return p_service_ipc->insert_event( p_event );
+      application::IThread::tSptr p_thread_ipc = application::Process::instance( )->thread_ipc( );
+      if( nullptr == p_thread_ipc )
+      {
+         SYS_ERR( "application IPC thread is not started" );
+         return false;
       }
-      default: break;
+      result &= p_thread_ipc->insert_event( p_event );
+
+      application::IThread::tSptrList thread_list = base::application::Process::instance( )->thread_list( );
+      for( auto p_thread : thread_list )
+         result &= p_thread->insert_event( p_event );
+
+      return result;
+   }
+   else if( application::Context::thread::local == to_context.tid( ) )
+   {
+      SYS_INF( "sending event to current application thread" );
+      application::IThread::tSptr p_thread = base::application::Process::instance( )->current_thread( );
+      if( nullptr == p_thread )
+      {
+         SYS_ERR( "sending event to unknown application thread" );
+         return false;
+      }
+
+      return p_thread->insert_event( p_event );
+   }
+   else
+   {
+      SYS_INF( "sending event to %s application thread", to_context.tid( ).name( ).c_str( ) );
+      application::IThread::tSptr p_thread = base::application::Process::instance( )->thread( to_context.tid( ) );
+      if( nullptr == p_thread )
+      {
+         SYS_ERR( "sending event to unknown application thread" );
+         return false;
+      }
+
+      return p_thread->insert_event( p_event );
    }
 
    return true;
-}
-
-const bool IEvent::send_to_context( tSptr p_event, IServiceThread::tWptr pw_service )
-{
-   if( !p_event ) return false;
-
-   IServiceThread::tSptr p_service = pw_service.lock( );
-   if( nullptr == p_service )
-   {
-      SYS_ERR( "sending ETC event to not valid service thread" );
-      return false;
-   }
-
-   return p_service->insert_event( p_event );
 }
 
 void IEvent::process( IAsync::IConsumer* p_consumer ) const

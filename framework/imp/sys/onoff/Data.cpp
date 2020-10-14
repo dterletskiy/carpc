@@ -6,12 +6,12 @@ namespace base::onoff {
 
    const base::async::tAsyncTypeID interface_type_id = data::OnOffEvent::Signature::build_type_id( );
 
-   const std::vector< base::interface::RequestResponseIDs< eOnOff > > s_rr = {
+   const std::vector< base::service::RequestResponseIDs< eOnOff > > s_rr = {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState },
       { eOnOff::RequestStart, eOnOff::RequestStartBusy, eOnOff::Undefined }
    };
 
-   const std::vector< base::interface::NotificationIDs< eOnOff > > s_n = {
+   const std::vector< base::service::NotificationIDs< eOnOff > > s_n = {
       { eOnOff::SubscribeCurrentState, eOnOff::UnsubscribeCurrentState, eOnOff::NotificationCurrentState }
    };
 
@@ -21,9 +21,8 @@ namespace base::onoff {
 
 namespace base::onoff::ipc {
 
-   const base::async::eCommType BaseTypes::COMM_TYPE = base::async::eCommType::IPC;
-   const std::vector< base::interface::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
-   const std::vector< base::interface::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
+   const std::vector< base::service::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
+   const std::vector< base::service::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
 
 
 
@@ -134,9 +133,8 @@ namespace base::onoff::ipc {
 
 namespace base::onoff::no_ipc {
 
-   const base::async::eCommType BaseTypes::COMM_TYPE = base::async::eCommType::ITC;
-   const std::vector< base::interface::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
-   const std::vector< base::interface::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
+   const std::vector< base::service::RequestResponseIDs< BaseTypes::tEventID > >& BaseTypes::RR = s_rr;
+   const std::vector< base::service::NotificationIDs< BaseTypes::tEventID > >& BaseTypes::N = s_n;
 
 
 

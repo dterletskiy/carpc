@@ -1,7 +1,19 @@
 #pragma once
 
+#define FAST 0
+#define SECURE 1
+#define SERVICE_TYPE SECURE
+
+#if SERVICE_TYPE == FAST
+   #define SERVICE_NAMESPACE fast
+#elif SERVICE_TYPE == SECURE
+   #define SERVICE_NAMESPACE secure
+#endif
+
 #include "api/sys/comm/event/Event.hpp"
-#include "api/sys/comm/interface/Types.hpp"
+#include "api/sys/comm/service/Types.hpp"
+#include "api/sys/comm/service/fast/TSignature.hpp"
+#include "api/sys/comm/service/secure/TSignature.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
 
 
@@ -14,7 +26,7 @@ namespace base::onoff {
       , SubscribeCurrentState, UnsubscribeCurrentState, NotificationCurrentState
       , Undefined // Must present always for all interfaces
    );
-   using tSignature = base::interface::TSignatureRR< eOnOff >;
+   using tSignature = base::service::SERVICE_NAMESPACE::TSignature< eOnOff >;
 
 } // namespace base::onoff
 
@@ -51,9 +63,8 @@ namespace base::onoff::ipc {
       using tBaseData = BaseData;
       using tEventData = OnOffEventData;
 
-      static const base::async::eCommType COMM_TYPE;
-      static const std::vector< base::interface::RequestResponseIDs< tEventID > >& RR;
-      static const std::vector< base::interface::NotificationIDs< tEventID > >& N;
+      static const std::vector< base::service::RequestResponseIDs< tEventID > >& RR;
+      static const std::vector< base::service::NotificationIDs< tEventID > >& N;
    };
 
    struct Types : public BaseTypes
@@ -190,9 +201,8 @@ namespace base::onoff::no_ipc {
       using tBaseData = BaseData;
       using tEventData = OnOffEventData;
 
-      static const base::async::eCommType COMM_TYPE;
-      static const std::vector< base::interface::RequestResponseIDs< tEventID > >& RR;
-      static const std::vector< base::interface::NotificationIDs< tEventID > >& N;
+      static const std::vector< base::service::RequestResponseIDs< tEventID > >& RR;
+      static const std::vector< base::service::NotificationIDs< tEventID > >& N;
    };
 
    struct Types : public BaseTypes

@@ -1,10 +1,15 @@
 #pragma once
 
-#include "api/sys/service/IServiceThread.hpp"
 #include "api/sys/comm/event/Types.hpp"
 #include "api/sys/comm/event/IAsync.hpp"
 
 
+
+namespace base::application {
+
+   class Context;
+
+}
 
 namespace base::async {
 
@@ -20,30 +25,27 @@ namespace base::async {
          struct ISignature : public IAsync::ISignature
          {
             const eAsyncType type( ) const override final { return eAsyncType::EVENT; }
-
-            virtual const bool to_stream( dsi::tByteStream& ) const = 0;
-            virtual const bool from_stream( dsi::tByteStream& ) = 0;
          };
 
          template< typename _EventType >
          struct TConsumer : public IAsync::IConsumer
          {
-            TConsumer( ) = default;
-            ~TConsumer( ) override { _EventType::clear_all_notifications( this ); }
+            public:
+               TConsumer( ) = default;
+               ~TConsumer( ) override { _EventType::clear_all_notifications( this ); }
 
-            virtual void process_event( const _EventType& ) = 0;
+               virtual void process_event( const _EventType& ) = 0;
          };
 
       public:
-         IEvent( const eCommType );
+         IEvent( ) = default;
          ~IEvent( ) override = default;
 
       public:
          static const bool set_notification( IAsync::IConsumer*, const ISignature& );
          static const bool clear_notification( IAsync::IConsumer*, const ISignature& );
          static const bool clear_all_notifications( IAsync::IConsumer*, const ISignature& );
-         static const bool send( tSptr, const eCommType comm_type = eCommType::NONE );
-         static const bool send_to_context( tSptr, IServiceThread::tWptr );
+         static const bool send( tSptr, const application::Context& );
 
          static bool check_in( const tAsyncTypeID&, tCreator );
          static void dump( );
@@ -52,8 +54,7 @@ namespace base::async {
          static tSptr deserialize( dsi::tByteStream& );
 
       public:
-         virtual const bool send( const eCommType comm_type = eCommType::NONE ) = 0;
-         virtual const bool send_to_context( IServiceThread::tWptr ) = 0;
+         virtual const bool send( const application::Context& ) = 0;
 
       private:
          void process( IAsync::IConsumer* ) const override;
@@ -67,30 +68,7 @@ namespace base::async {
 
       public:
          virtual const bool is_ipc( ) const = 0;
-
-      public:
-         const eCommType& comm_type( );
-      private:
-         eCommType m_comm_type;
+         virtual const application::Context& context( ) const = 0;
    };
-
-
-
-   inline
-   IEvent::IEvent( const eCommType comm_type )
-      : m_comm_type( comm_type )
-   {
-   }
-
-   inline
-   const eCommType& IEvent::comm_type( )
-   {
-      if( eCommType::NONE == m_comm_type )
-         m_comm_type = is_ipc( ) ? eCommType::IPC : eCommType::ITC;
-
-      return m_comm_type;
-   }
-
-
 
 } // namespace base::async

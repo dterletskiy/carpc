@@ -7,12 +7,12 @@
 
 
 
-using namespace base;
+using namespace base::component;
 
 
 
-RootComponent::RootComponent( IServiceThread& service, const std::string& name )
-   : Component( service, name )
+RootComponent::RootComponent( application::IThread& app_thread, const std::string& name )
+   : Component( app_thread, name )
 {
    SYS_INF( "%p", this );
 }
@@ -27,6 +27,8 @@ void RootComponent::boot( const std::string& message )
 
 void RootComponent::shutdown( const std::string& message )
 {
-   events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, base::async::eCommType::ITC );
-   // events::service::Service::Event::create_send( { events::service::eID::shutdown }, { "shutdown application" }, base::async::eCommType::IPC );
+   events::system::System::Event::create_send(
+      { events::system::eID::shutdown },
+      { "shutdown application" }
+   );
 }

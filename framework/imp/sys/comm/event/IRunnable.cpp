@@ -1,5 +1,5 @@
 #include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/application/Process.hpp"
 #include "api/sys/comm/event/IRunnable.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -12,26 +12,26 @@ using namespace base::async;
 
 const bool IRunnable::send( )
 {
-   IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );
-   if( nullptr == p_service )
+   application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
+   if( nullptr == p_thread )
    {
-      SYS_ERR( "sending runnable not from service thread" );
+      SYS_ERR( "sending runnable not from application thread" );
       return false;
    }
 
-   return p_service->insert_event( shared_from_this( ) );
+   return p_thread->insert_event( shared_from_this( ) );
 }
 
-const bool IRunnable::send_to_context( IServiceThread::tWptr pw_service )
+const bool IRunnable::send_to_context( application::IThread::tWptr pw_thread )
 {
-   IServiceThread::tSptr p_service = pw_service.lock( );
-   if( nullptr == p_service )
+   application::IThread::tSptr p_thread = pw_thread.lock( );
+   if( nullptr == p_thread )
    {
-      SYS_ERR( "sending runnable to not valid service thread" );
+      SYS_ERR( "sending runnable to not valid application thread" );
       return false;
    }
 
-   return p_service->insert_event( shared_from_this( ) );
+   return p_thread->insert_event( shared_from_this( ) );
 }
 
 void IRunnable::process( IAsync::IConsumer* p_consumer ) const

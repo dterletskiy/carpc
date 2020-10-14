@@ -1,36 +1,33 @@
 #pragma once
 
 #include <memory>
-#include "api/sys/service/IServiceThread.hpp"
+#include "api/sys/application/IThread.hpp"
+#include "api/sys/component/Types.hpp"
 
 
 
-namespace base {
+namespace base::component {
 
+   class IComponent
+   {
+      public:
+         using tSptr = std::shared_ptr< IComponent >;
+         using tSptrList = std::list< tSptr >;
+         using tCreator = IComponent::tSptr (*)( application::IThread& );
+         using tCreatorVector = std::vector< tCreator >;
 
+      public:
+         IComponent( )  = default;
+         virtual ~IComponent( ) = default;
 
-class IComponent
-{
-public:
-   using tSptr = std::shared_ptr< IComponent >;
-   using tSptrList = std::list< tSptr >;
-   using tCreator = IComponent::tSptr (*)( IServiceThread& );
-   using tCreatorVector = std::vector< tCreator >;
+      public:
+         virtual const std::string& name( ) const = 0;
+         virtual const ID& id( ) const = 0;
+         virtual const bool is_root( ) const = 0;
 
-public:
-   IComponent( )  = default;
-   virtual ~IComponent( ) = default;
+      public:
+         virtual void boot( const std::string& message = "boot" ) = 0;
+         virtual void shutdown( const std::string& message = "shutdown" ) = 0;
+   };
 
-public:
-   virtual const std::string& name( ) const = 0;
-   virtual const ID& id( ) const = 0;
-   virtual const bool is_root( ) const = 0;
-
-public:
-   virtual void boot( const std::string& message = "boot" ) = 0;
-   virtual void shutdown( const std::string& message = "shutdown" ) = 0;
-};
-
-
-
-} // namespace base
+} // namespace base::component

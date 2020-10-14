@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/service/IServiceThread.hpp"
+#include "api/sys/application/IThread.hpp"
 #include "api/sys/comm/event/Types.hpp"
 #include "api/sys/comm/event/IAsync.hpp"
 
@@ -23,6 +23,15 @@ namespace base::async {
             Signature( ) = default;
             Signature( const Signature& other ) = default;
             ~Signature( ) override = default;
+
+            const bool to_stream( dsi::tByteStream& ) const override
+            {
+               return false;
+            }
+            const bool from_stream( dsi::tByteStream& ) override
+            {
+               return false;
+            }
 
             const IAsync::ISignature* const create_copy( ) const override { return new Signature( *this ); }
             bool operator<( const IAsync::ISignature& signature ) const override
@@ -54,7 +63,7 @@ namespace base::async {
 
       public:
          const bool send( );
-         const bool send_to_context( IServiceThread::tWptr );
+         const bool send_to_context( application::IThread::tWptr );
 
       private:
          void process( IAsync::IConsumer* ) const override;

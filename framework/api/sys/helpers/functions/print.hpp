@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/Includes.hpp"
 
 
 
@@ -22,6 +22,14 @@ namespace base {
 
       if( is_new_line ) printf( "\n" );
    }
+
+   // template< typename TYPE >
+   // void print( const TYPE* pointer, const bool is_new_line = false )
+   // {
+   //    printf( "%#x", pointer );
+
+   //    if( is_new_line ) printf( "\n" );
+   // }
 
 
    template< typename TYPE >

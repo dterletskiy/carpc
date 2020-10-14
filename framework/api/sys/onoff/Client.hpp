@@ -1,6 +1,7 @@
 #pragma once
 
-#include "api/sys/comm/interface/TClient.hpp"
+#include "api/sys/comm/service/fast/TClient.hpp"
+#include "api/sys/comm/service/secure/TClient.hpp"
 #include "api/sys/onoff/Data.hpp"
 
 
@@ -8,8 +9,11 @@
 namespace base::onoff {
 
    class Client
-      : public base::interface::TClient< data::Types >
+      : public base::service::SERVICE_NAMESPACE::TClient< data::Types >
    {
+      public:
+         using tSptr = std::shared_ptr< Client >;
+
       public:
          Client( const std::string& );
          virtual ~Client( );
@@ -24,7 +28,7 @@ namespace base::onoff {
 
       public:
          void request_start( );
-         const size_t request_trigger_state( const std::string&, const size_t );
+         const base::service::tSequenceID request_trigger_state( const std::string&, const size_t );
          void subscribe_current_state( );
          void unsubscribe_current_state( );
       private:

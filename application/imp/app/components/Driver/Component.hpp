@@ -10,27 +10,23 @@
 
 namespace application::components::driver {
 
+   class Component
+      : public base::component::Component
+      , public events::AppEvent::Consumer
+   {
+      public:
+         static base::component::IComponent::tSptr creator( base::application::IThread& service );
 
+      private:
+         Component( base::application::IThread& service, const std::string& );
+      public:
+         ~Component( ) override;
 
-class Component
-   : public base::Component
-   , public events::AppEvent::Consumer
-{
-public:
-   static base::IComponent::tSptr creator( base::IServiceThread& service );
+      private:
+         void process_event( const events::AppEvent::Event& ) override;
 
-private:
-   Component( base::IServiceThread& service, const std::string& );
-public:
-   ~Component( ) override;
-
-private:
-   void process_event( const events::AppEvent::Event& ) override;
-
-private:
-   clients::onoff::Client* mp_client_onoff = nullptr;
-};
-
-
+      private:
+         clients::onoff::Client::tSptr mp_client_onoff = nullptr;
+   };
 
 } // namespace application::components::driver

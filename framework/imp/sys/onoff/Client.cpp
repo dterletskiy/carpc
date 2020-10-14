@@ -10,7 +10,7 @@ using namespace base::onoff;
 
 
 Client::Client( const std::string& role_name )
-   : base::interface::TClient< data::Types >( base::onoff::interface_type_id, role_name, true )
+   : base::service::SERVICE_NAMESPACE::TClient< data::Types >( base::onoff::interface_type_id, role_name, true )
 {
    SYS_TRC( "Created" );
 }
@@ -36,7 +36,7 @@ void Client::request_start( )
    mp_proxy->request< data::RequestStartData >( this );
 }
 
-const size_t Client::request_trigger_state( const std::string& state, const size_t delay )
+const base::service::tSequenceID Client::request_trigger_state( const std::string& state, const size_t delay )
 {
    SYS_TRC( "state: %s / delay: %zu", state.c_str( ), delay );
    return mp_proxy->request< data::RequestTriggerStateData >( this, state, delay );

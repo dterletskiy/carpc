@@ -1,9 +1,6 @@
 #include <map>
 #include "api/sys/oswrappers/linux/signals.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/service/ServiceProcess.hpp"
-#include "api/sys/tools/Tools.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -53,10 +50,11 @@ void event_handler( union sigval sv )
 
 
 
-Timer::Timer( ITimerConsumer* p_consumer )
-   : m_id( tools::id::generate( "timer" ) )
+Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
+   : m_name( name )
+   , m_id( ID::generate( ) )
    , mp_consumer( p_consumer )
-   , mp_service( ServiceProcess::instance( )->current_service( ) )
+   , m_context( application::Context::eInitType::Auto )
 {
    if( nullptr == mp_consumer )
    {
@@ -64,10 +62,9 @@ Timer::Timer( ITimerConsumer* p_consumer )
       return;
    }
 
-   IServiceThread::tSptr p_service = mp_service.lock( );
-   if( nullptr == p_service )
+   if( application::Context::thread::broadcast == m_context.tid( ) )
    {
-      SYS_ERR( "ServiceThread has not been found. Creating timer not in service thread" );
+      SYS_ERR( "application::Thread has not been found. Creating timer not in application thread" );
       return;
    }
 
@@ -91,13 +88,13 @@ Timer::Timer( ITimerConsumer* p_consumer )
       return;
    }
 
-   SYS_TRC( "created timer: %zu -> %#lx", m_id, (long) m_timer_id );
-   TimerEvent::Event::set_notification( mp_consumer, { m_id } );
+   SYS_TRC( "created timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+   TimerEvent::Event::set_notification( mp_consumer, { m_id.value( ) } );
 }
 
 Timer::~Timer( )
 {
-   TimerEvent::Event::clear_notification( mp_consumer, { m_id } );
+   TimerEvent::Event::clear_notification( mp_consumer, { m_id.value( ) } );
 
    mutex_consumer_map.lock( );
    const size_t result = consumer_map.erase( m_timer_id );
@@ -117,7 +114,7 @@ Timer::~Timer( )
    }
    else
    {
-      SYS_TRC( "removed timer: %zu -> %#lx", m_id, (long) m_timer_id );
+      SYS_TRC( "removed timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
    }
 }
 
@@ -151,7 +148,7 @@ bool Timer::start( const std::size_t nanoseconds, const std::size_t count )
       return false;
    }
 
-   SYS_TRC( "started timer: %zu -> %#lx", m_id, (long) m_timer_id );
+   SYS_TRC( "started timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
    m_is_running = true;
    return true;  
 }
@@ -175,7 +172,7 @@ bool Timer::stop( )
       return false;
    }
 
-   SYS_TRC( "stoped timer: %zu -> %#lx", m_id, (long) m_timer_id );
+   SYS_TRC( "stoped timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
    return true;  
 }
 
@@ -193,7 +190,7 @@ void Timer::process( const base::os::linux::timer::tID id )
    else if( m_ticks > m_count )
       return;
 
-   TimerEvent::Event::create_send_to_context( m_id, { m_id }, mp_service );
+   TimerEvent::Event::create_send( { m_id.value( ) }, { m_id }, m_context );
 }
 
 
@@ -222,16 +219,20 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 #include <thread>
 #include <limits>
 #include "api/sys/comm/event/Runnable.hpp"
+#include "api/sys/application/Process.hpp"
 
 namespace base::timer {
 
-   ID start( const size_t milliseconds, const size_t count, std::function< void( const ID ) > callback, const bool asynchronous )
+   base::Timer::ID start( const size_t milliseconds, const size_t count, tCallback callback, const bool asynchronous )
    {
-      IServiceThread::tSptr p_service = ServiceProcess::instance( )->current_service( );
-      if( !p_service )
+      application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
+      if( !p_thread )
+      {
+         SYS_ERR( "application::Thread has not been found. Creating timer not in application thread" );
          return 0;
+      }
 
-      const ID id = tools::id::generate( "timer" );
+      const base::Timer::ID id = base::Timer::ID::generate( );
       auto on_timer = [=]( ){ callback( id ); };
 
       if( asynchronous )
@@ -242,7 +243,7 @@ namespace base::timer {
                for( size_t ticks = 0; ticks < count; ++ticks )
                {
                   std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-                  base::async::Runnable::create_send_to_context( on_timer, p_service );
+                  base::async::Runnable::create_send_to_context( on_timer, p_thread );
                }
             }
          ).detach( );
@@ -252,7 +253,7 @@ namespace base::timer {
          for( size_t ticks = 0; ticks < count; ++ticks )
          {
             std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-            base::async::Runnable::create_send_to_context( on_timer, p_service );
+            base::async::Runnable::create_send_to_context( on_timer, p_thread );
          }
       }
 

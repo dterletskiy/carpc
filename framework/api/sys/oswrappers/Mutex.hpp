@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/sys/oswrappers/linux/thread.hpp"
+#include "api/sys/common/ID.hpp"
 
 
 
@@ -9,13 +10,18 @@ namespace base::os {
    class Mutex
    {
       public:
+         using ID = base::TID< Mutex >;
+
+      public:
          Mutex( const bool auto_lock = false, const char* name = "mutex_no_name" );
          Mutex( const Mutex& ) = delete;
          virtual ~Mutex( );
 
       public:
+         const ID id( ) const;
          const char* const name( ) const;
       private:
+         ID                m_id;
          const char* const m_name;
 
       public:
@@ -33,6 +39,12 @@ namespace base::os {
    };
 
 
+
+   inline
+   const Mutex::ID Mutex::id( ) const
+   {
+      return m_id;
+   }
 
    inline
    const char* const Mutex::name( ) const

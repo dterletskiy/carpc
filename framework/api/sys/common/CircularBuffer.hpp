@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/Includes.hpp"
 #include "api/sys/common/RawBuffer.hpp"
 #include "api/sys/helpers/functions/pointer.hpp"
 
@@ -18,8 +18,12 @@ namespace base {
       static const char* c_str( const ePush );
 
    public:
-      CircularBuffer( const size_t capacity = 1024, const bool is_overlap_allowed = true, const bool is_reallocate_allowed = false
-         , const bool auto_free = true );
+      CircularBuffer(
+                        const size_t capacity = 1024,
+                        const bool is_overlap_allowed = true,
+                        const bool is_reallocate_allowed = false,
+                        const bool auto_free = true
+                     );
       CircularBuffer( const CircularBuffer& buffer );
       ~CircularBuffer( );
 

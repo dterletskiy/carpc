@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/application/Context.hpp"
 #include "api/sys/comm/event/IEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -26,13 +27,15 @@ namespace base::async {
 
       // constructors
       protected:
-         TEvent( const tUserSignature& signature, const eCommType comm_type )
-            : IEvent( comm_type )
+         TEvent( const tSignature& signature )
+            : IEvent( )
             , m_signature( signature )
+            , m_context( application::Context::eInitType::Auto )
          { }
-         TEvent( const tUserSignature& signature, const tData& data, const eCommType comm_type )
-            : IEvent( comm_type )
+         TEvent( const tSignature& signature, const tData& data )
+            : IEvent( )
             , m_signature( signature )
+            , m_context( application::Context::eInitType::Auto )
          {
             mp_data = std::make_shared< tData >( data );
          }
@@ -54,50 +57,36 @@ namespace base::async {
             return IEvent::clear_all_notifications( p_consumer, tSignature( ) );
          }
 
+      public:
          // This "create" static function is used only for creating concrete event type with all empty data what should be filled during serialization.
          static IEvent::tSptr create( )
          {
-            return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), eCommType::IPC ) );
+            return std::shared_ptr< tEvent >( new tEvent( tSignature( tUserSignature( ) ) ) );
          }
 
-         static std::shared_ptr< tEvent > create( const tUserSignature& signature, const eCommType comm_type = eCommType::NONE )
+         static std::shared_ptr< tEvent > create( const tUserSignature& signature )
          {
-            return std::shared_ptr< tEvent >( new tEvent( signature, comm_type ) );
+            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ) ) );
          }
-         static std::shared_ptr< tEvent > create( const tUserSignature& signature, const tData& data, const eCommType comm_type = eCommType::NONE )
+         static std::shared_ptr< tEvent > create( const tUserSignature& signature, const tData& data )
          {
-            return std::shared_ptr< tEvent >( new tEvent( signature, data, comm_type ) );
-         }
-
-         static const bool create_send( const tUserSignature& signature, const eCommType comm_type = eCommType::NONE )
-         {
-            return create( signature, comm_type )->send( comm_type );
-         }
-         static const bool create_send( const tUserSignature& signature, const tData& data, const eCommType comm_type = eCommType::NONE )
-         {
-            return create( signature, data, comm_type )->send( comm_type );
+            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), data ) );
          }
 
-         static const bool create_send_to_context( const tUserSignature& signature, IServiceThread::tWptr pw_service )
+         static const bool create_send( const tUserSignature& signature, const application::Context& to_context = application::Context( ) )
          {
-            return create( signature )->send_to_context( pw_service );
+            return create( signature )->send( to_context );
          }
-         static const bool create_send_to_context( const tUserSignature& signature, const tData& data, IServiceThread::tWptr pw_service )
+         static const bool create_send( const tUserSignature& signature, const tData& data, const application::Context& to_context = application::Context( ) )
          {
-            return create( signature, data )->send_to_context( pw_service );
+            return create( signature, data )->send( to_context );
          }
 
       // virual function
       public:
-         const bool send( const eCommType comm_type = eCommType::NONE ) override
+         const bool send( const application::Context& to_context = application::Context( ) ) override
          {
-            if( eCommType::NONE == comm_type )
-               return IEvent::send( TEvent< _Generator >::shared_from_this( ), this->comm_type( ) );
-            return IEvent::send( TEvent< _Generator >::shared_from_this( ), comm_type );
-         }
-         const bool send_to_context( IServiceThread::tWptr pw_service ) override
-         {
-            return IEvent::send_to_context( TEvent< _Generator >::shared_from_this( ), pw_service );
+            return IEvent::send( TEvent< _Generator >::shared_from_this( ), to_context );
          }
          void process_event( IAsync::IConsumer* p_consumer ) const override
          {
@@ -110,7 +99,7 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( false == stream.push( m_signature ) )
+               if( false == stream.push( m_signature, m_context ) )
                   return false;
 
                if( false == stream.push( ( nullptr != mp_data ) ) )
@@ -129,7 +118,7 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( false == stream.pop( m_signature ) )
+               if( false == stream.pop( m_signature, m_context ) )
                   return false;
 
                bool is_data = false;
@@ -161,6 +150,11 @@ namespace base::async {
          void data( const tDataPtr data ) { mp_data = data; }
       private:
          tDataPtr mp_data = nullptr;
+
+      public:
+         const application::Context& context( ) const override { return m_context; }
+      private:
+         application::Context m_context;
    };
 
 

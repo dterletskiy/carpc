@@ -2,7 +2,8 @@
 
 #include "api/sys/oswrappers/linux/timer.hpp"
 #include "api/sys/comm/event/Event.hpp"
-#include "api/sys/service/IServiceThread.hpp"
+#include "api/sys/common/ID.hpp"
+// #include "api/sys/application/Process.hpp"
 
 
 
@@ -12,14 +13,19 @@ namespace base {
 
 
 
+   /**************************************************************
+    *
+    * Timer object MUST be created in application service thread.
+    *
+    *************************************************************/
    class Timer
    {
       public:
-         using tID = base::ID;
+         using ID = base::TID< Timer >;
          static const std::size_t CONTINIOUS = std::numeric_limits< std::size_t >::max( );
 
       public:
-         Timer( ITimerConsumer* );
+         Timer( ITimerConsumer*, const std::string& name = "NoName_Timer" );
          ~Timer( );
 
          const bool operator<( const Timer& ) const;
@@ -29,9 +35,14 @@ namespace base {
          void process( const base::os::linux::timer::tID );
 
       public:
-         const base::ID id( ) const;
+         const std::string& name( ) const;
       private:
-         base::ID                m_id = InvalidID;
+         std::string             m_name = "NoName_Timer";
+
+      public:
+         const ID id( ) const;
+      private:
+         ID                      m_id = ID::invalid( );
 
       public:
          bool is_running( ) const;
@@ -54,7 +65,7 @@ namespace base {
 
       private:
          ITimerConsumer*         mp_consumer = nullptr;
-         IServiceThread::tWptr   mp_service;
+         application::Context    m_context;
    };
 
 
@@ -66,7 +77,7 @@ namespace base {
    }
 
    inline
-   const base::ID Timer::id( ) const
+   const Timer::ID Timer::id( ) const
    {
       return m_id;
    }
@@ -99,9 +110,9 @@ namespace base {
 
    struct TimerEventData
    {
-      base::ID id;
+      Timer::ID id;
    };
-   DEFINE_EVENT( TimerEvent, TimerEventData, base::async::TSignatureID< size_t > );
+   DEFINE_EVENT( TimerEvent, TimerEventData, base::async::id::TSignature< Timer::ID::VALUE_TYPE > );
 
 
 
@@ -112,7 +123,7 @@ namespace base {
          ITimerConsumer( );
          virtual ~ITimerConsumer( );
 
-         virtual void process_timer( const base::ID ) = 0;
+         virtual void process_timer( const Timer::ID ) = 0;
 
       private:
          void process_event( const TimerEvent::Event& ) override;
@@ -126,12 +137,14 @@ namespace base {
 
 namespace base::timer {
 
+   using tCallback = std::function< void( const base::Timer::ID ) >;
    const std::size_t Infinite = std::numeric_limits< size_t >::max( );
 
-   // This timer creates new thread and sleep it to some milliseconds. When thread is finished "callback" will be executed in context of service
+   // This timer creates new thread and sleep it to some milliseconds.
+   // When thread is finished "callback" will be executed in context of application thread
    // where this timer have been called.
    // Performance of this timer is worse then base::Timer implementation.
    // This timer can't be stopped.
-   ID start( const size_t milliseconds, const size_t count, std::function< void( const ID ) > callback, const bool asynchronous = true );
+   base::Timer::ID start( const size_t milliseconds, const size_t count, tCallback callback, const bool asynchronous = true );
 
 } // namespace base::timer

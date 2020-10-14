@@ -1,4 +1,4 @@
-#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/application/Process.hpp"
 #include "api/sys/comm/event/Runnable.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -19,7 +19,7 @@ const bool Runnable::create_send( const tOperation operation )
    return create( operation )->send( );
 }
 
-const bool Runnable::create_send_to_context( const tOperation operation, IServiceThread::tWptr pw_service )
+const bool Runnable::create_send_to_context( const tOperation operation, application::IThread::tWptr pw_thread )
 {
-   return create( operation )->send_to_context( pw_service );
+   return create( operation )->send_to_context( pw_thread );
 }

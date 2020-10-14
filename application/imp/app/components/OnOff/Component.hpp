@@ -10,35 +10,31 @@
 
 namespace application::components::onoff {
 
+   class Component
+      : public base::component::RootComponent
+      , public base::ITimerConsumer
+   {
+      public:
+         static base::component::IComponent::tSptr creator( base::application::IThread& service );
 
+      private:
+         Component( base::application::IThread& service, const std::string& );
+      public:
+         ~Component( ) override;
 
-class Component
-   : public base::RootComponent
-   , public base::ITimerConsumer
-{
-public:
-   static base::IComponent::tSptr creator( base::IServiceThread& service );
+      private:
+         void boot( const std::string& ) override;
 
-private:
-   Component( base::IServiceThread& service, const std::string& );
-public:
-   ~Component( ) override;
+      private:
+         Server m_server_onoff;
 
-private:
-   void boot( const std::string& ) override;
+      // Timer
+      private:
+         void process_timer( const base::Timer::ID ) override;
+         base::Timer m_timer;
 
-private:
-   Server m_server_onoff;
-
-// Timer
-private:
-   void process_timer( const base::ID ) override;
-   base::Timer m_timer;
-
-public:
-   void on_timer( const base::ID );
-};
-
-
+      public:
+         void on_timer( const base::Timer::ID );
+   };
 
 } // namespace application::components::onoff

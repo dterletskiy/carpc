@@ -15,7 +15,7 @@ namespace base::async {
       public:
          static tSptr create( const tOperation );
          static const bool create_send( const tOperation );
-         static const bool create_send_to_context( const tOperation, IServiceThread::tWptr );
+         static const bool create_send_to_context( const tOperation, application::IThread::tWptr );
    };
 
 

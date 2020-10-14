@@ -5,14 +5,14 @@
 #define CLASS_ABBR "Component"
 
 
-using namespace base;
+using namespace base::component;
 
 
 
-Component::Component( IServiceThread& service, const std::string& name )
+Component::Component( application::IThread& app_thread, const std::string& name )
    : m_name( name )
-   , m_id( tools::id::generate( "Component" ) )
-   , m_service( service )
+   , m_id( ID::generate( ) )
+   , m_app_thread( app_thread )
    , m_performance( m_name )
 {
    DBG_MSG( "Created: %s", m_name.c_str( ) );

@@ -24,8 +24,12 @@ namespace base::async {
 
       public:
          TSignature( ) = default;
-         TSignature( const tUserSignature& user_signature ) : m_user_signature( user_signature ) { }
-         TSignature( const TSignature& other ) : m_user_signature( other.m_user_signature ) { }
+         TSignature( const tUserSignature& user_signature )
+            : m_user_signature( user_signature )
+         { }
+         TSignature( const TSignature& other )
+            : m_user_signature( other.m_user_signature )
+         { }
          ~TSignature( ) override = default;
 
       public:
@@ -35,7 +39,7 @@ namespace base::async {
          }
          const std::string name( ) const override
          {
-            static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", type: ", c_str( type( ) ) );
+            static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", type: ", c_str( type( ) ), ", " );
             return s_name + m_user_signature.name( );
          }
          const tAsyncTypeID& type_id( ) const override
@@ -66,22 +70,16 @@ namespace base::async {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
                tAsyncTypeID type_id;
-               return stream.pop( type_id, m_user_signature );
-
-               // const bool result = stream.pop( type_id, m_user_signature );
-               // if( type_id( ) != type_id )
-               // {
-               //    SYS_ERR( "event type_id mismatch" );
-               // }
-               // return result;
+               const bool result = stream.pop( type_id, m_user_signature );
+               // if( type_id( ) != type_id ) { SYS_ERR( "event type_id mismatch" ); }
+               return result;
             }
             return false;
          }
-         const tUserSignature& user_signature( ) const
-         {
-            return m_user_signature;
-         }
 
+      public:
+         const tUserSignature& user_signature( ) const { return m_user_signature; }
+         void user_signature( const tUserSignature& signature ) { m_user_signature = signature; }
       private:
          tUserSignature m_user_signature;
    };
@@ -94,26 +92,23 @@ namespace base::async {
 
 
 
-namespace base::async {
+namespace base::async::id {
 
    template< typename _ID >
-   class TSignatureID
+   class TSignature
    {
       public:
-         using tID = _ID;
-
-      public:
-         TSignatureID( ) = default;
-         TSignatureID( const _ID id ) : m_id( id ) { }
-         TSignatureID( const TSignatureID& other ) : m_id( other.m_id ) { }
-         ~TSignatureID( ) = default;
+         TSignature( ) = default;
+         TSignature( const _ID id ) : m_id( id ) { }
+         TSignature( const TSignature& other ) : m_id( other.m_id ) { }
+         ~TSignature( ) = default;
 
       public:
          const std::string name( ) const
          {
-            return base::format_string( ", id: ", size_t(m_id) );
+            return base::format_string( "id: ", size_t(m_id) );
          }
-         bool operator<( const TSignatureID& other ) const
+         bool operator<( const TSignature& other ) const
          {
             return m_id < other.m_id;
          }
@@ -133,4 +128,4 @@ namespace base::async {
          _ID m_id = { };
    };
 
-} // namespace base::async
+} // namespace base::async::id

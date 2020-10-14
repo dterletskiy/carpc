@@ -4,9 +4,10 @@
 #include <list>
 #include <functional>
 #include <memory>
-#include "api/sys/common/Types.hpp"
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
+#include "api/sys/common/Includes.hpp"
+#include "api/sys/common/ID.hpp"
 
 
 
@@ -18,8 +19,7 @@ namespace base::os {
          enum class eResult { OK, ERROR, DISCONNECTED };
          const char* c_str( const eResult );
 
-         using tID = ID;
-         static const tID InvalidID;
+         using ID = base::TID< Socket >;
          using tList = std::list< Socket >;
          using tSptr = std::shared_ptr< Socket >;
          using tWptr = std::weak_ptr< Socket >;
@@ -62,9 +62,9 @@ namespace base::os {
          linux::socket::tSocket        m_socket = linux::socket::InvalidSocket;
 
       public:
-         tID id( ) const;
+         ID id( ) const;
       private:
-         tID                           m_id = InvalidID;
+         ID                            m_id;
 
       public:
          const linux::socket::configuration& configuration( ) const;
@@ -98,7 +98,7 @@ namespace base::os {
    }
 
    inline
-   Socket::tID Socket::id( ) const
+   Socket::ID Socket::id( ) const
    {
       return m_id;
    }

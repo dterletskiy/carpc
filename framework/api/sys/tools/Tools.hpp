@@ -1,14 +1,14 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/Includes.hpp"
 
 
 
-namespace base::tools::id {
+// namespace base::tools::id {
 
-   const ID generate( const char* const name_space = "default" );
+//    const tID generate( const char* const name_space = "default" );
 
-} // namespace base::tools::id
+// } // namespace base::tools::id
 
 
 

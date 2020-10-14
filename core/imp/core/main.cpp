@@ -1,5 +1,5 @@
 // Framework
-#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/application/Process.hpp"
 #include "api/sys/tools/Tools.hpp"
 // Application
 #include "imp/core/components/onoff/Component.hpp"
@@ -47,20 +47,14 @@ void boot( int argc, char** argv )
    memory::dump( );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
-   base::tools::cmd::init( argc, argv );
-   base::tools::cmd::print( );
-   base::tools::cfg::init( base::tools::cmd::argument( "config" ).value_or( "core.cfg" ) );
-   base::tools::cfg::print( );
-
-   REGISTER_EVENT( base::onoff::ipc::OnOffEvent );
    DUMP_IPC_EVENTS;
 
-   base::ServiceThread::Info::tVector services =
+   base::application::Thread::Info::tVector services =
    {
         { "OnOff_Service", { core::components::onoff::Component::creator }, 5 }
    };
 
-   base::ServiceProcess::tSptr p_process = base::ServiceProcess::instance( );
+   base::application::Process::tSptr p_process = base::application::Process::instance( argc, argv );
    if( p_process->start( services ) )
    {
       DBG_MSG( "Booting..." );

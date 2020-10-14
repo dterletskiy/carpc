@@ -106,6 +106,8 @@ namespace base::dsi {
 
       public:
          Packet( );
+         template< typename ... TYPES >
+            Packet( const eCommand _command, const TYPES& ... _values );
          ~Packet( );
 
       public:
@@ -116,11 +118,7 @@ namespace base::dsi {
       public:
          void add_package( Package&& );
          template< typename ... TYPES >
-            void add_package( const eCommand _command, const TYPES& ... _values )
-            {
-               m_packages.emplace_back(  _command, _values... );
-               m_size += m_packages.back( ).size( );
-            }
+            void add_package( const eCommand _command, const TYPES& ... _values );
          Package::tVector& packages( );
 
       private:
@@ -135,6 +133,20 @@ namespace base::dsi {
    };
 
 
+
+   template< typename ... TYPES >
+   Packet::Packet( const eCommand _command, const TYPES& ... _values )
+   {
+      m_packages.emplace_back(  _command, _values... );
+      m_size += m_packages.back( ).size( );
+   }
+
+   template< typename ... TYPES >
+   void Packet::add_package( const eCommand _command, const TYPES& ... _values )
+   {
+      m_packages.emplace_back(  _command, _values... );
+      m_size += m_packages.back( ).size( );
+   }
 
    inline
    Package::tVector& Packet::packages( )

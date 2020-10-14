@@ -10,7 +10,7 @@ namespace base {
    void print( const void* const p_buffer, const size_t size, const bool is_new_line )
    {
       for( size_t i = 0; i < size; ++i )
-         printf( "%#x ", static_cast< const uint8_t* const >( p_buffer )[i] );
+         printf( "%#x ", static_cast< const std::uint8_t* const >( p_buffer )[i] );
 
       if( is_new_line ) printf( "\n" );
    }

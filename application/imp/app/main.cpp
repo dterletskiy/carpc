@@ -1,5 +1,5 @@
 // Framework
-#include "api/sys/service/ServiceProcess.hpp"
+#include "api/sys/application/Process.hpp"
 #include "api/sys/tools/Tools.hpp"
 // Application
 #include "imp/app/components/OnOff/Component.hpp"
@@ -50,23 +50,18 @@ void boot( int argc, char** argv )
    memory::dump( );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
-   base::tools::cmd::init( argc, argv );
-   base::tools::cmd::print( );
-   base::tools::cfg::init( base::tools::cmd::argument( "config" ).value_or( "application.cfg" ) );
-   base::tools::cfg::print( );
-
    REGISTER_EVENT( base::onoff::ipc::OnOffEvent );
    REGISTER_EVENT( application::events::AppEvent );
    DUMP_IPC_EVENTS;
 
-   base::ServiceThread::Info::tVector services =
+   base::application::Thread::Info::tVector services =
    {
         { "OnOff_Service", { application::components::onoff::Component::creator }, 5 }
       , { "Driver_Service", { application::components::driver::Component::creator }, 10 }
       , { "Device_Service", { application::components::master::Component::creator, application::components::slave::Component::creator }, 10 }
    };
 
-   base::ServiceProcess::tSptr p_process = base::ServiceProcess::instance( );
+   base::application::Process::tSptr p_process = base::application::Process::instance( argc, argv );
    if( p_process->start( services ) )
    {
       DBG_MSG( "Booting..." );
@@ -145,52 +140,10 @@ void boot( int argc, char** argv )
 
 
 
-#include "test/sys/math/TMatrix.hpp"
-#include "test/other/nn/nn.hpp"
-#include "api/sys/helpers/functions/print.hpp"
-#include "api/sys/helpers/functions/format.hpp"
-
-#include "api/app/proto/SensorData.pb.h"
-#include <fstream>
-namespace proto = com::tda::sensor::protos;
-
-
-
 const bool test( int argc, char** argv )
 {
    return true;
    SYS_ERR( "--------------- MARKER ---------------" );
-
-
-
-
-
-
-   // base::math::tmatrixd::test::run( );
-   // other::nn::test::run( );
-
-
-
-   // proto::GeneralData general_data;
-   // general_data.mutable_signdata( )->mutable_position( )->set_latitude( 0.123 );
-   // general_data.mutable_signdata( )->mutable_position( )->set_longitude( 0.456 );
-   // general_data.mutable_signdata( )->mutable_offset( )->set_x( 12.0 );
-   // general_data.mutable_signdata( )->mutable_offset( )->set_y( 3.0 );
-   // general_data.mutable_signdata( )->mutable_offset( )->set_z( 2.0 );
-   // general_data.mutable_signdata( )->set_location( proto::SignLocation::LeftLocation );
-   // general_data.mutable_signdata( )->set_type( proto::SignType::SpeedLimitSign );
-   // general_data.mutable_signdata( )->set_detectedtime( 1234567890 );
-   // general_data.mutable_cardata( )->set_softwareversion( "1.0.0" );
-   // general_data.mutable_cardata( )->set_mapversion( "3.0.0" );
-   // general_data.mutable_cardata( )->set_uuid( "12-34-56-78-90" );
-   // general_data.mutable_cardata( )->set_vin( "A12DE45CF" );
-   // general_data.mutable_cardata( )->set_speed( 54 );
-
-   // std::ofstream ofs( "/home/scorpion/Desktop/sensor.data", std::ios_base::out | std::ios_base::binary );
-   // general_data.SerializeToOstream( &ofs );
-
-
-
 
 
 

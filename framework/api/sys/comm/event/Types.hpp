@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/Includes.hpp"
 #include "api/sys/dsi/Types.hpp"
 #include "api/sys/helpers/functions/format.hpp"
 
@@ -74,11 +74,11 @@ namespace base_v1 {
          TAsyncTypeID( ) = default;
          TAsyncTypeID( const TYPE& _value )
             : TBaseAsyncTypeID< TYPE >( _value )
-            , m_name( base::format_string( _value ) )
+            , m_name( base::format_string( "0x", std::hex, _value ) )
          { }
          TAsyncTypeID( const TAsyncTypeID< TYPE >& _other )
             : TBaseAsyncTypeID< TYPE >( _other.m_value )
-            , m_name( base::format_string( _other.m_value ) )
+            , m_name( base::format_string( "0x", std::hex, _other.m_value ) )
          { }
          ~TAsyncTypeID( ) = default;
 
@@ -92,7 +92,7 @@ namespace base_v1 {
             {
                const std::string _name = base::format_string( std::hex, typeid( T ).name( ) );
                const std::size_t _hash_code = typeid( T ).hash_code( );
-               SYS_MSG( "async typeid: %zu => %s", _hash_code, _name.c_str( ) );
+               SYS_MSG( "async typeid: %p => %s", (void*)_hash_code, _name.c_str( ) );
                return typeid( T ).hash_code( );
             }
 
@@ -168,50 +168,6 @@ namespace base::async {
 
    enum class eAsyncType : size_t { EVENT, RUNNABLE, UNDEFINED };
    const char* c_str( const eAsyncType );
-
-   enum class eCommType : size_t { IPC, ITC, ETC, NONE };
-   const char* c_str( const eCommType );
-
-
-
-   struct Address
-   {
-      public:
-         using tOpt = std::optional< Address >;
-         using tSet = std::set< Address >;
-
-      public:
-         Address( ) = default;
-         Address( const base::ID&, const base::ID& external_id = base::InvalidID );
-         Address( const Address& );
-         ~Address( ) = default;
-
-      public:
-         bool to_stream( base::dsi::tByteStream& ) const;
-         bool from_stream( base::dsi::tByteStream& );
-
-      public:
-         Address& operator=( const Address& );
-         bool operator==( const Address& ) const;
-         bool operator!=( const Address& ) const;
-         bool operator<( const Address& ) const;
-         operator bool( ) const;
-
-      public:
-         const std::string name( ) const;
-
-      public:
-         bool is_local( ) const;
-         bool is_external( ) const;
-
-      public:
-         const base::ID& external_id( ) const;
-         const base::ID& internal_id( ) const;
-      private:
-         base::ID m_internal_id = base::InvalidID;
-         base::ID m_external_id = base::InvalidID;
-   };
-
 
 } // namespace base::async
 

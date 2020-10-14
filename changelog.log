@@ -1,3 +1,20 @@
+version 2.0.0
+   - Complete system redesign.
+   - New ID concept (base::TID) implemented in next types: Component, ServiceThread, ServiceProcess, Socket, Thread, Mutex, ConditionVariable, Timer.
+   - Send event logic changed.
+   - eCommType was removed.
+   - Context type implemented and used in send event and other logic.
+   - Service renamed to application thread.
+   - Interface renamed to Service.
+   - ConnectionDB renamed to Registry.
+   - Fixed bug in clear_notification in application thread.
+   - IPC thread redesigned.
+   - Fixed some bugs in Server/Proxy logic.
+   - Implemented two variants on TServer/TProxy:
+         - fast - usual one what works faster but not safty in meaning of sending broadcast events for notifications.
+         - secure - slower one but safty (this variant is compilable but some logic bugs should be fixed).
+   - Tests removed.
+
 version 1.8.2a
    - Minor change in base::TID.
 

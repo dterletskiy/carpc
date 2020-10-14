@@ -6,19 +6,19 @@
 
 
 
-namespace application::components::slave {
+using namespace application::components::slave;
 
 
 
-base::IComponent::tSptr Component::creator( base::IServiceThread& service )
+base::component::IComponent::tSptr Component::creator( base::application::IThread& service )
 {
    return std::shared_ptr< Component >( new Component( service, "Slave" ) );
 }
 
-Component::Component( base::IServiceThread& service, const std::string& name )
-   : base::Component( service, name )
+Component::Component( base::application::IThread& _service, const std::string& _name )
+   : base::component::Component( _service, _name )
 {
-   DBG_MSG( "Created: %s", base::Component::name( ).c_str( ) );
+   DBG_MSG( "Created: %s", name( ).c_str( ) );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::BOOT );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::SHUTDOWN );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::PING );
@@ -43,14 +43,12 @@ void Component::process_event( const events::AppEvent::Event& event )
             // auto request = [ ]( ){  };
             auto request = [ this ]( ){ mp_client_onoff->request_trigger_state( "Slave", 1000000000 ); };
             auto request_start = [ this ]( ){ mp_client_onoff->request_start( ); };
-            mp_client_onoff = new clients::onoff::Client( "OnOffService", "OnOffService-Client-Slave", request );
+            mp_client_onoff = std::shared_ptr< clients::onoff::Client >(
+               new clients::onoff::Client( "OnOffService", "OnOffService-Client-Slave", request )
+            );
          }
          break;
       }
       default: break;
    }
 }
-
-
-
-} // namespace application::components::slave

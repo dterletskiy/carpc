@@ -60,6 +60,7 @@ void RawBuffer::free( )
    if( nullptr != ptr )
       ::free( ptr );
    size = 0;
+   ptr = nullptr;
 }
 
 void RawBuffer::fill( const uint8_t symbol, const ssize_t delta ) const
@@ -71,5 +72,5 @@ void RawBuffer::fill( const uint8_t symbol, const ssize_t delta ) const
 
 void RawBuffer::dump( ) const
 {
-   print( ptr, size );
+   print( ptr, size, true );
 }

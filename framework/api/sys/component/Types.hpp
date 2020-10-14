@@ -1,11 +1,12 @@
 #pragma once
 
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/ID.hpp"
 
 
 
-namespace base {
+namespace base::component {
 
+   class Component;
+   using ID = base::TID< Component >;
 
-
-} // namespace base
+} // namespace base::component

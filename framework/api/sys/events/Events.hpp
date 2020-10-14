@@ -1,14 +1,14 @@
 #pragma once
 
-#include "api/sys/oswrappers/linux/socket.hpp"
-#include "api/sys/comm/interface/Types.hpp"
+#include "api/sys/comm/service/Address.hpp"
+#include "api/sys/comm/service/Signature.hpp"
 #include "api/sys/comm/event/Event.hpp"
 
 
 
 namespace base::events {
 
-   namespace service {
+   namespace system {
 
       enum class eID : size_t { boot, shutdown, ping, undefined };
       const char* c_str( const eID );
@@ -17,11 +17,13 @@ namespace base::events {
       {
          std::string message;
       };
-      DEFINE_EVENT( Service, Data, base::async::TSignatureID< eID > );
+      DEFINE_EVENT( System, Data, base::async::id::TSignature< eID > );
 
    }
 
-   namespace interface {
+
+
+   namespace service {
 
       enum class eAction : size_t
       {
@@ -38,10 +40,10 @@ namespace base::events {
          bool to_stream( base::dsi::tByteStream& ) const;
          bool from_stream( base::dsi::tByteStream& );
 
-         base::interface::Signature    signature;
-         const void*                   ptr = nullptr;
+         base::service::Signature   signature;
+         base::service::Address     address;
       };
-      DEFINE_IPC_EVENT( Action, ActionData, base::async::TSignatureID< eAction > );
+      DEFINE_IPC_EVENT( Action, ActionData, base::async::id::TSignature< eAction > );
 
 
 
@@ -59,7 +61,7 @@ namespace base::events {
       {
          public:
             SignatureStatus( ) = default;
-            SignatureStatus( const base::interface::Signature&, const eStatus );
+            SignatureStatus( const base::service::Signature&, const eStatus );
             SignatureStatus( const SignatureStatus& );
             ~SignatureStatus( ) = default;
 
@@ -70,16 +72,14 @@ namespace base::events {
             const bool from_stream( dsi::tByteStream& );
 
          public:
-            const base::interface::Signature& signature( ) const;
+            const base::service::Signature& signature( ) const;
             const eStatus id( ) const;
 
          private:
-            base::interface::Signature    m_signature;
+            base::service::Signature      m_signature;
             eStatus                       m_id = eStatus::Undefined;
       };
-
-
-      DEFINE_IPC_EVENT( Status, base::interface::Address, SignatureStatus );
+      DEFINE_IPC_EVENT( Status, base::service::Address, SignatureStatus );
 
    }
 

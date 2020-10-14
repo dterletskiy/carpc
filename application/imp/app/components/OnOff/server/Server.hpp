@@ -25,12 +25,12 @@ namespace application::components::onoff {
 
       // Timer
       private:
-         void process_timer( const base::ID ) override;
+         void process_timer( const base::Timer::ID ) override;
          struct TimerSeqID
          {
             std::string current_state;
             std::shared_ptr< base::Timer > timer;
-            size_t seq_id;
+            base::service::tSequenceID seq_id;
          };
          std::list< TimerSeqID > m_timers;
    };

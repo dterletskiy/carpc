@@ -10,8 +10,6 @@ using namespace base::os;
 
 
 
-const Socket::tID Socket::InvalidID = InvalidID;
-
 const char* Socket::c_str( const eResult comm_type )
 {
    switch( comm_type )
@@ -24,7 +22,7 @@ const char* Socket::c_str( const eResult comm_type )
 }
 
 Socket::Socket( const linux::socket::configuration& configuration, const size_t buffer_capacity )
-   : m_id( tools::id::generate( "Socket" ) )
+   : m_id( ID::generate( ) )
    , m_configuration( configuration )
    , m_buffer_capacity( buffer_capacity )
 {
@@ -33,7 +31,7 @@ Socket::Socket( const linux::socket::configuration& configuration, const size_t 
 
 Socket::Socket( linux::socket::tSocket socket, const size_t buffer_capacity )
    : m_socket( socket )
-   , m_id( tools::id::generate( "Socket" ) )
+   , m_id( ID::generate( ) )
    , m_buffer_capacity( buffer_capacity )
 {
    mp_buffer = malloc( m_buffer_capacity );
@@ -85,7 +83,7 @@ Socket& Socket::operator=( Socket&& other )
    m_total_send_size = other.m_total_send_size;
 
    other.m_socket = linux::socket::InvalidSocket;
-   other.m_id = InvalidID;
+   other.m_id = ID::invalid( );
    other.mp_buffer = nullptr;
 
    return *this;

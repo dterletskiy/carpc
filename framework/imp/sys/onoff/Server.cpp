@@ -10,7 +10,7 @@ using namespace base::onoff;
 
 
 Server::Server( const std::string& role_name )
-   : base::interface::TServer< data::Types >( base::onoff::interface_type_id, role_name, true )
+   : base::service::SERVICE_NAMESPACE::TServer< data::Types >( base::onoff::interface_type_id, role_name, true )
 {
    SYS_TRC( "Created" );
 }

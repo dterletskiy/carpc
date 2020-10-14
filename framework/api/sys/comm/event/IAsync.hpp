@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/common/ID.hpp"
 #include "api/sys/comm/event/Types.hpp"
 
 
@@ -17,6 +18,9 @@ namespace base::async {
             ISignature( ) = default;
             ISignature( const ISignature& ) = default;
             virtual ~ISignature( ) = default;
+
+            virtual const bool to_stream( dsi::tByteStream& ) const = 0;
+            virtual const bool from_stream( dsi::tByteStream& ) = 0;
 
             virtual const ISignature* const create_copy( ) const = 0;
 

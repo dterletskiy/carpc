@@ -3,22 +3,39 @@
 // Framework
 #include "api/sys/component/RootComponent.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
-// Application
-#include "imp/controller/components/onoff/server/Server.hpp"
-#include "imp/controller/components/onoff/client/Client.hpp"
+#include "api/sys/dsi/Types.hpp"
+
+
+
+namespace controller::event {
+
+   enum class eID : size_t { boot, shutdown, ping, undefined };
+   const char* c_str( const eID );
+
+   struct Data
+   {
+      bool to_stream( base::dsi::tByteStream& _stream ) const { return true; }
+      bool from_stream( base::dsi::tByteStream& _stream ) { return true; }
+   };
+
+   DEFINE_IPC_EVENT( App, Data, base::async::id::TSignature< eID > );
+
+}
 
 
 
 namespace controller::components::onoff {
 
    class Component
-      : public base::RootComponent
+      : public base::component::RootComponent
+      , public base::ITimerConsumer
+      , public controller::event::App::Consumer
    {
       public:
-         static base::IComponent::tSptr creator( base::IServiceThread& service );
+         static base::component::IComponent::tSptr creator( base::application::IThread& service );
 
       private:
-         Component( base::IServiceThread& service, const std::string& );
+         Component( base::application::IThread& service, const std::string& );
       public:
          ~Component( ) override;
 
@@ -26,11 +43,14 @@ namespace controller::components::onoff {
          void boot( const std::string& ) override;
 
       private:
-         Server m_server_onoff;
-         Client m_client_onoff;
+         void process_timer( const base::Timer::ID ) override;
+         base::Timer m_timer;
 
       public:
-         void on_timer( const base::ID );
+         void on_timer( const base::Timer::ID );
+
+      private:
+         void process_event( const controller::event::App::Event& ) override;
    };
 
 } // namespace controller::components::onoff

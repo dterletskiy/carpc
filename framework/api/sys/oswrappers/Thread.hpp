@@ -1,7 +1,8 @@
 #pragma once
 
 #include "api/sys/oswrappers/linux/thread.hpp"
-#include "api/sys/common/Types.hpp"
+#include "api/sys/common/Includes.hpp"
+#include "api/sys/common/ID.hpp"
 
 
 
@@ -10,6 +11,7 @@ namespace base::os {
    class Thread
    {
       public:
+         using ID = base::TID< Thread >;
          using tSptr = std::shared_ptr< Thread >;
          using FunctionThread = std::function< void( ) >;
 
@@ -60,7 +62,7 @@ namespace base::os {
    }
 
    inline
-   const ID& Thread::id( ) const
+   const Thread::ID& Thread::id( ) const
    {
       return m_id;
    }
