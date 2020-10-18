@@ -17,8 +17,29 @@ namespace base::os::linux::socket {
 
    void configuration::print( const std::string& _message ) const
    {
-      SYS_INF( "%s => domain: %d / type: %d / protocole: %d / address: %s / port: %d", _message.c_str( ), domain, type, protocole, address.c_str( ), port );
+      SYS_INF(
+         "%s => domain: %d / type: %d / protocole: %d / address: %s / port: %d",
+         _message.c_str( ), domain, type, protocole, address.c_str( ), port
+      );
    }
+
+   bool configuration::operator==( const configuration& other ) const
+   {
+      return ( other.domain == domain ) && ( other.type == type ) && ( other.protocole == protocole )
+               && ( other.address == address ) && ( other.port == port );
+   }
+
+   bool configuration::operator!=( const configuration& other ) const
+   {
+      return !( *this == other );
+   }
+
+   bool configuration::eq( const configuration& other ) const
+   {
+      return ( other.address == address ) && ( other.port == port );
+   }
+
+
 
    socket_addr::socket_addr( const int _domain, const char* const _address, const int _port )
    {

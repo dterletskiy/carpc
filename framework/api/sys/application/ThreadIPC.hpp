@@ -73,7 +73,8 @@ namespace base::application {
 
 
       public:
-         bool insert_ipc_event( const base::async::IAsync::tSptr, const application::Context& to_context );
+         bool send( const base::async::IAsync::tSptr, const application::Context& );
+         bool send( const dsi::Packet&, const application::Context& );
          base::async::IAsync::tSptr get_ipc_event( );
          const uint64_t processed_ipc_events( ) const;
       private:

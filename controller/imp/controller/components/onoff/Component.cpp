@@ -38,6 +38,8 @@ base::component::IComponent::tSptr Component::creator( base::application::IThrea
 Component::Component( base::application::IThread& _service, const std::string& _name )
    : base::component::RootComponent( _service, _name )
    , m_timer( this )
+   , m_server_onoff( )
+   , m_client_onoff( )
 {
    DBG_MSG( "Created: %s", name( ).c_str( ) );
    controller::event::App::Event::set_notification( this, { controller::event::eID::boot } );
@@ -53,9 +55,9 @@ void Component::boot( const std::string& command )
    DBG_MSG( "%s", command.c_str( ) );
 
    REGISTER_EVENT( controller::event::App );
-   controller::event::App::Event::create_send( { controller::event::eID::boot },
-      base::application::Context( base::application::process::ID::generate( ), base::application::thread::ID::generate( ) )
-   );
+   // controller::event::App::Event::create_send( { controller::event::eID::boot },
+   //    base::application::Context( base::application::process::ID::generate( ), base::application::thread::ID::generate( ) )
+   // );
    // controller::event::App::Event::create_send( { controller::event::eID::boot } );
 }
 
@@ -81,6 +83,6 @@ void Component::process_event( const controller::event::App::Event& event )
 {
    DBG_MSG( "%s", event.signature( )->name( ).c_str( ) );
 
-   const base::Timer::ID id = base::timer::start( 10000, 1, [ this ]( const base::Timer::ID id ){ on_timer( id ); } );
+   const base::Timer::ID id = base::timer::start( 100000, 1, [ this ]( const base::Timer::ID id ){ on_timer( id ); } );
    DBG_MSG( "started timer: %s", id.name( ).c_str( ) );
 }

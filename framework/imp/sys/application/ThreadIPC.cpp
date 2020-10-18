@@ -255,16 +255,17 @@ void ThreadIPC::dump( ) const
    SYS_WRN( "-------------------------  END DUMP  -------------------------" );
 }
 
-bool ThreadIPC::insert_ipc_event( const base::async::IAsync::tSptr p_event, const application::Context& to_context )
+bool ThreadIPC::send( const base::async::IAsync::tSptr p_event, const application::Context& to_context )
 {
    base::dsi::Packet packet(
       base::dsi::eCommand::BroadcastEvent,
       *(std::static_pointer_cast< base::async::IEvent >( p_event )),
       to_context
    );
-   base::RawBuffer buffer = base::dsi::tByteStream::serialize( packet );
-   m_send_receive.send( to_context, buffer );
-   buffer.free( );
+   return m_send_receive.send( packet, to_context );
+}
 
-   return true;
+bool ThreadIPC::send( const dsi::Packet& packet, const application::Context& to_context )
+{
+   return m_send_receive.send( packet, to_context );
 }

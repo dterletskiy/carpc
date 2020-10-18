@@ -31,6 +31,12 @@ namespace base::application {
             static const tID local;
          };
 
+         static const Context& invalid( )
+         {
+            static Context context( process::tID::invalid( ), thread::tID::invalid( ) );
+            return context;
+         }
+
       public:
          Context( const eInitType init_type = eInitType::Default );
          Context( const process::tID& );
@@ -55,6 +61,7 @@ namespace base::application {
       public:
          bool is_local( ) const;
          bool is_external( ) const;
+         bool is_valid( ) const;
 
       public:
          const process::tID& pid( ) const;

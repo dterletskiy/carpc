@@ -7,6 +7,7 @@
 #include "api/sys/comm/service/Registry.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/Types.hpp"
+#include "api/sys/dsi/Types.hpp"
 
 
 
@@ -73,9 +74,9 @@ namespace base::application {
       public:
          struct Configuration
          {
-            os::linux::socket::configuration ipc_sb;
+            dsi::SocketCongiguration ipc_sb;
             size_t ipc_sb_buffer_size;
-            os::linux::socket::configuration ipc_app;
+            dsi::SocketCongiguration ipc_app;
             size_t ipc_app_buffer_size;
          };
       public:

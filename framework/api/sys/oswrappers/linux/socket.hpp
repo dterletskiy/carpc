@@ -27,6 +27,11 @@ namespace base::os::linux::socket {
    {
       void print( const std::string& _message = "" ) const;
 
+      bool operator==( const configuration& ) const;
+      bool operator!=( const configuration& ) const;
+
+      bool eq( const configuration& ) const;
+
       int         domain;
       int         type;
       int         protocole;

@@ -59,6 +59,11 @@ bool Context::is_external( ) const
    return !is_local( );
 }
 
+bool Context::is_valid( ) const
+{
+   return m_pid.is_valid( ) && m_tid.is_valid( );
+}
+
 bool Context::to_stream( base::dsi::tByteStream& stream ) const
 {
    return stream.push( m_pid, m_tid );

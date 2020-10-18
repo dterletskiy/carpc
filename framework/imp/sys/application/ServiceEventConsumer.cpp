@@ -65,8 +65,6 @@ void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
 
    const auto& configuration = Process::instance( )->configuration( );
    dsi::Packet packet;
-   packet.add_package( command, signature, address, configuration.ipc_app.address, configuration.ipc_app.port );
-   dsi::tByteStream stream;
-   stream.push( packet );
-   // m_service.send( stream );
+   packet.add_package( command, signature, address, configuration.ipc_app );
+   m_service.send( packet, application::Context::invalid( ) );
 }

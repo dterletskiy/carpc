@@ -14,6 +14,13 @@ namespace base::application {
 
    class SendReceive
    {
+      private:
+         struct ProcessInfo
+         {
+            os::Socket::tSptr socket;
+         };
+         using tProcessMapping = std::map< application::process::ID, ProcessInfo >;
+
       public:
          SendReceive( );
          ~SendReceive( );
@@ -33,21 +40,26 @@ namespace base::application {
          bool                       m_started = false;
 
       public:
-         bool send( const application::Context&, const base::RawBuffer& );
+         bool send( const base::RawBuffer&, const application::Context& );
+         bool send( const dsi::Packet&, const application::Context& );
+      private:
+         bool send( const base::RawBuffer&, os::Socket::tSptr );
+         bool send( const dsi::Packet&, os::Socket::tSptr );
 
       private:
          bool setup_connection( );
-         os::Socket                 m_socket_sb;
-         os::Socket                 m_socket_master;
-         os::Socket::tSptrList      m_sockets_slave;
-         os::Socket::tSptrList      m_sockets_client;
+         os::Socket::tSptr socket( const application::Context& );
+         os::Socket::tSptr          mp_socket_sb;
+         os::Socket::tSptr          mp_socket_master;
+         os::Socket::tSptrSet       m_pending_sockets;
+         tProcessMapping            m_process_mapping;
 
       private:
          void prepare_select( os::linux::socket::tSocket&, os::linux::socket::fd& );
          void process_select( os::linux::socket::tSocket&, os::linux::socket::fd& );
-         bool process_stream( dsi::tByteStream&, os::Socket& );
-         bool process_packet( dsi::Packet&, os::Socket& );
-         bool process_package( dsi::Package&, os::Socket& );
+         bool process_stream( dsi::tByteStream&, os::Socket::tSptr );
+         bool process_packet( dsi::Packet&, os::Socket::tSptr );
+         bool process_package( dsi::Package&, os::Socket::tSptr );
    };
 
 

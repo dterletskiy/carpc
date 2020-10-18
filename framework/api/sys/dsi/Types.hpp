@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdlib>
+#include "api/sys/oswrappers/linux/socket.hpp"
 #include "api/sys/common/ByteStream.hpp"
 
 
@@ -8,6 +9,16 @@
 namespace base::dsi {
 
    using tByteStream = base::ByteStream;
+
+   struct SocketCongiguration : public os::linux::socket::configuration
+   {
+      const std::string name( ) const;
+
+      bool to_stream( tByteStream& stream ) const;
+      bool from_stream( tByteStream& stream );
+   };
+
+
 
    enum class eCommand : size_t
    {
@@ -17,6 +28,7 @@ namespace base::dsi {
       UnregisterClient,
       DetectedServer,
       DetectedClient,
+      RegisterProcess,
       BroadcastEvent,
       Undefined
    };

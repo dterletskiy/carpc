@@ -2,7 +2,7 @@
 
 #define FAST 0
 #define SECURE 1
-#define SERVICE_TYPE SECURE
+#define SERVICE_TYPE FAST
 
 #if SERVICE_TYPE == FAST
    #define SERVICE_NAMESPACE fast

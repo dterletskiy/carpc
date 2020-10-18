@@ -1,3 +1,4 @@
+#include "api/sys/helpers/functions/format.hpp"
 #include "api/sys/dsi/Types.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -17,6 +18,7 @@ namespace base::dsi {
          case eCommand::UnregisterClient:    return "UnregisterClient";
          case eCommand::DetectedServer:      return "DetectedServer";
          case eCommand::DetectedClient:      return "DetectedClient";
+         case eCommand::RegisterProcess:     return "RegisterProcess";
          case eCommand::BroadcastEvent:      return "BroadcastEvent";
          default:                            return "Undefined";
       }
@@ -27,6 +29,23 @@ namespace base::dsi {
 
 
 using namespace base::dsi;
+
+
+
+const std::string SocketCongiguration::name( ) const
+{
+   return base::format_string( domain, ".", type, ".", protocole, "-", address, ":", port );
+}
+
+bool SocketCongiguration::to_stream( tByteStream& stream ) const
+{
+   return stream.push( domain, type, protocole, address, port );
+}
+
+bool SocketCongiguration::from_stream( tByteStream& stream )
+{
+   return stream.pop( domain, type, protocole, address, port );
+}
 
 
 

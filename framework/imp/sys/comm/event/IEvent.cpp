@@ -147,7 +147,7 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
          return false;
       }
 
-      return std::static_pointer_cast< application::ThreadIPC >( p_thread_ipc )->insert_ipc_event( p_event, to_context );
+      return std::static_pointer_cast< application::ThreadIPC >( p_thread_ipc )->send( p_event, to_context );
    }
    else if( application::Context::thread::broadcast == to_context.tid( ) )
    {

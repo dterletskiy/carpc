@@ -24,6 +24,7 @@ namespace base::os {
          using tSptr = std::shared_ptr< Socket >;
          using tWptr = std::weak_ptr< Socket >;
          using tSptrList = std::list< tSptr >;
+         using tSptrSet = std::set< tSptr >;
          using tRecvCallback = std::function< void( void*, const size_t, const eResult ) >;
 
       public:

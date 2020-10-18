@@ -27,6 +27,7 @@ clean: config \
 	$(PROJECT_APPLICATION_NAME)_clean \
 	$(PROJECT_CORE_NAME)_clean \
 	$(PROJECT_CONTROLLER_NAME)_clean \
+	$(PROJECT_HMI_NAME)_clean \
 
 build: config \
 	$(PROJECT_HOOKS_NAME)_build \
@@ -35,6 +36,7 @@ build: config \
 	$(PROJECT_APPLICATION_NAME)_build \
 	$(PROJECT_CORE_NAME)_build \
 	$(PROJECT_CONTROLLER_NAME)_build \
+	$(PROJECT_HMI_NAME)_build \
 
 clean_build: clean build
 
@@ -45,6 +47,7 @@ generate: config \
 	$(PROJECT_APPLICATION_NAME)_generate \
 	$(PROJECT_CORE_NAME)_generate \
 	$(PROJECT_CONTROLLER_NAME)_generate \
+	$(PROJECT_HMI_NAME)_generate \
 
 info: config \
 	$(PROJECT_HOOKS_NAME)_info \
@@ -53,6 +56,7 @@ info: config \
 	$(PROJECT_APPLICATION_NAME)_info \
 	$(PROJECT_CORE_NAME)_info \
 	$(PROJECT_CONTROLLER_NAME)_info \
+	$(PROJECT_HMI_NAME)_info \
 
 archive: clean
 	@$(TAR) -cvf $(ROOT_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar ../$(PROJECT_NAME)
@@ -206,6 +210,35 @@ $(PROJECT_CONTROLLER_NAME)_debug:
 
 $(PROJECT_CONTROLLER_NAME)_disassm:
 	$(MAKE) -C $(PROJECT_CONTROLLER_DIR) disassm $(CONTROLLER_MAKE_PARAMS)
+
+
+
+$(PROJECT_HMI_NAME)_build:
+	$(MAKE) -C $(PROJECT_HMI_DIR) build $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_generate:
+	$(MAKE) -C $(PROJECT_HMI_DIR) generate $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_clean:
+	$(MAKE) -C $(PROJECT_HMI_DIR) clean $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_info:
+	$(MAKE) -C $(PROJECT_HMI_DIR) info $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_archive:
+	$(MAKE) -C $(PROJECT_HMI_DIR) archive $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_execute:
+	$(MAKE) -C $(PROJECT_HMI_DIR) execute $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_pexecute:
+	$(MAKE) -C $(PROJECT_HMI_DIR) pexecute $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_debug:
+	$(MAKE) -C $(PROJECT_HMI_DIR) debug $(HMI_MAKE_PARAMS)
+
+$(PROJECT_HMI_NAME)_disassm:
+	$(MAKE) -C $(PROJECT_HMI_DIR) disassm $(HMI_MAKE_PARAMS)
 
 
 

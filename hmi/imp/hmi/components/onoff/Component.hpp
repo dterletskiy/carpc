@@ -5,12 +5,11 @@
 #include "api/sys/comm/timer/Timer.hpp"
 #include "api/sys/dsi/Types.hpp"
 // Application
-#include "imp/controller/components/onoff/server/Server.hpp"
-#include "imp/controller/components/onoff/client/Client.hpp"
+#include "imp/hmi/components/onoff/client/Client.hpp"
 
 
 
-namespace controller::event {
+namespace hmi::event {
 
    enum class eID : size_t { boot, shutdown, ping, undefined };
    const char* c_str( const eID );
@@ -27,12 +26,12 @@ namespace controller::event {
 
 
 
-namespace controller::components::onoff {
+namespace hmi::components::onoff {
 
    class Component
       : public base::component::RootComponent
       , public base::ITimerConsumer
-      , public controller::event::App::Consumer
+      , public hmi::event::App::Consumer
    {
       public:
          static base::component::IComponent::tSptr creator( base::application::IThread& service );
@@ -53,11 +52,10 @@ namespace controller::components::onoff {
          void on_timer( const base::Timer::ID );
 
       private:
-         void process_event( const controller::event::App::Event& ) override;
+         void process_event( const hmi::event::App::Event& ) override;
 
       private:
-         Server m_server_onoff;
          Client m_client_onoff;
    };
 
-} // namespace controller::components::onoff
+} // namespace hmi::components::onoff

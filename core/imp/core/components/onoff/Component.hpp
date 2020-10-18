@@ -4,6 +4,8 @@
 #include "api/sys/component/RootComponent.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
 #include "api/sys/dsi/Types.hpp"
+// Application
+#include "imp/core/components/onoff/server/Server.hpp"
 
 
 
@@ -51,6 +53,9 @@ namespace core::components::onoff {
 
       private:
          void process_event( const core::event::App::Event& ) override;
+
+      private:
+         Server m_server_onoff;
    };
 
 } // namespace core::components::onoff

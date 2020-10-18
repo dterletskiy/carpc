@@ -127,19 +127,17 @@ void ConnectionProcessor::register_server( base::os::Socket::tSptr p_socket, bas
 {
    base::service::Signature service_signature;
    base::service::Address service_address;
-   std::string inet_address;
-   int inet_port = 0;
-   if( false == package.data( service_signature, service_address, inet_address, inet_port ) )
+   base::dsi::SocketCongiguration inet_address;
+   if( false == package.data( service_signature, service_address, inet_address ) )
    {
       SYS_ERR( "parce package error" );
       return;
    }
-   SYS_INF( "service signature: %s / socket: %d / address: %s:%d (%s)",
+   SYS_INF( "service signature: %s / service address: %s / socket: %d / inet address: %s",
                service_signature.name( ).c_str( ),
+               service_address.name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.c_str( ),
-               inet_port,
-               service_address.name( ).c_str( )
+               inet_address.name( ).c_str( )
             );
 
    // Add service signature and server information to DB
@@ -160,7 +158,7 @@ void ConnectionProcessor::register_server( base::os::Socket::tSptr p_socket, bas
    }
 
    // Add server information to DB
-   service_connection.server = Connection{ p_socket, service_address, inet_address, inet_port };
+   service_connection.server = Connection{ p_socket, service_address, inet_address };
 
    // Check if any client registered with current service signature
    if( true == service_connection.clients.empty( ) )
@@ -169,7 +167,7 @@ void ConnectionProcessor::register_server( base::os::Socket::tSptr p_socket, bas
    // Send notification packet to clients about registered server with current service signature
    SYS_INF( "notifying clients due to registered server with service signature '%s'", service_signature.name( ).c_str( ) );
    base::dsi::Packet packet;
-   packet.add_package( base::dsi::eCommand::DetectedServer, service_signature, service_address, inet_address, inet_port );
+   packet.add_package( base::dsi::eCommand::DetectedServer, service_signature, service_address, inet_address );
    base::dsi::tByteStream stream;
    stream.push( packet );
    for( auto connection : service_connection.clients )
@@ -180,19 +178,17 @@ void ConnectionProcessor::unregister_server( base::os::Socket::tSptr p_socket, b
 {
    base::service::Signature service_signature;
    base::service::Address service_address;
-   std::string inet_address;
-   int inet_port = 0;
-   if( false == package.data( service_signature, service_address, inet_address, inet_port ) )
+   base::dsi::SocketCongiguration inet_address;
+   if( false == package.data( service_signature, service_address, inet_address ) )
    {
       SYS_ERR( "parce package error" );
       return;
    }
-   SYS_INF( "service signature: %s / socket: %d / address: %s:%d (%s)",
+   SYS_INF( "service signature: %s / service address: %s / socket: %d / inet address: %s",
                service_signature.name( ).c_str( ),
+               service_address.name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.c_str( ),
-               inet_port,
-               service_address.name( ).c_str( )
+               inet_address.name( ).c_str( )
             );
 
    // Find registered server with current service signature 
@@ -226,19 +222,17 @@ void ConnectionProcessor::register_client( base::os::Socket::tSptr p_socket, bas
 {
    base::service::Signature service_signature;
    base::service::Address service_address;
-   std::string inet_address;
-   int inet_port = 0;
-   if( false == package.data( service_signature, service_address, inet_address, inet_port ) )
+   base::dsi::SocketCongiguration inet_address;
+   if( false == package.data( service_signature, service_address, inet_address ) )
    {
       SYS_ERR( "parce package error" );
       return;
    }
-   SYS_INF( "service signature: %s / socket: %d / address: %s:%d (%s)",
+   SYS_INF( "service signature: %s / service address: %s / socket: %d / inet address: %s",
                service_signature.name( ).c_str( ),
+               service_address.name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.c_str( ),
-               inet_port,
-               service_address.name( ).c_str( )
+               inet_address.name( ).c_str( )
             );
 
    // Add service signature to DB if it is not exists
@@ -250,7 +244,7 @@ void ConnectionProcessor::register_client( base::os::Socket::tSptr p_socket, bas
    auto& service_connection = service_iterator->second;
 
    // Add client information to DB
-   auto result = service_connection.clients.emplace( Connection{ p_socket, service_address, inet_address, inet_port } );
+   auto result = service_connection.clients.emplace( Connection{ p_socket, service_address, inet_address } );
    if( false == result.second )
    {
       if( service_connection.clients.end( ) != result.first )
@@ -274,7 +268,7 @@ void ConnectionProcessor::register_client( base::os::Socket::tSptr p_socket, bas
    const Connection& server = service_connection.server.value( );
    SYS_INF( "notifying server due to registered client with service signature '%s'", service_signature.name( ).c_str( ) );
    base::dsi::Packet packet;
-   packet.add_package( base::dsi::eCommand::DetectedServer, service_signature, server.service_address, server.inet_address, server.inet_port );
+   packet.add_package( base::dsi::eCommand::DetectedServer, service_signature, server.service_address, server.inet_address );
    base::dsi::tByteStream stream;
    stream.push( packet );
    local::send( p_socket, stream );
@@ -284,19 +278,17 @@ void ConnectionProcessor::unregister_client( base::os::Socket::tSptr p_socket, b
 {
    base::service::Signature service_signature;
    base::service::Address service_address;
-   std::string inet_address;
-   int inet_port = 0;
-   if( false == package.data( service_signature, service_address, inet_address, inet_port ) )
+   base::dsi::SocketCongiguration inet_address;
+   if( false == package.data( service_signature, service_address, inet_address ) )
    {
       SYS_ERR( "parce package error" );
       return;
    }
-   SYS_INF( "service signature: %s / socket: %d / address: %s:%d (%s)",
+   SYS_INF( "service signature: %s / service address: %s / socket: %d / inet address: %s",
                service_signature.name( ).c_str( ),
+               service_address.name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.c_str( ),
-               inet_port,
-               service_address.name( ).c_str( )
+               inet_address.name( ).c_str( )
             );
 
    // Find registered client with current service signature 
@@ -309,7 +301,7 @@ void ConnectionProcessor::unregister_client( base::os::Socket::tSptr p_socket, b
    auto& service_connection = service_iterator->second;
 
    // Find registered client with current service signature and remove it if exists
-   const size_t result = service_connection.clients.erase( Connection{ p_socket, service_address, inet_address, inet_port } );
+   const size_t result = service_connection.clients.erase( Connection{ p_socket, service_address, inet_address } );
    // Check if any client was removed
    if( 0 == result )
    {

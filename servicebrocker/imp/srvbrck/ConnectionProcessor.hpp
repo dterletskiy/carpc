@@ -19,9 +19,7 @@ struct Connection
 
    base::os::Socket::tSptr socket = nullptr;
    base::service::Address  service_address;
-   std::string             inet_address;
-   int                     inet_port;
-   // base::os::linux::socket::configuration;
+   base::dsi::SocketCongiguration inet_address;
 };
 
 struct ServiceConnection

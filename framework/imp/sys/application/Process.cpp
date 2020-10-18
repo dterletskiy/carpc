@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <unistd.h>
+#include <filesystem>
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/ThreadIPC.hpp"
@@ -46,12 +47,15 @@ Process::Process( int argc, char** argv )
 {
    SYS_TRC( "created" );
 
+   std::string file_name = std::filesystem::path( *argv ).filename( );
+   file_name += std::string( ".cfg" );
+
    base::tools::cmd::init( argc, argv );
    base::tools::cmd::print( );
-   base::tools::cfg::init( base::tools::cmd::argument( "config" ).value_or( "application.cfg" ) );
+   base::tools::cfg::init( base::tools::cmd::argument( "config" ).value_or( file_name.c_str( ) ) );
    base::tools::cfg::print( );
 
-   m_configuration.ipc_sb = os::linux::socket::configuration {
+   m_configuration.ipc_sb = dsi::SocketCongiguration {
       AF_UNIX,
       SOCK_STREAM,
       static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_protocole" ).value( ) ) ),
@@ -60,7 +64,7 @@ Process::Process( int argc, char** argv )
    };
    m_configuration.ipc_sb_buffer_size = static_cast< size_t >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_buffer_size" ).value( ) ) );
 
-   m_configuration.ipc_app = os::linux::socket::configuration {
+   m_configuration.ipc_app = dsi::SocketCongiguration {
       AF_UNIX,
       SOCK_STREAM,
       static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_application_protocole" ).value( ) ) ),

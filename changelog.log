@@ -1,3 +1,7 @@
+version 2.0.1
+   - IPC service register implemented.
+   - HMI example application was added.
+
 version 2.0.0
    - Complete system redesign.
    - New ID concept (base::TID) implemented in next types: Component, ServiceThread, ServiceProcess, Socket, Thread, Mutex, ConditionVariable, Timer.
