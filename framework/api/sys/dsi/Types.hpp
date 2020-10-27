@@ -29,6 +29,8 @@ namespace base::dsi {
       DetectedServer,
       DetectedClient,
       RegisterProcess,
+      RegisterClientProcess,
+      RegisterServerProcess,
       BroadcastEvent,
       Undefined
    };

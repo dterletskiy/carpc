@@ -12,15 +12,17 @@ namespace base::dsi {
    {
       switch( comm_type )
       {
-         case eCommand::RegisterServer:      return "RegisterServer";
-         case eCommand::UnregisterServer:    return "UnregisterServer";
-         case eCommand::RegisterClient:      return "RegisterClient";
-         case eCommand::UnregisterClient:    return "UnregisterClient";
-         case eCommand::DetectedServer:      return "DetectedServer";
-         case eCommand::DetectedClient:      return "DetectedClient";
-         case eCommand::RegisterProcess:     return "RegisterProcess";
-         case eCommand::BroadcastEvent:      return "BroadcastEvent";
-         default:                            return "Undefined";
+         case eCommand::RegisterServer:         return "RegisterServer";
+         case eCommand::UnregisterServer:       return "UnregisterServer";
+         case eCommand::RegisterClient:         return "RegisterClient";
+         case eCommand::UnregisterClient:       return "UnregisterClient";
+         case eCommand::DetectedServer:         return "DetectedServer";
+         case eCommand::DetectedClient:         return "DetectedClient";
+         case eCommand::RegisterProcess:        return "RegisterProcess";
+         case eCommand::RegisterClientProcess:  return "RegisterClientProcess";
+         case eCommand::RegisterServerProcess:  return "RegisterServerProcess";
+         case eCommand::BroadcastEvent:         return "BroadcastEvent";
+         default:                               return "Undefined";
       }
       return "Undefined";
    }

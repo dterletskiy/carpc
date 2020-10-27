@@ -2,6 +2,7 @@
 
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/oswrappers/Socket.hpp"
+#include "api/sys/comm/event/IEvent.hpp"
 #include "api/sys/dsi/Types.hpp"
 
 
@@ -35,15 +36,16 @@ namespace base::application {
          bool wait( );
       private:
          void thread_loop( );
-         const base::os::Thread& thread( ) const;
+         const os::Thread& thread( ) const;
          os::Thread                 m_thread;
          bool                       m_started = false;
 
       public:
-         bool send( const base::RawBuffer&, const application::Context& );
+         bool send( const RawBuffer&, const application::Context& );
          bool send( const dsi::Packet&, const application::Context& );
+         bool send( const async::IEvent::tSptr, const application::Context& );
       private:
-         bool send( const base::RawBuffer&, os::Socket::tSptr );
+         bool send( const RawBuffer&, os::Socket::tSptr );
          bool send( const dsi::Packet&, os::Socket::tSptr );
 
       private:

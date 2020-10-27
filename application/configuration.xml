@@ -22,6 +22,7 @@
       <setting type="flag" value="-fopenmp" status="active"/>
       <setting type="flag" value="-ltbb" status="active"/>
       <setting type="flag" value="-lprotobuf" status="active"/>
+      <setting type="flag" value="-lboost_thread" status="active"/>
    </settings>
 
 </project>

@@ -204,8 +204,14 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
          }
          else
          {
-            SYS_TRC( "received event (%s)", p_event->signature( )->name( ).c_str( ) );
-            p_event->send( Context( ) );
+            application::Context to_context;
+            if( false == package.data( to_context ) )
+            {
+               SYS_ERR( "parce package error" );
+               return false;
+            }
+            SYS_TRC( "received event '%s' to context: %s", p_event->signature( )->name( ).c_str( ), to_context.name( ).c_str( ) );
+            p_event->send( to_context );
          }
          break;
       }
@@ -259,6 +265,8 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
 
                dsi::Packet packet( dsi::eCommand::RegisterProcess, application::Process::instance( )->id( ) );
                send( packet, p_socket );
+
+               m_process_mapping.insert( std::make_pair( service_address.context( ).pid( ), ProcessInfo{ p_socket } ) );
             }
          }
 
@@ -298,13 +306,13 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
          }
          SYS_INF( "register process: %s", pid.name( ).c_str( ) );
 
-         m_process_mapping.insert( std::make_pair( pid, ProcessInfo{ p_socket_from } ) );
-
          auto iterator = m_pending_sockets.find( p_socket_from );
          if( m_pending_sockets.end( ) == iterator )
          {
             SYS_WRN( "there is no pending socket" );
          }
+
+         m_process_mapping.insert( std::make_pair( pid, ProcessInfo{ p_socket_from } ) );
 
          break;
       }
@@ -367,7 +375,7 @@ base::os::Socket::tSptr SendReceive::socket( const application::Context& context
    return iterator->second.socket;
 }
 
-bool SendReceive::send( const base::RawBuffer& buffer, os::Socket::tSptr p_socket )
+bool SendReceive::send( const RawBuffer& buffer, os::Socket::tSptr p_socket )
 {
    if( nullptr == buffer.ptr )
       return false;
@@ -377,14 +385,14 @@ bool SendReceive::send( const base::RawBuffer& buffer, os::Socket::tSptr p_socke
    return os::Socket::eResult::OK == p_socket->send( buffer.ptr, buffer.size );
 }
 
-bool SendReceive::send( const base::RawBuffer& buffer, const application::Context& to_context )
+bool SendReceive::send( const RawBuffer& buffer, const application::Context& to_context )
 {
    return send( buffer, socket( to_context ) );
 }
 
 bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
 {
-   base::RawBuffer buffer = base::dsi::tByteStream::serialize( packet );
+   RawBuffer buffer = dsi::tByteStream::serialize( packet );
    bool result = send( buffer, p_socket );
    buffer.free( );
 
@@ -393,9 +401,15 @@ bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
 
 bool SendReceive::send( const dsi::Packet& packet, const application::Context& to_context )
 {
-   base::RawBuffer buffer = base::dsi::tByteStream::serialize( packet );
+   RawBuffer buffer = dsi::tByteStream::serialize( packet );
    bool result = send( buffer, socket( to_context ) );
    buffer.free( );
 
    return result;
+}
+
+bool SendReceive::send( const async::IEvent::tSptr p_event, const application::Context& to_context )
+{
+   dsi::Packet packet( dsi::eCommand::BroadcastEvent, *p_event, to_context );
+   return send( packet, to_context );
 }

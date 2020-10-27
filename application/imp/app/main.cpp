@@ -135,15 +135,129 @@ void boot( int argc, char** argv )
 
 
 
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/thread.hpp>
+#include <chrono>
+#include <thread>
+#include <iostream>
 
 
 
 
+
+// void run_service( const std::size_t id )
+// {
+//    DBG_INF( "thread id: %zu - enter", id );
+//    ioservice_1.run( );
+//    DBG_INF( "thread id: %zu - exit", id );
+// };
 
 const bool test( int argc, char** argv )
 {
    return true;
    SYS_ERR( "--------------- MARKER ---------------" );
+
+   boost::asio::io_service ioservice_1;
+   boost::asio::io_service ioservice_2;
+
+
+
+   std::shared_ptr< boost::asio::steady_timer > timer_1 = nullptr;
+   timer_1 = std::make_shared< boost::asio::steady_timer >( ioservice_1, std::chrono::seconds{ 3 } );
+   timer_1->async_wait(
+      [ ]( const boost::system::error_code& ec )
+      {
+         DBG_MSG( "timer 1 enter" );
+         DBG_MSG( "timer 1 exit" );
+      }
+   );
+
+
+
+   std::shared_ptr< boost::asio::steady_timer > timer_2 = nullptr;
+   timer_2 = std::make_shared< boost::asio::steady_timer >( ioservice_1, std::chrono::seconds{ 5 } );
+   timer_2->async_wait(
+      [ &ioservice_1 ]( const boost::system::error_code& ec )
+      {
+         DBG_MSG( "timer 2 enter" );
+         ioservice_1.post( [ ]( ){ DBG_ERR( "---------------" ); } );
+         DBG_MSG( "timer 2 exit" );
+      }
+   );
+
+
+
+   boost::asio::steady_timer timer_3{ ioservice_1, std::chrono::seconds{ 10 } };
+   timer_3.async_wait(
+      [ ]( const boost::system::error_code& ec )
+      {
+         DBG_MSG( "timer 3 enter" );
+         DBG_MSG( "timer 3 exit" );
+      }
+   );
+
+
+
+   // DBG_INF( "---------------" );
+   // ioservice_1.run( );
+   // DBG_INF( "---------------" );
+   // ioservice_1.run( );
+   // DBG_INF( "---------------" );
+
+
+
+   // std::vector< std::shared_ptr< boost::asio::steady_timer > > timer_vector;
+   // for( std::size_t count = 0; count < 100; ++count )
+   // {
+   //    timer_vector.push_back(
+   //       std::make_shared< boost::asio::steady_timer >( ioservice_1, std::chrono::seconds{ 3 } )
+   //    );
+   //    timer_vector.back( )->async_wait(
+   //       [ count ]( const boost::system::error_code& ec )
+   //       {
+   //          DBG_MSG( "timer %zu enter", count );
+   //          DBG_MSG( "timer %zu exit", count );
+   //       }
+   //    );
+   // }
+
+
+
+   auto thread_loop = [ ]( boost::asio::io_service& service, const std::size_t id )
+   {
+      DBG_INF( "thread id: %zu - enter", id );
+      service.run( );
+      DBG_INF( "thread id: %zu - exit", id );
+   };
+
+   std::thread thread_1{ thread_loop, std::ref( ioservice_1 ), 1 };
+   std::thread thread_2{ thread_loop, std::ref( ioservice_1 ), 2 };
+
+
+
+   thread_1.join( );
+   thread_2.join( );
+
+
+
+
+
+
+   // auto run_service = [ &ioservice_1 ]( const std::size_t id )
+   // {
+   //    DBG_INF( "thread id: %zu - enter", id );
+   //    ioservice_1.run( );
+   //    DBG_INF( "thread id: %zu - exit", id );
+   // };
+   // boost::thread( boost::bind( run_service, 1 ) );
+   // boost::thread( boost::bind( run_service, 2 ) );
+
+   // while( true )
+   // {
+   //    DBG_MSG( );
+   //    sleep( 1 );
+   // }
 
 
 

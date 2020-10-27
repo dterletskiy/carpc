@@ -38,8 +38,6 @@ base::component::IComponent::tSptr Component::creator( base::application::IThrea
 Component::Component( base::application::IThread& _service, const std::string& _name )
    : base::component::RootComponent( _service, _name )
    , m_timer( this )
-   , m_server_onoff( )
-   , m_client_onoff( )
 {
    DBG_MSG( "Created: %s", name( ).c_str( ) );
    controller::event::App::Event::set_notification( this, { controller::event::eID::boot } );
@@ -57,6 +55,9 @@ void Component::boot( const std::string& command )
    REGISTER_EVENT( controller::event::App );
    // controller::event::App::Event::create_send( { controller::event::eID::boot },
    //    base::application::Context( base::application::process::ID::generate( ), base::application::thread::ID::generate( ) )
+   // );
+   // controller::event::App::Event::create_send( { controller::event::eID::boot },
+   //    base::application::Context( base::application::Context::process::broadcast, base::application::Context::thread::broadcast )
    // );
    // controller::event::App::Event::create_send( { controller::event::eID::boot } );
 }

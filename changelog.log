@@ -1,3 +1,8 @@
+version 2.0.2
+   - Introduced AsyncQueue and AsyncConsumerMap.
+   - application::Thread and application::ThreadIPC implementation refactored using AsyncQueue and AsyncConsumerMap.
+   - Minor changes.
+
 version 2.0.1
    - IPC service register implemented.
    - HMI example application was added.

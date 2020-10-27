@@ -55,10 +55,9 @@ namespace base::os {
 
    template< typename _Fn, typename... _Args >
    Thread::Thread( _Fn&& p_function, _Args&&... args )
-      : mp_function( )
+      : mp_function( std::bind( p_function, args... ) )
    {
       init( );
-      mp_function = std::bind( p_function, args... );
    }
 
    inline

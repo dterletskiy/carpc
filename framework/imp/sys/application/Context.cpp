@@ -9,7 +9,8 @@ using namespace base::application;
 
 
 
-const Context::process::tID Context::process::local = Context::process::tID::invalid( ) - Context::process::tID::VALUE_TYPE( 1 );
+const Context::process::tID Context::process::broadcast = Context::process::tID::invalid( );
+const Context::process::tID Context::process::local = Context::process::broadcast - Context::process::tID::VALUE_TYPE( 1 );
 
 const Context::thread::tID Context::thread::broadcast = Context::thread::tID::invalid( );
 const Context::thread::tID Context::thread::local = Context::thread::broadcast - Context::thread::tID::VALUE_TYPE( 1 );

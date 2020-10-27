@@ -26,7 +26,7 @@ Client::~Client( )
 void Client::connected( )
 {
    DBG_MSG( );
-   // subscribe_current_state( );
+   subscribe_current_state( );
    // request_trigger_state( "UNLOADED", 10000000000 );
 }
 

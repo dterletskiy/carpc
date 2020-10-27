@@ -22,6 +22,7 @@ namespace base::application {
          struct process
          {
             using tID = application::process::ID;
+            static const tID broadcast;
             static const tID local;
          };
          struct thread
