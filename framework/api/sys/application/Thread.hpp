@@ -13,9 +13,9 @@ namespace base::application {
    class Thread : public IThread
    {
       public:
-         struct Info
+         struct Configuration
          {
-            using tVector = std::vector< Info >;
+            using tVector = std::vector< Configuration >;
             std::string                m_name;
             component::IComponent::tCreatorVector
                                        m_component_creators;
@@ -23,7 +23,7 @@ namespace base::application {
          };
 
       public:
-         Thread( const Info& );
+         Thread( const Configuration& );
          ~Thread( );
          Thread( const Thread& ) = delete;
          Thread& operator=( const Thread& ) = delete;
@@ -62,7 +62,7 @@ namespace base::application {
          component::IComponent::tCreatorVector        m_component_creators;
 
       private:
-         void dump( ) const;
+         void dump( ) const override;
    };
 
 

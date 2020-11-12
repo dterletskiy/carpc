@@ -87,6 +87,7 @@ namespace base::service::fast {
    template< typename TYPES >
    void NotificationStatus< TYPES >::add_subscriber( const application::Context& context, const service::ID& service_id )
    {
+      SYS_WRN( "----- %s / %s -----", context.name( ).c_str( ), service_id.name( ).c_str( ) );
       // In case of current process PID can have two different exact values but what can mean the same logic values.
       // It is current process ID and appliocation::Context::process::local
       // Here we should standartize what exact value should be stored in collection.
@@ -143,7 +144,9 @@ namespace base::service::fast {
       // Notifying all subscribers by sending notification broadcast event to each process.
       for( const auto& subscriber : subscribers )
       {
-         p_event->send( application::Context( subscriber.first, application::Context::thread::broadcast ) );
+         application::Context context( subscriber.first, application::Context::thread::broadcast );
+         SYS_WRN( "----- %s -----", context.name( ).c_str( ) )
+         p_event->send( context );
       }
    }
 

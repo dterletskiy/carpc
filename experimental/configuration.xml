@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" ?>
+
+<project name="experimental" type="local">
+
+   <version major="0" minor="1" patch="0"/>
+
+   <configuration>
+      <config name="type" status="executable"/>
+      <config name="MEMORY_HOOK" status="inactive"/>
+   </configuration>
+
+   <settings type="compilation">
+      <setting type="include" value="/home/scorpion/Source/RPC/experimental" status="active"/>
+      <setting type="include" value="/home/scorpion/Source/RPC/framework" status="active"/>
+      <setting type="flag" value="-fopenmp" status="active"/>
+   </settings>
+
+   <settings type="link">
+      <setting type="flag" value="-ldl" status="active"/>
+      <setting type="include" value="/home/scorpion/Source/RPC/framework_product/lib" status="active"/>
+      <setting type="flag" value="-lframework" status="active"/>
+      <setting type="flag" value="-fopenmp" status="active"/>
+      <setting type="flag" value="-ltbb" status="active"/>
+      <setting type="flag" value="-lprotobuf" status="active"/>
+      <setting type="flag" value="-lboost_thread" status="active"/>
+   </settings>
+
+</project>

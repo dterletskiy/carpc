@@ -25,7 +25,7 @@ namespace base::os {
          void init( );
 
       public:
-         bool run( );
+         bool run( const std::string& name = "NoName" );
          bool join( );
 
          static const ID current_id( );
@@ -49,6 +49,11 @@ namespace base::os {
          FunctionThread             mp_function;
          bool                       m_created = false;
          static void* thread_loop( void* );
+
+      public:
+         const std::string& name( ) const;
+      private:
+         std::string                m_name = "NoName";
    };
 
 
@@ -76,6 +81,12 @@ namespace base::os {
    const pthread_attr_t& Thread::attr( ) const
    {
       return m_attr;
+   }
+
+   inline
+   const std::string& Thread::name( ) const
+   {
+      return m_name;
    }
 
 } // namespace base::os

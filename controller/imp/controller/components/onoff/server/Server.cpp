@@ -22,6 +22,16 @@ Server::~Server( )
    DBG_MSG( "destroyed" );
 }
 
+void Server::connected( )
+{
+   DBG_MSG( "connected" );
+}
+
+void Server::disconnected( )
+{
+   DBG_MSG( "disconnected" );
+}
+
 void Server::request_start( )
 {
    DBG_MSG( );
@@ -45,8 +55,8 @@ void Server::process_timer( const base::Timer::ID id )
    if( m_timers.end( ) == iterator )
       return;
 
-   prepare_response( iterator->seq_id );
-   response_trigger_state( true );
+   // prepare_response( iterator->seq_id );
+   // response_trigger_state( true );
    current_state( iterator->current_state );
    m_timers.erase( iterator );
 }

@@ -31,6 +31,7 @@ namespace base::application {
          virtual void boot( const std::string& ) = 0;
          virtual void shutdown( const std::string& ) = 0;
          virtual const base::os::Thread& thread( ) const = 0;
+         virtual void dump( ) const = 0;
 
       public:
          virtual void set_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) = 0;

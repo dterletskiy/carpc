@@ -18,7 +18,10 @@ namespace base::application {
       private:
          struct ProcessInfo
          {
+            ProcessInfo( os::Socket::tSptr p_socket ) : socket( p_socket ) { }
+
             os::Socket::tSptr socket;
+            bool confirmed = false;
          };
          using tProcessMapping = std::map< application::process::ID, ProcessInfo >;
 

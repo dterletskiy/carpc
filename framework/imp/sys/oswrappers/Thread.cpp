@@ -48,7 +48,6 @@ void Thread::init( )
    pthread_attr_init( &m_attr );
    pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
    pthread_attr_setscope( &m_attr, PTHREAD_SCOPE_PROCESS );
-
 }
 
 const Thread::ID Thread::current_id( )
@@ -85,7 +84,7 @@ void* Thread::thread_loop( void* parameters )
    return static_cast< void* >( p_thread );
 }
 
-bool Thread::run( )
+bool Thread::run( const std::string& name )
 {
    if( true == m_created )
    {
@@ -102,6 +101,13 @@ bool Thread::run( )
    else
    {
       SYS_ERR( "Thread was not created. Error: %d", result );
+   }
+
+   m_name = name;
+   result = pthread_setname_np( m_thread_id, name.c_str( ) );
+   if( 0 != result )
+   {
+      SYS_ERR( "Unable to set thread name. Error: %d", result );
    }
 
    return m_created;

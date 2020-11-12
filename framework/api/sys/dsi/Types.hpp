@@ -29,6 +29,7 @@ namespace base::dsi {
       DetectedServer,
       DetectedClient,
       RegisterProcess,
+      RegisterProcessAck,
       RegisterClientProcess,
       RegisterServerProcess,
       BroadcastEvent,

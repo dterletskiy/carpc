@@ -25,14 +25,14 @@ Client::~Client( )
 
 void Client::connected( )
 {
-   DBG_MSG( );
+   DBG_MSG( "connected" );
    // subscribe_current_state( );
    // request_trigger_state( "UNLOADED", 10000000000 );
 }
 
 void Client::disconnected( )
 {
-   DBG_MSG( );
+   DBG_MSG( "disconnected" );
    unsubscribe_current_state( );
 }
 

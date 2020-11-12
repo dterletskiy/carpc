@@ -22,6 +22,16 @@ Server::~Server( )
    DBG_MSG( "destroyed" );
 }
 
+void Server::connected( )
+{
+   DBG_MSG( "connected" );
+}
+
+void Server::disconnected( )
+{
+   DBG_MSG( "disconnected" );
+}
+
 void Server::request_start( )
 {
    DBG_MSG( );

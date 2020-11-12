@@ -53,7 +53,7 @@ namespace base::application {
          async::AsyncConsumerMap                      m_consumers_map;
 
       private:
-         void dump( ) const;
+         void dump( ) const override;
 
       public:
          bool send( const base::async::IAsync::tSptr, const application::Context& );

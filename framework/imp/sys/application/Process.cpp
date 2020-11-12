@@ -127,16 +127,16 @@ IThread::tSptr Process::current_thread( ) const
    return nullptr;
 }
 
-bool Process::start( const Thread::Info::tVector& thread_infos )
+bool Process::start( const Thread::Configuration::tVector& thread_configs )
 {
    // Creating IPC brocker thread
    mp_thread_ipc = std::make_shared< ThreadIPC >( );
    if( nullptr == mp_thread_ipc )
       return false;
    // Creating application threads
-   for( const auto& thread_info : thread_infos )
+   for( const auto& thread_config : thread_configs )
    {
-      IThread::tSptr p_thread = std::make_shared< Thread >( thread_info );
+      IThread::tSptr p_thread = std::make_shared< Thread >( thread_config );
       if( nullptr == p_thread )
          return false;
       m_thread_list.emplace_back( p_thread );

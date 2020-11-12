@@ -155,7 +155,9 @@ bool ThreadIPC::is_subscribed( const base::async::IAsync::tSptr p_event )
 void ThreadIPC::dump( ) const
 {
    SYS_WRN( "------------------------- START DUMP -------------------------" );
-   SYS_INF( "%s:", m_name.c_str( ) )
+   SYS_INF( "%s:", m_name.c_str( ) );
+   m_event_queue.dump( );
+   m_consumers_map.dump( );
    SYS_WRN( "-------------------------  END DUMP  -------------------------" );
 }
 

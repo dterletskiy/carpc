@@ -40,7 +40,7 @@ namespace base::application {
          static tSptr mp_instance;
 
       public:
-         bool start( const Thread::Info::tVector& );
+         bool start( const Thread::Configuration::tVector& );
          bool stop( );
          void boot( );
 

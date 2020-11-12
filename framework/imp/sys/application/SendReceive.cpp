@@ -152,7 +152,6 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
          dsi::tByteStream stream;
          stream.push( p_buffer, recv_size );
          process_stream( stream, p_socket );
-         // m_pending_sockets.erase( iterator ); // @TDA: should be removed if was processed and added to m_process_mapping
       }
    }
 
@@ -218,56 +217,41 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
       case dsi::eCommand::DetectedServer:
       {
          service::Signature service_signature;
-         service::Address service_address;
+         service::Address server_address;
          dsi::SocketCongiguration inet_address;
-         if( false == package.data( service_signature, service_address, inet_address ) )
+         if( false == package.data( service_signature, server_address, inet_address ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
          SYS_INF(
             "detected server: '%s' / %s / %s",
-            service_signature.name( ).c_str( ), service_address.name( ).c_str( ), inet_address.name( ).c_str( )
+            service_signature.name( ).c_str( ), server_address.name( ).c_str( ), inet_address.name( ).c_str( )
          );
 
          os::Socket::tSptr p_socket = nullptr;
-
-         // Check if socket to interested process was created before
-         auto iterator_process_mapping = m_process_mapping.find( service_address.context( ).pid( ) );
+         auto iterator_process_mapping = m_process_mapping.find( server_address.context( ).pid( ) );
          if( m_process_mapping.end( ) != iterator_process_mapping )
          {
             p_socket = iterator_process_mapping->second.socket;
          }
          else
          {
-            auto iterator_pending_sockets = std::find_if(
-               m_pending_sockets.begin( ),
-               m_pending_sockets.end( ),
-               [ &inet_address ]( const os::Socket::tSptr p_pending_socket )
-               {
-                  return p_pending_socket->configuration( ) == inet_address;
-               }
+            p_socket = std::make_shared< os::Socket >( inet_address, Process::instance( )->configuration( ).ipc_app_buffer_size );
+            if( os::Socket::eResult::ERROR == p_socket->create( ) )
+               return false;
+            if( os::Socket::eResult::ERROR == p_socket->connect( ) )
+               return false;
+            p_socket->unblock( );
+            p_socket->info( "connection to process created" );
+            m_process_mapping.insert( std::make_pair( server_address.context( ).pid( ), ProcessInfo( p_socket ) ) );
+
+            dsi::Packet packet(
+               dsi::eCommand::RegisterProcess,
+               application::Process::instance( )->id( ),
+               Process::instance( )->configuration( ).ipc_app
             );
-            if( m_pending_sockets.end( ) != iterator_pending_sockets )
-            {
-               p_socket = *iterator_pending_sockets;
-            }
-            else
-            {
-               p_socket = std::make_shared< os::Socket >( inet_address, Process::instance( )->configuration( ).ipc_app_buffer_size );
-               if( os::Socket::eResult::ERROR == p_socket->create( ) )
-                  return false;
-               if( os::Socket::eResult::ERROR == p_socket->connect( ) )
-                  return false;
-               p_socket->unblock( );
-               p_socket->info( "connection to process created" );
-               m_pending_sockets.insert( p_socket );
-
-               dsi::Packet packet( dsi::eCommand::RegisterProcess, application::Process::instance( )->id( ) );
-               send( packet, p_socket );
-
-               m_process_mapping.insert( std::make_pair( service_address.context( ).pid( ), ProcessInfo{ p_socket } ) );
-            }
+            send( packet, p_socket );
          }
 
          auto clients_addresses = application::Process::instance( )->service_registry( ).clients( service_signature );
@@ -299,54 +283,112 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
       case dsi::eCommand::RegisterProcess:
       {
          application::process::ID pid;
+         dsi::SocketCongiguration inet_address;
+         if( false == package.data( pid, inet_address ) )
+         {
+            SYS_ERR( "parce package error" );
+            return false;
+         }
+         SYS_INF( "register process: %s / %s", pid.name( ).c_str( ), inet_address.name( ).c_str( ) );
+
+         os::Socket::tSptr p_socket = nullptr;
+         auto iterator_process_mapping = m_process_mapping.find( pid );
+         if( m_process_mapping.end( ) != iterator_process_mapping )
+         {
+            SYS_WRN( "process already registered: %s", pid.name( ).c_str( ) );
+            p_socket = iterator_process_mapping->second.socket;
+         }
+         else
+         {
+            p_socket = std::make_shared< os::Socket >( inet_address, Process::instance( )->configuration( ).ipc_app_buffer_size );
+            if( os::Socket::eResult::ERROR == p_socket->create( ) )
+               return false;
+            if( os::Socket::eResult::ERROR == p_socket->connect( ) )
+               return false;
+            p_socket->unblock( );
+            p_socket->info( "connection to process created" );
+            m_process_mapping.insert( std::make_pair( pid, ProcessInfo( p_socket ) ) );
+         }
+
+         dsi::Packet packet( dsi::eCommand::RegisterProcessAck, application::Process::instance( )->id( ) );
+         send( packet, p_socket );
+
+         break;
+      }
+      case dsi::eCommand::RegisterProcessAck:
+      {
+         application::process::ID pid;
          if( false == package.data( pid ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register process: %s", pid.name( ).c_str( ) );
+         SYS_INF( "register process acknowledge: %s", pid.name( ).c_str( ) );
 
-         auto iterator = m_pending_sockets.find( p_socket_from );
-         if( m_pending_sockets.end( ) == iterator )
+         auto iterator_process_mapping = m_process_mapping.find( pid );
+         if( m_process_mapping.end( ) == iterator_process_mapping )
          {
-            SYS_WRN( "there is no pending socket" );
+            SYS_WRN( "acknowledge for unknown process" );
+            return false;
          }
 
-         m_process_mapping.insert( std::make_pair( pid, ProcessInfo{ p_socket_from } ) );
+         iterator_process_mapping->second.confirmed = true;
 
          break;
       }
       case dsi::eCommand::RegisterServer:
       {
          service::Signature service_signature;
-         service::Address service_address;
-         if( false == package.data( service_signature, service_address ) )
+         service::Address server_address;
+         if( false == package.data( service_signature, server_address ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register server: %s / %s", service_signature.name( ).c_str( ), service_address.name( ).c_str( ) );
+         SYS_INF( "register server: %s / %s", service_signature.name( ).c_str( ), server_address.name( ).c_str( ) );
 
-         application::Process::instance( )->service_registry( ).register_server( service_signature, service_address );
+         auto iterator_process_mapping = m_process_mapping.find( server_address.context( ).pid( ) );
+         if( m_process_mapping.end( ) == iterator_process_mapping )
+         {
+            SYS_WRN( "process was not registered: %s", server_address.context( ).pid( ).name( ).c_str( ) );
+            return false;
+         }
+
+         application::Process::instance( )->service_registry( ).register_server( service_signature, server_address );
 
          break;
       }
       case dsi::eCommand::RegisterClient:
       {
          service::Signature service_signature;
-         service::Address service_address;
-         if( false == package.data( service_signature, service_address ) )
+         service::Address client_address;
+         if( false == package.data( service_signature, client_address ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register client: %s / %s", service_signature.name( ).c_str( ), service_address.name( ).c_str( ) );
+         SYS_INF( "register client: %s / %s", service_signature.name( ).c_str( ), client_address.name( ).c_str( ) );
 
          const auto& server_address = application::Process::instance( )->service_registry( ).server( service_signature );
-         dsi::Packet packet( dsi::eCommand::RegisterServer, service_signature, server_address );
-         send( packet, p_socket_from );
+         if( false == server_address.is_valid( ) )
+         {
+            SYS_WRN( "server is not registered" );
+            return false;
+         }
 
-         application::Process::instance( )->service_registry( ).register_client( service_signature, service_address );
+         auto iterator_process_mapping = m_process_mapping.find( client_address.context( ).pid( ) );
+         if( m_process_mapping.end( ) == iterator_process_mapping )
+         {
+            SYS_WRN( "process was not registered: %s", client_address.context( ).pid( ).name( ).c_str( ) );
+            return false;
+         }
+
+         os::Socket::tSptr p_socket = iterator_process_mapping->second.socket;
+
+         dsi::Packet packet( dsi::eCommand::RegisterServer, service_signature, server_address );
+         send( packet, p_socket );
+
+         application::Process::instance( )->service_registry( ).register_client( service_signature, client_address );
 
          break;
       }
@@ -362,9 +404,6 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
 
 base::os::Socket::tSptr SendReceive::socket( const application::Context& context )
 {
-   if( false == context.is_valid( ) )
-      return mp_socket_sb;
-
    auto iterator = m_process_mapping.find( context.pid( ) );
    if( m_process_mapping.end( ) == iterator )
    {
@@ -387,7 +426,11 @@ bool SendReceive::send( const RawBuffer& buffer, os::Socket::tSptr p_socket )
 
 bool SendReceive::send( const RawBuffer& buffer, const application::Context& to_context )
 {
-   return send( buffer, socket( to_context ) );
+   auto p_socket = socket( to_context );
+   if( nullptr == p_socket )
+      return false;
+
+   return send( buffer, p_socket );
 }
 
 bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
@@ -402,7 +445,12 @@ bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
 bool SendReceive::send( const dsi::Packet& packet, const application::Context& to_context )
 {
    RawBuffer buffer = dsi::tByteStream::serialize( packet );
-   bool result = send( buffer, socket( to_context ) );
+
+   auto p_socket = socket( to_context );
+   if( nullptr == p_socket )
+      return false;
+
+   bool result = send( buffer, p_socket );
    buffer.free( );
 
    return result;

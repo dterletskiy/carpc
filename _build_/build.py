@@ -66,7 +66,7 @@ COMPILER=os.environ.get( 'CXX', "g++" )
 SESSION=os.environ.get( 'SESSION', "default" )
 
 ROOT = "/home/scorpion/Source/RPC"
-projects: list = [ "framework", "hooks", "servicebrocker", "application", "core", "controller", "hmi" ]
+projects: list = [ "framework", "hooks", "servicebrocker", "application", "core", "controller", "hmi", "experimental" ]
 actions: dict = {
    'archive':     [ project.clean_all, archive                                ],
    'clean':       [ project.clean_all                                         ],

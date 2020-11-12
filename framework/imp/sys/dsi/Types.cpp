@@ -19,6 +19,7 @@ namespace base::dsi {
          case eCommand::DetectedServer:         return "DetectedServer";
          case eCommand::DetectedClient:         return "DetectedClient";
          case eCommand::RegisterProcess:        return "RegisterProcess";
+         case eCommand::RegisterProcessAck:     return "RegisterProcessAck";
          case eCommand::RegisterClientProcess:  return "RegisterClientProcess";
          case eCommand::RegisterServerProcess:  return "RegisterServerProcess";
          case eCommand::BroadcastEvent:         return "BroadcastEvent";

@@ -1,3 +1,8 @@
+version 2.0.3
+   - Register IPC client/server finished (initial variant).
+   - IPC request/response/notification communication extablished.
+   - experimental project introduced.
+
 version 2.0.2
    - Introduced AsyncQueue and AsyncConsumerMap.
    - application::Thread and application::ThreadIPC implementation refactored using AsyncQueue and AsyncConsumerMap.

@@ -27,13 +27,13 @@ namespace base::trace::android {
 
 
 #define DBG_ANDROID( LEVEL, USER_FORMAT, ... ) \
-   base::trace::write::simple::dbg_lock( ); \
+   ::base::trace::write::simple::dbg_lock( ); \
    ::sprintf( \
-              base::trace::android::simple::p_buffer \
+              ::base::trace::android::simple::p_buffer \
             , PREFIX_FORMAT_CODE, CLASS_ABBR, __FUNCTION__, __LINE__ \
    ); \
-   __android_log_print( LEVEL, base::trace::android::simple::p_buffer, " " USER_FORMAT, ##__VA_ARGS__ ); \
-   base::trace::write::simple::dbg_unlock( );
+   __android_log_print( LEVEL, ::base::trace::android::simple::p_buffer, " " USER_FORMAT, ##__VA_ARGS__ ); \
+   ::base::trace::write::simple::dbg_unlock( );
 
 
 

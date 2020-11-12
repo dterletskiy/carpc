@@ -39,37 +39,37 @@ namespace base::trace::printf
 
 
 #define DBG_PRINTF_CODE( USER_FORMAT, ... ) \
-   base::trace::printf::simple::dbg_lock( ); \
+   ::base::trace::printf::simple::dbg_lock( ); \
    ::printf( \
               PREFIX_FORMAT_CODE USER_FORMAT NEW_LINE \
             , CLASS_ABBR, __FUNCTION__, __LINE__ \
             , ##__VA_ARGS__ \
    ); \
-   base::trace::printf::simple::dbg_unlock( );
+   ::base::trace::printf::simple::dbg_unlock( );
 
 #define DBG_PRINTF_MICROSECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
-   base::trace::printf::extended::dbg_lock( ); \
+   ::base::trace::printf::extended::dbg_lock( ); \
    ::printf( \
               PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
-            , base::os::linux::microseconds( ) \
+            , ::base::os::linux::microseconds( ) \
             , getpid( ), pthread_self( ) \
             , CLASS_ABBR, __FUNCTION__, __LINE__ \
             , ##__VA_ARGS__ \
    ); \
-   base::trace::printf::extended::dbg_unlock( );
+   ::base::trace::printf::extended::dbg_unlock( );
 
 #define DBG_PRINTF_DATE_TIME_MILLISECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
-   base::trace::printf::extended::dbg_lock( ); \
-   base::os::linux::local_time_of_date( base::trace::printf::extended::time_tm, base::trace::printf::extended::milliseconds ); \
+   ::base::trace::printf::extended::dbg_lock( ); \
+   ::base::os::linux::local_time_of_date( ::base::trace::printf::extended::time_tm, ::base::trace::printf::extended::milliseconds ); \
    ::printf( \
               PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
-            , base::trace::printf::extended::time_tm->tm_year + 1900, base::trace::printf::extended::time_tm->tm_mon + 1, base::trace::printf::extended::time_tm->tm_mday \
-            , base::trace::printf::extended::time_tm->tm_hour, base::trace::printf::extended::time_tm->tm_min, base::trace::printf::extended::time_tm->tm_sec, base::trace::printf::extended::milliseconds \
+            , ::base::trace::printf::extended::time_tm->tm_year + 1900, ::base::trace::printf::extended::time_tm->tm_mon + 1, ::base::trace::printf::extended::time_tm->tm_mday \
+            , ::base::trace::printf::extended::time_tm->tm_hour, ::base::trace::printf::extended::time_tm->tm_min, ::base::trace::printf::extended::time_tm->tm_sec, ::base::trace::printf::extended::milliseconds \
             , getpid( ), pthread_self( ) \
             , CLASS_ABBR, __FUNCTION__, __LINE__ \
             , ##__VA_ARGS__ \
    ); \
-   base::trace::printf::extended::dbg_unlock( );
+   ::base::trace::printf::extended::dbg_unlock( );
 
 
 

@@ -40,16 +40,15 @@ namespace memory {
 
 
 
-const bool test( int argc, char** argv );
-
 void boot( int argc, char** argv )
 {
    memory::dump( );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
+   REGISTER_EVENT( base::onoff::ipc::OnOffEvent );
    DUMP_IPC_EVENTS;
 
-   base::application::Thread::Info::tVector services =
+   base::application::Thread::Configuration::tVector services =
    {
         { "OnOff_Service", { core::components::onoff::Component::creator }, 5 }
    };
@@ -78,8 +77,7 @@ void boot( int argc, char** argv )
    {
       DBG_MSG( "argc = %d", argc );
 
-      if( test( argc, argv ) )
-         boot( argc, argv );
+      boot( argc, argv );
 
       return 0;
    }
@@ -107,25 +105,3 @@ void boot( int argc, char** argv )
    }
 
 #endif
-
-
-
-
-
-
-
-
-
-#include "api/sys/oswrappers/Socket.hpp"
-
-
-
-const bool test( int argc, char** argv )
-{
-   return true;
-   SYS_ERR( "--------------- MARKER ---------------" );
-
-
-
-   return false;
-}

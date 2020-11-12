@@ -1,4 +1,5 @@
 #include "api/sys/helpers/macros/strings.hpp"
+#include "api/sys/comm/timer/Timer.hpp"
 // Application
 #include "Client.hpp"
 
@@ -25,14 +26,24 @@ Client::~Client( )
 
 void Client::connected( )
 {
-   DBG_MSG( );
-   subscribe_current_state( );
+   DBG_MSG( "connected" );
+   // subscribe_current_state( );
    // request_trigger_state( "UNLOADED", 10000000000 );
+
+   base::timer::start(
+      10000, 1,
+      [ this ]( const base::Timer::ID id )
+      {
+         DBG_MSG( "Timer expired" );
+         subscribe_current_state( );
+         request_trigger_state( "UNLOADED", 10000000000 );
+      }
+   );
 }
 
 void Client::disconnected( )
 {
-   DBG_MSG( );
+   DBG_MSG( "disconnected" );
    unsubscribe_current_state( );
 }
 

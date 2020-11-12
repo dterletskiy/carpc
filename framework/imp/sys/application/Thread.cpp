@@ -1,7 +1,6 @@
 #include "api/sys/comm/event/Event.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "imp/sys/application/SystemEventConsumer.hpp"
-#include "api/sys/helpers/functions/print.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Srv"
@@ -12,11 +11,11 @@ using namespace base::application;
 
 
 
-Thread::Thread( const Info& info )
-   : IThread( info.m_name, info.m_wd_timeout )
+Thread::Thread( const Configuration& config )
+   : IThread( config.m_name, config.m_wd_timeout )
    , m_thread( std::bind( &Thread::thread_loop, this ) )
    , m_components( )
-   , m_component_creators( info.m_component_creators )
+   , m_component_creators( config.m_component_creators )
 {
    SYS_TRC( "'%s': created", m_name.c_str( ) );
 }
@@ -157,6 +156,8 @@ bool Thread::is_subscribed( const base::async::IAsync::tSptr p_event )
 void Thread::dump( ) const
 {
    SYS_WRN( "------------------------- START DUMP -------------------------" );
-   SYS_INF( "%s:", m_name.c_str( ) )
+   SYS_INF( "%s:", m_name.c_str( ) );
+   m_event_queue.dump( );
+   m_consumers_map.dump( );
    SYS_WRN( "-------------------------  END DUMP  -------------------------" );
 }
