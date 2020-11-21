@@ -28,7 +28,7 @@ void Client::connected( )
 {
    DBG_MSG( "connected" );
    // subscribe_current_state( );
-   // request_trigger_state( "UNLOADED", 10000000000 );
+   // request_trigger_state( "BASIC OPERABLE", 10000000000 );
 
    base::timer::start(
       10000, 1,
@@ -36,7 +36,7 @@ void Client::connected( )
       {
          DBG_MSG( "Timer expired" );
          subscribe_current_state( );
-         request_trigger_state( "UNLOADED", 10000000000 );
+         request_trigger_state( "BASIC OPERABLE", 10000000000 );
       }
    );
 }

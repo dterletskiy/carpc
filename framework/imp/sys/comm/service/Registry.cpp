@@ -49,6 +49,16 @@ const Address::tSet& Registry::clients( const Signature& signature ) const
    return iterator->second.clients;
 }
 
+const Address& Registry::server( const Passport& passport ) const
+{
+   return server( passport.signature );
+}
+
+const Address::tSet& Registry::clients( const Passport& passport ) const
+{
+   return clients( passport.signature );
+}
+
 Registry::eResult Registry::register_server( const Signature& signature, const Address& address )
 {
    os::MutexAutoLocker locker( s_mutex );
@@ -202,4 +212,24 @@ Registry::eResult Registry::unregister_client( const Signature& signature, const
    ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientDisconnected }, address );
 
    return eResult::OK_Paired;
+}
+
+Registry::eResult Registry::register_server( const Passport& passport )
+{
+   return register_server( passport.signature, passport.address );
+}
+
+Registry::eResult Registry::unregister_server( const Passport& passport )
+{
+   return unregister_server( passport.signature, passport.address );
+}
+
+Registry::eResult Registry::register_client( const Passport& passport )
+{
+   return register_client( passport.signature, passport.address );
+}
+
+Registry::eResult Registry::unregister_client( const Passport& passport )
+{
+   return unregister_client( passport.signature, passport.address );
 }

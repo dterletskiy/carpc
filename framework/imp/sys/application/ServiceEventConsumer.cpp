@@ -30,9 +30,8 @@ ServiceEventConsumer::~ServiceEventConsumer( )
 void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
 {
    const auto& id = event.info( ).id( );
-   const base::service::Signature& signature = event.data( )->signature;
-   const base::service::Address& address = event.data( )->address;
-   SYS_INF( "id: %s / signature: %s / address: %s", ev_i::c_str( id ), signature.name( ).c_str( ), address.name( ).c_str( ) );
+   const base::service::Passport& service_passport = *(event.data( ));
+   SYS_INF( "id: %s / passport: %s", ev_i::c_str( id ), service_passport.name( ).c_str( ) );
 
    dsi::eCommand command = dsi::eCommand::Undefined;
    switch( id )
@@ -64,6 +63,6 @@ void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
       return;
 
    const auto& configuration = Process::instance( )->configuration( );
-   dsi::Packet packet( command, signature, address, configuration.ipc_app );
+   dsi::Packet packet( command, service_passport, configuration.ipc_app );
    m_service.send( packet, application::Context::invalid( ) );
 }

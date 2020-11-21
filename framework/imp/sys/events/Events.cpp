@@ -100,14 +100,4 @@ namespace base::events::service {
       }
    }
 
-   bool ActionData::to_stream( base::dsi::tByteStream& stream ) const
-   {
-      return stream.push( signature, address );
-   }
-
-   bool ActionData::from_stream( base::dsi::tByteStream& stream )
-   {
-      return stream.pop( signature, address );
-   }
-
 }

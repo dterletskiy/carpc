@@ -2,6 +2,7 @@
 
 #include "api/sys/comm/service/Address.hpp"
 #include "api/sys/comm/service/Signature.hpp"
+#include "api/sys/comm/service/Passport.hpp"
 #include "api/sys/comm/event/Event.hpp"
 
 
@@ -35,15 +36,7 @@ namespace base::events {
       };
       const char* c_str( const eAction );
 
-      struct ActionData
-      {
-         bool to_stream( base::dsi::tByteStream& ) const;
-         bool from_stream( base::dsi::tByteStream& );
-
-         base::service::Signature   signature;
-         base::service::Address     address;
-      };
-      DEFINE_IPC_EVENT( Action, ActionData, base::async::id::TSignature< eAction > );
+      DEFINE_IPC_EVENT( Action, base::service::Passport, base::async::id::TSignature< eAction > );
 
 
 

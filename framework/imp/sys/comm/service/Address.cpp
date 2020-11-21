@@ -1,4 +1,3 @@
-#include "api/sys/helpers/functions/format.hpp"
 #include "api/sys/comm/service/Address.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -67,5 +66,5 @@ bool Address::operator<( const Address& other ) const
 
 const std::string Address::name( ) const
 {
-   return base::format_string( m_context.name( ), ".", m_id.name( ) );
+   return m_context.name( ) + "." + m_id.name( );
 }

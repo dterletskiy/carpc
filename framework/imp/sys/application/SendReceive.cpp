@@ -103,9 +103,9 @@ void SendReceive::prepare_select( os::linux::socket::tSocket& max_socket, os::li
 
    for( const auto& p_socket : m_pending_sockets )
    {
-      fd_set.set( p_socket->socket( ), os::linux::socket::fd::eType::READ );
-      if( p_socket->socket( ) > max_socket )
-         max_socket = p_socket->socket( );
+      fd_set.set( p_socket.first->socket( ), os::linux::socket::fd::eType::READ );
+      if( p_socket.first->socket( ) > max_socket )
+         max_socket = p_socket.first->socket( );
    }
    SYS_INF( "max_socket = %d", max_socket );
 }
@@ -118,7 +118,7 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
       const os::Socket::eResult result = mp_socket_sb->recv( );
       if( os::Socket::eResult::DISCONNECTED == result )
       {
-         mp_socket_sb->info( "Host disconnected" );
+         mp_socket_sb->info( "ServiceBrocker disconnected" );
       }
       else if( os::Socket::eResult::OK == result )
       {
@@ -131,16 +131,41 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
    }
 
    // process client sockets
-   for( auto iterator = m_pending_sockets.begin( ); iterator != m_pending_sockets.end( ); ++iterator )
+   for( auto iterator = m_process_mapping.begin( ); iterator != m_process_mapping.end( ); ++iterator )
    {
-      auto p_socket = *iterator;
+      auto p_socket = iterator->second.socket;
       if( false == fd_set.is_set( p_socket->socket( ), os::linux::socket::fd::eType::READ ) )
          continue;
 
       const os::Socket::eResult result = p_socket->recv( );
       if( os::Socket::eResult::DISCONNECTED == result )
       {
-         p_socket->info( "Host disconnected" );
+         p_socket->info( "Server disconnected" );
+         iterator = m_process_mapping.erase( iterator );
+         if( m_process_mapping.end( ) == iterator )
+            break;
+      }
+      else if( os::Socket::eResult::OK == result )
+      {
+         SYS_WRN( "Received data from server" );
+      }
+   }
+
+   // process client sockets
+   for( auto iterator = m_pending_sockets.begin( ); iterator != m_pending_sockets.end( ); ++iterator )
+   {
+      auto p_socket = iterator->first;
+      if( false == fd_set.is_set( p_socket->socket( ), os::linux::socket::fd::eType::READ ) )
+         continue;
+
+      const os::Socket::eResult result = p_socket->recv( );
+      if( os::Socket::eResult::DISCONNECTED == result )
+      {
+         p_socket->info( "Client disconnected" );
+
+         for( const auto& service_info : iterator->second )
+            application::Process::instance( )->service_registry( ).unregister_client( service_info );
+
          iterator = m_pending_sockets.erase( iterator );
          if( m_pending_sockets.end( ) == iterator )
             break;
@@ -160,8 +185,8 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
    {
       if( auto p_socket = mp_socket_master->accept( ) )
       {
-         m_pending_sockets.insert( p_socket );
-         p_socket->info( "Host connected" );
+         m_pending_sockets.insert( std::make_pair( p_socket, service::Passport::tList{ } ) );
+         p_socket->info( "Client connected" );
          p_socket->unblock( );
       }
    }
@@ -216,21 +241,17 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
       }
       case dsi::eCommand::DetectedServer:
       {
-         service::Signature service_signature;
-         service::Address server_address;
+         service::Passport service_passport;
          dsi::SocketCongiguration inet_address;
-         if( false == package.data( service_signature, server_address, inet_address ) )
+         if( false == package.data( service_passport, inet_address ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF(
-            "detected server: '%s' / %s / %s",
-            service_signature.name( ).c_str( ), server_address.name( ).c_str( ), inet_address.name( ).c_str( )
-         );
+         SYS_INF( "detected server: '%s' / %s", service_passport.name( ).c_str( ), inet_address.name( ).c_str( ) );
 
          os::Socket::tSptr p_socket = nullptr;
-         auto iterator_process_mapping = m_process_mapping.find( server_address.context( ).pid( ) );
+         auto iterator_process_mapping = m_process_mapping.find( service_passport.address.context( ).pid( ) );
          if( m_process_mapping.end( ) != iterator_process_mapping )
          {
             p_socket = iterator_process_mapping->second.socket;
@@ -244,7 +265,7 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
                return false;
             p_socket->unblock( );
             p_socket->info( "connection to process created" );
-            m_process_mapping.insert( std::make_pair( server_address.context( ).pid( ), ProcessInfo( p_socket ) ) );
+            m_process_mapping.insert( std::make_pair( service_passport.address.context( ).pid( ), ProcessInfo( p_socket ) ) );
 
             dsi::Packet packet(
                dsi::eCommand::RegisterProcess,
@@ -254,10 +275,10 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
             send( packet, p_socket );
          }
 
-         auto clients_addresses = application::Process::instance( )->service_registry( ).clients( service_signature );
+         auto clients_addresses = application::Process::instance( )->service_registry( ).clients( service_passport );
          for( const auto& client_address : clients_addresses )
          {
-            dsi::Packet packet( dsi::eCommand::RegisterClient, service_signature, client_address );
+            dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( service_passport.signature, client_address ) );
             send( packet, p_socket );
          }
 
@@ -265,18 +286,14 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
       }
       case dsi::eCommand::DetectedClient:
       {
-         service::Signature service_signature;
-         service::Address service_address;
+         service::Passport service_passport;
          dsi::SocketCongiguration inet_address;
-         if( false == package.data( service_signature, service_address, inet_address ) )
+         if( false == package.data( service_passport, inet_address ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF(
-            "detected client: '%s' / %s / %s",
-            service_signature.name( ).c_str( ), service_address.name( ).c_str( ), inet_address.name( ).c_str( )
-         );
+         SYS_INF( "detected client: %s / %s", service_passport.name( ).c_str( ), inet_address.name( ).c_str( ) );
 
          break;
       }
@@ -338,57 +355,64 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
       }
       case dsi::eCommand::RegisterServer:
       {
-         service::Signature service_signature;
-         service::Address server_address;
-         if( false == package.data( service_signature, server_address ) )
+         service::Passport service_passport;
+         if( false == package.data( service_passport ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register server: %s / %s", service_signature.name( ).c_str( ), server_address.name( ).c_str( ) );
+         SYS_INF( "register server: %s", service_passport.name( ).c_str( ) );
 
-         auto iterator_process_mapping = m_process_mapping.find( server_address.context( ).pid( ) );
+         auto iterator_process_mapping = m_process_mapping.find( service_passport.address.context( ).pid( ) );
          if( m_process_mapping.end( ) == iterator_process_mapping )
          {
-            SYS_WRN( "process was not registered: %s", server_address.context( ).pid( ).name( ).c_str( ) );
+            SYS_WRN( "process was not registered: %s", service_passport.address.context( ).pid( ).name( ).c_str( ) );
             return false;
          }
 
-         application::Process::instance( )->service_registry( ).register_server( service_signature, server_address );
+         application::Process::instance( )->service_registry( ).register_server( service_passport );
 
          break;
       }
       case dsi::eCommand::RegisterClient:
       {
-         service::Signature service_signature;
-         service::Address client_address;
-         if( false == package.data( service_signature, client_address ) )
+         service::Passport service_passport;
+         if( false == package.data( service_passport ) )
          {
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register client: %s / %s", service_signature.name( ).c_str( ), client_address.name( ).c_str( ) );
+         SYS_INF( "register client: %s", service_passport.name( ).c_str( ) );
 
-         const auto& server_address = application::Process::instance( )->service_registry( ).server( service_signature );
+         const auto& server_address = application::Process::instance( )->service_registry( ).server( service_passport );
          if( false == server_address.is_valid( ) )
          {
             SYS_WRN( "server is not registered" );
             return false;
          }
 
-         auto iterator_process_mapping = m_process_mapping.find( client_address.context( ).pid( ) );
+         auto iterator_process_mapping = m_process_mapping.find( service_passport.address.context( ).pid( ) );
          if( m_process_mapping.end( ) == iterator_process_mapping )
          {
-            SYS_WRN( "process was not registered: %s", client_address.context( ).pid( ).name( ).c_str( ) );
+            SYS_WRN( "process was not registered: %s", service_passport.address.context( ).pid( ).name( ).c_str( ) );
             return false;
          }
-
          os::Socket::tSptr p_socket = iterator_process_mapping->second.socket;
 
-         dsi::Packet packet( dsi::eCommand::RegisterServer, service_signature, server_address );
+         dsi::Packet packet( dsi::eCommand::RegisterServer, service::Passport( service_passport.signature, server_address ) );
          send( packet, p_socket );
 
-         application::Process::instance( )->service_registry( ).register_client( service_signature, client_address );
+         auto iterator_pending_sockets = m_pending_sockets.find( p_socket_from );
+         if( m_pending_sockets.end( ) == iterator_pending_sockets )
+         {
+            // This situation should never happen because current method is called during processing
+            // sockets from m_pending_sockets
+            SYS_WRN( "service was not maped to the socket" );
+            return false;
+         }
+         iterator_pending_sockets->second.push_back( service_passport );
+
+         application::Process::instance( )->service_registry( ).register_client( service_passport );
 
          break;
       }
@@ -404,6 +428,9 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
 
 base::os::Socket::tSptr SendReceive::socket( const application::Context& context )
 {
+   if( context.pid( ).is_invalid( ) )
+      return mp_socket_sb;
+
    auto iterator = m_process_mapping.find( context.pid( ) );
    if( m_process_mapping.end( ) == iterator )
    {
@@ -426,11 +453,7 @@ bool SendReceive::send( const RawBuffer& buffer, os::Socket::tSptr p_socket )
 
 bool SendReceive::send( const RawBuffer& buffer, const application::Context& to_context )
 {
-   auto p_socket = socket( to_context );
-   if( nullptr == p_socket )
-      return false;
-
-   return send( buffer, p_socket );
+   return send( buffer, socket( to_context ) );
 }
 
 bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
@@ -445,12 +468,7 @@ bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
 bool SendReceive::send( const dsi::Packet& packet, const application::Context& to_context )
 {
    RawBuffer buffer = dsi::tByteStream::serialize( packet );
-
-   auto p_socket = socket( to_context );
-   if( nullptr == p_socket )
-      return false;
-
-   bool result = send( buffer, p_socket );
+   bool result = send( buffer, socket( to_context ) );
    buffer.free( );
 
    return result;

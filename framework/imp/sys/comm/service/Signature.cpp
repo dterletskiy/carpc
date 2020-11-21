@@ -1,4 +1,3 @@
-#include "api/sys/helpers/functions/format.hpp"
 #include "api/sys/comm/service/Signature.hpp"
 
 #include "api/sys/trace/Trace.hpp"

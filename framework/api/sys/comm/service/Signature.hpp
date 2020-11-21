@@ -10,6 +10,10 @@ namespace base::service {
    class Signature
    {
       public:
+         using tVector = std::vector< Signature >;
+         using tSet = std::set< Signature >;
+
+      public:
          Signature( ) = default;
          Signature( const base::async::tAsyncTypeID&, const std::string& );
          Signature( const Signature& );

@@ -14,7 +14,7 @@ Server::Server( )
    : base::onoff::Server( "OnOff_Controller" )
 {
    DBG_MSG( "created" );
-   current_state( "Unloaded" );
+   current_state( "UNLOADED" );
 }
 
 Server::~Server( )
@@ -55,8 +55,8 @@ void Server::process_timer( const base::Timer::ID id )
    if( m_timers.end( ) == iterator )
       return;
 
-   // prepare_response( iterator->seq_id );
-   // response_trigger_state( true );
+   prepare_response( iterator->seq_id );
+   response_trigger_state( true );
    current_state( iterator->current_state );
    m_timers.erase( iterator );
 }

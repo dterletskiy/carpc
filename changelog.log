@@ -1,3 +1,7 @@
+version 2.0.4
+   - Unregister process and service for IPC.
+   - service::Passport implemented.
+
 version 2.0.3
    - Register IPC client/server finished (initial variant).
    - IPC request/response/notification communication extablished.

@@ -3,6 +3,7 @@
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/oswrappers/Socket.hpp"
 #include "api/sys/comm/event/IEvent.hpp"
+#include "api/sys/comm/service/Passport.hpp"
 #include "api/sys/dsi/Types.hpp"
 
 
@@ -22,8 +23,11 @@ namespace base::application {
 
             os::Socket::tSptr socket;
             bool confirmed = false;
+            // service::Signature::tSet services;
          };
          using tProcessMapping = std::map< application::process::ID, ProcessInfo >;
+
+         using tServiceMapping = std::map< os::Socket::tSptr, service::Passport::tList >;
 
       public:
          SendReceive( );
@@ -56,7 +60,7 @@ namespace base::application {
          os::Socket::tSptr socket( const application::Context& );
          os::Socket::tSptr          mp_socket_sb;
          os::Socket::tSptr          mp_socket_master;
-         os::Socket::tSptrSet       m_pending_sockets;
+         tServiceMapping            m_pending_sockets;
          tProcessMapping            m_process_mapping;
 
       private:
