@@ -126,9 +126,7 @@ void ThreadIPC::notify( const base::async::IAsync::tSptr p_event )
       return;
    }
 
-   // Here we create a copy of consumers set to avoid modifying consumers set during iterating it,
-   // for example, during calling "clear_notification" from "process_event".
-   auto consumers_set = m_consumers_map.consumers( p_event->signature( ) );
+   auto& consumers_set = m_consumers_map.start_process( p_event->signature( ) );
    SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
    for( base::async::IAsync::IConsumer* p_consumer : consumers_set )
    {
@@ -146,6 +144,7 @@ void ThreadIPC::notify( const base::async::IAsync::tSptr p_event )
          );
    }
    process_stop( );
+   m_consumers_map.finish_process( );
 }
 
 void ThreadIPC::set_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
