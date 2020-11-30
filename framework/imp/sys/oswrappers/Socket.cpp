@@ -215,6 +215,14 @@ void SocketServer::fd_init( )
    }
 }
 
+void SocketServer::connected( tSptr )
+{
+}
+
+void SocketServer::disconnected( tSptr )
+{
+}
+
 bool SocketServer::select( )
 {
    fd_reset( );
@@ -231,6 +239,7 @@ bool SocketServer::select( )
       if( eResult::DISCONNECTED == result )
       {
          (*iterator)->info( "Host disconnected" );
+         disconnected( *iterator );
          iterator = m_slave_sockets.erase( iterator );
          if( m_slave_sockets.end( ) == iterator )
             break;
@@ -248,6 +257,7 @@ bool SocketServer::select( )
          m_slave_sockets.push_back( p_socket );
          p_socket->info( "Host connected" );
          p_socket->unblock( );
+         connected( p_socket );
       }
    }
 

@@ -5,7 +5,7 @@
 #include "api/sys/helpers/functions/format.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "BASE"
+#define CLASS_ABBR "BASE_ASYNC"
 
 
 

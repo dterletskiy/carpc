@@ -1,4 +1,5 @@
 #include "api/sys/comm/event/Event.hpp"
+#include "api/sys/application/Process.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "imp/sys/application/SystemEventConsumer.hpp"
 
@@ -14,6 +15,8 @@ using namespace base::application;
 Thread::Thread( const Configuration& config )
    : IThread( config.m_name, config.m_wd_timeout )
    , m_thread( std::bind( &Thread::thread_loop, this ) )
+   , m_event_queue( Process::instance( )->configuration( ).max_priority, config.m_name )
+   , m_consumers_map( config.m_name )
    , m_components( )
    , m_component_creators( config.m_component_creators )
 {
@@ -108,11 +111,19 @@ void Thread::notify( const base::async::IAsync::tSptr p_event )
    // Processing runnable IAsync object
    if( base::async::eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
    {
-      m_process_started = time( nullptr );
-      SYS_TRC( "'%s': start processing runnable at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
+      process_start( );
+      SYS_TRC( "'%s': start processing runnable at %ld (%s)",
+            m_name.c_str( ),
+            process_started( ),
+            p_event->signature( )->name( ).c_str( )
+         );
       p_event->process( );
-      SYS_TRC( "'%s': finished processing runnable started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
-      m_process_started.reset( );
+      SYS_TRC( "'%s': finished processing runnable started at %ld (%s)",
+            m_name.c_str( ),
+            process_started( ),
+            p_event->signature( )->name( ).c_str( )
+         );
+      process_stop( );
       return;
    }
 
@@ -122,12 +133,20 @@ void Thread::notify( const base::async::IAsync::tSptr p_event )
    SYS_TRC( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
    for( base::async::IAsync::IConsumer* p_consumer : consumers_set )
    {
-      m_process_started = time( nullptr );
-      SYS_TRC( "'%s': start processing event at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
+      process_start( );
+      SYS_TRC( "'%s': start processing event at %ld (%s)",
+            m_name.c_str( ),
+            process_started( ),
+            p_event->signature( )->name( ).c_str( )
+         );
       p_event->process( p_consumer );
-      SYS_TRC( "'%s': finished processing event started at %ld (%s)", m_name.c_str( ), m_process_started.value( ), p_event->signature( )->name( ).c_str( ) );
+      SYS_TRC( "'%s': finished processing event started at %ld (%s)",
+            m_name.c_str( ),
+            process_started( ),
+            p_event->signature( )->name( ).c_str( )
+         );
    }
-   m_process_started.reset( );
+   process_stop( );
 }
 
 void Thread::set_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
@@ -155,9 +174,9 @@ bool Thread::is_subscribed( const base::async::IAsync::tSptr p_event )
 
 void Thread::dump( ) const
 {
-   SYS_WRN( "------------------------- START DUMP -------------------------" );
+   SYS_DUMP_START( );
    SYS_INF( "%s:", m_name.c_str( ) );
    m_event_queue.dump( );
    m_consumers_map.dump( );
-   SYS_WRN( "-------------------------  END DUMP  -------------------------" );
+   SYS_DUMP_END( );
 }

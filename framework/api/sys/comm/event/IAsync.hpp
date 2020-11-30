@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/sys/common/ID.hpp"
+#include "api/sys/common/Priority.hpp"
 #include "api/sys/comm/event/Types.hpp"
 
 
@@ -45,6 +46,7 @@ namespace base::async {
       public:
          virtual void process( IConsumer* p_consumer = nullptr ) const = 0;
          virtual const ISignature* const signature( ) const = 0;
+         virtual const tPriority priority( ) const = 0;
    };
 
 } // namespace base::async

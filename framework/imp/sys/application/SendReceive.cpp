@@ -141,6 +141,10 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
       if( os::Socket::eResult::DISCONNECTED == result )
       {
          p_socket->info( "Server disconnected" );
+
+         for( const auto& service_passport : iterator->second.service_passport_list )
+            application::Process::instance( )->service_registry( ).unregister_server( service_passport );
+
          iterator = m_process_mapping.erase( iterator );
          if( m_process_mapping.end( ) == iterator )
             break;
@@ -163,8 +167,8 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
       {
          p_socket->info( "Client disconnected" );
 
-         for( const auto& service_info : iterator->second )
-            application::Process::instance( )->service_registry( ).unregister_client( service_info );
+         for( const auto& service_passport : iterator->second )
+            application::Process::instance( )->service_registry( ).unregister_client( service_passport );
 
          iterator = m_pending_sockets.erase( iterator );
          if( m_pending_sockets.end( ) == iterator )
@@ -370,6 +374,7 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
             return false;
          }
 
+         iterator_process_mapping->second.service_passport_list.push_back( service_passport );
          application::Process::instance( )->service_registry( ).register_server( service_passport );
 
          break;

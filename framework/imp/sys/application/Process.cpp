@@ -1,6 +1,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <filesystem>
+#include <chrono>
+#include <thread>
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/ThreadIPC.hpp"
@@ -22,11 +24,11 @@ namespace {
 
       for( const auto& p_thread : base::application::Process::instance( )->thread_list( ) )
       {
-         std::optional< time_t > time_stamp = p_thread->process_started( );
-         if( std::nullopt == time_stamp )
+         time_t time_stamp = p_thread->process_started( );
+         if( 0 == time_stamp )
             continue;
 
-         if( p_thread->wd_timeout( ) > static_cast< size_t >( time( nullptr ) - time_stamp.value( ) ) )
+         if( p_thread->wd_timeout( ) > static_cast< size_t >( time( nullptr ) - time_stamp ) )
             continue;
 
          SYS_ERR( "WhatchDog error: '%s'", p_thread->name( ).c_str( ) );
@@ -147,12 +149,12 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    {
       // return false;
    }
-   sleep(1); // timeout IPC thread is started before other application threads
+   std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout IPC thread is started before other application threads
    // Starting application threads
    for( const auto p_thread : m_thread_list )
       if( false == p_thread->start( ) )
          return false;
-   sleep(1); // timeout all application threads is started before booting system
+   std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout all application threads is started before booting system
 
    // Watchdog timer
    if( false == os::linux::timer::create( m_timer_id, timer_handler ) )

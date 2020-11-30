@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include <cstdint>
 #include <limits>
 #include "api/sys/helpers/functions/format.hpp"
@@ -11,67 +9,143 @@
 
 namespace base {
 
-   using tValueID = std::uint64_t;
-   const tValueID ValueInvalidID = std::numeric_limits< tValueID >::max( );
-
    template< typename T >
    class TID
    {
       public:
          using tID = TID< T >;
-         using VALUE_TYPE = tValueID;
+         using VALUE_TYPE = std::uint64_t;
+         using OBJECT_TYPE = T;
+
+         static constexpr VALUE_TYPE min_value = std::numeric_limits< VALUE_TYPE >::min( );
+         static constexpr VALUE_TYPE max_value = std::numeric_limits< VALUE_TYPE >::max( );
+         static constexpr VALUE_TYPE invalid_value = max_value;
+         static constexpr VALUE_TYPE zero_value = 0;
 
          static const tID generate( )
          {
-            static tID id( 0 );
+            static tID id( zero_value );
             return ++id;
+         }
+         static const tID& min( )
+         {
+            static tID id( min_value );
+            return id;
+         }
+         static const tID& max( )
+         {
+            static tID id( max_value );
+            return id;
          }
          static const tID& invalid( )
          {
-            static tID id;
+            static tID id( invalid_value );
             return id;
          }
          static const tID& zero( )
          {
-            static tID id( 0 );
+            static tID id( zero_value );
             return id;
          }
 
       public:
-         TID( const VALUE_TYPE& value = ValueInvalidID ) : m_value( value ) { }
-         TID( const tID& other ) : m_value( other.m_value ) { }
+         TID( const VALUE_TYPE& value = invalid_value )
+            : m_value( value )
+         { }
+         TID( const tID& other )
+            : m_value( other.m_value )
+         { }
          ~TID( ) = default;
 
       public:
-         bool to_stream( dsi::tByteStream& stream ) const { return stream.push( m_value ); }
-         bool from_stream( dsi::tByteStream& stream ) { return stream.pop( m_value ); }
+         bool to_stream( dsi::tByteStream& stream ) const
+         {
+            return stream.push( m_value );
+         }
+         bool from_stream( dsi::tByteStream& stream )
+         {
+            return stream.pop( m_value );
+         }
 
       public:
-         tID& operator=( const tID& other ) { m_value = other.m_value; return *this; }
-         bool operator==( const tID& other ) const { return m_value == other.m_value; }
-         bool operator!=( const tID& other ) const { return m_value != other.m_value; }
-         bool operator<( const tID& other ) const { return m_value < other.m_value; }
-         bool operator>( const tID& other ) const { return m_value > other.m_value; }
-         bool operator<=( const tID& other ) const { return m_value <= other.m_value; }
-         bool operator>=( const tID& other ) const { return m_value >= other.m_value; }
+         tID& operator=( const tID& other )
+         {
+            m_value = other.m_value;
+            return *this;
+         }
+         bool operator==( const tID& other ) const
+         {
+            return m_value == other.m_value;
+         }
+         bool operator!=( const tID& other ) const
+         {
+            return m_value != other.m_value;
+         }
+         bool operator<( const tID& other ) const
+         {
+            return m_value < other.m_value;
+         }
+         bool operator>( const tID& other ) const
+         {
+            return m_value > other.m_value;
+         }
+         bool operator<=( const tID& other ) const
+         {
+            return m_value <= other.m_value;
+         }
+         bool operator>=( const tID& other ) const
+         {
+            return m_value >= other.m_value;
+         }
 
-         tID operator++( ) { ++m_value; return *this; }
-         tID operator++( int ) { return tID( m_value++ ); }
-         tID operator--( ) { return tID( --m_value ); }
-         tID operator--( int ) { return tID( m_value-- ); }
+         tID operator++( )
+         {
+            ++m_value;
+            return *this;
+         }
+         tID operator++( int )
+         {
+            return tID( m_value++ );
+         }
+         tID operator--( )
+         {
+            return tID( --m_value );
+         }
+         tID operator--( int )
+         {
+            return tID( m_value-- );
+         }
 
-         tID operator+( const VALUE_TYPE& value ) const { return tID( m_value + value ); }
-         tID operator-( const VALUE_TYPE& value ) const { return tID( m_value - value ); }
+         tID operator+( const VALUE_TYPE& value ) const
+         {
+            return tID( m_value + value );
+         }
+         tID operator-( const VALUE_TYPE& value ) const
+         {
+            return tID( m_value - value );
+         }
 
          // operator VALUE_TYPE( ) const { return m_value; }
 
       public:
-         const VALUE_TYPE& value( ) const { return m_value; }
-         bool is_valid( ) const { return m_value != ValueInvalidID; }
-         bool is_invalid( ) const { return m_value == ValueInvalidID; }
-         const std::string name( ) const { return base::format_string( "0x", std::hex, m_value ); }
+         const VALUE_TYPE& value( ) const
+         {
+            return m_value;
+         }
+         bool is_valid( ) const
+         {
+            return m_value != invalid_value;
+         }
+         bool is_invalid( ) const
+         {
+            return m_value == invalid_value;
+         }
+         const std::string name( ) const
+         {
+            return base::format_string( "0x", std::hex, m_value );
+         }
       private:
-         VALUE_TYPE m_value = ValueInvalidID;
+         VALUE_TYPE m_value = invalid_value;
    };
 
 

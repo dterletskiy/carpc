@@ -27,15 +27,17 @@ namespace base::async {
 
       // constructors
       protected:
-         TEvent( const tSignature& signature )
+         TEvent( const tSignature& signature, const tPriority& priority )
             : IEvent( )
             , m_signature( signature )
             , m_context( application::Context::eInitType::Auto )
+            , m_priority( priority )
          { }
-         TEvent( const tSignature& signature, const tData& data )
+         TEvent( const tSignature& signature, const tData& data, const tPriority& priority )
             : IEvent( )
             , m_signature( signature )
             , m_context( application::Context::eInitType::Auto )
+            , m_priority( priority )
          {
             mp_data = std::make_shared< tData >( data );
          }
@@ -58,28 +60,60 @@ namespace base::async {
          }
 
       public:
-         // This "create" static function is used only for creating concrete event type with all empty data what should be filled during serialization.
+         // This "create" static function is used only for creating concrete event type with all empty data
+         // what should be filled during serialization.
          static IEvent::tSptr create( )
          {
-            return std::shared_ptr< tEvent >( new tEvent( tSignature( tUserSignature( ) ) ) );
+            return std::shared_ptr< tEvent >( new tEvent( tSignature( tUserSignature( ) ), tPriority( ) ) );
          }
 
-         static std::shared_ptr< tEvent > create( const tUserSignature& signature )
+         static std::shared_ptr< tEvent > create(
+               const tUserSignature& signature,
+               const tPriority& priority = { }
+            )
          {
-            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ) ) );
+            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), priority ) );
          }
-         static std::shared_ptr< tEvent > create( const tUserSignature& signature, const tData& data )
+         static std::shared_ptr< tEvent > create(
+               const tUserSignature& signature,
+               const tData& data,
+               const tPriority& priority = { }
+            )
          {
-            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), data ) );
+            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), data, priority ) );
          }
 
-         static const bool create_send( const tUserSignature& signature, const application::Context& to_context = application::Context( ) )
+         static const bool create_send(
+               const tUserSignature& signature,
+               const application::Context& to_context = application::Context( )
+            )
          {
             return create( signature )->send( to_context );
          }
-         static const bool create_send( const tUserSignature& signature, const tData& data, const application::Context& to_context = application::Context( ) )
+         static const bool create_send(
+               const tUserSignature& signature,
+               const tPriority& priority,
+               const application::Context& to_context = application::Context( )
+            )
+         {
+            return create( signature, priority )->send( to_context );
+         }
+         static const bool create_send(
+               const tUserSignature& signature,
+               const tData& data,
+               const application::Context& to_context = application::Context( )
+            )
          {
             return create( signature, data )->send( to_context );
+         }
+         static const bool create_send(
+               const tUserSignature& signature,
+               const tData& data,
+               const tPriority& priority,
+               const application::Context& to_context = application::Context( )
+            )
+         {
+            return create( signature, data, priority )->send( to_context );
          }
 
       // virual function
@@ -155,6 +189,11 @@ namespace base::async {
          const application::Context& context( ) const override { return m_context; }
       private:
          application::Context m_context;
+
+      public:
+         const tPriority priority( ) const override { return m_priority; }
+      protected:
+         tPriority m_priority = { };
    };
 
 

@@ -54,7 +54,7 @@ void AsyncQueue::dump( ) const
    SYS_INF( "%s:", m_name.c_str( ) )
    for( const auto element : m_collection )
    {
-      printf( "%s\n", element->signature( )->name( ).c_str( ) );
+      SYS_INF( "%s", element->signature( )->name( ).c_str( ) );
    }
    SYS_WRN( "-------------------------  END DUMP  -------------------------" );
 }

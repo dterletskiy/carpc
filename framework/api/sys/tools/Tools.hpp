@@ -4,14 +4,6 @@
 
 
 
-// namespace base::tools::id {
-
-//    const tID generate( const char* const name_space = "default" );
-
-// } // namespace base::tools::id
-
-
-
 namespace base::tools::cmd {
 
    char* get_option( int, char**, const std::string& );

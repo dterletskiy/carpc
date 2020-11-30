@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdio.h>  /* puts() */
-#include <unistd.h> /* sleep() */
+#include <stdio.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <sstream>
@@ -25,6 +25,7 @@
 #include <set>
 #include <map>
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <optional>

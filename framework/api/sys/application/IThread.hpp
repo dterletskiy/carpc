@@ -3,6 +3,9 @@
 #include "api/sys/common/ID.hpp"
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/comm/event/IAsync.hpp"
+#include "api/sys/comm/event/AsyncQueue.hpp"
+#include "api/sys/comm/event/AsyncPriorityQueue.hpp"
+#include "api/sys/comm/event/AsyncConsumerMap.hpp"
 #include "api/sys/application/Types.hpp"
 
 
@@ -16,6 +19,10 @@ namespace base::application {
          using tSptr = std::shared_ptr< IThread >;
          using tWptr = std::weak_ptr< IThread >;
          using tSptrList = std::list< tSptr >;
+
+      protected:
+         using tEventCollection = async::AsyncPriorityQueue;
+         using tConsumerMap = async::AsyncConsumerMap;
 
       public:
          IThread( const std::string&, const size_t );
@@ -48,10 +55,13 @@ namespace base::application {
 
       public:
          const size_t wd_timeout( ) const;
-         const std::optional< time_t > process_started( ) const;
+         const time_t process_started( ) const;
       protected:
+         void process_start( );
+         void process_stop( );
+      private:
          size_t                        m_wd_timeout = 0;
-         std::optional< time_t >       m_process_started = std::nullopt;
+         std::atomic< time_t >         m_process_started = 0;
    };
 
 
@@ -75,9 +85,21 @@ namespace base::application {
    }
 
    inline
-   const std::optional< time_t > IThread::process_started( ) const
+   const time_t IThread::process_started( ) const
    {
-      return m_process_started;
+      return m_process_started.load( );
+   }
+
+   inline
+   void IThread::process_start( )
+   {
+      return m_process_started.store( time( nullptr ) );
+   }
+
+   inline
+   void IThread::process_stop( )
+   {
+      return m_process_started.store( 0 );
    }
 
 } // namespace base::application

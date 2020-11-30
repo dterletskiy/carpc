@@ -1,9 +1,10 @@
 #pragma once
 
+#include "api/sys/common/ID.hpp"
+#include "api/sys/common/Priority.hpp"
 #include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
 #include "api/sys/oswrappers/linux/timer.hpp"
-#include "api/sys/common/ID.hpp"
 #include "api/sys/comm/service/Registry.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/Types.hpp"
@@ -78,6 +79,8 @@ namespace base::application {
             size_t ipc_sb_buffer_size;
             dsi::SocketCongiguration ipc_app;
             size_t ipc_app_buffer_size;
+
+            const tPriority max_priority = priority( ePriority::MAX );
          };
       public:
          const Configuration& configuration( ) const;

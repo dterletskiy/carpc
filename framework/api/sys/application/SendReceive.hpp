@@ -23,7 +23,7 @@ namespace base::application {
 
             os::Socket::tSptr socket;
             bool confirmed = false;
-            // service::Signature::tSet services;
+            service::Passport::tList service_passport_list;
          };
          using tProcessMapping = std::map< application::process::ID, ProcessInfo >;
 

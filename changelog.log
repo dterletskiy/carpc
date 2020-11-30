@@ -1,3 +1,8 @@
+version 2.0.5
+   - Priority for event implemented.
+   - 'AsyncPriorityQueue' implemented.
+   - Watchdog handling 'm_process_started' chaged to std::atomic.
+
 version 2.0.4
    - Unregister process and service for IPC.
    - service::Passport implemented.

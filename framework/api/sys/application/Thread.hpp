@@ -1,8 +1,5 @@
 #pragma once
 
-#include "api/sys/comm/event/IAsync.hpp"
-#include "api/sys/comm/event/AsyncQueue.hpp"
-#include "api/sys/comm/event/AsyncConsumerMap.hpp"
 #include "api/sys/component/IComponent.hpp"
 #include "api/sys/application/IThread.hpp"
 
@@ -47,7 +44,7 @@ namespace base::application {
       private:
          bool insert_event( const base::async::IAsync::tSptr ) override;
          base::async::IAsync::tSptr get_event( );
-         async::AsyncQueue                            m_event_queue;
+         tEventCollection                             m_event_queue;
 
       private:
          void set_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) override;
@@ -55,7 +52,7 @@ namespace base::application {
          void clear_all_notifications( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) override;
          bool is_subscribed( const base::async::IAsync::tSptr );
          void notify( const base::async::IAsync::tSptr );
-         async::AsyncConsumerMap                      m_consumers_map;
+         tConsumerMap                                 m_consumers_map;
 
       private:
          component::IComponent::tSptrList             m_components;

@@ -154,6 +154,10 @@ namespace base::os {
          void fd_reset( );
          void fd_init( );
 
+      private:
+         virtual void connected( tSptr );
+         virtual void disconnected( tSptr );
+
       public:
          linux::socket::tSocket max_socket( ) const;
       private:

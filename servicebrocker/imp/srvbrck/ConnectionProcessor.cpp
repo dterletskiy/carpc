@@ -105,6 +105,46 @@ void ConnectionProcessor::read_slave( base::os::Socket::tSptr p_socket )
    }
 }
 
+void ConnectionProcessor::connected( base::os::Socket::tSptr p_socket )
+{
+}
+
+void ConnectionProcessor::disconnected( base::os::Socket::tSptr p_socket )
+{
+   for( auto& pair : m_service_map )
+   {
+      auto& service_signature = pair.first;
+      auto& service_connection = pair.second;
+
+      if( std::nullopt != service_connection.server )
+      {
+         if( service_connection.server.value( ).socket == p_socket )
+         {
+            SYS_INF( "unregister server: %s / %s",
+               service_signature.name( ).c_str( ),
+               service_connection.server.value( ).service_address.name( ).c_str( )
+            );
+            service_connection.server.reset( );
+         }
+      }
+
+      auto& clients = service_connection.clients;
+      for( auto iterator = clients.begin( ); iterator != clients.end( ); ++iterator )
+      {
+         if( iterator->socket == p_socket )
+         {
+            SYS_INF( "unregister client: %s / %s",
+               service_signature.name( ).c_str( ),
+               iterator->service_address.name( ).c_str( )
+            );
+            iterator = clients.erase( iterator );
+            if( clients.end( ) == iterator )
+               break;
+         }
+      }
+   }
+}
+
 void ConnectionProcessor::connection_loop( )
 {
    while( true )

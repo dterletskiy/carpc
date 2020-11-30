@@ -45,6 +45,8 @@ class ConnectionProcessor : public base::os::SocketServer
 
    private:
       void read_slave( base::os::Socket::tSptr ) override;
+      void connected( base::os::Socket::tSptr ) override;
+      void disconnected( base::os::Socket::tSptr ) override;
 
    private:
       void process_broadcast_event( base::os::Socket::tSptr p_socket, base::dsi::Package& package );

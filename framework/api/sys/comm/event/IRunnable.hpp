@@ -58,7 +58,7 @@ namespace base::async {
          };
 
       public:
-         IRunnable( const tOperation );
+         IRunnable( const tOperation, const tPriority& priority = { } );
          ~IRunnable( ) override = default;
 
       public:
@@ -72,6 +72,11 @@ namespace base::async {
          const Signature* const signature( ) const override;
          Signature m_signature;
 
+      public:
+         const tPriority priority( ) const override;
+      private:
+         tPriority m_priority = { };
+
       private:
          tOperation m_operation = nullptr;
    };
@@ -79,8 +84,9 @@ namespace base::async {
 
 
    inline
-   IRunnable::IRunnable( const tOperation operation )
-      : m_operation( operation )
+   IRunnable::IRunnable( const tOperation operation, const tPriority& priority )
+      : m_priority( priority )
+      , m_operation( operation )
    {
    }
 
@@ -88,6 +94,12 @@ namespace base::async {
    const IRunnable::Signature* const IRunnable::signature( ) const
    {
       return &m_signature;
+   }
+
+   inline
+   const tPriority IRunnable::priority( ) const
+   {
+      return m_priority;
    }
 
 } // namespace base::async
