@@ -28,6 +28,7 @@ namespace fw::application {
 
       public:
          std::shared_ptr< Thread > current_thread( ) const;
+         const std::list< std::shared_ptr< Thread > >& threads( ) const;
       private:
          std::list< std::shared_ptr< Thread > > m_threads;
    };

@@ -1,3 +1,4 @@
+#include "imp/experimental/components/onoff/servers/OnOff.hpp"
 #include "imp/experimental/components/onoff/Component.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -17,6 +18,10 @@ std::unique_ptr< fw::component::Base > Component::creator( )
 Component::Component( )
    : fw::component::Base( "OnOff" )
 {
+   mp_onoff_server = servers::OnOff::create( );
+   mp_onoff_server->check_in( );
+
+   // events::OnOffEvent::create( 12345, { "Starting" } )->send( );
 }
 
 Component::~Component( )

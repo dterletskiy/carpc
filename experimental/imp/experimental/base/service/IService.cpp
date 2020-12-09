@@ -1,5 +1,4 @@
 #include "imp/experimental/base/application/Application.hpp"
-#include "imp/experimental/base/application/Thread.hpp"
 #include "imp/experimental/base/service/Registry.hpp"
 #include "imp/experimental/base/service/IService.hpp"
 
@@ -12,16 +11,14 @@ using namespace fw::service;
 
 
 
-IService::IService( )
-   : mp_thread ( application::Application::instance( ).current_thread( ) )
+IService::IService( const tServiceID& id, const tServiceRole& role )
+   : m_info( id, role )
+   , mp_thread ( application::Application::instance( ).current_thread( ) )
 {
+   DBG_MSG( "created" );
 }
 
 IService::~IService( )
 {
-}
-
-const tServiceID& IService::service_id( ) const
-{
-   return m_service_id;
+   DBG_MSG( "destroyed" );
 }

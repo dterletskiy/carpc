@@ -66,3 +66,50 @@ std::thread::id Thread::id( ) const
 {
    return m_thread.get_id( );
 }
+
+bool Thread::set_notification( const event::Info& event_info, std::shared_ptr< event::IEventConsumer > p_consumer )
+{
+   auto iterator = m_subscriptions.find( event_info );
+   if( m_subscriptions.end( ) == iterator )
+   {
+      auto result = m_subscriptions.insert( std::make_pair( event_info, tEventConsumers{ } ) );
+      if( !result.second )
+         return false;
+      iterator = result.first;
+   }
+   iterator->second.insert( p_consumer );
+
+   return true;
+}
+
+bool Thread::clear_notification( const event::Info& event_info, std::shared_ptr< event::IEventConsumer > p_consumer )
+{
+   auto iterator = m_subscriptions.find( event_info );
+   if( m_subscriptions.end( ) == iterator )
+      return false;
+
+   iterator->second.erase( p_consumer );
+   return true;
+}
+
+bool Thread::insert_event( std::shared_ptr< event::IEvent > p_event )
+{
+   auto lambda = [this, p_event]( )
+   {
+      const event::Info event_info{ p_event->class_id( ), p_event->id( ) };
+      auto iterator = m_subscriptions.find( event_info );
+      if( m_subscriptions.end( ) == iterator )
+         return;
+
+      for( auto wp_consumer : iterator->second )
+      {
+         if( auto sp_consumer = wp_consumer.lock( ) )
+         {
+            p_event->process( sp_consumer );
+         }
+      }
+   };
+   post( lambda );
+
+   return true;
+}

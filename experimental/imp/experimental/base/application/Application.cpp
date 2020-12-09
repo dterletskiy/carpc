@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "imp/experimental/base/component/Service.hpp"
 #include "imp/experimental/base/application/Application.hpp"
 
@@ -39,20 +40,21 @@ void Application::run( const std::list< Thread::Configuration >& configs )
 
    for( const auto config : service_configs )
    {
-      auto p_thread = std::make_shared< Thread >( config.component_creators, config.name );
-      if( p_thread )
+      if( auto p_thread = std::make_shared< Thread >( config.component_creators, config.name ) )
          m_threads.push_back( p_thread );
    }
 
    for( const auto config : configs )
    {
-      auto p_thread = std::make_shared< Thread >( config.component_creators, config.name );
-      if( p_thread )
+      if( auto p_thread = std::make_shared< Thread >( config.component_creators, config.name ) )
          m_threads.push_back( p_thread );
    }
 
    for( auto p_thread : m_threads )
+   {
       p_thread->run( );
+      usleep( 10000 );
+   }
 
    for( auto p_thread : m_threads )
       p_thread->wait( );
@@ -66,4 +68,9 @@ std::shared_ptr< Thread > Application::current_thread( ) const
          return p_thread;
 
    return nullptr;
+}
+
+const std::list< std::shared_ptr< Thread > >& Application::threads( ) const
+{
+   return m_threads;
 }

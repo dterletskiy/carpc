@@ -111,8 +111,8 @@ const bool run( int argc, char** argv )
 
    const std::list< fw::application::Thread::Configuration > configuration =
    {
+        { "System_Thread", { component::system::Component::creator } },
         { "OnOff_Thread", { component::onoff::Component::creator } },
-        { "System_Thread", { component::system::Component::creator } }
    };
 
    auto& application = fw::application::Application::instance( );
