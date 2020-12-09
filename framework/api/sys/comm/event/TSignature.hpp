@@ -92,6 +92,37 @@ namespace base::async {
 
 
 
+namespace base::async::simple {
+
+   template< typename _ID >
+   class Signature
+   {
+      public:
+         Signature( ) = default;
+         Signature( const Signature& other ) = default;
+         ~Signature( ) = default;
+
+      public:
+         const std::string name( ) const
+         {
+            return std::string{ };
+         }
+         bool operator<( const Signature& other ) const
+         {
+            return false;
+         }
+         const bool to_stream( dsi::tByteStream& stream ) const
+         {
+            return true;
+         }
+         const bool from_stream( dsi::tByteStream& stream )
+         {
+            return true;
+         }
+   };
+
+} // namespace base::async::simple
+
 namespace base::async::id {
 
    template< typename _ID >

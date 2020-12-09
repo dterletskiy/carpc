@@ -190,7 +190,7 @@ void Timer::process( const base::os::linux::timer::tID id )
    else if( m_ticks > m_count )
       return;
 
-   TimerEvent::Event::create_send( { m_id.value( ) }, { m_id }, tPriority( 100 ), m_context );
+   TimerEvent::Event::create_send( { m_id.value( ) }, { m_id }, base::priority( ePriority::TIMER ), m_context );
 }
 
 

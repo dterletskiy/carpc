@@ -1,3 +1,11 @@
+version 2.1.0
+   - Minor changes. Set default priorities.
+
+version 2.0.6
+   - Optimization for 'notify' method in application::Thread to avoid copying consumers set during notification,
+     because of it could be modified during this process. This optimized method does not use any copy ore move for collections.
+     Optimization is done in 'AsyncConsumerMap'.
+
 version 2.0.5
    - Priority for event implemented.
    - 'AsyncPriorityQueue' implemented.

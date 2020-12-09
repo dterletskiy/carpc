@@ -69,7 +69,7 @@ namespace base::async {
 
          static std::shared_ptr< tEvent > create(
                const tUserSignature& signature,
-               const tPriority& priority = { }
+               const tPriority& priority = base::priority( ePriority::DEFAULT )
             )
          {
             return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), priority ) );
@@ -77,7 +77,7 @@ namespace base::async {
          static std::shared_ptr< tEvent > create(
                const tUserSignature& signature,
                const tData& data,
-               const tPriority& priority = { }
+               const tPriority& priority = base::priority( ePriority::DEFAULT )
             )
          {
             return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), data, priority ) );
@@ -133,7 +133,7 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( false == stream.push( m_signature, m_context ) )
+               if( false == stream.push( m_signature, m_context, m_priority ) )
                   return false;
 
                if( false == stream.push( ( nullptr != mp_data ) ) )
@@ -152,7 +152,7 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( false == stream.pop( m_signature, m_context ) )
+               if( false == stream.pop( m_signature, m_context, m_priority ) )
                   return false;
 
                bool is_data = false;
@@ -193,7 +193,7 @@ namespace base::async {
       public:
          const tPriority priority( ) const override { return m_priority; }
       protected:
-         tPriority m_priority = { };
+         tPriority m_priority = base::priority( ePriority::DEFAULT );
    };
 
 
