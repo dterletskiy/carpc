@@ -10,8 +10,8 @@ import time
 from datetime import datetime
 import enum
 
-import base
 import console
+import file
 import settings
 
 
@@ -30,10 +30,11 @@ ExtentionsMap = {
 # 
 ########################################
 class Target:
-   def __init__( self, source, object ):
+   def __init__( self, source, object, preproc ):
       # console.debug.trace( "Target::__init__" )
       self.__source = source
       self.__object = object
+      self.__preproc = preproc
    # def __init__
 
    def __del__( self ):
@@ -53,13 +54,16 @@ class Target:
    def info( self, tabulations ):
       console.debug.info( tabulations * "\t", "source: ", self.__source )
       console.debug.info( tabulations * "\t", "object: ", self.__object )
+      console.debug.info( tabulations * "\t", "preproc: ", self.__preproc )
    # def info
 
    def source( self ): return self.__source
    def object( self ): return self.__object
+   def preproc( self ): return self.__preproc
 
    __source: str = None
    __object: str = None
+   __preproc: str = None
 
 
 ########################################
@@ -76,6 +80,7 @@ class ProjectSettings:
       self.__path = { }
       self.__path['project']        = os.path.join( root_dir, self.__name )
       self.__path['product']        = os.path.join( self.__path['project'] + "_product", self.__session )
+      self.__path['preproc']        = os.path.join( self.__path['product'], "preproc" )
       self.__path['obj']            = os.path.join( self.__path['product'], "obj" )
       self.__path['lib']            = os.path.join( self.__path['product'], "lib" )
       self.__path['gen']            = os.path.join( self.__path['product'], "gen" )
@@ -90,7 +95,8 @@ class ProjectSettings:
                if file.endswith( "." + ext ):
                   source = os.path.join( root, file )
                   object = source.replace( self.__path['project'], self.__path['obj'] ).replace( "." + ext, "." + ExtentionsMap['object'][0] )
-                  self.__target_list.append( Target( source, object ) )
+                  preproc = source.replace( self.__path['project'], self.__path['preproc'] )
+                  self.__target_list.append( Target( source, object, preproc ) )
       # Building congiguration
       self.__settings = { }
       self.__settings = settings.init( ( self.__path['global_config'], self.__path['local_config'] ) )
@@ -144,8 +150,9 @@ class ProjectSettings:
 
       console.debug.header( self.__delimeter )
       console.debug.info( "Processing:", target.source( ) )
-      source_time = base.file_time( target.source( ) )
-      object_time = base.file_time( target.object( ) )
+      source_time = file.file_time( target.source( ) )
+      object_time = file.file_time( target.object( ) )
+
       if None == source_time:
          console.debug.error( "Source doen't exist: ", target.source( ) )
          console.debug.header( self.__delimeter )
@@ -158,6 +165,7 @@ class ProjectSettings:
          console.debug.info( "Compiled" )
          console.debug.header( self.__delimeter )
          return True
+
       code: str = self.__compiler + " " + self.__settings['cflags'] + " -c -o " + target.object( ) + " " + target.source( )
       os.makedirs( os.path.dirname( target.object( ) ), exist_ok = True )
       console.debug.trace( code )
@@ -165,6 +173,52 @@ class ProjectSettings:
 
       finish_compile: int = int( round(time.time() * 1000) )
       console.debug.question( "compile time: %d ms" %(finish_compile - start_compile) )
+
+      console.debug.header( self.__delimeter )
+      return result
+   # def compile_target
+
+   def preprocessing( self ) -> bool:
+      start_compile: int = int( round(time.time() * 1000) )
+
+      for target in self.__target_list:
+         if False == self.preprocessing_target( target ):
+            return False
+
+      finish_compile: int = int( round(time.time() * 1000) )
+      console.debug.question( "Total preprocessing time: %d ms" %(finish_compile - start_compile) )
+
+      return True
+   # def preprocessing
+
+   def preprocessing_target( self, target ) -> bool:
+      start_compile: int = int( round(time.time() * 1000) )
+
+      console.debug.header( self.__delimeter )
+      console.debug.info( "Processing:", target.source( ) )
+      source_time = file.file_time( target.source( ) )
+      preproc_time = file.file_time( target.preproc( ) )
+
+      if None == source_time:
+         console.debug.error( "Source doen't exist: ", target.source( ) )
+         console.debug.header( self.__delimeter )
+         return False
+      elif None == preproc_time:
+         console.debug.info( "Preprocessing..." )
+      elif source_time > preproc_time:
+         console.debug.info( "Preprocessing..." )
+      else:
+         console.debug.info( "Compiled" )
+         console.debug.header( self.__delimeter )
+         return True
+
+      code: str = self.__compiler + " " + self.__settings['cflags'] + " -E -o " + target.preproc( ) + " " + target.source( )
+      os.makedirs( os.path.dirname( target.preproc( ) ), exist_ok = True )
+      console.debug.trace( code )
+      result: bool = 0 == os.system( code )
+
+      finish_compile: int = int( round(time.time() * 1000) )
+      console.debug.question( "preprocessing time: %d ms" %(finish_compile - start_compile) )
 
       console.debug.header( self.__delimeter )
       return result
@@ -242,6 +296,11 @@ def clean_all( projects: dict ) -> bool:
    console.debug.trace( "Cleaning..." )
    for name, project in projects.items( ):
       project.clean( )
+
+def preprocessing_all( projects: dict ) -> bool:
+   console.debug.trace( "Preprocessing..." )
+   for name, project in projects.items( ):
+      if False == project.preprocessing( ): sys.exit( 1 )
 
 def compile_all( projects: dict ) -> bool:
    console.debug.trace( "Compiling..." )

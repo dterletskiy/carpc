@@ -1,3 +1,12 @@
+version 2.1.1
+   - Minor changes in build system.
+   - Minor changes in OnOff interface.
+   - Removed depricated PrintfTrace.hpp and PrintfTrace.cpp
+   - Optimized tracing macro to have a possibility to write single line scope (for example in 'if', 'else', etc.) without scope brackets.
+   - Improvement trace system. Base trace macros replaced by variadic template function. Mutex replaced by thread_local variable.
+   - OnOff service moved to /services/onoff.
+   - Minor chages in TServer, TProxy, TClient what allowe to simplify generated code for services.
+
 version 2.1.0a
    - Modifying experimental project.
 

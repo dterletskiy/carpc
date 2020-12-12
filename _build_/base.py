@@ -3,6 +3,7 @@
 import os
 import stat
 import time
+
 import console
 
 
@@ -62,12 +63,3 @@ def to_string( container, new_line = True ):
    else: string = str( container )
 
    return string
-
-def file_time( file ):
-   try:
-      st = os.stat( file )
-   except IOError:
-      return None
-   else:
-      return st[ stat.ST_MTIME ]
-      # return time.asctime( time.localtime(st[stat.ST_MTIME]) )

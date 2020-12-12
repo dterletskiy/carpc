@@ -8,37 +8,20 @@
 
 
 
-namespace base::trace::write {
-
-   namespace simple {
-
-      void dbg_lock( );
-      void dbg_unlock( );
-
-      extern char p_buffer[ 1024 ];
-
-   }
-
-   namespace extended {
-
-      void dbg_lock( );
-      void dbg_unlock( );
-
-      extern char p_buffer[ 1024 ];
-
-      extern tm* time_tm;
-      extern size_t milliseconds;
-
-   }
+namespace base::trace {
 
    template< typename... Args >
-   void message( const char* _format, Args... _args )
+   void write( const char* _format, Args... _args )
    {
-      char p_buffer[ 1024 ];
-      ::write( STDOUT_FILENO, p_buffer, ::sprintf( p_buffer, _format, _args... ) );
+      static thread_local char* p_buffer = (char*)malloc( 1024 );
+      auto size = ::sprintf( p_buffer, _format, _args... );
+      ::write( STDOUT_FILENO, p_buffer, size );
    }
 
-} // namespace base::trace::write
+   extern thread_local tm* time_tm;
+   extern thread_local std::size_t milliseconds;
+
+} // namespace base::trace
 
 
 
@@ -46,62 +29,35 @@ namespace base::trace::write {
 
 
 
-#define DBG_WRITE_CODE_NO_THREAD_SAFE( USER_FORMAT, ... ) \
-   ::base::trace::write::message( \
-        PREFIX_FORMAT_CODE USER_FORMAT NEW_LINE \
-      , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
-   );
-#define DBG_WRITE_PID_TID_CODE_NO_THREAD_SAFE( USER_FORMAT, ... ) \
-   ::base::trace::write::message( \
-        PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
-      , ::base::os::linux::microseconds( ) \
-      , getpid( ), pthread_self( ) \
-      , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
-   );
+#define WRITE_CODE( USER_FORMAT, ... ) \
+   { \
+      ::base::trace::write( \
+           PREFIX_FORMAT_CODE USER_FORMAT NEW_LINE \
+         , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
+      ); \
+   }
 
+#define WRITE_MICROSECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
+   { \
+      ::base::trace::write( \
+           PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
+         , ::base::os::linux::microseconds( ) \
+         , getpid( ), pthread_self( ) \
+         , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
+      ); \
+   }
 
-
-#define DBG_WRITE_CODE( USER_FORMAT, ... ) \
-   ::base::trace::write::simple::dbg_lock( ); \
-   ::write( STDOUT_FILENO, ::base::trace::write::simple::p_buffer, \
-      ::sprintf( \
-                 ::base::trace::write::simple::p_buffer \
-               , PREFIX_FORMAT_CODE USER_FORMAT NEW_LINE \
-               , CLASS_ABBR, __FUNCTION__, __LINE__ \
-               , ##__VA_ARGS__ \
-      ) \
-   ); \
-   ::base::trace::write::simple::dbg_unlock( );
-
-#define DBG_WRITE_MICROSECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
-   ::base::trace::write::extended::dbg_lock( ); \
-   ::write( STDOUT_FILENO, ::base::trace::write::extended::p_buffer, \
-      ::sprintf( \
-                 ::base::trace::write::extended::p_buffer \
-               , PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
-               , ::base::os::linux::microseconds( ) \
-               , getpid( ), pthread_self( ) \
-               , CLASS_ABBR, __FUNCTION__, __LINE__ \
-               , ##__VA_ARGS__ \
-      ) \
-   ); \
-   ::base::trace::write::extended::dbg_unlock( );
-
-#define DBG_WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
-   ::base::trace::write::extended::dbg_lock( ); \
-   ::base::os::linux::local_time_of_date( ::base::trace::write::extended::time_tm, ::base::trace::write::extended::milliseconds ); \
-   ::write( STDOUT_FILENO, ::base::trace::write::extended::p_buffer, \
-      ::sprintf( \
-                 ::base::trace::write::extended::p_buffer \
-               , PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
-               , ::base::trace::write::extended::time_tm->tm_year + 1900, ::base::trace::write::extended::time_tm->tm_mon + 1, ::base::trace::write::extended::time_tm->tm_mday \
-               , ::base::trace::write::extended::time_tm->tm_hour, ::base::trace::write::extended::time_tm->tm_min, ::base::trace::write::extended::time_tm->tm_sec, ::base::trace::write::extended::milliseconds \
-               , getpid( ), pthread_self( ) \
-               , CLASS_ABBR, __FUNCTION__, __LINE__ \
-               , ##__VA_ARGS__ \
-      ) \
-   ); \
-   ::base::trace::write::extended::dbg_unlock( );
+#define WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
+   { \
+      ::base::os::linux::local_time_of_date( ::base::trace::time_tm, ::base::trace::milliseconds ); \
+      ::base::trace::write( \
+           PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
+         , ::base::trace::time_tm->tm_year + 1900, ::base::trace::time_tm->tm_mon + 1, ::base::trace::time_tm->tm_mday \
+         , ::base::trace::time_tm->tm_hour, ::base::trace::time_tm->tm_min, ::base::trace::time_tm->tm_sec, ::base::trace::milliseconds \
+         , getpid( ), pthread_self( ) \
+         , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
+      ); \
+   }
 
 
 

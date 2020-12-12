@@ -4,12 +4,11 @@ import os
 import sys
 
 import base
+import archive
 import console
 import settings
 import project
 import time
-import datetime
-import shutil
 
 
 
@@ -31,6 +30,7 @@ def choose_projects( _projects: list ):
             _project_names = _projects
             break
          if number > len( _projects ):
+            console.debug.error( "wrong choise: ", number )
             exit( 3 )
          _project_names.append( _projects[ number ] )
    # console.debug.info( "Projects: ", _project_names )
@@ -38,7 +38,7 @@ def choose_projects( _projects: list ):
 # def choose_projects
 
 def choose_action( _actions: list ) -> str:
-   console.debug.info( "Available projects:" )
+   console.debug.info( "Available actions:" )
    for index, action in enumerate( _actions ):
       console.debug.trace( "   %d: %s" %(index, action) )
 
@@ -53,12 +53,6 @@ def choose_action( _actions: list ) -> str:
    return _actions[ number ]
 # def choose_action
 
-def archive( dir_name: str ):
-   output_filename: str = dir_name + "_" + datetime.datetime.now( ).strftime( "%Y-%m-%d_%H-%M-%S" )
-   print( "date and time =", output_filename )
-   shutil.make_archive( output_filename, 'zip', dir_name )
-# def archive
-
 
 
 os.system( "reset" )
@@ -67,14 +61,16 @@ SESSION=os.environ.get( 'SESSION', "default" )
 
 ROOT = "/home/scorpion/Source/RPC"
 projects: list = [ "framework", "hooks", "servicebrocker", "application", "core", "controller", "hmi", "experimental" ]
+# projects: list = [ "framework", "experimental" ]
 actions: dict = {
-   'archive':     [ project.clean_all, archive                                ],
-   'clean':       [ project.clean_all                                         ],
-   'info':        [ project.info_all                                          ],
-   'compile':     [ project.compile_all                                       ],
-   'link':        [ project.link_all                                          ],
-   'build':       [ project.compile_all, project.link_all                     ],
-   'clean build': [ project.clean_all, project.compile_all, project.link_all  ]
+   'archive':        [ project.clean_all, archive.archive                        ],
+   'clean':          [ project.clean_all                                         ],
+   'info':           [ project.info_all                                          ],
+   'preprocessing':  [ project.preprocessing_all                                 ],
+   'compile':        [ project.compile_all                                       ],
+   'link':           [ project.link_all                                          ],
+   'build':          [ project.compile_all, project.link_all                     ],
+   'clean build':    [ project.clean_all, project.compile_all, project.link_all  ]
 }
 PROJECTS: dict = { }
 
@@ -86,8 +82,8 @@ action_name: str = choose_action( list( actions.keys( ) ) )
 start_action: int = int( round(time.time() * 1000) )
 project.init( project_names, PROJECTS, ROOT, SESSION, COMPILER )
 for processor in actions.get( action_name ):
-   if archive == processor:
-      archive( ROOT )
+   if archive.archive == processor:
+      archive.archive( ROOT )
    else:
       processor( PROJECTS )
 finish_action: int = int( round(time.time() * 1000) )

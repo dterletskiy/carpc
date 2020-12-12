@@ -56,15 +56,15 @@ namespace base::onoff::ipc {
 
    struct BaseTypes
    {
-      using tEvent = OnOffEvent::Event;
+      using tEvent         = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
-      using tSignature = base::onoff::tSignature;
-      using tEventID = base::onoff::eOnOff;
-      using tBaseData = BaseData;
-      using tEventData = OnOffEventData;
+      using tSignature     = OnOffEvent::UserSignature;
+      using tEventID       = OnOffEvent::UserSignature::tID;
+      using tEventData     = OnOffEvent::Data;
+      using tBaseData      = BaseData;
 
-      static const std::vector< base::service::RequestResponseIDs< tEventID > >& RR;
-      static const std::vector< base::service::NotificationIDs< tEventID > >& N;
+      static const base::service::RequestResponseIDs< tEventID >::tVector& RR;
+      static const base::service::NotificationIDs< tEventID >::tVector& N;
    };
 
    struct Types : public BaseTypes
@@ -194,15 +194,15 @@ namespace base::onoff::no_ipc {
 
    struct BaseTypes
    {
-      using tEvent = OnOffEvent::Event;
+      using tEvent         = OnOffEvent::Event;
       using tEventConsumer = OnOffEvent::Consumer;
-      using tSignature = base::onoff::tSignature;
-      using tEventID = base::onoff::eOnOff;
-      using tBaseData = BaseData;
-      using tEventData = OnOffEventData;
+      using tSignature     = OnOffEvent::UserSignature;
+      using tEventID       = OnOffEvent::UserSignature::tID;
+      using tEventData     = OnOffEvent::Data;
+      using tBaseData      = BaseData;
 
-      static const std::vector< base::service::RequestResponseIDs< tEventID > >& RR;
-      static const std::vector< base::service::NotificationIDs< tEventID > >& N;
+      static const base::service::RequestResponseIDs< tEventID >::tVector& RR;
+      static const base::service::NotificationIDs< tEventID >::tVector& N;
    };
 
    struct Types : public BaseTypes

@@ -11,6 +11,7 @@
 
 
 
+// @TDA: This finctionality must be rewritten similar to the same stuff for linux
 namespace base::trace::android {
 
    namespace simple {

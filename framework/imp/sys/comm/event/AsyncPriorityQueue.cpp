@@ -35,6 +35,8 @@ bool AsyncPriorityQueue::insert( const IAsync::tSptr p_async )
 
    m_buffer_cond_var.lock( );
 
+   // If priority of current async object is higher then max supported priority it will be inserted
+   // with highest priority.
    if( p_async->priority( ).value( ) >= m_collections.size( ) )
    {
       m_collections.back( ).push_back( p_async );

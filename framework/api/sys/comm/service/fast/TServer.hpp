@@ -471,7 +471,11 @@ namespace base::service::fast {
    template< typename tRequestData >
    const tRequestData* TServer< TYPES >::get_event_data( const typename TYPES::tEvent& event )
    {
-      return static_cast< tRequestData* >( event.data( )->ptr.get( ) );
+      if( const tRequestData* p_data = static_cast< tRequestData* >( event.data( )->ptr.get( ) ) )
+         return p_data;
+
+      SYS_ERR( "missing request data for request ID: %s", to_string( event.info( ).id( ) ).c_str( ) );
+      return nullptr;
    }
 
 } // namespace base::service::fast

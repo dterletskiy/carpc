@@ -29,6 +29,7 @@ namespace base::service {
    struct RequestResponseIDs
    {
       using tRequestResponseIDs = RequestResponseIDs< _ID >;
+      using tVector = std::vector< tRequestResponseIDs >;
 
       struct Comparator
       {
@@ -56,6 +57,9 @@ namespace base::service {
    template< typename _ID >
    struct NotificationIDs
    {
+      using tNotificationIDs = NotificationIDs< _ID >;
+      using tVector = std::vector< tNotificationIDs >;
+
       _ID subscribe = _ID::Undefined;
       _ID unsubscribe = _ID::Undefined;
       _ID notification = _ID::Undefined;

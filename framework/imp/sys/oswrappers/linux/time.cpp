@@ -20,6 +20,13 @@ uint64_t time( const eGranularity gran, clockid_t clk_id )
    return time_timespec.tv_sec * static_cast< size_t >( gran ) + time_timespec.tv_nsec / ( 1000000000 / static_cast< size_t >( gran ) );
 }
 
+uint64_t milliseconds( clockid_t clk_id )
+{
+   timespec time_timespec;
+   clock_gettime( clk_id, &time_timespec );
+   return time_timespec.tv_sec * 1000 + time_timespec.tv_nsec / 1000000;
+}
+
 uint64_t microseconds( clockid_t clk_id )
 {
    timespec time_timespec;

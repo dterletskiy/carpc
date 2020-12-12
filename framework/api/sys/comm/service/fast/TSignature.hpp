@@ -10,6 +10,9 @@ namespace base::service::fast {
    class TSignature
    {
       public:
+         using tID = _ID;
+
+      public:
          TSignature( ) = default;
          TSignature( const tServiceName& role, const _ID& id, const service::ID& from = { }, const service::ID to = { }, const tSequenceID seq_id = { } )
             : m_role( role )

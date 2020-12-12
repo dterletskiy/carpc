@@ -1,7 +1,6 @@
 #pragma once
 
 #include "api/sys/trace/AndroidTrace.hpp"
-#include "api/sys/trace/PrintfTrace.hpp"
 #include "api/sys/trace/WriteTrace.hpp"
 
 
@@ -23,13 +22,13 @@
 #elif OS == LINUX
 
    #ifdef SYS_TRACE
-      #define SYS_TYPE DBG_WRITE_MICROSECONDS_PID_TID_CODE
+      #define SYS_TYPE WRITE_MICROSECONDS_PID_TID_CODE
    #else
       #define SYS_TYPE( ... )
    #endif
 
    #ifdef DBG_TRACE
-      #define DBG_TYPE DBG_WRITE_MICROSECONDS_PID_TID_CODE
+      #define DBG_TYPE WRITE_MICROSECONDS_PID_TID_CODE
    #else
       #define DBG_TYPE( ... )
    #endif
@@ -47,18 +46,17 @@
    #define DBG_MSG( USER_FORMAT, ... )          DBG_TYPE( FG_LIGHT_GREEN   DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
    #define DBG_WRN( USER_FORMAT, ... )          DBG_TYPE( FG_LIGHT_BLUE    DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
    #define DBG_ERR( USER_FORMAT, ... )          DBG_TYPE( FG_LIGHT_RED     DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
-   #define DBG_MSG_SIZEOF( TYPE )               DBG_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
 
 
 
    #ifdef SYS_TRACE
-      #define SYS_SIMPLE_TYPE DBG_WRITE_CODE
+      #define SYS_SIMPLE_TYPE WRITE_CODE
    #else
       #define SYS_SIMPLE_TYPE( ... )
    #endif
 
    #ifdef DBG_TRACE
-      #define DBG_SIMPLE_TYPE DBG_WRITE_CODE
+      #define DBG_SIMPLE_TYPE WRITE_CODE
    #else
       #define DBG_SIMPLE_TYPE( ... )
    #endif
@@ -80,13 +78,13 @@
 
 
    #ifdef SYS_TRACE
-      #define SYS_EXT_TYPE DBG_WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE
+      #define SYS_EXT_TYPE WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE
    #else
       #define SYS_EXT_TYPE( ... )
    #endif
 
    #ifdef DBG_TRACE
-      #define DBG_EXT_TYPE DBG_WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE
+      #define DBG_EXT_TYPE WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE
    #else
       #define DBG_EXT_TYPE( ... )
    #endif
@@ -112,7 +110,9 @@
 #define SYS_MARKER( VALUE )      SYS_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
 #define SYS_DUMP_START( VALUE )  SYS_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )
 #define SYS_DUMP_END( VALUE )    SYS_WRN( MARKER_LINE "  END DUMP:  %s " MARKER_LINE, #VALUE )
+#define SYS_MSG_SIZEOF( TYPE )   SYS_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
 
 #define DBG_MARKER( VALUE )      DBG_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
 #define DBG_DUMP_START( VALUE )  DBG_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )
 #define DBG_DUMP_END( VALUE )    DBG_WRN( MARKER_LINE "  END DUMP:  %s " MARKER_LINE, #VALUE )
+#define DBG_MSG_SIZEOF( TYPE )   DBG_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );

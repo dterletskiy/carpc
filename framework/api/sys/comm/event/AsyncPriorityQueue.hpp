@@ -14,6 +14,14 @@ namespace base::async {
          using tWptr = std::weak_ptr< AsyncPriorityQueue >;
 
       public:
+         /***************
+          *
+          * max_priority - max number of priorities.
+          *    Container with prioritised object will containe indexes [0; max_priority),
+          *    but real iteration will be performed from (0; max_priority).
+          *    This is because of method base::Tpriority::check( )
+          *
+          **************/
          AsyncPriorityQueue( const tPriority& max_priority = tPriority::max( ), const std::string& name = "NoName" );
          ~AsyncPriorityQueue( );
          AsyncPriorityQueue( const AsyncPriorityQueue& ) = delete;

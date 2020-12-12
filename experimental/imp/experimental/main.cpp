@@ -104,8 +104,34 @@ const bool run( int argc, char** argv );
 
 
 
+void thread_loop( const std::size_t index )
+{
+   while( true )
+      DBG_MSG( "%zu -> 0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", index );
+}
+
 const bool run( int argc, char** argv )
 {
+   // std::vector< base::os::Thread* > threads;
+   // for( std::size_t index = 0; index < 100; ++index )
+   //    threads.push_back( new base::os::Thread( thread_loop, index ) );
+
+   // for( auto thread : threads )
+   //    thread->run( );
+
+   // for( auto thread : threads )
+   //    thread->join( );
+
+
+
+
+
+
+
+
+
+
+
    SYS_ERR( "--------------- MARKER ---------------" );
 
 

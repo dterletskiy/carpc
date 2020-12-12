@@ -410,6 +410,9 @@ namespace base::service::fast {
          void connected( ) override final { }
          void disconnected( ) override final { }
 
+      public:
+         void test( ) { }
+
       private:
          void process_event( const typename TYPES::tEvent& ) override final;
 
@@ -544,7 +547,11 @@ namespace base::service::fast {
    template< typename tResponseData >
    const tResponseData* TProxy< TYPES >::get_event_data( const typename TYPES::tEvent& event )
    {
-      return static_cast< tResponseData* >( event.data( )->ptr.get( ) );
+      if( const tResponseData* p_data = static_cast< tResponseData* >( event.data( )->ptr.get( ) ) )
+         return p_data;
+
+      SYS_ERR( "missing data for response/notification ID: %s", to_string( event.info( ).id( ) ).c_str( ) );
+      return nullptr;
    }
 
 } // namespace base::service::fast

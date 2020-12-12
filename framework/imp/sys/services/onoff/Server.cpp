@@ -1,4 +1,4 @@
-#include "api/sys/onoff/Server.hpp"
+#include "api/sys/services/onoff/Server.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "OnOffServerBase"
@@ -12,12 +12,10 @@ using namespace base::onoff;
 Server::Server( const std::string& role_name )
    : base::service::SERVICE_NAMESPACE::TServer< data::Types >( base::onoff::interface_type_id, role_name, true )
 {
-   SYS_TRC( "Created" );
 }
 
 Server::~Server( )
 {
-   SYS_TRC( "Destroyed" );
 }
 
 void Server::connected( )
@@ -39,8 +37,7 @@ void Server::response_trigger_state( const bool result )
 
 void Server::process_request_event( const data::OnOffEvent::Event& event )
 {
-   auto event_id = event.info( ).id( );
-   switch( event_id )
+   switch( event.info( ).id( ) )
    {
       case eOnOff::RequestStart:
       {
@@ -49,12 +46,7 @@ void Server::process_request_event( const data::OnOffEvent::Event& event )
       }
       case eOnOff::RequestTriggerState:
       {
-         const data::RequestTriggerStateData* request_data = get_event_data< data::RequestTriggerStateData >( event );
-         if( nullptr == request_data )
-         {
-            SYS_ERR( "missing tequest data for request ID: %s", to_string( event_id ).c_str( ) );
-         }
-         else
+         if( const data::RequestTriggerStateData* request_data = get_event_data< data::RequestTriggerStateData >( event ) )
          {
             request_trigger_state( request_data->state, request_data->delay );
          }
@@ -71,11 +63,9 @@ void Server::current_state( const std::string& _current_state )
 
 const std::string& Server::current_state( ) const
 {
-   auto p_data = attribute< data::NotificationCurrentStateData >( );
-   if( nullptr == p_data )
-   {
-      static const std::string state = "";
-      return state;
-   }
-   return p_data->state;
+   if( auto p_data = attribute< data::NotificationCurrentStateData >( ) )
+      return p_data->state;
+
+   static const std::string state = "";
+   return state;
 }
