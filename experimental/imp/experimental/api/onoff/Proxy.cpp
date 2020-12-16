@@ -1,5 +1,4 @@
 #include "imp/experimental/api/onoff/Types.hpp"
-#include "imp/experimental/api/onoff/Stub.hpp"
 #include "imp/experimental/api/onoff/Proxy.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -29,7 +28,7 @@ namespace api::onoff {
 
    void EventConsumerProxy::process( const Event& event )
    {
-      eEventID id = static_cast< eEventID >( event.id( ) );
+      eEventID id = static_cast< eEventID >( event.info_t( ).id( ) );
       switch( id )
       {
          case eEventID::ResponseBoot:

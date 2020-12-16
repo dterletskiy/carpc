@@ -10,17 +10,17 @@ using namespace fw::event;
 
 
 
-bool IEvent::set_notification( std::shared_ptr< IEventConsumer > p_consumer, const tClassID& class_id, const tID& id )
+bool IEvent::set_notification( std::shared_ptr< IEventConsumer > p_consumer, const tClassID& class_id, const IInfo& info )
 {
    if( auto p_thread = application::Application::instance( ).current_thread( ) )
-      return p_thread->set_notification( Info{ class_id, id }, p_consumer );
+      return p_thread->set_notification( class_id, info, p_consumer );
    return false;
 }
 
-bool IEvent::clear_notification( std::shared_ptr< IEventConsumer > p_consumer, const tClassID& class_id, const tID& id )
+bool IEvent::clear_notification( std::shared_ptr< IEventConsumer > p_consumer, const tClassID& class_id, const IInfo& info )
 {
    if( auto p_thread = application::Application::instance( ).current_thread( ) )
-      return p_thread->clear_notification( Info{ class_id, id }, p_consumer );
+      return p_thread->clear_notification( class_id, info, p_consumer );
    return false;
 }
 

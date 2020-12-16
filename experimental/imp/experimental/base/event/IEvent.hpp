@@ -2,7 +2,7 @@
 
 #include <string>
 #include <memory>
-#include "imp/experimental/base/event/Types.hpp"
+#include "imp/experimental/base/event/IInfo.hpp"
 
 
 
@@ -22,8 +22,8 @@ namespace fw::event {
          IEvent( ) = default;
          virtual ~IEvent( ) = default;
 
-         static bool set_notification( std::shared_ptr< IEventConsumer >, const tClassID&, const tID& );
-         static bool clear_notification( std::shared_ptr< IEventConsumer >, const tClassID&, const tID& );
+         static bool set_notification( std::shared_ptr< IEventConsumer >, const tClassID&, const IInfo& );
+         static bool clear_notification( std::shared_ptr< IEventConsumer >, const tClassID&, const IInfo& );
          static bool send( std::shared_ptr< IEvent > );
 
          virtual bool send( ) = 0;
@@ -31,7 +31,7 @@ namespace fw::event {
 
       public:
          virtual const tClassID& class_id( ) const = 0;
-         virtual const tID& id( ) const = 0;
+         virtual const IInfo& info( ) const = 0;
    };
 
 } // namespace fw::event

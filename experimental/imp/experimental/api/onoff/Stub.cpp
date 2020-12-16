@@ -28,7 +28,7 @@ namespace api::onoff {
 
    void EventConsumerStub::process( const Event& event )
    {
-      eEventID id = static_cast< eEventID >( event.id( ) );
+      eEventID id = static_cast< eEventID >( event.info_t( ).id( ) );
       switch( id )
       {
          case eEventID::RequestBoot:

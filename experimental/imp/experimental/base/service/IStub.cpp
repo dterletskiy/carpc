@@ -81,10 +81,3 @@ bool IStub::is_disconnected( ) const
 {
    return !is_connected( );
 }
-
-void IStub::client_seq_id( const tSeqID seq_id, std::weak_ptr< IProxy > p_proxy )
-{
-   ++m_seq_id;
-   DBG_INF( "stub seq_id: %zu -> client seq_id: %zu", m_seq_id, seq_id );
-   m_seq_id_mapping.insert( std::make_pair( m_seq_id, ProxySeqID{ seq_id, p_proxy } ) );
-}

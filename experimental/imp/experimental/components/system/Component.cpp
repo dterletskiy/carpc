@@ -12,7 +12,7 @@ using namespace component::system;
 
 void OnOffEventConsumer::process( const events::OnOffEvent& event )
 {
-   DBG_MSG( "id: %zu / message: %s", event.id( ), event.data( ).message.c_str( ) );
+   DBG_MSG( "id: %zu / message: %s", event.info_t( ).id( ), event.data( ).message.c_str( ) );
 }
 
 

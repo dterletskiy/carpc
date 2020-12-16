@@ -37,21 +37,10 @@ namespace fw::service {
          bool is_connected( ) const override;
          bool is_disconnected( ) const override;
 
-      protected:
-         void request( application::Context::tFunction );
-         template< typename T >
-            std::shared_ptr< T > stub( ) const;
       private:
          std::weak_ptr< IStub >  mp_stub;
+      protected:
          tSeqID                  m_seq_id = 0;
    };
-
-
-
-   template< typename T >
-   std::shared_ptr< T > IProxy::stub( ) const
-   {
-      return std::static_pointer_cast< T >( mp_stub.lock( ) );
-   }
 
 } // namespace fw::service

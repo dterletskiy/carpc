@@ -58,14 +58,8 @@ namespace fw::service {
 
       public:
          const tSeqID unblock_request( ) const;
-         void client_seq_id( const tSeqID, std::weak_ptr< IProxy > );
+         void prepare_response( const tSeqID& );
       private:
-         struct ProxySeqID
-         {
-            tSeqID seq_id;
-            std::weak_ptr< IProxy > proxy;
-         };
-         std::map< tSeqID, ProxySeqID >   m_seq_id_mapping;
          tSeqID                           m_seq_id = 1000;
    };
 

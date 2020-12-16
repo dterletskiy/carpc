@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imp/experimental/base/event/IEvent.hpp"
+#include "imp/experimental/base/event/TInfo.hpp"
 
 
 
@@ -24,7 +25,7 @@ namespace fw::event {
    {
       private:
          TEvent( const tID& id, const typename _Common::tData& data )
-            : m_id( id )
+            : m_info( id )
             , m_data( data )
          {
          }
@@ -39,12 +40,12 @@ namespace fw::event {
 
          static bool set_notification( std::shared_ptr< typename _Common::tConsumer > p_consumer, const tID& id )
          {
-            return IEvent::set_notification( p_consumer, s_class_id, id );
+            return IEvent::set_notification( p_consumer, s_class_id, TInfo< _Common >( id ) );
          }
 
          static bool clear_notification( std::shared_ptr< typename _Common::tConsumer > p_consumer, const tID& id )
          {
-            return IEvent::clear_notification( p_consumer, s_class_id, id );
+            return IEvent::clear_notification( p_consumer, s_class_id, TInfo< _Common >( id ) );
          }
 
       public:
@@ -67,12 +68,16 @@ namespace fw::event {
          static tClassID s_class_id;
 
       public:
-         virtual const tID& id( ) const override
+         const TInfo< _Common >& info_t( ) const
          {
-            return m_id;
+            return m_info;
          }
       private:
-         tID m_id;
+         const IInfo& info( ) const override
+         {
+            return m_info;
+         }
+         TInfo< _Common > m_info;
 
       public:
          const typename _Common::tData& data( ) const

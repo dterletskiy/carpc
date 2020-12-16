@@ -51,10 +51,11 @@ namespace fw::application {
          std::vector< component::Base::tCreator >           m_component_creators;
 
       public:
-         bool set_notification( const event::Info&, std::shared_ptr< event::IEventConsumer > );
-         bool clear_notification( const event::Info&, std::shared_ptr< event::IEventConsumer > );
+         bool set_notification( const event::tClassID&, const event::IInfo&, std::shared_ptr< event::IEventConsumer > );
+         bool clear_notification( const event::tClassID&, const event::IInfo&, std::shared_ptr< event::IEventConsumer > );
+         bool is_subsribed( const event::tClassID&, const event::IInfo& ) const;
       private:
-         struct Comparator
+         struct ComparatorConsumers
          {
             bool operator( )( const std::weak_ptr< event::IEventConsumer > wp_1, const std::weak_ptr< event::IEventConsumer > wp_2 ) const
             {
@@ -65,9 +66,28 @@ namespace fw::application {
                return sp_1 < sp_2;
             }
          };
+         struct ComparatorInfo
+         {
+            using is_transparent = void;
+
+            bool operator( )( const std::shared_ptr< event::IInfo > sp_1, const std::shared_ptr< event::IInfo > sp_2 ) const
+            {
+               return *sp_1 < *sp_2;
+            }
+            bool operator( )( const std::shared_ptr< event::IInfo > sp_1, const event::IInfo& info_2 ) const
+            {
+               return *sp_1 < info_2;
+            }
+            bool operator( )( const event::IInfo& info_1, const std::shared_ptr< event::IInfo > sp_2 ) const
+            {
+               return info_1 < *sp_2;
+            }
+
+         };
       private:
-         using tEventConsumers = std::set< std::weak_ptr< event::IEventConsumer >, Comparator >;
-         std::map< event::Info, tEventConsumers >   m_subscriptions;
+         using tConsumers = std::set< std::weak_ptr< event::IEventConsumer >, ComparatorConsumers >;
+         using tConsumerInfoMap = std::map< std::shared_ptr< event::IInfo >, tConsumers, ComparatorInfo >;
+         std::map< event::tClassID, tConsumerInfoMap >   m_subscriptions;
 
       public:
          bool insert_event( std::shared_ptr< event::IEvent > );
