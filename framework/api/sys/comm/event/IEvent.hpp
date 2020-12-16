@@ -42,9 +42,9 @@ namespace base::async {
          ~IEvent( ) override = default;
 
       public:
-         static const bool set_notification( IAsync::IConsumer*, const ISignature& );
-         static const bool clear_notification( IAsync::IConsumer*, const ISignature& );
-         static const bool clear_all_notifications( IAsync::IConsumer*, const ISignature& );
+         static const bool set_notification( IAsync::IConsumer*, const ISignature::tSptr );
+         static const bool clear_notification( IAsync::IConsumer*, const ISignature::tSptr );
+         static const bool clear_all_notifications( IAsync::IConsumer*, const ISignature::tSptr );
          static const bool send( tSptr, const application::Context& );
 
          static bool check_in( const tAsyncTypeID&, tCreator );

@@ -18,11 +18,11 @@ namespace base::async {
       private:
          struct Comparator
          {
-            bool operator( )( const IAsync::ISignature* p_es1, const IAsync::ISignature* p_es2 ) const
+            bool operator( )( const IAsync::ISignature::tSptr p_es1, const IAsync::ISignature::tSptr p_es2 ) const
             { return *p_es1 < *p_es2; }
          };
          using tConsumersSet = std::set< IAsync::IConsumer* >;
-         using tAsyncConsumersMap = std::map< const IAsync::ISignature*, tConsumersSet, Comparator >;
+         using tAsyncConsumersMap = std::map< const IAsync::ISignature::tSptr, tConsumersSet, Comparator >;
 
       public:
          AsyncConsumerMap( const std::string& name = "NoName" );
@@ -34,22 +34,15 @@ namespace base::async {
          std::string                      m_name;
 
       public:
-         void set_notification( const IAsync::ISignature&, IAsync::IConsumer* );
-         void clear_notification( const IAsync::ISignature&, IAsync::IConsumer* );
-         void clear_all_notifications( const IAsync::ISignature&, IAsync::IConsumer* );
-         bool is_subscribed( const IAsync::ISignature* );
-         // This method is depricated and should not be used to notify consumers because of returned collection
-         // could be modified during this process.
-         // This issue could be solved by copying this collection before notifying consumers but
-         // this solution is not optimyzed.
-         // For most optimyzed solution methods 'start_process' and 'finish_process' should be used.
-         // In this case there is no any copy or move collection and it is safe for modifications.
-         const tConsumersSet& consumers( const IAsync::ISignature* ) const;
+         void set_notification( const IAsync::ISignature::tSptr, IAsync::IConsumer* );
+         void clear_notification( const IAsync::ISignature::tSptr, IAsync::IConsumer* );
+         void clear_all_notifications( const IAsync::ISignature::tSptr, IAsync::IConsumer* );
+         bool is_subscribed( const IAsync::ISignature::tSptr );
       private:
          tAsyncConsumersMap               m_map;
 
       public:
-         const tConsumersSet& start_process( const IAsync::ISignature* );
+         const tConsumersSet& start_process( const IAsync::ISignature::tSptr );
          bool finish_process( );
       private:
          class ProcessingSignature
@@ -59,19 +52,18 @@ namespace base::async {
 
                ProcessingSignature( const std::string& );
 
-               const tConsumersSet& start( const IAsync::ISignature*, tConsumersSet& );
+               const tConsumersSet& start( const IAsync::ISignature::tSptr, tConsumersSet& );
                bool finish( tConsumersSet& );
                void reset( );
                bool is_processing( ) const;
-               bool is_processing( const IAsync::ISignature& ) const;
-               bool is_processing( const IAsync::ISignature* ) const;
+               bool is_processing( const IAsync::ISignature::tSptr ) const;
 
             public:
-               const IAsync::ISignature* signature( ) const;
+               const IAsync::ISignature::tSptr signature( ) const;
                bool add_consumer_to_remove( IAsync::IConsumer* );
                bool remove_consumer_to_remove( IAsync::IConsumer* );
             private:
-               const IAsync::ISignature*     mp_signature = nullptr;
+               IAsync::ISignature::tSptr     mp_signature = nullptr;
                tConsumersSet                 m_consumers_to_process;
                tConsumersSet                 m_consumers_to_remove;
                const std::string&            m_name;

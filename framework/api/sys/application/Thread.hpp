@@ -47,9 +47,9 @@ namespace base::application {
          tEventCollection                             m_event_queue;
 
       private:
-         void set_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) override;
-         void clear_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) override;
-         void clear_all_notifications( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) override;
+         void set_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) override;
+         void clear_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) override;
+         void clear_all_notifications( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) override;
          bool is_subscribed( const base::async::IAsync::tSptr );
          void notify( const base::async::IAsync::tSptr );
          tConsumerMap                                 m_consumers_map;

@@ -27,18 +27,19 @@ namespace base::async {
 
       // constructors
       protected:
-         TEvent( const tSignature& signature, const tPriority& priority )
+         TEvent( const tUserSignature& signature, const tPriority& priority )
             : IEvent( )
-            , m_signature( signature )
-            , m_context( application::Context::eInitType::Auto )
-            , m_priority( priority )
-         { }
-         TEvent( const tSignature& signature, const tData& data, const tPriority& priority )
-            : IEvent( )
-            , m_signature( signature )
             , m_context( application::Context::eInitType::Auto )
             , m_priority( priority )
          {
+            mp_signature = tSignature::create( signature );
+         }
+         TEvent( const tUserSignature& signature, const tData& data, const tPriority& priority )
+            : IEvent( )
+            , m_context( application::Context::eInitType::Auto )
+            , m_priority( priority )
+         {
+            mp_signature = tSignature::create( signature );
             mp_data = std::make_shared< tData >( data );
          }
       public:
@@ -48,15 +49,15 @@ namespace base::async {
       public:
          static const bool set_notification( tConsumer* p_consumer, const tUserSignature& signature )
          {
-            return IEvent::set_notification( p_consumer, tSignature( signature ) );
+            return IEvent::set_notification( p_consumer, tSignature::create( signature ) );
          }
          static const bool clear_notification( tConsumer* p_consumer, const tUserSignature& signature )
          {
-            return IEvent::clear_notification( p_consumer, tSignature( signature ) );
+            return IEvent::clear_notification( p_consumer, tSignature::create( signature ) );
          }
          static const bool clear_all_notifications( tConsumer* p_consumer )
          {
-            return IEvent::clear_all_notifications( p_consumer, tSignature( ) );
+            return IEvent::clear_all_notifications( p_consumer, tSignature::create( ) );
          }
 
       public:
@@ -64,7 +65,7 @@ namespace base::async {
          // what should be filled during serialization.
          static IEvent::tSptr create( )
          {
-            return std::shared_ptr< tEvent >( new tEvent( tSignature( tUserSignature( ) ), tPriority( ) ) );
+            return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), tPriority( ) ) );
          }
 
          static std::shared_ptr< tEvent > create(
@@ -72,7 +73,7 @@ namespace base::async {
                const tPriority& priority = base::priority( ePriority::DEFAULT )
             )
          {
-            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), priority ) );
+            return std::shared_ptr< tEvent >( new tEvent( signature, priority ) );
          }
          static std::shared_ptr< tEvent > create(
                const tUserSignature& signature,
@@ -80,7 +81,7 @@ namespace base::async {
                const tPriority& priority = base::priority( ePriority::DEFAULT )
             )
          {
-            return std::shared_ptr< tEvent >( new tEvent( tSignature( signature ), data, priority ) );
+            return std::shared_ptr< tEvent >( new tEvent( signature, data, priority ) );
          }
 
          static const bool create_send(
@@ -133,12 +134,17 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( false == stream.push( m_signature, m_context, m_priority ) )
+               if( !mp_signature )
+               {
+                  SYS_ERR( "missing event signature for serrialization" );
+                  return false;
+               }
+
+               if( false == stream.push( *mp_signature, m_context, m_priority ) )
                   return false;
 
                if( false == stream.push( ( nullptr != mp_data ) ) )
                   return false;
-
                if( mp_data )
                   if( false == stream.push( *mp_data ) )
                      return false;
@@ -152,7 +158,8 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               if( false == stream.pop( m_signature, m_context, m_priority ) )
+               mp_signature = tSignature::create( );
+               if( false == stream.pop( *mp_signature, m_context, m_priority ) )
                   return false;
 
                bool is_data = false;
@@ -172,10 +179,10 @@ namespace base::async {
 
       // signature
       public:
-         const tUserSignature& info( ) const { return m_signature.user_signature( ); }
-         const IAsync::ISignature* const signature( ) const override { return &m_signature; }
+         const tUserSignature& info( ) const { return mp_signature->user_signature( ); }
+         const IAsync::ISignature::tSptr signature( ) const override { return mp_signature; }
       private:
-         tSignature m_signature;
+         typename tSignature::tSptr mp_signature;
 
       // data
       public:

@@ -41,9 +41,9 @@ namespace base::application {
          virtual void dump( ) const = 0;
 
       public:
-         virtual void set_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) = 0;
-         virtual void clear_notification( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) = 0;
-         virtual void clear_all_notifications( const base::async::IAsync::ISignature&, base::async::IAsync::IConsumer* ) = 0;
+         virtual void set_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
+         virtual void clear_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
+         virtual void clear_all_notifications( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
          virtual bool insert_event( const base::async::IAsync::tSptr ) = 0;
 
       public:

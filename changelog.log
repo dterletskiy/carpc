@@ -1,3 +1,6 @@
+version 2.1.2
+   - Change ISignature* to std::shared_ptr< ISignature > with some optimization.
+
 version 2.1.1
    - Minor changes in build system.
    - Minor changes in OnOff interface.

@@ -17,12 +17,15 @@ namespace base::async {
       using tService       = typename _Generator::Config::tService;
 
       public:
+         using tSptr       = std::shared_ptr< tSignature >;
+
+      public:
          static const tAsyncTypeID build_type_id( )
          {
             return tAsyncTypeID::generate< tSignature >( );
          }
 
-      public:
+      private:
          TSignature( ) = default;
          TSignature( const tUserSignature& user_signature )
             : m_user_signature( user_signature )
@@ -30,13 +33,14 @@ namespace base::async {
          TSignature( const TSignature& other )
             : m_user_signature( other.m_user_signature )
          { }
+      public:
          ~TSignature( ) override = default;
+         static tSptr create( const tUserSignature& user_signature = { } )
+         {
+            return tSptr( new tSignature( user_signature ) );
+         }
 
       public:
-         const IAsync::ISignature* const create_copy( ) const override
-         {
-            return new TSignature( *this );
-         }
          const std::string name( ) const override
          {
             static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", type: ", c_str( type( ) ), ", " );

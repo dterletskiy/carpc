@@ -16,14 +16,14 @@ namespace base::async {
       public:
          struct ISignature
          {
+            using tSptr = std::shared_ptr< ISignature >;
+
             ISignature( ) = default;
             ISignature( const ISignature& ) = default;
             virtual ~ISignature( ) = default;
 
             virtual const bool to_stream( dsi::tByteStream& ) const = 0;
             virtual const bool from_stream( dsi::tByteStream& ) = 0;
-
-            virtual const ISignature* const create_copy( ) const = 0;
 
             virtual bool operator<( const ISignature& ) const = 0;
 
@@ -45,7 +45,7 @@ namespace base::async {
 
       public:
          virtual void process( IConsumer* p_consumer = nullptr ) const = 0;
-         virtual const ISignature* const signature( ) const = 0;
+         virtual const ISignature::tSptr signature( ) const = 0;
          virtual const tPriority priority( ) const = 0;
    };
 

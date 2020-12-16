@@ -85,7 +85,7 @@ IEvent::tSptr IEvent::deserialize( dsi::tByteStream& stream )
 
 
 
-const bool IEvent::set_notification( IAsync::IConsumer* p_consumer, const ISignature& signature )
+const bool IEvent::set_notification( IAsync::IConsumer* p_consumer, const ISignature::tSptr p_signature )
 {
    application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
    if( nullptr == p_thread )
@@ -94,13 +94,13 @@ const bool IEvent::set_notification( IAsync::IConsumer* p_consumer, const ISigna
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / application thread: %s", signature.name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
-   p_thread->set_notification( signature, p_consumer );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   p_thread->set_notification( p_signature, p_consumer );
 
    return true;
 }
 
-const bool IEvent::clear_notification( IAsync::IConsumer* p_consumer, const ISignature& signature )
+const bool IEvent::clear_notification( IAsync::IConsumer* p_consumer, const ISignature::tSptr p_signature )
 {
    application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
    if( nullptr == p_thread )
@@ -109,13 +109,13 @@ const bool IEvent::clear_notification( IAsync::IConsumer* p_consumer, const ISig
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / application thread: %s", signature.name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
-   p_thread->clear_notification( signature, p_consumer );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   p_thread->clear_notification( p_signature, p_consumer );
 
    return true;
 }
 
-const bool IEvent::clear_all_notifications( IAsync::IConsumer* p_consumer, const ISignature& signature )
+const bool IEvent::clear_all_notifications( IAsync::IConsumer* p_consumer, const ISignature::tSptr p_signature )
 {
    application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
    if( nullptr == p_thread )
@@ -124,8 +124,8 @@ const bool IEvent::clear_all_notifications( IAsync::IConsumer* p_consumer, const
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / application thread: %s", signature.name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
-   p_thread->clear_all_notifications( signature, p_consumer );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   p_thread->clear_all_notifications( p_signature, p_consumer );
 
    return true;
 }

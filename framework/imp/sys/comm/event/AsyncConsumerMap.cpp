@@ -22,21 +22,17 @@ AsyncConsumerMap::~AsyncConsumerMap( )
    SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
 }
 
-void AsyncConsumerMap::set_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void AsyncConsumerMap::set_notification( const IAsync::ISignature::tSptr p_signature, IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
-   SYS_INF( "'%s': async object (%s) / consumer (%p)", m_name.c_str( ), signature.name( ).c_str( ), p_consumer );
+   SYS_INF( "'%s': async object (%s) / consumer (%p)", m_name.c_str( ), p_signature->name( ).c_str( ), p_consumer );
 
-   const auto& iterator = m_map.find( &signature );
+   const auto& iterator = m_map.find( p_signature );
    if( iterator == m_map.end( ) )
    {
-      // Here signature is a temporary object created on a stack in concrete async object static function.
-      // So we should create a copy of this signature in a heap and store its pointer to consumers map.
-      // Later on when number of consumers for this signature becase zero we must delete object by this pointer and remove poinetr from this map.
-      auto p_signature = signature.create_copy( );
       m_map.emplace(
-         std::pair< const IAsync::ISignature*, tConsumersSet >( p_signature, { p_consumer } )
+         std::pair< const IAsync::ISignature::tSptr, tConsumersSet >( p_signature, { p_consumer } )
       );
    }
    else
@@ -44,23 +40,23 @@ void AsyncConsumerMap::set_notification( const IAsync::ISignature& signature, IA
       iterator->second.emplace( p_consumer );
    }
 
-   if( m_processing.is_processing( signature ) )
+   if( m_processing.is_processing( p_signature ) )
    {
       m_processing.remove_consumer_to_remove( p_consumer );
    }
 }
 
-void AsyncConsumerMap::clear_notification( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void AsyncConsumerMap::clear_notification( const IAsync::ISignature::tSptr p_signature, IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
-   const auto& iterator_map = m_map.find( &signature );
+   const auto& iterator_map = m_map.find( p_signature );
    if( iterator_map == m_map.end( ) )
       return;
 
    auto& consumers_set = iterator_map->second;
 
-   if( m_processing.is_processing( signature ) )
+   if( m_processing.is_processing( p_signature ) )
    {
       m_processing.add_consumer_to_remove( p_consumer );
    }
@@ -69,30 +65,26 @@ void AsyncConsumerMap::clear_notification( const IAsync::ISignature& signature, 
       consumers_set.erase( p_consumer );
       if( true == consumers_set.empty( ) )
       {
-         // Number of consumers for this async object signature is zero (last one has just deleted),
-         // so we should remove pointer to this signature from the map
-         // and must delete dynamicly created object (in function "set_notification")
-         delete iterator_map->first;
          m_map.erase( iterator_map );
       }
    }
 }
 
-void AsyncConsumerMap::clear_all_notifications( const IAsync::ISignature& signature, IAsync::IConsumer* p_consumer )
+void AsyncConsumerMap::clear_all_notifications( const IAsync::ISignature::tSptr p_signature, IAsync::IConsumer* p_consumer )
 {
    if( nullptr == p_consumer ) return;
 
    auto iterator_map = m_map.begin( );
    while( iterator_map != m_map.end( ) )
    {
-      if( signature.type_id( ) != iterator_map->first->type_id( ) )
+      if( p_signature->type_id( ) != iterator_map->first->type_id( ) )
       {
          ++iterator_map;
          continue;
       }
 
 
-      if( m_processing.is_processing( signature ) )
+      if( m_processing.is_processing( p_signature ) )
       {
          m_processing.add_consumer_to_remove( p_consumer );
          ++iterator_map;
@@ -110,10 +102,6 @@ void AsyncConsumerMap::clear_all_notifications( const IAsync::ISignature& signat
          consumers_set.erase( iterator_set );
          if( true == consumers_set.empty( ) )
          {
-            // Number of async objectss for this async object signature is zero (last one has just deleted),
-            // so we should remove pointer to this signature from the map
-            // and must delete dynamicly created object (in function "set_notification")
-            delete iterator_map->first;
             // Set iterator to previous item after removing current one.
             // So we should not increment iterator.
             iterator_map = m_map.erase( iterator_map );
@@ -126,37 +114,25 @@ void AsyncConsumerMap::clear_all_notifications( const IAsync::ISignature& signat
    }
 }
 
-bool AsyncConsumerMap::is_subscribed( const IAsync::ISignature* signature )
+bool AsyncConsumerMap::is_subscribed( const IAsync::ISignature::tSptr p_signature )
 {
    // If any record is presend in DB for current signature this means that there is at least
    // one consumer must be present for this async object.
    // This is the reason why any record for any signature must be deleted in case of
    // there is no any consumers for this signature any more.
-   return m_map.end( ) != m_map.find( signature );
+   return m_map.end( ) != m_map.find( p_signature );
 }
 
-const AsyncConsumerMap::tConsumersSet& AsyncConsumerMap::consumers( const IAsync::ISignature* signature ) const
+const AsyncConsumerMap::tConsumersSet& AsyncConsumerMap::start_process( const IAsync::ISignature::tSptr p_signature )
 {
-   const auto iterator = m_map.find( signature );
-   if( iterator == m_map.end( ) )
-   {
-      static tConsumersSet dummy;
-      return dummy;
-   }
-
-   return iterator->second;
-}
-
-const AsyncConsumerMap::tConsumersSet& AsyncConsumerMap::start_process( const IAsync::ISignature* signature )
-{
-   auto iterator = m_map.find( signature );
+   auto iterator = m_map.find( p_signature );
    if( m_map.end( ) == iterator )
    {
       static const tConsumersSet dummy = { };
       return dummy;
    }
 
-   return m_processing.start( signature, iterator->second );
+   return m_processing.start( p_signature, iterator->second );
 }
 
 bool AsyncConsumerMap::finish_process( )
@@ -202,7 +178,7 @@ AsyncConsumerMap::ProcessingSignature::ProcessingSignature( const std::string& n
 }
 
 const AsyncConsumerMap::tConsumersSet& AsyncConsumerMap::ProcessingSignature::start(
-      const IAsync::ISignature* signature, tConsumersSet& from_consumers_set
+      const IAsync::ISignature::tSptr p_signature, tConsumersSet& from_consumers_set
    )
 {
    if( mp_signature )
@@ -214,7 +190,7 @@ const AsyncConsumerMap::tConsumersSet& AsyncConsumerMap::ProcessingSignature::st
       return dummy;
    }
 
-   mp_signature = signature;
+   mp_signature = p_signature;
    // Here we swap local consumers set with original set to process this set while original set
    // is empty since now and could be changed during this processing.
    // When processing will be finished this set (contains origianl set) will be merged with original set
@@ -225,7 +201,7 @@ const AsyncConsumerMap::tConsumersSet& AsyncConsumerMap::ProcessingSignature::st
 
 bool AsyncConsumerMap::ProcessingSignature::finish( tConsumersSet& to_consumers_set )
 {
-   if( !mp_signature )
+   if( nullptr == mp_signature )
    {
       SYS_WRN( "'%s': there is no async object in processing", m_name.c_str( ) );
       return false;
@@ -252,25 +228,20 @@ bool AsyncConsumerMap::ProcessingSignature::is_processing( ) const
    return mp_signature != nullptr;
 }
 
-bool AsyncConsumerMap::ProcessingSignature::is_processing( const IAsync::ISignature& signature ) const
+bool AsyncConsumerMap::ProcessingSignature::is_processing( const IAsync::ISignature::tSptr p_signature ) const
 {
    if( false == is_processing( ) )
       return false;
 
-   if( *mp_signature < signature )
+   if( *mp_signature < *p_signature )
       return false;
-   if( signature < *mp_signature )
+   if( *p_signature < *mp_signature )
       return false;
 
    return true;
 }
 
-bool AsyncConsumerMap::ProcessingSignature::is_processing( const IAsync::ISignature* p_signature ) const
-{
-   return is_processing( *p_signature );
-}
-
-const IAsync::ISignature* AsyncConsumerMap::ProcessingSignature::signature( ) const
+const IAsync::ISignature::tSptr AsyncConsumerMap::ProcessingSignature::signature( ) const
 {
    return mp_signature;
 }

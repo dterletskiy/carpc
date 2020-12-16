@@ -148,19 +148,19 @@ void Thread::notify( const base::async::IAsync::tSptr p_event )
    m_consumers_map.finish_process( );
 }
 
-void Thread::set_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
+void Thread::set_notification( const base::async::IAsync::ISignature::tSptr p_signature, base::async::IAsync::IConsumer* p_consumer )
 {
-   m_consumers_map.set_notification( signature, p_consumer );
+   m_consumers_map.set_notification( p_signature, p_consumer );
 }
 
-void Thread::clear_notification( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
+void Thread::clear_notification( const base::async::IAsync::ISignature::tSptr p_signature, base::async::IAsync::IConsumer* p_consumer )
 {
-   m_consumers_map.clear_notification( signature, p_consumer );
+   m_consumers_map.clear_notification( p_signature, p_consumer );
 }
 
-void Thread::clear_all_notifications( const base::async::IAsync::ISignature& signature, base::async::IAsync::IConsumer* p_consumer )
+void Thread::clear_all_notifications( const base::async::IAsync::ISignature::tSptr p_signature, base::async::IAsync::IConsumer* p_consumer )
 {
-   m_consumers_map.clear_all_notifications( signature, p_consumer );
+   m_consumers_map.clear_all_notifications( p_signature, p_consumer );
 }
 
 bool Thread::is_subscribed( const base::async::IAsync::tSptr p_event )
