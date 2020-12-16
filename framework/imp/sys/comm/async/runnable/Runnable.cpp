@@ -1,5 +1,5 @@
 #include "api/sys/application/Process.hpp"
-#include "api/sys/comm/event/Runnable.hpp"
+#include "api/sys/comm/async/runnable/Runnable.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Runnable"

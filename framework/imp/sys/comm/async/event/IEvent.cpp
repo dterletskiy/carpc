@@ -3,7 +3,7 @@
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/Process.hpp"
 #include "api/sys/application/Context.hpp"
-#include "api/sys/comm/event/IEvent.hpp"
+#include "api/sys/comm/async/event/IEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "IEvent"

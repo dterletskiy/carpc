@@ -1,8 +1,8 @@
 #pragma once
 
 #include "api/sys/application/IThread.hpp"
-#include "api/sys/comm/event/Types.hpp"
-#include "api/sys/comm/event/IAsync.hpp"
+#include "api/sys/comm/async/Types.hpp"
+#include "api/sys/comm/async/IAsync.hpp"
 
 
 

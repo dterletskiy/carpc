@@ -1,5 +1,5 @@
-#include "api/sys/comm/event/Event.hpp"
-#include "api/sys/comm/event/AsyncConsumerMap.hpp"
+#include "api/sys/comm/async/event/Event.hpp"
+#include "api/sys/comm/async/AsyncConsumerMap.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "EvConsMap"

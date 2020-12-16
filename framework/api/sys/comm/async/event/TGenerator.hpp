@@ -1,7 +1,7 @@
 #pragma once
 
-#include "api/sys/comm/event/TEvent.hpp"
-#include "api/sys/comm/event/TSignature.hpp"
+#include "api/sys/comm/async/event/TEvent.hpp"
+#include "api/sys/comm/async/event/TSignature.hpp"
 
 
 

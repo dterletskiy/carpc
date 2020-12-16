@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/application/Context.hpp"
-#include "api/sys/comm/event/IEvent.hpp"
+#include "api/sys/comm/async/event/IEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TEvent"

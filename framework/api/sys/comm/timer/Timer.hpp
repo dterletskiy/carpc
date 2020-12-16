@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/oswrappers/linux/timer.hpp"
-#include "api/sys/comm/event/Event.hpp"
+#include "api/sys/comm/async/event/Event.hpp"
 #include "api/sys/common/ID.hpp"
 // #include "api/sys/application/Process.hpp"
 

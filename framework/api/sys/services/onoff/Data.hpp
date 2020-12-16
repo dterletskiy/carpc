@@ -10,7 +10,7 @@
    #define SERVICE_NAMESPACE secure
 #endif
 
-#include "api/sys/comm/event/Event.hpp"
+#include "api/sys/comm/async/event/Event.hpp"
 #include "api/sys/comm/service/Types.hpp"
 #include "api/sys/comm/service/fast/TSignature.hpp"
 #include "api/sys/comm/service/secure/TSignature.hpp"

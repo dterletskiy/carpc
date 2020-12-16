@@ -1,5 +1,5 @@
-#include "api/sys/comm/event/Event.hpp"
-#include "api/sys/comm/event/AsyncPriorityQueue.hpp"
+#include "api/sys/comm/async/event/Event.hpp"
+#include "api/sys/comm/async/AsyncPriorityQueue.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "AsyncPriorityQueue"

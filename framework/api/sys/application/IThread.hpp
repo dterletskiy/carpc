@@ -2,10 +2,10 @@
 
 #include "api/sys/common/ID.hpp"
 #include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/comm/event/IAsync.hpp"
-#include "api/sys/comm/event/AsyncQueue.hpp"
-#include "api/sys/comm/event/AsyncPriorityQueue.hpp"
-#include "api/sys/comm/event/AsyncConsumerMap.hpp"
+#include "api/sys/comm/async/IAsync.hpp"
+#include "api/sys/comm/async/AsyncQueue.hpp"
+#include "api/sys/comm/async/AsyncPriorityQueue.hpp"
+#include "api/sys/comm/async/AsyncConsumerMap.hpp"
 #include "api/sys/application/Types.hpp"
 
 

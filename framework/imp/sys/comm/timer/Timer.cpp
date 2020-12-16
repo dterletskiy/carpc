@@ -218,7 +218,7 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 #include <functional>
 #include <thread>
 #include <limits>
-#include "api/sys/comm/event/Runnable.hpp"
+#include "api/sys/comm/async/runnable/Runnable.hpp"
 #include "api/sys/application/Process.hpp"
 
 namespace base::timer {

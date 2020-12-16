@@ -1,6 +1,6 @@
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/application/Process.hpp"
-#include "api/sys/comm/event/IRunnable.hpp"
+#include "api/sys/comm/async/runnable/IRunnable.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "IRunnable"

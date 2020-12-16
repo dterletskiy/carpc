@@ -2,7 +2,7 @@
 
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/oswrappers/Socket.hpp"
-#include "api/sys/comm/event/IEvent.hpp"
+#include "api/sys/comm/async/event/IEvent.hpp"
 #include "api/sys/comm/service/Passport.hpp"
 #include "api/sys/dsi/Types.hpp"
 
