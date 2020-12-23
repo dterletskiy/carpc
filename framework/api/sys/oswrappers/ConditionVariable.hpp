@@ -21,7 +21,7 @@ namespace base::os {
       public:
          const ID id( ) const;
       private:
-         ID                m_id;
+         ID                m_id = ID::generate( );
 
       public:
          void lock( );

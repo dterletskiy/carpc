@@ -21,7 +21,7 @@ namespace base::os {
          const ID id( ) const;
          const char* const name( ) const;
       private:
-         ID                m_id;
+         ID                m_id = ID::generate( );
          const char* const m_name;
 
       public:

@@ -1,3 +1,6 @@
+version 2.1.4
+   - FSM implemented as a base in framework.
+
 version 2.1.3
    - Changed file structure for /framework/api/comm/event and /framework/imp/comm/event.
 

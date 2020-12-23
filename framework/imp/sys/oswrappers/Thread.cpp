@@ -43,8 +43,6 @@ Thread::~Thread( )
 
 void Thread::init( )
 {
-   m_id = ID::generate( );
-
    pthread_attr_init( &m_attr );
    pthread_attr_setdetachstate( &m_attr, PTHREAD_CREATE_JOINABLE );
    pthread_attr_setscope( &m_attr, PTHREAD_SCOPE_PROCESS );

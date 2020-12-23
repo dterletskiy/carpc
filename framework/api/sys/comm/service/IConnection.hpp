@@ -47,7 +47,7 @@ namespace base::service {
       public:
          const ID& id( ) const;
       protected:
-         ID                      m_id;
+         ID                      m_id = ID::generate( );
 
       public:
          bool is_external( ) const;

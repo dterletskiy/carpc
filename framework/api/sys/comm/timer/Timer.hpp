@@ -42,7 +42,7 @@ namespace base {
       public:
          const ID id( ) const;
       private:
-         ID                      m_id = ID::invalid( );
+         ID                      m_id = ID::generate( );
 
       public:
          bool is_running( ) const;

@@ -10,8 +10,7 @@ using namespace base::application;
 
 
 IThread::IThread( const std::string& name, const size_t wd_timeout )
-   : m_id( thread::ID::generate( ) )
-   , m_name( name )
+   : m_name( name )
    , m_wd_timeout( wd_timeout )
 {
 }

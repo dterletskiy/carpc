@@ -50,7 +50,7 @@ namespace base::application {
          const thread::ID& id( ) const;
          const std::string& name( ) const;
       protected:
-         thread::ID     m_id;
+         thread::ID     m_id = thread::ID::generate( );
          std::string    m_name = "NoName";
 
       public:

@@ -13,7 +13,6 @@ using namespace base::os;
 
 
 ConditionVariable::ConditionVariable( )
-   : m_id( ID::generate( ) )
 {
 }
 

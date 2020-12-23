@@ -7,8 +7,7 @@ using namespace base::os;
 
 
 Mutex::Mutex( const bool auto_lock, const char* const name )
-   : m_id( ID::generate( ) )
-   , m_name( name )
+   : m_name( name )
    , m_auto_lock( auto_lock )
 {
    pthread_mutexattr_init( &m_attr );

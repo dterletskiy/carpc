@@ -198,6 +198,12 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
 
 void IEvent::process( IAsync::IConsumer* p_consumer ) const
 {
+   if( nullptr == p_consumer )
+   {
+      SYS_ERR( "consumer: %p", p_consumer );
+      return;
+   }
+
    SYS_INF( "consumer: %p", p_consumer );
-   if( nullptr != p_consumer ) process_event( p_consumer );
+   process_event( p_consumer );
 }

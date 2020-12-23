@@ -12,7 +12,7 @@
       using Event          = Generator::Config::tEvent; \
       using Signature      = Generator::Config::tSignature; \
       using UserSignature  = Generator::Config::tUserSignature; \
-      using Data           = dataType; \
+      using Data           = Generator::Config::tData; \
       using Consumer       = Generator::Config::tConsumer; \
    }
 
@@ -24,7 +24,7 @@
       using Event          = Generator::Config::tEvent; \
       using Signature      = Generator::Config::tSignature; \
       using UserSignature  = Generator::Config::tUserSignature; \
-      using Data           = dataType; \
+      using Data           = Generator::Config::tData; \
       using Consumer       = Generator::Config::tConsumer; \
    }
 
@@ -33,3 +33,17 @@
 
 #define DUMP_IPC_EVENTS \
    base::async::IEvent::dump( );
+
+
+
+#define DEFINE_EVENT_S( eventType, dataType, signatureType ) \
+   struct eventType { \
+      class eventType##_TYPE; \
+      using Generator      = base::async::TGenerator< base::async::NoServiceType, eventType##_TYPE, dataType, signatureType >; \
+      using Event          = typename Generator::Config::tEvent; \
+      using Signature      = typename Generator::Config::tSignature; \
+      using UserSignature  = typename Generator::Config::tUserSignature; \
+      using Data           = typename Generator::Config::tData; \
+      using Consumer       = typename Generator::Config::tConsumer; \
+   };
+

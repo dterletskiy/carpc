@@ -98,7 +98,6 @@ namespace base::async {
 
 namespace base::async::simple {
 
-   template< typename _ID >
    class Signature
    {
       public:
@@ -141,7 +140,10 @@ namespace base::async::id {
       public:
          const std::string name( ) const
          {
-            return base::format_string( "id: ", size_t(m_id) );
+            if constexpr( std::is_enum_v< _ID > || std::is_integral_v< _ID > )
+               return base::format_string( "id: ", size_t(m_id) );
+            else
+               return base::format_string( "id: ", m_id.name( ) );
          }
          bool operator<( const TSignature& other ) const
          {

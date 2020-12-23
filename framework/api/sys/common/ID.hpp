@@ -166,13 +166,13 @@ namespace base {
          using ID = base::TID< A >;
 
       public:
-         A( ) : m_id( ID::generate( ) ) { }
+         A( ) = default;
          ~A( ) = default;
 
          const ID id( ) const { return m_id; }
 
       private:
-         ID m_id;
+         ID m_id = ID::generate( );
    };
 
    class B
@@ -181,13 +181,13 @@ namespace base {
          using ID = base::TID< B >;
 
       public:
-         B( ) : m_id( ID::generate( ) ) { }
+         B( ) = default;
          ~B( ) = default;
 
          const ID id( ) const { return m_id; }
 
       private:
-         ID m_id;
+         ID m_id = ID::generate( );
    };
 
 

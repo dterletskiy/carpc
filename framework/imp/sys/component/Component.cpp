@@ -11,7 +11,6 @@ using namespace base::component;
 
 Component::Component( application::IThread& app_thread, const std::string& name )
    : m_name( name )
-   , m_id( ID::generate( ) )
    , m_app_thread( app_thread )
    , m_performance( m_name )
 {

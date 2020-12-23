@@ -3,7 +3,9 @@
 // Framework
 #include "api/sys/component/RootComponent.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
+#include "api/sys/fsm/TStateManager.hpp"
 // Application
+#include "imp/app/components/OnOff/fsm/Manager.hpp"
 #include "imp/app/components/OnOff/server/Server.hpp"
 
 
@@ -35,6 +37,9 @@ namespace application::components::onoff {
 
       public:
          void on_timer( const base::Timer::ID );
+
+      private:
+         Manager m_fsm;
    };
 
 } // namespace application::components::onoff

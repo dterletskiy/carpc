@@ -22,8 +22,7 @@ const char* Socket::c_str( const eResult comm_type )
 }
 
 Socket::Socket( const linux::socket::configuration& configuration, const size_t buffer_capacity )
-   : m_id( ID::generate( ) )
-   , m_configuration( configuration )
+   : m_configuration( configuration )
    , m_buffer_capacity( buffer_capacity )
 {
    mp_buffer = malloc( m_buffer_capacity );
@@ -31,7 +30,6 @@ Socket::Socket( const linux::socket::configuration& configuration, const size_t 
 
 Socket::Socket( linux::socket::tSocket socket, const size_t buffer_capacity )
    : m_socket( socket )
-   , m_id( ID::generate( ) )
    , m_buffer_capacity( buffer_capacity )
 {
    mp_buffer = malloc( m_buffer_capacity );

@@ -26,7 +26,7 @@ namespace base::component {
       public:
          const ID& id( ) const override final;
       private:
-         ID                         m_id;
+         ID                         m_id = ID::generate( );
 
       private:
          application::IThread&      m_app_thread;

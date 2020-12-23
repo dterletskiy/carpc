@@ -15,7 +15,6 @@ using namespace base::service;
 IConnection::IConnection( const base::async::tAsyncTypeID& interface_type_id, const std::string& role, const bool is_external )
    : m_signature( interface_type_id, role )
    , m_context( application::Context::eInitType::Auto )
-   , m_id( ID::generate( ) )
    , m_is_external( is_external )
 {
    if( application::Process::instance( )->current_thread( )->id( ).is_invalid( ) )

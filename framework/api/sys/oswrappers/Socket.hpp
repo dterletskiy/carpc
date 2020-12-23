@@ -65,7 +65,7 @@ namespace base::os {
       public:
          ID id( ) const;
       private:
-         ID                            m_id;
+         ID                            m_id = ID::generate( );
 
       public:
          const linux::socket::configuration& configuration( ) const;
