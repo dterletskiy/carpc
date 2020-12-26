@@ -4,8 +4,6 @@
 
 namespace base::onoff {
 
-   const base::async::tAsyncTypeID interface_type_id = data::OnOffEvent::Signature::build_type_id( );
-
    const base::service::RequestResponseIDs< eOnOff >::tVector s_rr = {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState },
       { eOnOff::RequestStart, eOnOff::RequestStartBusy, eOnOff::Undefined }
@@ -21,18 +19,18 @@ namespace base::onoff {
 
 namespace base::onoff::ipc {
 
-   const base::service::RequestResponseIDs< BaseTypes::tEventID >::tVector& BaseTypes::RR = s_rr;
-   const base::service::NotificationIDs< BaseTypes::tEventID >::tVector& BaseTypes::N = s_n;
+   const base::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
+   const base::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
 
 
 
-   tBaseDataPtr BaseData::create( base::dsi::tByteStream& stream )
+   BaseData::tSptr BaseData::create( base::dsi::tByteStream& stream )
    {
       eOnOff id = eOnOff::Undefined;
       if( false == stream.pop( id ) )
          return nullptr;
 
-      tBaseDataPtr ptr = nullptr;
+      tSptr ptr = nullptr;
       switch( id )
       {
          case eOnOff::RequestTriggerState:         ptr = std::make_shared< RequestTriggerStateData >( );       break;
@@ -61,7 +59,7 @@ namespace base::onoff::ipc {
    const eOnOff RequestTriggerStateData::RESPONSE = eOnOff::ResponseTriggerState;
    const eOnOff RequestTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
-   RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay )
+   RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const std::size_t _delay )
       : BaseData( ), state( _state ), delay( _delay ) { }
 
    const eOnOff RequestTriggerStateData::ID = eOnOff::RequestTriggerState;
@@ -112,29 +110,14 @@ namespace base::onoff::ipc {
    bool NotificationCurrentStateData::to_stream( base::dsi::tByteStream& stream ) { return stream.push( state ); }
    bool NotificationCurrentStateData::from_stream( base::dsi::tByteStream& stream ) { return stream.pop( state ); }
 
-
-
-   OnOffEventData::OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
-
-   bool OnOffEventData::to_stream( base::dsi::tByteStream& stream ) const
-   {
-      if( nullptr == ptr ) return true;
-      return ptr->serrialize( stream );
-   }
-   bool OnOffEventData::from_stream( base::dsi::tByteStream& stream )
-   {
-      ptr = BaseData::create( stream );
-      return nullptr != ptr;
-   }
-
 } // namespace base::onoff::ipc
 
 
 
 namespace base::onoff::no_ipc {
 
-   const base::service::RequestResponseIDs< BaseTypes::tEventID >::tVector& BaseTypes::RR = s_rr;
-   const base::service::NotificationIDs< BaseTypes::tEventID >::tVector& BaseTypes::N = s_n;
+   const base::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
+   const base::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
 
 
 
@@ -142,7 +125,7 @@ namespace base::onoff::no_ipc {
    const eOnOff RequestTriggerStateData::RESPONSE = eOnOff::ResponseTriggerState;
    const eOnOff RequestTriggerStateData::BUSY = eOnOff::RequestTriggerStateBusy;
 
-   RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const size_t _delay  )
+   RequestTriggerStateData::RequestTriggerStateData( const std::string& _state, const std::size_t _delay  )
       : BaseData( ), state( _state ), delay( _delay ) { }
 
 
@@ -168,9 +151,5 @@ namespace base::onoff::no_ipc {
 
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
       : BaseData( ), state( _state ) { }
-
-
-
-   OnOffEventData::OnOffEventData( tBaseDataPtr _ptr ) : ptr( _ptr ) { }
 
 } // namespace base::onoff::no_ipc

@@ -45,7 +45,7 @@ void boot( int argc, char** argv )
    memory::dump( );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
-   REGISTER_EVENT( base::onoff::ipc::OnOffEvent );
+   // REGISTER_EVENT( base::onoff::ipc::OnOffEvent );
    DUMP_IPC_EVENTS;
 
    base::application::Thread::Configuration::tVector services =

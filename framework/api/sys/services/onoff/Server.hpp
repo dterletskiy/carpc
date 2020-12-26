@@ -23,11 +23,11 @@ namespace base::onoff {
          void disconnected( ) override;
 
       private:
-         void process_request_event( const data::OnOffEvent::Event& ) override;
+         void process_request_event( const tService::Event& ) override;
 
       public:
          virtual void request_start( ) = 0;
-         virtual void request_trigger_state( const std::string&, const size_t ) = 0;
+         virtual void request_trigger_state( const std::string&, const std::size_t ) = 0;
          void response_trigger_state( const bool );
 
       public:

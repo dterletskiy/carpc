@@ -1,17 +1,15 @@
 #pragma once
 
-#include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/application/Process.hpp"
 #include "api/sys/comm/service/IProxy.hpp"
 #include "api/sys/comm/service/secure/TClient.hpp"
-#include "api/sys/comm/service/secure/TSignature.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TProxySecure"
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
    template< typename TYPES >
       class TServer;
@@ -20,18 +18,18 @@ namespace base::service::secure {
    template< typename TYPES >
       class TClient;
 
-} // namespace base::service::secure
+} // namespace base::service::secure::__private
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
    template< typename TYPES >
    struct RequestDB
    {
       using tClient = TClient< TYPES >;
 
-      size_t                              m_count = 0;
+      std::size_t                         m_count = 0;
       std::map< tSequenceID, tClient* >   m_client_map;
    };
 
@@ -92,13 +90,13 @@ namespace base::service::secure {
       // If response exists for current request
       if( TYPES::tEventID::Undefined != tRequestData::RESPONSE )
       {
-         size_t& count = event_id_iterator->second.m_count;
+         std::size_t& count = event_id_iterator->second.m_count;
          // In case if count for current request id is zero this means current proxy is not subscribed for corresponding responses of mentioned request
          if( 0 == count )
          {
             TYPES::tEvent::set_notification(
                mp_proxy,
-               typename TYPES::tSignature(
+               typename TYPES::tEventUserSignature(
                   mp_proxy->signature( ).role( ),
                   tRequestData::RESPONSE,
                   mp_proxy->server( ).id( ),
@@ -107,7 +105,7 @@ namespace base::service::secure {
             );
             TYPES::tEvent::set_notification(
                mp_proxy,
-               typename TYPES::tSignature(
+               typename TYPES::tEventUserSignature(
                   mp_proxy->signature( ).role( ),
                   tRequestData::BUSY,
                   mp_proxy->server( ).id( ),
@@ -129,7 +127,7 @@ namespace base::service::secure {
          }
       }
 
-      typename TYPES::tSignature event_signature(
+      typename TYPES::tEventUserSignature event_signature(
             mp_proxy->signature( ).role( ),
             tRequestData::REQUEST,
             mp_proxy->id( ),
@@ -160,7 +158,7 @@ namespace base::service::secure {
             return false;
          }
 
-         size_t& count = event_id_iterator->second.m_count;
+         std::size_t& count = event_id_iterator->second.m_count;
          --count;
          // In case if count for current request is zero this means current proxy is not interested in following response notifications
          if( 0 == count )
@@ -169,7 +167,7 @@ namespace base::service::secure {
             {
                TYPES::tEvent::clear_notification(
                      mp_proxy,
-                     typename TYPES::tSignature(
+                     typename TYPES::tEventUserSignature(
                         mp_proxy->signature( ).role( ),
                         item.response,
                         mp_proxy->server( ).id( ),
@@ -179,7 +177,7 @@ namespace base::service::secure {
             }
             TYPES::tEvent::clear_notification(
                   mp_proxy,
-                  typename TYPES::tSignature(
+                  typename TYPES::tEventUserSignature(
                      mp_proxy->signature( ).role( ),
                      item.busy,
                      mp_proxy->server( ).id( ),
@@ -205,11 +203,11 @@ namespace base::service::secure {
       return false;
    }
 
-} // namespace base::service::secure
+} // namespace base::service::secure::__private
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
    template< typename TYPES >
    struct NotificationDB
@@ -282,7 +280,7 @@ namespace base::service::secure {
       {
          TYPES::tEvent::set_notification(
                mp_proxy,
-               typename TYPES::tSignature(
+               typename TYPES::tEventUserSignature(
                   mp_proxy->signature( ).role( ),
                   tNotificationData::NOTIFICATION,
                   mp_proxy->server( ).id( ),
@@ -290,7 +288,7 @@ namespace base::service::secure {
                )
             );
          TYPES::tEvent::create_send(
-               typename TYPES::tSignature(
+               typename TYPES::tEventUserSignature(
                   mp_proxy->signature( ).role( ),
                   tNotificationData::SUBSCRIBE,
                   mp_proxy->id( ),
@@ -306,7 +304,7 @@ namespace base::service::secure {
          SYS_TRC( "having cached attribute event" );
 
          auto p_event = TYPES::tEvent::create(
-               typename TYPES::tSignature(
+               typename TYPES::tEventUserSignature(
                      mp_proxy->signature( ).role( ),
                      tNotificationData::NOTIFICATION
                   )
@@ -336,7 +334,7 @@ namespace base::service::secure {
       {
          TYPES::tEvent::clear_notification(
             mp_proxy,
-            typename TYPES::tSignature(
+            typename TYPES::tEventUserSignature(
                   mp_proxy->signature( ).role( ),
                   tNotificationData::NOTIFICATION,
                   mp_proxy->server( ).id( ),
@@ -344,7 +342,7 @@ namespace base::service::secure {
                )
          );
          TYPES::tEvent::create_send(
-            typename TYPES::tSignature(
+            typename TYPES::tEventUserSignature(
                mp_proxy->signature( ).role( ),
                tNotificationData::UNSUBSCRIBE,
                mp_proxy->id( ),
@@ -380,11 +378,11 @@ namespace base::service::secure {
       return true;
    }
 
-} // namespace base::service::secure
+} // namespace base::service::secure::__private
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
    template< typename TYPES >
    class TProxy
@@ -544,10 +542,14 @@ namespace base::service::secure {
    template< typename tResponseData >
    const tResponseData* TProxy< TYPES >::get_event_data( const typename TYPES::tEvent& event )
    {
-      return static_cast< tResponseData* >( event.data( )->ptr.get( ) );
+      if( const tResponseData* p_data = static_cast< tResponseData* >( event.data( )->ptr.get( ) ) )
+         return p_data;
+
+      SYS_ERR( "missing data for response/notification ID: %s", to_string( event.info( ).id( ) ).c_str( ) );
+      return nullptr;
    }
 
-} // namespace base::service::secure
+} // namespace base::service::secure::__private
 
 
 

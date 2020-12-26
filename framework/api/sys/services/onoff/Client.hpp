@@ -23,12 +23,12 @@ namespace base::onoff {
          void disconnected( ) override;
 
       private:
-         void process_response_event( const data::OnOffEvent::Event& ) override;
-         void process_notification_event( const data::OnOffEvent::Event& ) override;
+         void process_response_event( const tService::Event& ) override;
+         void process_notification_event( const tService::Event& ) override;
 
       public:
          void request_start( );
-         const base::service::tSequenceID request_trigger_state( const std::string&, const size_t );
+         const base::service::tSequenceID request_trigger_state( const std::string&, const std::size_t );
          void subscribe_current_state( );
          void unsubscribe_current_state( );
       private:

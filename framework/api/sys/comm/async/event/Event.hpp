@@ -28,14 +28,6 @@
       using Consumer       = Generator::Config::tConsumer; \
    }
 
-#define REGISTER_EVENT( eventType ) \
-   base::async::IEvent::check_in( eventType::Signature::build_type_id( ), eventType::Event::create );
-
-#define DUMP_IPC_EVENTS \
-   base::async::IEvent::dump( );
-
-
-
 #define DEFINE_EVENT_S( eventType, dataType, signatureType ) \
    struct eventType { \
       class eventType##_TYPE; \
@@ -47,3 +39,20 @@
       using Consumer       = typename Generator::Config::tConsumer; \
    };
 
+#define DEFINE_IPC_EVENT_S( eventType, dataType, signatureType ) \
+   struct eventType { \
+      class ServiceType; \
+      class eventType##_TYPE; \
+      using Generator      = base::async::TGenerator< ServiceType, eventType##_TYPE, dataType, signatureType >; \
+      using Event          = typename Generator::Config::tEvent; \
+      using Signature      = typename Generator::Config::tSignature; \
+      using UserSignature  = typename Generator::Config::tUserSignature; \
+      using Data           = typename Generator::Config::tData; \
+      using Consumer       = typename Generator::Config::tConsumer; \
+   };
+
+#define REGISTER_EVENT( eventType ) \
+   base::async::IEvent::check_in( eventType::Signature::build_type_id( ), eventType::Event::create );
+
+#define DUMP_IPC_EVENTS \
+   base::async::IEvent::dump( );

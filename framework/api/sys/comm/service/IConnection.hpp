@@ -78,6 +78,7 @@ namespace base::service {
    inline
    bool IConnection::is_external( ) const
    {
+      // @TDA: here should be check of combination is_export and is_ipc
       return m_is_external;
    }
 

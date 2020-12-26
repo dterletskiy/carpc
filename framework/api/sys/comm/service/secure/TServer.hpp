@@ -2,14 +2,14 @@
 
 #include "api/sys/application/Process.hpp"
 #include "api/sys/comm/service/IServer.hpp"
-#include "api/sys/comm/service/secure/TSignature.hpp"
+#include "api/sys/comm/service/secure/TService.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TServerSecure"
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
    template< typename TYPES >
       class TProxy;
@@ -17,13 +17,13 @@ namespace base::service::secure {
    template< typename TYPES >
       class TServer;
 
-} // namespace base::service::secure
+} // namespace base::service::secure::__private
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
-   enum class eRequestStatus : size_t { BUSY, READY };
+   enum class eRequestStatus : std::uint8_t { BUSY, READY };
 
    struct RequestInfo
    {
@@ -49,11 +49,11 @@ namespace base::service::secure {
       std::set< RequestInfo > info_set;
    };
 
-} // namespace base::service::secure
+} // namespace base::service::secure::__private
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
    template< typename TYPES >
    struct NotificationStatus
@@ -156,7 +156,7 @@ namespace base::service::secure {
       {
          for( const auto& subscriber : pair.second )
          {
-            typename TYPES::tSignature event_signature(
+            typename TYPES::tEventUserSignature event_signature(
                server.signature( ).role( ), tNotificationData::NOTIFICATION, server.id( ), subscriber.sid
             );
             TYPES::tEvent::create_send( event_signature, event_data, application::Context( pair.first, subscriber.tid ) );
@@ -164,11 +164,11 @@ namespace base::service::secure {
       }
    }
 
-} // namespace base::service::secure
+} // namespace base::service::secure::__private
 
 
 
-namespace base::service::secure {
+namespace base::service::secure::__private {
 
    template< typename TYPES >
    class TServer
@@ -252,18 +252,18 @@ namespace base::service::secure {
       {
          TYPES::tEvent::set_notification(
             this,
-            typename TYPES::tSignature( signature( ).role( ), rr_item.request, proxy_address.id( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), rr_item.request, proxy_address.id( ), id( ) )
          );
       }
       for( auto n_item : TYPES::N )
       {
          TYPES::tEvent::set_notification(
             this,
-            typename TYPES::tSignature( signature( ).role( ), n_item.subscribe, proxy_address.id( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.subscribe, proxy_address.id( ), id( ) )
          );
          TYPES::tEvent::set_notification(
             this,
-            typename TYPES::tSignature( signature( ).role( ), n_item.unsubscribe, proxy_address.id( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.unsubscribe, proxy_address.id( ), id( ) )
          );
       }
 
@@ -277,18 +277,18 @@ namespace base::service::secure {
       {
          TYPES::tEvent::clear_notification(
             this,
-            typename TYPES::tSignature( signature( ).role( ), rr_item.request, proxy_address.id( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), rr_item.request, proxy_address.id( ), id( ) )
          );
       }
       for( auto n_item : TYPES::N )
       {
          TYPES::tEvent::clear_notification(
             this,
-            typename TYPES::tSignature( signature( ).role( ), n_item.subscribe, proxy_address.id( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.subscribe, proxy_address.id( ), id( ) )
          );
          TYPES::tEvent::clear_notification(
             this,
-            typename TYPES::tSignature( signature( ).role( ), n_item.unsubscribe, proxy_address.id( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.unsubscribe, proxy_address.id( ), id( ) )
          );
       }
 
@@ -346,7 +346,7 @@ namespace base::service::secure {
          SYS_WRN( "request busy: %s", to_string( event_id ).c_str( ) );
          // Sending event with request busy id
          TYPES::tEvent::create_send(
-            typename TYPES::tSignature( signature( ).role( ), rrIDs.busy, id( ), from_id, seq_id ), from_context
+            typename TYPES::tEventUserSignature( signature( ).role( ), rrIDs.busy, id( ), from_id, seq_id ), from_context
          );
          return false;
       }
@@ -430,7 +430,7 @@ namespace base::service::secure {
 
       const RequestInfo& request_info = request_info_opt.value( );
 
-      typename TYPES::tSignature event_signature(
+      typename TYPES::tEventUserSignature event_signature(
          signature( ).role( ), tResponseData::RESPONSE, id( ), request_info.client_addr.id( ), request_info.client_seq_id
       );
       typename TYPES::tEventData event_data( std::make_shared< tResponseData >( args... ) );
@@ -464,7 +464,7 @@ namespace base::service::secure {
 
             if( notification_status.data( ) )
             {
-               typename TYPES::tSignature event_signature( signature( ).role( ), item.notification, id( ), from_id );
+               typename TYPES::tEventUserSignature event_signature( signature( ).role( ), item.notification, id( ), from_id );
                typename TYPES::tEventData event_data( notification_status.data( ) );
                TYPES::tEvent::create_send( event_signature, event_data, from_context );
             }
@@ -514,7 +514,33 @@ namespace base::service::secure {
    template< typename tRequestData >
    const tRequestData* TServer< TYPES >::get_event_data( const typename TYPES::tEvent& event )
    {
-      return static_cast< tRequestData* >( event.data( )->ptr.get( ) );
+      if( const tRequestData* p_data = static_cast< tRequestData* >( event.data( )->ptr.get( ) ) )
+         return p_data;
+
+      SYS_ERR( "missing request data for request ID: %s", to_string( event.info( ).id( ) ).c_str( ) );
+      return nullptr;
+   }
+
+} // namespace base::service::secure::__private
+
+
+
+namespace base::service::secure {
+
+   template< typename TYPES >
+   class TServer : public __private::TServer< TGenerator< TYPES > >
+   {
+      public:
+         TServer( const std::string&, const bool );
+
+         using tService = typename TGenerator< TYPES >::Service;
+   };
+
+   template< typename TYPES >
+   TServer< TYPES >::TServer( const std::string& role_name, const bool is_export )
+      : __private::TServer< TGenerator< TYPES > >( TGenerator< TYPES >::interface_type_id, role_name, is_export )
+   {
+      REGISTER_EVENT( tService );
    }
 
 } // namespace base::service::secure

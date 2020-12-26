@@ -10,7 +10,7 @@ using namespace base::onoff;
 
 
 Client::Client( const std::string& role_name )
-   : base::service::SERVICE_NAMESPACE::TClient< data::Types >( base::onoff::interface_type_id, role_name, true )
+   : base::service::SERVICE_NAMESPACE::TClient< data::Types >( role_name, true )
 {
 }
 
@@ -34,7 +34,7 @@ void Client::request_start( )
    request< data::RequestStartData >( this );
 }
 
-const base::service::tSequenceID Client::request_trigger_state( const std::string& state, const size_t delay )
+const base::service::tSequenceID Client::request_trigger_state( const std::string& state, const std::size_t delay )
 {
    SYS_TRC( "state: %s / delay: %zu", state.c_str( ), delay );
    return request< data::RequestTriggerStateData >( this, state, delay );
@@ -52,7 +52,7 @@ void Client::unsubscribe_current_state( )
    unsubscribe< data::NotificationCurrentStateData >( this );
 }
 
-void Client::process_response_event( const data::OnOffEvent::Event& event )
+void Client::process_response_event( const tService::Event& event )
 {
    switch( event.info( ).id( ) )
    {
@@ -77,7 +77,7 @@ void Client::process_response_event( const data::OnOffEvent::Event& event )
    }
 }
 
-void Client::process_notification_event( const data::OnOffEvent::Event& event )
+void Client::process_notification_event( const tService::Event& event )
 {
    switch( event.info( ).id( ) )
    {

@@ -2,13 +2,14 @@
 
 #include "api/sys/comm/service/IClient.hpp"
 #include "api/sys/comm/service/fast/TProxy.hpp"
+#include "api/sys/comm/service/fast/TService.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TClientFast"
 
 
 
-namespace base::service::fast {
+namespace base::service::fast::__private {
 
    template< typename TYPES >
    class TClient : public IClient
@@ -107,6 +108,28 @@ namespace base::service::fast {
    typename TClient< TYPES >::tProxy* TClient< TYPES >::proxy( ) const
    {
       return mp_proxy;
+   }
+
+} // namespace base::service::fast::__private
+
+
+
+namespace base::service::fast {
+
+   template< typename TYPES >
+   class TClient : public __private::TClient< TGenerator< TYPES > >
+   {
+      public:
+         TClient( const std::string&, const bool );
+
+         using tService = typename TGenerator< TYPES >::Service;
+   };
+
+   template< typename TYPES >
+   TClient< TYPES >::TClient( const std::string& role_name, const bool is_export )
+      : __private::TClient< TGenerator< TYPES > >( TGenerator< TYPES >::interface_type_id, role_name, is_export )
+   {
+      REGISTER_EVENT( tService );
    }
 
 } // namespace base::service::fast

@@ -10,7 +10,7 @@ using namespace base::onoff;
 
 
 Server::Server( const std::string& role_name )
-   : base::service::SERVICE_NAMESPACE::TServer< data::Types >( base::onoff::interface_type_id, role_name, true )
+   : base::service::SERVICE_NAMESPACE::TServer< data::Types >( role_name, true )
 {
 }
 
@@ -35,7 +35,7 @@ void Server::response_trigger_state( const bool result )
    response< data::ResponseTriggerStateData >( result );
 }
 
-void Server::process_request_event( const data::OnOffEvent::Event& event )
+void Server::process_request_event( const tService::Event& event )
 {
    switch( event.info( ).id( ) )
    {

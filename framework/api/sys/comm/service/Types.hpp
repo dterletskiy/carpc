@@ -25,6 +25,11 @@ namespace base::service {
 
 
 
+   class IPC;
+   class NO_IPC;
+
+
+
    template< typename _ID >
    struct RequestResponseIDs
    {
