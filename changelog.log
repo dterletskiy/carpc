@@ -1,3 +1,6 @@
+version 2.2.0a
+   - Minor changes in Event macros.
+
 version 2.2.0
    - Templated service refactoring.
    - Reduced generated stuff for service.
