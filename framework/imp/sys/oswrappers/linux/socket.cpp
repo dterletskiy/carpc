@@ -47,7 +47,7 @@ namespace base::os::linux::socket {
       {
          case AF_UNIX:
          {
-            SYS_INF( "AF_UNIX" );
+            // SYS_INF( "AF_UNIX" );
 
             struct sockaddr_un* serv_addr_un = (sockaddr_un*)malloc( sizeof( sockaddr_un ) );
             memset( serv_addr_un, 0, sizeof( sockaddr_un ) );
@@ -61,7 +61,7 @@ namespace base::os::linux::socket {
          }
          case AF_INET:
          {
-            SYS_INF( "AF_INET" );
+            // SYS_INF( "AF_INET" );
 
             struct sockaddr_in* serv_addr_in = (sockaddr_in*)malloc( sizeof( sockaddr_in ) );
             memset( serv_addr_in, 0, sizeof( sockaddr_in ) );
@@ -78,7 +78,7 @@ namespace base::os::linux::socket {
          default:          break;
       }
 
-      print( m_addr );
+      // print( m_addr );
    }
 
    socket_addr::~socket_addr( )

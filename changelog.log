@@ -1,3 +1,6 @@
+version 2.2.1
+   - Fix in SendReceive thread IPC for not detecting disconnected socket to process with server service.
+
 version 2.2.0a
    - Minor changes in Event macros.
 

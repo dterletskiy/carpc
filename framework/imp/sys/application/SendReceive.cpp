@@ -101,12 +101,22 @@ void SendReceive::prepare_select( os::linux::socket::tSocket& max_socket, os::li
    if( mp_socket_master->socket( ) > max_socket )
       max_socket = mp_socket_master->socket( );
 
-   for( const auto& p_socket : m_pending_sockets )
+   for( const auto& pair : m_pending_sockets )
    {
-      fd_set.set( p_socket.first->socket( ), os::linux::socket::fd::eType::READ );
-      if( p_socket.first->socket( ) > max_socket )
-         max_socket = p_socket.first->socket( );
+      auto p_socket = pair.first;
+      fd_set.set( p_socket->socket( ), os::linux::socket::fd::eType::READ );
+      if( p_socket->socket( ) > max_socket )
+         max_socket = p_socket->socket( );
    }
+
+   for( const auto& pair : m_process_mapping )
+   {
+      auto p_socket = pair.second.socket;
+      fd_set.set( p_socket->socket( ), os::linux::socket::fd::eType::READ );
+      if( p_socket->socket( ) > max_socket )
+         max_socket = p_socket->socket( );
+   }
+
    SYS_INF( "max_socket = %d", max_socket );
 }
 

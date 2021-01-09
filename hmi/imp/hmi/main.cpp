@@ -69,6 +69,8 @@ void boot( int argc, char** argv )
    memory::dump( );
 }
 
+bool test( int argc, char* argv[ ] );
+
 
 
 #if OS == LINUX
@@ -77,7 +79,8 @@ void boot( int argc, char** argv )
    {
       DBG_MSG( "argc = %d", argc );
 
-      boot( argc, argv );
+      if( test( argc, argv ) )
+         boot( argc, argv );
 
       return 0;
    }
@@ -105,3 +108,14 @@ void boot( int argc, char** argv )
    }
 
 #endif
+
+
+
+
+
+#include "api/sys/oswrappers/Socket.hpp"
+
+bool test( int argc, char* argv[ ] )
+{
+   return true;
+}
