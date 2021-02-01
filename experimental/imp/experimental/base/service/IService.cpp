@@ -15,10 +15,10 @@ IService::IService( const tServiceID& id, const tServiceRole& role )
    : m_info( id, role )
    , mp_thread( application::Application::instance( ).current_thread( ) )
 {
-   DBG_MSG( "created" );
+   MSG_DBG( "created" );
 }
 
 IService::~IService( )
 {
-   DBG_MSG( "destroyed" );
+   MSG_DBG( "destroyed" );
 }

@@ -197,24 +197,24 @@ namespace base {
       A a1, a2, a3;
       B b1, b2, b3;
 
-      DBG_MSG( "a1: %s", a1.id( ).name( ).c_str( ) );
-      DBG_MSG( "a1: %zu", (A::ID::TYPE)(a1.id( )) );
-      DBG_MSG( "a2: %zu", (A::ID::TYPE)(a2.id( )) );
-      DBG_MSG( "a3: %zu", (A::ID::TYPE)(a3.id( )) );
+      MSG_DBG( "a1: %s", a1.id( ).name( ).c_str( ) );
+      MSG_DBG( "a1: %zu", (A::ID::TYPE)(a1.id( )) );
+      MSG_DBG( "a2: %zu", (A::ID::TYPE)(a2.id( )) );
+      MSG_DBG( "a3: %zu", (A::ID::TYPE)(a3.id( )) );
 
-      DBG_MSG( "b1: %zu", (B::ID::TYPE)(b1.id( )) );
-      DBG_MSG( "b2: %zu", (B::ID::TYPE)(b2.id( )) );
-      DBG_MSG( "b3: %zu", (B::ID::TYPE)(b3.id( )) );
+      MSG_DBG( "b1: %zu", (B::ID::TYPE)(b1.id( )) );
+      MSG_DBG( "b2: %zu", (B::ID::TYPE)(b2.id( )) );
+      MSG_DBG( "b3: %zu", (B::ID::TYPE)(b3.id( )) );
 
       {
          A::ID id_a = A::ID::generate( );
          // B::ID id_b = id_a;
-         DBG_MSG( "id_a: %s", id_a.name( ).c_str( ) );
+         MSG_DBG( "id_a: %s", id_a.name( ).c_str( ) );
       }
 
       {
          A::ID id_a = A::ID::invalid( );
-         DBG_MSG( "id_a: %s", id_a.name( ).c_str( ) );
+         MSG_DBG( "id_a: %s", id_a.name( ).c_str( ) );
       }
 
       return 0;

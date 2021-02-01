@@ -42,12 +42,12 @@ namespace base::os::linux {
          if( 0 < _fd )
             write( _fd, wrn_duffer_size, strlen( wrn_duffer_size ) );
       }
-      SYS_MSG( "backtrace() returned %d addresses:", nptrs );
+      SYS_DBG( "backtrace() returned %d addresses:", nptrs );
 
 
       if( 0 < _fd )
       {
-         SYS_MSG( "dump backtrace to %d", _fd );
+         SYS_DBG( "dump backtrace to %d", _fd );
          backtrace_symbols_fd( buffer, nptrs, _fd );
       }
       else
@@ -61,7 +61,7 @@ namespace base::os::linux {
 
          for( int i = 0; i < nptrs; ++i )
          {
-            SYS_MSG( "%s", strings[ i ] );
+            SYS_DBG( "%s", strings[ i ] );
          }
          free( strings );
       }

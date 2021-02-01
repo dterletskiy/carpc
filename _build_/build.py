@@ -60,8 +60,8 @@ COMPILER=os.environ.get( 'CXX', "g++" )
 SESSION=os.environ.get( 'SESSION', "default" )
 
 ROOT = "/mnt/p4v/Source/RPC"
-# projects: list = [ "framework", "hooks", "servicebrocker", "application", "core", "controller", "hmi", "experimental" ]
-projects: list = [ "framework", "servicebrocker", "application", "core", "controller", "hmi" ]
+projects: list = [ "framework", "hooks", "servicebrocker", "application", "core", "controller", "hmi", "experimental" ]
+# projects: list = [ "framework", "servicebrocker", "application", "core", "controller", "hmi" ]
 # projects: list = [ "framework", "experimental" ]
 actions: dict = {
    'archive':        [ project.clean_all, archive.archive                        ],

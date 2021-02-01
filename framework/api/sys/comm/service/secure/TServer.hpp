@@ -145,7 +145,7 @@ namespace base::service::secure::__private {
 
       if( false == is_subscribed( ) )
       {
-         SYS_TRC( "there are no subscribers to notify: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+         SYS_VRB( "there are no subscribers to notify: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
          return;
       }
 
@@ -298,7 +298,7 @@ namespace base::service::secure::__private {
    template< typename TYPES >
    void TServer< TYPES >::process_event( const typename TYPES::tEvent& event )
    {
-      SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
       m_processing_event_id = event.info( ).id( );
 
       if( true == prepare_request( event ) )
@@ -456,7 +456,7 @@ namespace base::service::secure::__private {
             return false;
          }
 
-         SYS_TRC( "notification subscribe/unsubscribe ID: %s", to_string( event_id ).c_str( ) );
+         SYS_VRB( "notification subscribe/unsubscribe ID: %s", to_string( event_id ).c_str( ) );
          tNotificationStatus& notification_status = iterator->second;
          if( item.subscribe == event_id )
          {

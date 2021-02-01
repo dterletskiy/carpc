@@ -14,23 +14,23 @@ Server::Server( const std::string& role_name, const std::string& name )
    : base::onoff::Server( role_name )
    , m_name( name )
 {
-   DBG_MSG( "%s: created", m_name.c_str( ) );
+   MSG_DBG( "%s: created", m_name.c_str( ) );
    current_state( "Unloaded" );
 }
 
 Server::~Server( )
 {
-   DBG_MSG( "%s: destroyed", m_name.c_str( ) );
+   MSG_DBG( "%s: destroyed", m_name.c_str( ) );
 }
 
 void Server::request_start( )
 {
-   DBG_MSG( );
+   MSG_DBG( );
 }
 
 void Server::request_trigger_state( const std::string& state, const size_t delay )
 {
-   DBG_MSG( "%s: state: %s / delay: %zu", m_name.c_str( ), state.c_str( ), delay );
+   MSG_DBG( "%s: state: %s / delay: %zu", m_name.c_str( ), state.c_str( ), delay );
 
    std::shared_ptr< base::Timer > timer = std::make_shared< base::Timer >( this, state );
    timer->start( delay, 1 );
@@ -40,7 +40,7 @@ void Server::request_trigger_state( const std::string& state, const size_t delay
 
 void Server::process_timer( const base::Timer::ID id )
 {
-   DBG_MSG( "%s: Timer '%s' expired", m_name.c_str( ), id.name( ).c_str( ) );
+   MSG_DBG( "%s: Timer '%s' expired", m_name.c_str( ), id.name( ).c_str( ) );
 
    auto iterator = std::find_if( m_timers.begin( ), m_timers.end( ), [ id ]( const TimerSeqID& element ){ return element.timer->id( ) == id; } );
    if( m_timers.end( ) == iterator )

@@ -47,7 +47,7 @@ void IProxy::connected( std::shared_ptr< IStub > p_stub )
    }
    else
    {
-      DBG_WRN( "current context is not exists" );
+      MSG_WRN( "current context is not exists" );
    }
 }
 
@@ -68,7 +68,7 @@ void IProxy::disconnected( std::shared_ptr< IStub > p_stub )
    }
    else
    {
-      DBG_WRN( "current context is not exists" );
+      MSG_WRN( "current context is not exists" );
    }
 }
 

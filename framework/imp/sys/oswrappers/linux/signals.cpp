@@ -34,7 +34,7 @@ namespace base::os::linux::signals {
          return false;
       }
 
-      SYS_TRC( "%s", map.find( is_thread )->second.second );
+      SYS_VRB( "%s", map.find( is_thread )->second.second );
       return true;
    }
 
@@ -58,7 +58,7 @@ namespace base::os::linux::signals {
          return false;
       }
 
-      SYS_TRC( "%s", map.find( is_thread )->second.second );
+      SYS_VRB( "%s", map.find( is_thread )->second.second );
       return true;
    }
 
@@ -82,7 +82,7 @@ namespace base::os::linux::signals {
          return false;
       }
 
-      SYS_TRC( "%s", map.find( is_thread )->second.second );
+      SYS_VRB( "%s", map.find( is_thread )->second.second );
       return true;
    }
 
@@ -98,7 +98,7 @@ namespace base::os::linux::signals {
          return false;
       }
 
-      SYS_TRC( "%s", map.find( is_thread )->second.second );
+      SYS_VRB( "%s", map.find( is_thread )->second.second );
       return true;
    }
 
@@ -166,7 +166,7 @@ namespace base::os::linux::signals {
          return false;
       }
 
-      SYS_TRC( "%d", *p_signal );
+      SYS_VRB( "%d", *p_signal );
       return true;
    }
 

@@ -21,7 +21,7 @@ void Performance::start( const std::string& message )
 {
    if( false == message.empty( ) )
    {
-      DBG_TRC( "%s", message.c_str( ) );
+      MSG_VRB( "%s", message.c_str( ) );
    }
 
    m_start.reset( );
@@ -47,7 +47,7 @@ void Performance::stop( const std::string& message )
    m_finish.reset( );
    if( false == message.empty( ) )
    {
-      DBG_TRC( "%s", message.c_str( ) );
+      MSG_VRB( "%s", message.c_str( ) );
    }
    static_cast< void >( info( ) );
 }
@@ -57,7 +57,7 @@ long int Performance::info( ) const
    if( std::nullopt == m_delta )
       return 0;
 
-   DBG_TRC( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
+   MSG_VRB( "%s: time delta: %ld microseconds", m_name.c_str( ), m_delta.value( ).count( ) );
    return m_delta.value( ).count( );
 }
 

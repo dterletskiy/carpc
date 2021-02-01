@@ -31,7 +31,7 @@ void IEvent::dump( )
 {
    for( auto& pair : s_registry )
    {
-      SYS_TRC( "name: %s / creator: %p", pair.first.c_str( ), pair.second );
+      SYS_VRB( "name: %s / creator: %p", pair.first.c_str( ), pair.second );
    }
 }
 
@@ -135,7 +135,7 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
    if( !p_event ) return false;
    if( !( p_event->signature( ) ) ) return false;
 
-   SYS_TRC( "event: %s", p_event->signature( )->name( ).c_str( ) );
+   SYS_VRB( "event: %s", p_event->signature( )->name( ).c_str( ) );
 
    if( to_context.is_external( ) )
    {

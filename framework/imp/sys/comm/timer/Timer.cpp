@@ -17,7 +17,7 @@ static std::map< base::os::linux::timer::tID, Timer* > consumer_map;
 
 void timer_processor( const base::os::linux::timer::tID timer_id )
 {
-   SYS_TRC( "processing timer: %#lx", (long)timer_id );
+   SYS_VRB( "processing timer: %#lx", (long)timer_id );
 
    mutex_consumer_map.lock( );
    auto iterator = consumer_map.find( timer_id );
@@ -35,17 +35,17 @@ void timer_processor( const base::os::linux::timer::tID timer_id )
 
 void signal_handler( int signal, siginfo_t* si, void* uc )
 {
-   SYS_TRC( "signal: %d / si->si_signo: %d", signal, si->si_signo );
-   SYS_TRC( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
+   SYS_VRB( "signal: %d / si->si_signo: %d", signal, si->si_signo );
+   SYS_VRB( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
 
    base::os::linux::timer::tID* timer_id = (base::os::linux::timer::tID*)si->si_value.sival_ptr;
-   SYS_TRC( "timer id: %#lx", (long)(*timer_id) );
+   SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
    timer_processor( *timer_id );
 }
 
 void event_handler( union sigval sv )
 {
-   SYS_TRC( "sv.sival_ptr: %p(%#lx) / sv.sival_int: %#x", sv.sival_ptr, *static_cast< size_t* >( sv.sival_ptr ), sv.sival_int );
+   SYS_VRB( "sv.sival_ptr: %p(%#lx) / sv.sival_int: %#x", sv.sival_ptr, *static_cast< size_t* >( sv.sival_ptr ), sv.sival_int );
 }
 
 
@@ -87,7 +87,7 @@ Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
       return;
    }
 
-   SYS_TRC( "created timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+   SYS_VRB( "created timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
    TimerEvent::Event::set_notification( mp_consumer, { m_id.value( ) } );
 }
 
@@ -113,7 +113,7 @@ Timer::~Timer( )
    }
    else
    {
-      SYS_TRC( "removed timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+      SYS_VRB( "removed timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
    }
 }
 
@@ -147,7 +147,7 @@ bool Timer::start( const std::size_t nanoseconds, const std::size_t count )
       return false;
    }
 
-   SYS_TRC( "started timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+   SYS_VRB( "started timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
    m_is_running = true;
    return true;  
 }
@@ -171,7 +171,7 @@ bool Timer::stop( )
       return false;
    }
 
-   SYS_TRC( "stoped timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+   SYS_VRB( "stoped timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
    return true;  
 }
 

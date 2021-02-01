@@ -61,7 +61,7 @@ MemoryMap::MemoryMap( const char* _path, const size_t _size )
    }
    else
    {
-      SYS_TRC( "log file opened: %s(%d)", m_path, m_fd );
+      SYS_VRB( "log file opened: %s(%d)", m_path, m_fd );
       int result = lseek( m_fd, 0, SEEK_END );
       if( -1 == result )
       {
@@ -70,14 +70,14 @@ MemoryMap::MemoryMap( const char* _path, const size_t _size )
       }
       else
       {
-         SYS_TRC( "descriptor file positioned: %d(%d)", m_fd, result );
+         SYS_VRB( "descriptor file positioned: %d(%d)", m_fd, result );
       }
    }
 }
 
 MemoryMap::~MemoryMap( )
 {
-   SYS_TRC( );
+   SYS_VRB( );
    close( m_fd );
 }
 
@@ -88,7 +88,7 @@ void MemoryMap::set_track_size( const size_t _size )
 
 bool MemoryMap::insert( void* _address, void* _caller, size_t _size )
 {
-   // SYS_TRC( "address = %p", _address );
+   // SYS_VRB( "address = %p", _address );
 
    if( nullptr == _address )
       return false;
@@ -113,7 +113,7 @@ bool MemoryMap::insert( void* _address, void* _caller, size_t _size )
 
 bool MemoryMap::remove( const void* _address )
 {
-   // SYS_TRC( "address = %p", _address );
+   // SYS_VRB( "address = %p", _address );
 
    if( nullptr == _address )
       return false;
@@ -131,7 +131,7 @@ bool MemoryMap::remove( const void* _address )
 
 size_t MemoryMap::find_free( ) const
 {
-   // SYS_TRC( );
+   // SYS_VRB( );
 
    for( size_t i = 0; i < s_memory_map_size; ++i )
       if( nullptr == m_mem_map[i].address )

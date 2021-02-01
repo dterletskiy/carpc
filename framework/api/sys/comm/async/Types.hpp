@@ -92,7 +92,7 @@ namespace base_v1 {
             {
                const std::string _name = base::format_string( std::hex, typeid( T ).name( ) );
                const std::size_t _hash_code = typeid( T ).hash_code( );
-               SYS_MSG( "async typeid: %p => %s", (void*)_hash_code, _name.c_str( ) );
+               SYS_DBG( "async typeid: %p => %s", (void*)_hash_code, _name.c_str( ) );
                return typeid( T ).hash_code( );
             }
 

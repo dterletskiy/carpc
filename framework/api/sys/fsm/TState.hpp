@@ -108,7 +108,7 @@ namespace base::fsm {
    template< typename TYPES >
    const std::optional< typename TYPES::tID > TState< TYPES >::in( )
    {
-      SYS_TRC( "%s: enter", m_name.c_str( ) );
+      SYS_VRB( "%s: enter", m_name.c_str( ) );
       auto p_next_state = enter( );
       State::Event::create_send( { m_uid } );
       return p_next_state;
@@ -117,7 +117,7 @@ namespace base::fsm {
    template< typename TYPES >
    void TState< TYPES >::out( )
    {
-      SYS_TRC( "%s: leave", m_name.c_str( ) );
+      SYS_VRB( "%s: leave", m_name.c_str( ) );
       leave( );
    }
 

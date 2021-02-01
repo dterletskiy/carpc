@@ -11,10 +11,10 @@
  * class Consumer
  * {
  * public:
- *    void print( int value ) { DBG_INF( "%d", value ); }
+ *    void print( int value ) { MSG_INF( "%d", value ); }
  * };
- * void print( int value ) { DBG_INF( "%d", value ); }
- * void print( ) { DBG_INF( ); }
+ * void print( int value ) { MSG_INF( "%d", value ); }
+ * void print( ) { MSG_INF( ); }
 
  * int main( int argc, char *argv[] )
  * {

@@ -14,10 +14,10 @@ Component::Component( application::IThread& app_thread, const std::string& name 
    , m_app_thread( app_thread )
    , m_performance( m_name )
 {
-   DBG_MSG( "Created: %s", m_name.c_str( ) );
+   MSG_DBG( "Created: %s", m_name.c_str( ) );
 }
 
 Component::~Component( )
 {
-   DBG_MSG( "Destroyed: %s", m_name.c_str( ) );
+   MSG_DBG( "Destroyed: %s", m_name.c_str( ) );
 }

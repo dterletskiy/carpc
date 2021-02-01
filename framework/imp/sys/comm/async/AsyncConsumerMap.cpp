@@ -14,12 +14,12 @@ AsyncConsumerMap::AsyncConsumerMap( const std::string& name )
    : m_name( name )
    , m_processing( name )
 {
-   SYS_TRC( "'%s': created", m_name.c_str( ) );
+   SYS_VRB( "'%s': created", m_name.c_str( ) );
 }
 
 AsyncConsumerMap::~AsyncConsumerMap( )
 {
-   SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
+   SYS_VRB( "'%s': destroyed", m_name.c_str( ) );
 }
 
 void AsyncConsumerMap::set_notification( const IAsync::ISignature::tSptr p_signature, IAsync::IConsumer* p_consumer )

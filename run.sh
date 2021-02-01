@@ -72,11 +72,11 @@ function stop_dlt_daemon( )
 
 reset
 
-# create_delivery
-# start_delivery
+create_delivery
+start_delivery
 
-stop_delivery
-clear_delivery
+# stop_delivery
+# clear_delivery
 
 # stop_dlt_daemon
 # start_dlt_daemon

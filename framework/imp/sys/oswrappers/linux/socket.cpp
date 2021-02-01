@@ -324,7 +324,7 @@ namespace base::os::linux::socket {
          return _socket;
       }
 
-      SYS_MSG( "socket(%d)", _socket );
+      SYS_DBG( "socket(%d)", _socket );
       return _socket;
    }
 
@@ -348,7 +348,7 @@ namespace base::os::linux::socket {
          SYS_ERR( "bind(%d) error: %d", _socket, error );
          return false;
       }
-      SYS_MSG( "bind(%d)", _socket );
+      SYS_DBG( "bind(%d)", _socket );
       return true;
    }
 
@@ -378,7 +378,7 @@ namespace base::os::linux::socket {
          SYS_ERR( "connect(%d): error %d", _socket, error );
          return false;
       }
-      SYS_MSG( "connect(%d)", _socket );
+      SYS_DBG( "connect(%d)", _socket );
       return true;
    }
 
@@ -402,7 +402,7 @@ namespace base::os::linux::socket {
          SYS_ERR( "listen(%d) error: %d", _socket, error );
          return false;
       }
-      SYS_MSG( "listen(%d)", _socket );
+      SYS_DBG( "listen(%d)", _socket );
       return true;
    }
 
@@ -421,7 +421,7 @@ namespace base::os::linux::socket {
          SYS_ERR( "send(%d): error %d / bytes %zd", _socket, error, size );
          return size;
       }
-      SYS_MSG( "send(%d): %zd bytes", _socket, size );
+      SYS_DBG( "send(%d): %zd bytes", _socket, size );
       return size;
    }
 
@@ -440,7 +440,7 @@ namespace base::os::linux::socket {
          SYS_ERR( "recv(%d): error %d", _socket, error );
          return size;
       }
-      SYS_MSG( "recv(%d): %zd bytes", _socket, size );
+      SYS_DBG( "recv(%d): %zd bytes", _socket, size );
       return size;
    }
 
@@ -453,7 +453,7 @@ namespace base::os::linux::socket {
          SYS_ERR( "accept(%d): error %d", _socket, error );
          return slave_socket;
       }
-      SYS_MSG( "accept(%d): %d slave socket", _socket, slave_socket );
+      SYS_DBG( "accept(%d): %d slave socket", _socket, slave_socket );
       return slave_socket;
    }
 
@@ -466,7 +466,7 @@ namespace base::os::linux::socket {
          SYS_ERR( "select(%d) error: %d", _max_socket + 1, error );
          return false;
       }
-      SYS_MSG( "select(%d)", _max_socket + 1 );
+      SYS_DBG( "select(%d)", _max_socket + 1 );
       return true;
    }
 
@@ -477,7 +477,7 @@ namespace base::os::linux::socket {
 
    void close( tSocket _socket )
    {
-      SYS_MSG( "%d", _socket );
+      SYS_DBG( "%d", _socket );
       ::shutdown( _socket, SHUT_RDWR );
       ::close( _socket );
    }

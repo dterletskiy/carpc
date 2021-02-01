@@ -24,8 +24,8 @@ namespace base::os::linux::timer {
          SYS_ERR( "error: %d", last_errno );
       }
 
-      // SYS_TRC( "%#lx", (long)timer_id );
-      // SYS_TRC( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
+      // SYS_VRB( "%#lx", (long)timer_id );
+      // SYS_VRB( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
       return 0 == result;
    }
 
@@ -45,8 +45,8 @@ namespace base::os::linux::timer {
          SYS_ERR( "error: %d", last_errno );
       }
 
-      // SYS_TRC( "%#lx", (long)timer_id );
-      // SYS_TRC( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
+      // SYS_VRB( "%#lx", (long)timer_id );
+      // SYS_VRB( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
       return 0 == result;
    }
 
@@ -59,7 +59,7 @@ namespace base::os::linux::timer {
          SYS_ERR( "error: %d", last_errno );
       }
 
-      // SYS_TRC( "%#lx", (long)timer_id );
+      // SYS_VRB( "%#lx", (long)timer_id );
       return 0 == result;
    }
 
@@ -82,7 +82,7 @@ namespace base::os::linux::timer {
          SYS_ERR( "error: %d", last_errno );
       }
 
-      // SYS_TRC( "%#lx", (long)timer_id );
+      // SYS_VRB( "%#lx", (long)timer_id );
       return 0 == result;
    }
 
@@ -98,7 +98,7 @@ namespace base::os::linux::timer {
          SYS_ERR( "error: %d", last_errno );
       }
 
-      // SYS_TRC( "%#lx", (long)timer_id );
+      // SYS_VRB( "%#lx", (long)timer_id );
       return 0 == result;
    }
 

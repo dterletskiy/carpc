@@ -49,7 +49,7 @@ namespace base::service::fast::__private {
       mp_proxy->register_client( this );
       if( mp_proxy )
       {
-         SYS_TRC( "created: %s", mp_proxy->signature( ).name( ).c_str( ) );
+         SYS_VRB( "created: %s", mp_proxy->signature( ).name( ).c_str( ) );
       }
       else
       {
@@ -66,7 +66,7 @@ namespace base::service::fast::__private {
    {
       if( mp_proxy )
       {
-         SYS_TRC( "destroyed: %s", mp_proxy->signature( ).name( ).c_str( ) );
+         SYS_VRB( "destroyed: %s", mp_proxy->signature( ).name( ).c_str( ) );
          mp_proxy->unregister_client( this );
          mp_proxy = nullptr;
       }

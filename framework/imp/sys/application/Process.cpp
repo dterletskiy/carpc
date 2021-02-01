@@ -47,7 +47,7 @@ Process::tSptr Process::mp_instance = nullptr;
 Process::Process( int argc, char** argv )
    : m_id( getpid( ) ) // @TDA: should be unique for all computers in the network
 {
-   SYS_TRC( "created" );
+   SYS_VRB( "created" );
 
    std::string file_name = std::filesystem::path( *argv ).filename( );
    file_name += std::string( ".cfg" );
@@ -78,7 +78,7 @@ Process::Process( int argc, char** argv )
 
 Process::~Process( )
 {
-   SYS_TRC( "destroyed" );
+   SYS_VRB( "destroyed" );
 }
 
 namespace { base::os::Mutex s_mutex; }
@@ -179,16 +179,16 @@ bool Process::stop( )
 
 void Process::boot( )
 {
-   SYS_MSG( "booting..." );
+   SYS_DBG( "booting..." );
 
    events::system::System::Event::create_send( { events::system::eID::boot }, { "booting application" } );
 
    for( auto& p_thread : m_thread_list )
       p_thread->wait( );
-   SYS_MSG( "All application threads are stopped" );
+   SYS_DBG( "All application threads are stopped" );
 
    mp_thread_ipc->wait( );
-   SYS_MSG( "IPC thread is stopped" );
+   SYS_DBG( "IPC thread is stopped" );
 
    os::linux::timer::remove( m_timer_id );
 

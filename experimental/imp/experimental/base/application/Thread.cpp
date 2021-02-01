@@ -14,12 +14,12 @@ Thread::Thread( const std::vector< component::Base::tCreator >& component_creato
    : m_name( name )
    , m_component_creators( component_creators )
 {
-   DBG_MSG( "%s: created", m_name.c_str( ) );
+   MSG_DBG( "%s: created", m_name.c_str( ) );
 }
 
 Thread::~Thread( )
 {
-   DBG_MSG( "%s: destroyed", m_name.c_str( ) );
+   MSG_DBG( "%s: destroyed", m_name.c_str( ) );
 }
 
 const std::string& Thread::name( ) const
@@ -50,7 +50,7 @@ void Thread::post( Context::tFunction function )
 
 void Thread::execute( )
 {
-   DBG_MSG( "%s: enter", m_name.c_str( ) );
+   MSG_DBG( "%s: enter", m_name.c_str( ) );
 
    for( auto creator : m_component_creators )
       m_components.emplace_back( creator( ) );
@@ -59,7 +59,7 @@ void Thread::execute( )
 
    m_components.clear( );
 
-   DBG_MSG( "%s: exit", m_name.c_str( ) );
+   MSG_DBG( "%s: exit", m_name.c_str( ) );
 }
 
 std::thread::id Thread::id( ) const

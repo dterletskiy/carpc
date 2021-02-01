@@ -12,7 +12,7 @@ DUM::DUM( const char* url, const size_t port )
    , m_port( port )
 {
    m_result = curl_global_init( CURL_GLOBAL_DEFAULT );
-   SYS_MSG( "curl_global_init: %s (%d)", curl_easy_strerror( m_result ), m_result );
+   SYS_DBG( "curl_global_init: %s (%d)", curl_easy_strerror( m_result ), m_result );
 }
 
 DUM::~DUM( )

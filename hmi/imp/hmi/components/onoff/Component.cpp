@@ -40,18 +40,18 @@ Component::Component( base::application::IThread& _service, const std::string& _
    , m_timer( this )
    , m_client_onoff( )
 {
-   DBG_MSG( "Created: %s", name( ).c_str( ) );
+   MSG_DBG( "Created: %s", name( ).c_str( ) );
    hmi::event::App::Event::set_notification( this, { hmi::event::eID::boot } );
 }
 
 Component::~Component( )
 {
-   DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
+   MSG_DBG( "Destroyed: %s", name( ).c_str( ) );
 }
 
 void Component::boot( const std::string& command )
 {
-   DBG_MSG( "%s", command.c_str( ) );
+   MSG_DBG( "%s", command.c_str( ) );
 
    REGISTER_EVENT( hmi::event::App );
    // hmi::event::App::Event::create_send( { hmi::event::eID::boot },
@@ -62,26 +62,26 @@ void Component::boot( const std::string& command )
 
 void Component::process_timer( const base::Timer::ID id )
 {
-   DBG_MSG( "Timer '%s' expired", id.name( ).c_str( ) );
+   MSG_DBG( "Timer '%s' expired", id.name( ).c_str( ) );
    if( id == m_timer.id( ) )
    {
-      DBG_WRN( "Shutting down system" );
+      MSG_WRN( "Shutting down system" );
       shutdown( );
    }
 }
 
 void Component::on_timer( const base::Timer::ID id )
 {
-   DBG_MSG( "Timer expired: %s", id.name( ).c_str( ) );
+   MSG_DBG( "Timer expired: %s", id.name( ).c_str( ) );
 
-   DBG_WRN( "Preparing shutdown system" );
+   MSG_WRN( "Preparing shutdown system" );
    m_timer.start( 5000000000, 1 );
 }
 
 void Component::process_event( const hmi::event::App::Event& event )
 {
-   DBG_MSG( "%s", event.signature( )->name( ).c_str( ) );
+   MSG_DBG( "%s", event.signature( )->name( ).c_str( ) );
 
    const base::Timer::ID id = base::timer::start( 100000, 1, [ this ]( const base::Timer::ID id ){ on_timer( id ); } );
-   DBG_MSG( "started timer: %s", id.name( ).c_str( ) );
+   MSG_DBG( "started timer: %s", id.name( ).c_str( ) );
 }

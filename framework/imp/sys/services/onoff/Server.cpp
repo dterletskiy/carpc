@@ -20,17 +20,17 @@ Server::~Server( )
 
 void Server::connected( )
 {
-   SYS_TRC( );
+   SYS_VRB( );
 }
 
 void Server::disconnected( )
 {
-   SYS_TRC( );
+   SYS_VRB( );
 }
 
 void Server::response_trigger_state( const bool result )
 {
-   SYS_MSG( "result: %s", BOOL_TO_STRING( result ) );
+   SYS_DBG( "result: %s", BOOL_TO_STRING( result ) );
 
    response< data::ResponseTriggerStateData >( result );
 }

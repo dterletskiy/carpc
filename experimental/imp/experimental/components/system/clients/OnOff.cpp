@@ -25,16 +25,16 @@ std::shared_ptr< OnOff > OnOff::create( )
 
 void OnOff::connected( )
 {
-   DBG_MSG( );
+   MSG_DBG( );
    request_boot( "Booting" );
 }
 
 void OnOff::disconnected( )
 {
-   DBG_MSG( );
+   MSG_DBG( );
 }
 
 void OnOff::response_boot( const bool result )
 {
-   DBG_MSG( "result: %s", result ? "true" : "false" );
+   MSG_DBG( "result: %s", result ? "true" : "false" );
 }

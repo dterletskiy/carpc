@@ -13,33 +13,33 @@ using namespace core::components::onoff;
 Server::Server( )
    : base::onoff::Server( "OnOff_Core" )
 {
-   DBG_MSG( "created" );
+   MSG_DBG( "created" );
    current_state( "Unloaded" );
 }
 
 Server::~Server( )
 {
-   DBG_MSG( "destroyed" );
+   MSG_DBG( "destroyed" );
 }
 
 void Server::connected( )
 {
-   DBG_MSG( "connected" );
+   MSG_DBG( "connected" );
 }
 
 void Server::disconnected( )
 {
-   DBG_MSG( "disconnected" );
+   MSG_DBG( "disconnected" );
 }
 
 void Server::request_start( )
 {
-   DBG_MSG( );
+   MSG_DBG( );
 }
 
 void Server::request_trigger_state( const std::string& state, const size_t delay )
 {
-   DBG_MSG( "state: %s / delay: %zu", state.c_str( ), delay );
+   MSG_DBG( "state: %s / delay: %zu", state.c_str( ), delay );
 
    std::shared_ptr< base::Timer > timer = std::make_shared< base::Timer >( this );
    timer->start( delay, 1 );
@@ -49,7 +49,7 @@ void Server::request_trigger_state( const std::string& state, const size_t delay
 
 void Server::process_timer( const base::Timer::ID id )
 {
-   DBG_MSG( "timer '%s' expired", id.name( ).c_str( ) );
+   MSG_DBG( "timer '%s' expired", id.name( ).c_str( ) );
 
    auto iterator = std::find_if( m_timers.begin( ), m_timers.end( ), [ id ]( const TimerSeqID& element ){ return element.timer->id( ) == id; } );
    if( m_timers.end( ) == iterator )

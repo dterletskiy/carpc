@@ -32,33 +32,33 @@ using tSignalHandler = void(*)( int, siginfo_t*, void* );
 
 void signal_handler( int sig, siginfo_t* si, void* uc )
 {
-   DBG_TRC( "Signal %d", sig );
+   MSG_VRB( "Signal %d", sig );
    tID* timer_id = static_cast< tID* >( si->si_value.sival_ptr );
-   DBG_MSG( "Elapsed timer with ID: %#lx", (long) *timer_id );
+   MSG_DBG( "Elapsed timer with ID: %#lx", (long) *timer_id );
 
    // signal( sig, SIG_IGN );
 }
 
 void event_handler( union sigval sv )
 {
-   DBG_TRC( "Event" );
+   MSG_VRB( "Event" );
    tID* timer_id = static_cast< tID* >( sv.sival_ptr );
-   DBG_MSG( "Elapsed timer with ID: %#lx", (long) *timer_id );
+   MSG_DBG( "Elapsed timer with ID: %#lx", (long) *timer_id );
 }
 
 bool set_signal_handler( int signal, tSignalHandler callback )
 {
-   DBG_MSG( );
+   MSG_DBG( );
 
    /* Устанавливаем обработчик для сигнала таймера */
-   DBG_MSG( "Setup signal handler %d", signal );
+   MSG_DBG( "Setup signal handler %d", signal );
    struct sigaction sa;
    sa.sa_flags = SA_SIGINFO;
    sa.sa_sigaction = callback;
    sigemptyset( &sa.sa_mask );
    if( sigaction( signal, &sa, nullptr ) == -1 )
    {
-      DBG_ERR( "sigaction" );
+      MSG_ERR( "sigaction" );
       return false;
    }
    return true;
@@ -66,12 +66,12 @@ bool set_signal_handler( int signal, tSignalHandler callback )
 
 void thread_loop_1( )
 {
-   DBG_MSG( );
+   MSG_DBG( );
 
    tID timer_id;
    if( false == base::os::linux::timer::create( timer_id, SIGRTMIN ) )
       return;
-   DBG_MSG( "Timer ID: %#lx", (long) timer_id );
+   MSG_DBG( "Timer ID: %#lx", (long) timer_id );
    if( false == base::os::linux::timer::start( timer_id, 1000000000, eTimerType::continious ) )
       return;
 
@@ -82,12 +82,12 @@ void thread_loop_1( )
 
 void thread_loop_2( )
 {
-   DBG_MSG( );
+   MSG_DBG( );
 
    tID timer_id;
    if( false == base::os::linux::timer::create( timer_id, event_handler ) )
       return;
-   DBG_MSG( "Timer ID: %#lx", (long) timer_id );
+   MSG_DBG( "Timer ID: %#lx", (long) timer_id );
    if( false == base::os::linux::timer::start( timer_id, 1500000000, eTimerType::continious ) )
       return;
 
@@ -100,7 +100,7 @@ void thread_loop_2( )
 
 int main( int argc, char *argv[] )
 {
-   DBG_MSG( "argc = %d", argc );
+   MSG_DBG( "argc = %d", argc );
 
    set_signal_handler( SIGRTMIN, signal_handler );
 
@@ -109,12 +109,12 @@ int main( int argc, char *argv[] )
 
    sigset_t mask;
    /* Временно блокируем сигнал таймера */
-   // DBG_MSG( "Blocking signal %d", SIGRTMIN );
+   // MSG_DBG( "Blocking signal %d", SIGRTMIN );
    // sigemptyset( &mask );
    // sigaddset( &mask, SIGRTMIN );
    // if( sigprocmask( SIG_SETMASK, &mask, nullptr ) == -1 )
    // {
-   //    DBG_ERR( "sigprocmask" );
+   //    MSG_ERR( "sigprocmask" );
    //    exit( EXIT_FAILURE );
    // }
 
@@ -122,10 +122,10 @@ int main( int argc, char *argv[] )
    thread_2.run( );
 
    /* Разблокируем сигнал таймера, чтобы доставлялись уведомления таймера */
-   // DBG_MSG( "Unblocking signal %d", SIGRTMIN );
+   // MSG_DBG( "Unblocking signal %d", SIGRTMIN );
    // if( sigprocmask( SIG_UNBLOCK, &mask, nullptr ) == -1 )
    // {
-   //    DBG_ERR( "sigprocmask" );
+   //    MSG_ERR( "sigprocmask" );
    //    exit( EXIT_FAILURE );
    // }
 

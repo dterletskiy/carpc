@@ -37,7 +37,7 @@ extern "C" void* malloc( size_t size )
    void* address = __libc_malloc( size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   SYS_TRC( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
+   SYS_VRB( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 
@@ -53,7 +53,7 @@ extern "C" void* memalign( size_t alignment, size_t size )
    void* address = __libc_memalign( alignment, size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   SYS_TRC( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
+   SYS_VRB( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 
@@ -73,7 +73,7 @@ extern "C" void* realloc( void* address, size_t size )
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    s_memory_map.insert( new_address, __builtin_return_address(0), size );
 
-   SYS_TRC( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
+   SYS_VRB( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
    return static_cast< void* >( static_cast< char* >( new_address ) + hook::memory::s_header_size );
 }
 
@@ -91,7 +91,7 @@ extern "C" void* calloc( size_t number, size_t size )
    memset( address, 0, number * size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), number * size );
 
-   SYS_TRC( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
+   SYS_VRB( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 
@@ -104,7 +104,7 @@ extern "C" void free( void* address )
       return;
    }
 
-   SYS_TRC( "address = %p", address );
+   SYS_VRB( "address = %p", address );
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    __libc_free( static_cast< char* >( address ) - hook::memory::s_header_size );
 }
@@ -136,7 +136,7 @@ void* malloc( size_t size )
       }
    }
    void* address = __malloc( size ) ;
-   SYS_TRC( "address = %p / size = %zu", address, size );
+   SYS_VRB( "address = %p / size = %zu", address, size );
 
    return address;
 }
@@ -157,7 +157,7 @@ void* calloc( size_t number, size_t size )
       }
    }
    void* address = __calloc( number, size ) ;
-   SYS_TRC( "address = %p / size = %zu / number = %zu", address, size, number );
+   SYS_VRB( "address = %p / size = %zu / number = %zu", address, size, number );
 
    return address;
 }
@@ -177,7 +177,7 @@ void* realloc( void* address, size_t size )
       }
    }
    void* new_address = __realloc( address, size );
-   SYS_TRC( "new address = %p / address = %p / size = %zu", new_address, address, size );
+   SYS_VRB( "new address = %p / address = %p / size = %zu", new_address, address, size );
 
    return new_address;
 }
@@ -196,7 +196,7 @@ void free( void* address )
          return;
       }
    }
-   SYS_TRC( "address = %p", address );
+   SYS_VRB( "address = %p", address );
    __free( address );
 }
 
@@ -263,7 +263,7 @@ void* malloc( size_t size, const void* )
    __malloc_hook = glibc::malloc;
    void* address = ::malloc( size );
    __malloc_hook = memory::malloc;
-   SYS_TRC( "address = %p / size = %zu", address, size );
+   SYS_VRB( "address = %p / size = %zu", address, size );
 
    return address;
 }
@@ -273,7 +273,7 @@ void* memalign( size_t alignment, size_t size, const void* )
    __memalign_hook = glibc::memalign;
    void* address = ::memalign( alignment, size );
    __memalign_hook = memory::memalign;
-   SYS_TRC( "address = %p / size = %zu / alignment = %zu", address, size, alignment );
+   SYS_VRB( "address = %p / size = %zu / alignment = %zu", address, size, alignment );
 
    return address;
 }
@@ -283,14 +283,14 @@ void* realloc( void* address, size_t size, const void* )
    __realloc_hook = glibc::realloc;
    void* new_address = ::realloc( address, size );
    __realloc_hook = memory::realloc;
-   SYS_TRC( "address = %p / size = %zu / new address = %p", address, size, new_address );
+   SYS_VRB( "address = %p / size = %zu / new address = %p", address, size, new_address );
 
    return new_address;
 }
 
 void free( void* address, const void* )
 {
-   SYS_TRC( "address = %p", address );
+   SYS_VRB( "address = %p", address );
    __free_hook = glibc::free;
    ::free( address );
    __free_hook = memory::free;
@@ -301,7 +301,7 @@ void free( void* address, const void* )
 void* calloc( size_t number, size_t size )
 {
    void* address = ::malloc( number * size );
-   SYS_TRC( "address = %p / size = %zu / number = %zu", address, size, number );
+   SYS_VRB( "address = %p / size = %zu / number = %zu", address, size, number );
    return address;
 }
 

@@ -229,7 +229,7 @@ bool SendReceive::process_packet( dsi::Packet& packet, os::Socket::tSptr p_socke
 
 bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_socket_from )
 {
-   SYS_TRC( "Processing package '%s'", package.c_str( ) );
+   SYS_VRB( "Processing package '%s'", package.c_str( ) );
 
    switch( package.command( ) )
    {
@@ -248,7 +248,7 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
                SYS_ERR( "parce package error" );
                return false;
             }
-            SYS_TRC( "received event '%s' to context: %s", p_event->signature( )->name( ).c_str( ), to_context.name( ).c_str( ) );
+            SYS_VRB( "received event '%s' to context: %s", p_event->signature( )->name( ).c_str( ), to_context.name( ).c_str( ) );
             p_event->send( to_context );
          }
          break;

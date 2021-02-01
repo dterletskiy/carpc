@@ -13,8 +13,8 @@ using namespace base::async;
 AsyncPriorityQueue::AsyncPriorityQueue( const tPriority& max_priority, const std::string& name )
    : m_name( name )
 {
-   SYS_TRC( "'%s': created", m_name.c_str( ) );
-   SYS_TRC( "max priority: %u", max_priority.value( ) );
+   SYS_VRB( "'%s': created", m_name.c_str( ) );
+   SYS_VRB( "max priority: %u", max_priority.value( ) );
 
    for( tPriority index = tPriority::zero( ); index < max_priority; ++index )
       m_collections.push_back( { } );
@@ -22,12 +22,12 @@ AsyncPriorityQueue::AsyncPriorityQueue( const tPriority& max_priority, const std
 
 AsyncPriorityQueue::~AsyncPriorityQueue( )
 {
-   SYS_TRC( "'%s': destroyed", m_name.c_str( ) );
+   SYS_VRB( "'%s': destroyed", m_name.c_str( ) );
 }
 
 bool AsyncPriorityQueue::insert( const IAsync::tSptr p_async )
 {
-   SYS_TRC( "'%s': inserting async object (%s) with priority %u",
+   SYS_VRB( "'%s': inserting async object (%s) with priority %u",
          m_name.c_str( ),
          p_async->signature( )->name( ).c_str( ),
          p_async->priority( ).value( )
@@ -54,7 +54,7 @@ bool AsyncPriorityQueue::insert( const IAsync::tSptr p_async )
 
 IAsync::tSptr AsyncPriorityQueue::get( )
 {
-   SYS_TRC( "'%s':", m_name.c_str( ) );
+   SYS_VRB( "'%s':", m_name.c_str( ) );
    m_buffer_cond_var.lock( );
 
    // Check if there is any event with any priority starting from max priority to min.
@@ -73,7 +73,7 @@ IAsync::tSptr AsyncPriorityQueue::get( )
    // in this case 'priority_to_process == std::nullopt'
    if( std::nullopt == priority_to_process )
    {
-      SYS_TRC( "'%s': waiting for async object...", m_name.c_str( ) );
+      SYS_VRB( "'%s': waiting for async object...", m_name.c_str( ) );
       m_buffer_cond_var.wait( );
    }
 
@@ -93,7 +93,7 @@ IAsync::tSptr AsyncPriorityQueue::get( )
    auto& collection = m_collections[ priority_to_process.value( ) ];
    IAsync::tSptr p_async = collection.front( );
    collection.pop_front( );
-   SYS_TRC( "'%s': received async object (%s) with priority: %u",
+   SYS_VRB( "'%s': received async object (%s) with priority: %u",
          m_name.c_str( ),
          p_async->signature( )->name( ).c_str( ),
          p_async->priority( ).value( )

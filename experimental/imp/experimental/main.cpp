@@ -64,14 +64,14 @@ const bool run( int argc, char** argv );
    void __constructor__( ) __attribute__(( constructor(102) ));
    void __destructor__( ) __attribute__(( destructor(102) ));
 
-   void __constructor__( ) { DBG_INF( "library loaded" ); }
-   void __destructor__( ) { DBG_INF( "library unloaded" ); }
+   void __constructor__( ) { MSG_INF( "library loaded" ); }
+   void __destructor__( ) { MSG_INF( "library unloaded" ); }
 
    extern "C" JNIEXPORT jstring JNICALL
    Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
    {
       base::trace::Logger::init( base::trace::eLogStrategy::ANDROID_T, "EXP" );
-      DBG_TRC( "JNI" );
+      MSG_VRB( "JNI" );
       boot_thread.run( );
 
       return env->NewStringUTF( "@TDA: Hello from C++" );
@@ -108,12 +108,12 @@ const bool run( int argc, char** argv );
 void thread_loop( const std::size_t index )
 {
    while( true )
-      DBG_MSG( "%zu -> 0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", index );
+      MSG_DBG( "%zu -> 0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", index );
 }
 
 const bool run( int argc, char** argv )
 {
-   DBG_MSG( "argc = %d", argc );
+   MSG_DBG( "argc = %d", argc );
 
    // std::vector< base::os::Thread* > threads;
    // for( std::size_t index = 0; index < 100; ++index )

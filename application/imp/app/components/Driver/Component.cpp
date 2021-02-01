@@ -18,7 +18,7 @@ base::component::IComponent::tSptr Component::creator( base::application::IThrea
 Component::Component( base::application::IThread& _service, const std::string& _name )
    : base::component::Component( _service, _name )
 {
-   DBG_MSG( "Created: %s", name( ).c_str( ) );
+   MSG_DBG( "Created: %s", name( ).c_str( ) );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::BOOT );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::SHUTDOWN );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::PING );
@@ -26,13 +26,13 @@ Component::Component( base::application::IThread& _service, const std::string& _
 
 Component::~Component( )
 {
-   DBG_MSG( "Destroyed: %s", name( ).c_str( ) );
+   MSG_DBG( "Destroyed: %s", name( ).c_str( ) );
    events::AppEvent::Event::clear_all_notifications( this );
 }
 
 void Component::process_event( const events::AppEvent::Event& event )
 {
-   DBG_MSG( "message = %s", event.data( )->message.c_str( ) );
+   MSG_DBG( "message = %s", event.data( )->message.c_str( ) );
 
    switch( event.info( ).id( ) )
    {

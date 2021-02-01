@@ -80,7 +80,7 @@ struct CulrMemory
 {
    void print( const char* message = "" ) const
    {
-      DBG_MSG( "%s", message );
+      MSG_DBG( "%s", message );
       if( nullptr == response )
          return;
       printf( "%s\n", response );
@@ -93,8 +93,8 @@ struct CulrMemory
 size_t write_callback( void* data, size_t size, size_t nmemb, void* userp )
 {
    struct CulrMemory* mem = (struct CulrMemory*)userp;
-   // DBG_MSG( "data: %p / size: %zu / nmemb: %zu / userp: %p", data, size, nmemb, userp );
-   // DBG_MSG( "mem->response: %p / mem->size: %zu", mem->response, mem->size );
+   // MSG_DBG( "data: %p / size: %zu / nmemb: %zu / userp: %p", data, size, nmemb, userp );
+   // MSG_DBG( "mem->response: %p / mem->size: %zu", mem->response, mem->size );
  
    size_t realsize = size * nmemb;
    char* ptr = (char*)realloc( (void*)(mem->response), mem->size + realsize + 1 );

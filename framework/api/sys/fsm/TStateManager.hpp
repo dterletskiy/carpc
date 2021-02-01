@@ -163,7 +163,7 @@ namespace base::fsm {
          return false;
       }
 
-      SYS_TRC( "%s: state '%s' registered", m_name.c_str( ), p_state->name( ).c_str( ) );
+      SYS_VRB( "%s: state '%s' registered", m_name.c_str( ), p_state->name( ).c_str( ) );
 
       return true;
    }
@@ -189,13 +189,13 @@ namespace base::fsm {
          return false;
       }
 
-      SYS_TRC( "%s: started", m_name.c_str( ) );
+      SYS_VRB( "%s: started", m_name.c_str( ) );
 
       tBase::Signal::Event::set_notification( this, { m_id } );
       for( const auto pair : m_states )
          tState::State::Event::set_notification( this, { pair.first } );
 
-      SYS_TRC( "%s: running", m_name.c_str( ) );
+      SYS_VRB( "%s: running", m_name.c_str( ) );
       m_status = eStatus::RUNNING;
 
       set_state( state_uid_opt.value_or( m_states.begin( )->first ) );
@@ -215,7 +215,7 @@ namespace base::fsm {
       tBase::Signal::Event::clear_all_notifications( this );
       tState::State::Event::clear_all_notifications( this );
 
-      SYS_TRC( "%s: stopped", m_name.c_str( ) );
+      SYS_VRB( "%s: stopped", m_name.c_str( ) );
       m_status = eStatus::STOPPED;
       return true;
    }
@@ -229,7 +229,7 @@ namespace base::fsm {
          return false;
       }
 
-      SYS_TRC( "%s: paused", m_name.c_str( ) );
+      SYS_VRB( "%s: paused", m_name.c_str( ) );
       m_status = eStatus::PAUSED;
       return true;
    }
@@ -243,7 +243,7 @@ namespace base::fsm {
          return false;
       }
 
-      SYS_TRC( "%s: running", m_name.c_str( ) );
+      SYS_VRB( "%s: running", m_name.c_str( ) );
       m_status = eStatus::RUNNING;
       return true;
    }

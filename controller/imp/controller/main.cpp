@@ -43,8 +43,8 @@ namespace memory {
 void boot( int argc, char** argv )
 {
    memory::dump( );
-   DBG_MSG( "argc = %d", argc );
-   DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
+   MSG_DBG( "argc = %d", argc );
+   MSG_DBG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
    DUMP_IPC_EVENTS;
 
@@ -56,15 +56,15 @@ void boot( int argc, char** argv )
    base::application::Process::tSptr p_process = base::application::Process::instance( argc, argv );
    if( p_process->start( services ) )
    {
-      DBG_MSG( "Booting..." );
+      MSG_DBG( "Booting..." );
       p_process->boot( );
    }
 
-   DBG_TRC( "Main: program exiting." );
-   DBG_INF( "Main: program exiting." );
-   DBG_MSG( "Main: program exiting." );
-   DBG_WRN( "Main: program exiting." );
-   DBG_ERR( "Main: program exiting." );
+   MSG_VRB( "Main: program exiting." );
+   MSG_INF( "Main: program exiting." );
+   MSG_DBG( "Main: program exiting." );
+   MSG_WRN( "Main: program exiting." );
+   MSG_ERR( "Main: program exiting." );
 
    memory::dump( );
 }
@@ -95,14 +95,14 @@ bool test( int argc, char* argv[ ] );
    void __constructor__( ) __attribute__(( constructor(102) ));
    void __destructor__( ) __attribute__(( destructor(102) ));
 
-   void __constructor__( ) { DBG_INF( "library loaded" ); }
-   void __destructor__( ) { DBG_INF( "library unloaded" ); }
+   void __constructor__( ) { MSG_INF( "library loaded" ); }
+   void __destructor__( ) { MSG_INF( "library unloaded" ); }
 
    extern "C" JNIEXPORT jstring JNICALL
    Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
    {
       base::trace::Logger::init( base::trace::eLogStrategy::ANDROID_T, "CTRL" );
-      DBG_TRC( "JNI" );
+      MSG_VRB( "JNI" );
       boot_thread.run( );
 
       return env->NewStringUTF( "@TDA: Hello from C++" );

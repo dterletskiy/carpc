@@ -1,14 +1,10 @@
 #pragma once
 
-#include <unistd.h>
-#include <iostream>
-
-#include "api/sys/oswrappers/linux/time.hpp"
-#include "api/sys/trace/Base.hpp"
+#include "api/sys/trace/Types.hpp"
 
 
 
-namespace base::trace {
+namespace base::trace::linux {
 
    template< typename... Args >
    void write( const char* _format, Args... _args )
@@ -21,7 +17,7 @@ namespace base::trace {
    extern thread_local tm* time_tm;
    extern thread_local std::size_t milliseconds;
 
-} // namespace base::trace
+} // namespace base::trace::linux
 
 
 
@@ -31,7 +27,7 @@ namespace base::trace {
 
 #define WRITE_CODE( USER_FORMAT, ... ) \
    { \
-      ::base::trace::write( \
+      base::trace::linux::write( \
            PREFIX_FORMAT_CODE USER_FORMAT NEW_LINE \
          , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
       ); \
@@ -39,7 +35,7 @@ namespace base::trace {
 
 #define WRITE_MICROSECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
    { \
-      ::base::trace::write( \
+      base::trace::linux::write( \
            PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
          , ::base::os::linux::microseconds( ) \
          , getpid( ), pthread_self( ) \
@@ -49,11 +45,11 @@ namespace base::trace {
 
 #define WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE( USER_FORMAT, ... ) \
    { \
-      ::base::os::linux::local_time_of_date( ::base::trace::time_tm, ::base::trace::milliseconds ); \
-      ::base::trace::write( \
+      ::base::os::linux::local_time_of_date( base::trace::linux::time_tm, base::trace::linux::milliseconds ); \
+      base::trace::linux::write( \
            PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE USER_FORMAT NEW_LINE \
-         , ::base::trace::time_tm->tm_year + 1900, ::base::trace::time_tm->tm_mon + 1, ::base::trace::time_tm->tm_mday \
-         , ::base::trace::time_tm->tm_hour, ::base::trace::time_tm->tm_min, ::base::trace::time_tm->tm_sec, ::base::trace::milliseconds \
+         , base::trace::linux::time_tm->tm_year + 1900, base::trace::linux::time_tm->tm_mon + 1, base::trace::linux::time_tm->tm_mday \
+         , base::trace::linux::time_tm->tm_hour, base::trace::linux::time_tm->tm_min, base::trace::linux::time_tm->tm_sec, base::trace::linux::milliseconds \
          , getpid( ), pthread_self( ) \
          , CLASS_ABBR, __FUNCTION__, __LINE__, ##__VA_ARGS__ \
       ); \

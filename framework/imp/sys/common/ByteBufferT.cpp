@@ -38,7 +38,7 @@ bool ByteBufferT::Transaction::start( const eType _type )
    }
 
    ++m_recursive_count;
-   // SYS_TRC( "m_size = %zu / m_recursive_count = %zu", m_size, m_recursive_count );
+   // SYS_VRB( "m_size = %zu / m_recursive_count = %zu", m_size, m_recursive_count );
    return true;
 }
 
@@ -47,7 +47,7 @@ bool ByteBufferT::Transaction::finish( )
    --m_recursive_count;
    if( 0 == m_recursive_count )
    {
-      // SYS_TRC( "Transaction finished" );
+      // SYS_VRB( "Transaction finished" );
       m_type = eType::undefined;
       m_size_backup = 0;
    }

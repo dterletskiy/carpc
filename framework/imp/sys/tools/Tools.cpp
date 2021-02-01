@@ -61,10 +61,10 @@ namespace base::tools::cmd {
 
    void print( )
    {
-      DBG_INF( "Command line parameters:" );
+      MSG_INF( "Command line parameters:" );
       for( auto pair : s_cmd_line_map )
       {
-         DBG_TRC( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
+         MSG_VRB( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
       }
    }
 
@@ -91,7 +91,7 @@ namespace base::tools::cfg {
 
       if( false == file_stream.is_open( ) )
       {
-         DBG_WRN( "configuration file '%s' can't be found", s_file.c_str( ) );
+         MSG_WRN( "configuration file '%s' can't be found", s_file.c_str( ) );
          return;
       }
 
@@ -129,10 +129,10 @@ namespace base::tools::cfg {
 
    void print( )
    {
-      DBG_INF( "Configuration file parameters (%s):", s_file.c_str( ) );
+      MSG_INF( "Configuration file parameters (%s):", s_file.c_str( ) );
       for( auto pair : s_cfg_line_map )
       {
-         DBG_TRC( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
+         MSG_VRB( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
       }
    }
 

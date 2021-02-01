@@ -1,9 +1,5 @@
 #pragma once
 
-
-
-#include "api/sys/trace/AndroidTrace.hpp"
-#include "api/sys/trace/WriteTrace.hpp"
 #include "api/sys/trace/Logger.hpp"
 
 
@@ -18,43 +14,51 @@
       #define SYS_TYPE( ... )
    #endif
 
-   #ifdef DBG_TRACE
-      #define DBG_TYPE TRACE_LOG
+   #ifdef MSG_TRACE
+      #define MSG_TYPE TRACE_LOG
    #else
-      #define DBG_TYPE( ... )
+      #define MSG_TYPE( ... )
    #endif
 
-   #define SYS_TRC( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
-   #define SYS_MSG( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
+   #define SYS_VRB( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
+   #define SYS_DBG( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
    #define SYS_INF( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::INFO,      USER_FORMAT, ##__VA_ARGS__ )
    #define SYS_WRN( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::WARNING,   USER_FORMAT, ##__VA_ARGS__ )
    #define SYS_ERR( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::ERROR,     USER_FORMAT, ##__VA_ARGS__ )
    #define SYS_FTL( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::FATAL,     USER_FORMAT, ##__VA_ARGS__ )
 
-   #define DBG_TRC( USER_FORMAT, ... )          DBG_TYPE( base::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
-   #define DBG_MSG( USER_FORMAT, ... )          DBG_TYPE( base::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
-   #define DBG_INF( USER_FORMAT, ... )          DBG_TYPE( base::trace::eLogLevel::INFO,      USER_FORMAT, ##__VA_ARGS__ )
-   #define DBG_WRN( USER_FORMAT, ... )          DBG_TYPE( base::trace::eLogLevel::WARNING,   USER_FORMAT, ##__VA_ARGS__ )
-   #define DBG_ERR( USER_FORMAT, ... )          DBG_TYPE( base::trace::eLogLevel::ERROR,     USER_FORMAT, ##__VA_ARGS__ )
-   #define DBG_FTL( USER_FORMAT, ... )          DBG_TYPE( base::trace::eLogLevel::FATAL,     USER_FORMAT, ##__VA_ARGS__ )
+   #define MSG_VRB( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
+   #define MSG_DBG( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
+   #define MSG_INF( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::INFO,      USER_FORMAT, ##__VA_ARGS__ )
+   #define MSG_WRN( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::WARNING,   USER_FORMAT, ##__VA_ARGS__ )
+   #define MSG_ERR( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::ERROR,     USER_FORMAT, ##__VA_ARGS__ )
+   #define MSG_FTL( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::FATAL,     USER_FORMAT, ##__VA_ARGS__ )
 
 #else
 
    #if OS == OS_ANDROID
 
-      #define SYS_TRC( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_INF( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_INFO,      USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_MSG( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_WRN( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_WARN,      USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_ERR( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_ERROR,     USER_FORMAT, ##__VA_ARGS__ )
+      #include "api/sys/trace/TraceAndroid.hpp"
 
-      #define DBG_TRC( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_INF( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_INFO,      USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_MSG( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_WRN( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_WARN,      USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_ERR( USER_FORMAT, ... )          DBG_ANDROID( ANDROID_LOG_ERROR,     USER_FORMAT, ##__VA_ARGS__ )
+
+
+      #define SYS_VRB( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_INF( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_INFO,      USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_DBG( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_WRN( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_WARN,      USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_ERR( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_ERROR,     USER_FORMAT, ##__VA_ARGS__ )
+
+      #define MSG_VRB( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_INF( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_INFO,      USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_DBG( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_WRN( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_WARN,      USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_ERR( USER_FORMAT, ... )          TRACE_ANDROID( ANDROID_LOG_ERROR,     USER_FORMAT, ##__VA_ARGS__ )
 
    #elif OS == OS_LINUX
+
+      #include "api/sys/trace/TraceLinux.hpp"
+
+
 
       #ifdef SYS_TRACE
          #define SYS_TYPE WRITE_MICROSECONDS_PID_TID_CODE
@@ -62,25 +66,25 @@
          #define SYS_TYPE( ... )
       #endif
 
-      #ifdef DBG_TRACE
-         #define DBG_TYPE WRITE_MICROSECONDS_PID_TID_CODE
+      #ifdef MSG_TRACE
+         #define MSG_TYPE WRITE_MICROSECONDS_PID_TID_CODE
       #else
-         #define DBG_TYPE( ... )
+         #define MSG_TYPE( ... )
       #endif
 
       #define SYS_BG BG_BLACK CURSIVE
-      #define SYS_TRC( USER_FORMAT, ... )          SYS_TYPE( FG_WHITE         SYS_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_VRB( USER_FORMAT, ... )          SYS_TYPE( FG_WHITE         SYS_BG     USER_FORMAT, ##__VA_ARGS__ )
       #define SYS_INF( USER_FORMAT, ... )          SYS_TYPE( FG_LIGHT_CYAN    SYS_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_MSG( USER_FORMAT, ... )          SYS_TYPE( FG_LIGHT_GREEN   SYS_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_DBG( USER_FORMAT, ... )          SYS_TYPE( FG_LIGHT_GREEN   SYS_BG     USER_FORMAT, ##__VA_ARGS__ )
       #define SYS_WRN( USER_FORMAT, ... )          SYS_TYPE( FG_LIGHT_BLUE    SYS_BG     USER_FORMAT, ##__VA_ARGS__ )
       #define SYS_ERR( USER_FORMAT, ... )          SYS_TYPE( FG_LIGHT_RED     SYS_BG     USER_FORMAT, ##__VA_ARGS__ )
 
-      #define DBG_BG BG_BLACK
-      #define DBG_TRC( USER_FORMAT, ... )          DBG_TYPE( FG_WHITE         DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_INF( USER_FORMAT, ... )          DBG_TYPE( FG_LIGHT_CYAN    DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_MSG( USER_FORMAT, ... )          DBG_TYPE( FG_LIGHT_GREEN   DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_WRN( USER_FORMAT, ... )          DBG_TYPE( FG_LIGHT_BLUE    DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_ERR( USER_FORMAT, ... )          DBG_TYPE( FG_LIGHT_RED     DBG_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_BG BG_BLACK
+      #define MSG_VRB( USER_FORMAT, ... )          MSG_TYPE( FG_WHITE         MSG_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_INF( USER_FORMAT, ... )          MSG_TYPE( FG_LIGHT_CYAN    MSG_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_DBG( USER_FORMAT, ... )          MSG_TYPE( FG_LIGHT_GREEN   MSG_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_WRN( USER_FORMAT, ... )          MSG_TYPE( FG_LIGHT_BLUE    MSG_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_ERR( USER_FORMAT, ... )          MSG_TYPE( FG_LIGHT_RED     MSG_BG     USER_FORMAT, ##__VA_ARGS__ )
 
 
 
@@ -90,25 +94,27 @@
          #define SYS_SIMPLE_TYPE( ... )
       #endif
 
-      #ifdef DBG_TRACE
-         #define DBG_SIMPLE_TYPE WRITE_CODE
+      #ifdef MSG_TRACE
+         #define MSG_SIMPLE_TYPE WRITE_CODE
       #else
-         #define DBG_SIMPLE_TYPE( ... )
+         #define MSG_SIMPLE_TYPE( ... )
       #endif
 
       #define SYS_SIMPLE_BG BG_BLACK
-      #define SYS_SIMPLE_TRC( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_WHITE         SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_SIMPLE_INF( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_CYAN    SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_SIMPLE_MSG( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_GREEN   SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_SIMPLE_WRN( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_BLUE    SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_SIMPLE_ERR( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_RED     SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_VRB_SIMPLE( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_WHITE         SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_INF_SIMPLE( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_CYAN    SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_DBG_SIMPLE( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_GREEN   SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_WRN_SIMPLE( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_BLUE    SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_ERR_SIMPLE( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_LIGHT_RED     SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_FTL_SIMPLE( USER_FORMAT, ... )   SYS_SIMPLE_TYPE( FG_RED           SYS_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
 
-      #define DBG_SIMPLE_BG BG_BLACK
-      #define DBG_SIMPLE_TRC( USER_FORMAT, ... )   DBG_SIMPLE_TYPE( FG_WHITE         DBG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_SIMPLE_INF( USER_FORMAT, ... )   DBG_SIMPLE_TYPE( FG_LIGHT_CYAN    DBG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_SIMPLE_MSG( USER_FORMAT, ... )   DBG_SIMPLE_TYPE( FG_LIGHT_GREEN   DBG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_SIMPLE_WRN( USER_FORMAT, ... )   DBG_SIMPLE_TYPE( FG_LIGHT_BLUE    DBG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_SIMPLE_ERR( USER_FORMAT, ... )   DBG_SIMPLE_TYPE( FG_LIGHT_RED     DBG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_SIMPLE_BG BG_BLACK
+      #define MSG_VRB_SIMPLE( USER_FORMAT, ... )   MSG_SIMPLE_TYPE( FG_WHITE         MSG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_INF_SIMPLE( USER_FORMAT, ... )   MSG_SIMPLE_TYPE( FG_LIGHT_CYAN    MSG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_DBG_SIMPLE( USER_FORMAT, ... )   MSG_SIMPLE_TYPE( FG_LIGHT_GREEN   MSG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_WRN_SIMPLE( USER_FORMAT, ... )   MSG_SIMPLE_TYPE( FG_LIGHT_BLUE    MSG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_ERR_SIMPLE( USER_FORMAT, ... )   MSG_SIMPLE_TYPE( FG_LIGHT_RED     MSG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_FTL_SIMPLE( USER_FORMAT, ... )   MSG_SIMPLE_TYPE( FG_RED           MSG_SIMPLE_BG     USER_FORMAT, ##__VA_ARGS__ )
 
 
 
@@ -118,25 +124,27 @@
          #define SYS_EXT_TYPE( ... )
       #endif
 
-      #ifdef DBG_TRACE
-         #define DBG_EXT_TYPE WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE
+      #ifdef MSG_TRACE
+         #define MSG_EXT_TYPE WRITE_DATE_TIME_MILLISECONDS_PID_TID_CODE
       #else
-         #define DBG_EXT_TYPE( ... )
+         #define MSG_EXT_TYPE( ... )
       #endif
 
       #define SYS_EXT_BG BG_BLACK
-      #define SYS_EXT_TRC( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_WHITE         SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_EXT_INF( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_CYAN    SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_EXT_MSG( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_GREEN   SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_EXT_WRN( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_BLUE    SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define SYS_EXT_ERR( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_RED     SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_VRB_EXT( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_WHITE         SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_INF_EXT( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_CYAN    SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_DBG_EXT( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_GREEN   SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_WRN_EXT( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_BLUE    SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_ERR_EXT( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_LIGHT_RED     SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define SYS_FTL_EXT( USER_FORMAT, ... )      SYS_EXT_TYPE( FG_RED           SYS_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
 
-      #define DBG_EXT_BG BG_BLACK
-      #define DBG_EXT_TRC( USER_FORMAT, ... )      DBG_EXT_TYPE( FG_WHITE         DBG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_EXT_INF( USER_FORMAT, ... )      DBG_EXT_TYPE( FG_LIGHT_CYAN    DBG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_EXT_MSG( USER_FORMAT, ... )      DBG_EXT_TYPE( FG_LIGHT_GREEN   DBG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_EXT_WRN( USER_FORMAT, ... )      DBG_EXT_TYPE( FG_LIGHT_BLUE    DBG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
-      #define DBG_EXT_ERR( USER_FORMAT, ... )      DBG_EXT_TYPE( FG_LIGHT_RED     DBG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_EXT_BG BG_BLACK
+      #define MSG_VRB_EXT( USER_FORMAT, ... )      MSG_EXT_TYPE( FG_WHITE         MSG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_INF_EXT( USER_FORMAT, ... )      MSG_EXT_TYPE( FG_LIGHT_CYAN    MSG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_DBG_EXT( USER_FORMAT, ... )      MSG_EXT_TYPE( FG_LIGHT_GREEN   MSG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_WRN_EXT( USER_FORMAT, ... )      MSG_EXT_TYPE( FG_LIGHT_BLUE    MSG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_ERR_EXT( USER_FORMAT, ... )      MSG_EXT_TYPE( FG_LIGHT_RED     MSG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
+      #define MSG_FTL_EXT( USER_FORMAT, ... )      MSG_EXT_TYPE( FG_RED           MSG_EXT_BG     USER_FORMAT, ##__VA_ARGS__ )
 
    #endif
 
@@ -151,9 +159,9 @@
 #define SYS_MARKER( VALUE )      SYS_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
 #define SYS_DUMP_START( VALUE )  SYS_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )
 #define SYS_DUMP_END( VALUE )    SYS_WRN( MARKER_LINE "  END DUMP:  %s " MARKER_LINE, #VALUE )
-#define SYS_MSG_SIZEOF( TYPE )   SYS_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
+#define SYS_SIZEOF( TYPE )       SYS_DBG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
 
-#define DBG_MARKER( VALUE )      DBG_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
-#define DBG_DUMP_START( VALUE )  DBG_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )
-#define DBG_DUMP_END( VALUE )    DBG_WRN( MARKER_LINE "  END DUMP:  %s " MARKER_LINE, #VALUE )
-#define DBG_MSG_SIZEOF( TYPE )   DBG_MSG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
+#define MSG_MARKER( VALUE )      MSG_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
+#define MSG_DUMP_START( VALUE )  MSG_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )
+#define MSG_DUMP_END( VALUE )    MSG_WRN( MARKER_LINE "  END DUMP:  %s " MARKER_LINE, #VALUE )
+#define MSG_SIZEOF( TYPE )       MSG_DBG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );

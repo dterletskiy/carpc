@@ -32,12 +32,12 @@ ByteStream::~ByteStream( )
  ****************************************/
 bool ByteStream::push( const void* const buffer, const size_t size )
 {
-   // SYS_TRC( "--------------- PUSH BEGIN ---------------" );
-   // SYS_TRC( "buffer: %p / size: %zu", buffer, size );
+   // SYS_VRB( "--------------- PUSH BEGIN ---------------" );
+   // SYS_VRB( "buffer: %p / size: %zu", buffer, size );
    // for( size_t i = 0; i < size; ++i )
    //    printf( "%#x ", static_cast< const uint8_t* const >( buffer )[i] );
    // printf( "\n" );
-   // SYS_TRC( "---------------- PUSH END ----------------" );
+   // SYS_VRB( "---------------- PUSH END ----------------" );
 
    return CircularBuffer::ePush::Error != m_buffer.push_back( buffer, size );
 }
@@ -103,9 +103,9 @@ bool ByteStream::push( const std::string& string )
  ****************************************/
 bool ByteStream::pop( void* const buffer, const size_t size )
 {
-   // SYS_TRC( "--------------- PUSH BEGIN ---------------" );
-   // SYS_TRC( "buffer: %p / size: %zu", buffer, size );
-   // SYS_TRC( "---------------- PUSH END ----------------" );
+   // SYS_VRB( "--------------- PUSH BEGIN ---------------" );
+   // SYS_VRB( "buffer: %p / size: %zu", buffer, size );
+   // SYS_VRB( "---------------- PUSH END ----------------" );
 
    if( false == m_buffer.front( buffer, size ) )
       return false;

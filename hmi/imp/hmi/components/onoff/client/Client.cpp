@@ -15,18 +15,18 @@ using namespace hmi::components::onoff;
 Client::Client( )
    : base::onoff::Client( "OnOff_Controller" )
 {
-   DBG_TRC( "created" );
+   MSG_VRB( "created" );
 }
 
 Client::~Client( )
 {
-   DBG_TRC( "destroyed" );
+   MSG_VRB( "destroyed" );
    unsubscribe_current_state( );
 }
 
 void Client::connected( )
 {
-   DBG_MSG( "connected" );
+   MSG_DBG( "connected" );
    // subscribe_current_state( );
    // request_trigger_state( "BASIC OPERABLE", 10000000000 );
 
@@ -34,7 +34,7 @@ void Client::connected( )
       10000, 1,
       [ this ]( const base::Timer::ID id )
       {
-         DBG_MSG( "Timer expired" );
+         MSG_DBG( "Timer expired" );
          subscribe_current_state( );
          request_trigger_state( "BASIC OPERABLE", 10000000000 );
       }
@@ -43,34 +43,34 @@ void Client::connected( )
 
 void Client::disconnected( )
 {
-   DBG_MSG( "disconnected" );
+   MSG_DBG( "disconnected" );
    unsubscribe_current_state( );
 }
 
 void Client::request_start( )
 {
-   DBG_MSG( );
+   MSG_DBG( );
    base::onoff::Client::request_start( );
 }
 
 
 void Client::response_trigger_state( const bool result )
 {
-   DBG_MSG( "result: %s", BOOL_TO_STRING( result ) );
+   MSG_DBG( "result: %s", BOOL_TO_STRING( result ) );
 }
 
 void Client::request_trigger_state( const std::string& state, const size_t delay )
 {
-   DBG_MSG( "state: %s / delay: %zu", state.c_str( ), delay );
+   MSG_DBG( "state: %s / delay: %zu", state.c_str( ), delay );
    base::onoff::Client::request_trigger_state( state, delay );
 }
 
 void Client::request_trigger_state_failed( )
 {
-   DBG_ERR( "request failed" );
+   MSG_ERR( "request failed" );
 }
 
 void Client::on_current_state( const std::string& state )
 {
-   DBG_MSG( "current state changed to '%s'", state.c_str( ) );
+   MSG_DBG( "current state changed to '%s'", state.c_str( ) );
 }

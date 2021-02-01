@@ -73,7 +73,7 @@ void Registry::check_out( std::shared_ptr< IProxy > p_proxy )
 
 void Registry::register_stub( std::shared_ptr< IStub > p_stub )
 {
-   DBG_MSG( "%s", p_stub->info( ).to_string( ).c_str( ) );
+   MSG_DBG( "%s", p_stub->info( ).to_string( ).c_str( ) );
 
    auto result_pair = m_registry.insert( std::make_pair( p_stub->info( ), Connection{ } ) );
    auto iterator_registry = result_pair.first;
@@ -83,11 +83,11 @@ void Registry::register_stub( std::shared_ptr< IStub > p_stub )
    {
       if( iterator_registry->second.stub.lock( ) == p_stub )
       {
-         DBG_WRN( "current stub for current service already registered" );
+         MSG_WRN( "current stub for current service already registered" );
       }
       else
       {
-         DBG_WRN( "stub for current service already registered" );
+         MSG_WRN( "stub for current service already registered" );
       }
       return;
    }
@@ -101,18 +101,18 @@ void Registry::register_stub( std::shared_ptr< IStub > p_stub )
 
 void Registry::unregister_stub( std::shared_ptr< IStub > p_stub )
 {
-   DBG_MSG( "%s", p_stub->info( ).to_string( ).c_str( ) );
+   MSG_DBG( "%s", p_stub->info( ).to_string( ).c_str( ) );
 
    auto iterator_registry = m_registry.find( p_stub->info( ) );
    if( m_registry.end( ) == iterator_registry )
    {
-      DBG_WRN( "current service was not registered" );
+      MSG_WRN( "current service was not registered" );
       return;
    }
 
    if( iterator_registry->second.stub.expired( ) )
    {
-      DBG_WRN( "stub was not registered for current service" );
+      MSG_WRN( "stub was not registered for current service" );
       return;
    }
 
@@ -125,7 +125,7 @@ void Registry::unregister_stub( std::shared_ptr< IStub > p_stub )
 
 void Registry::register_proxy( std::shared_ptr< IProxy > p_proxy )
 {
-   DBG_MSG( "%s", p_proxy->info( ).to_string( ).c_str( ) );
+   MSG_DBG( "%s", p_proxy->info( ).to_string( ).c_str( ) );
 
    auto result_pair = m_registry.insert( std::make_pair( p_proxy->info( ), Connection{ } ) );
    auto iterator_registry = result_pair.first;
@@ -139,19 +139,19 @@ void Registry::register_proxy( std::shared_ptr< IProxy > p_proxy )
 
 void Registry::unregister_proxy( std::shared_ptr< IProxy > p_proxy )
 {
-   DBG_MSG( "%s", p_proxy->info( ).to_string( ).c_str( ) );
+   MSG_DBG( "%s", p_proxy->info( ).to_string( ).c_str( ) );
 
    auto iterator_registry = m_registry.find( p_proxy->info( ) );
    if( m_registry.end( ) == iterator_registry )
    {
-      DBG_WRN( "current service was not registered" );
+      MSG_WRN( "current service was not registered" );
       return;
    }
 
    const std::size_t result = iterator_registry->second.proxies.erase( p_proxy );
    if( 0 == result )
    {
-      DBG_WRN( "proxy was not registered for current service" );
+      MSG_WRN( "proxy was not registered for current service" );
       return;
    }
 

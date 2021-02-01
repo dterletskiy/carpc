@@ -20,35 +20,35 @@ Client::~Client( )
 
 void Client::connected( )
 {
-   SYS_MSG( );
+   SYS_DBG( );
 }
 
 void Client::disconnected( )
 {
-   SYS_MSG( );
+   SYS_DBG( );
 }
 
 void Client::request_start( )
 {
-   SYS_TRC( );
+   SYS_VRB( );
    request< data::RequestStartData >( this );
 }
 
 const base::service::tSequenceID Client::request_trigger_state( const std::string& state, const std::size_t delay )
 {
-   SYS_TRC( "state: %s / delay: %zu", state.c_str( ), delay );
+   SYS_VRB( "state: %s / delay: %zu", state.c_str( ), delay );
    return request< data::RequestTriggerStateData >( this, state, delay );
 }
 
 void Client::subscribe_current_state( )
 {
-   SYS_TRC( );
+   SYS_VRB( );
    subscribe< data::NotificationCurrentStateData >( this );
 }
 
 void Client::unsubscribe_current_state( )
 {
-   SYS_TRC( );
+   SYS_VRB( );
    unsubscribe< data::NotificationCurrentStateData >( this );
 }
 

@@ -301,7 +301,7 @@ namespace base::service::secure::__private {
 
       if( nullptr != event_id_iterator->second.mp_event_data )
       {
-         SYS_TRC( "having cached attribute event" );
+         SYS_VRB( "having cached attribute event" );
 
          auto p_event = TYPES::tEvent::create(
                typename TYPES::tEventUserSignature(
@@ -451,7 +451,7 @@ namespace base::service::secure::__private {
    {
       if( nullptr != sp_proxy )
       {
-         SYS_TRC( "return existing proxy: %p", sp_proxy );
+         SYS_VRB( "return existing proxy: %p", sp_proxy );
          return sp_proxy;
       }
 
@@ -467,7 +467,7 @@ namespace base::service::secure::__private {
          SYS_ERR( "unable create proxy" );
          return nullptr;
       }
-      SYS_TRC( "proxy created: %p", sp_proxy );
+      SYS_VRB( "proxy created: %p", sp_proxy );
 
       return sp_proxy;
    }
@@ -495,7 +495,7 @@ namespace base::service::secure::__private {
       const tSequenceID seq_id = event.info( ).seq_id( );
       const auto from_context = event.context( );
 
-      SYS_TRC( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
 
       if( true == m_request_processor.response( event ) )
          return;
