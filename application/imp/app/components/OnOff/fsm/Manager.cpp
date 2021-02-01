@@ -14,7 +14,7 @@ using namespace application::components::onoff;
 
 struct Callback : public Manager::Subscriber
 {
-   void state_changed( const Types::tID& state_uid )
+   void state_changed( const Types::tID& state_uid ) override
    {
       DBG_MARKER( );
    }

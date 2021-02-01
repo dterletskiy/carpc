@@ -32,7 +32,7 @@ MemoryHeader* MemoryHeader::cast( void* p )
 void MemoryHeader::dump( void* _address )
 {
    MemoryHeader* p_header = cast( _address );
-   SYS_SIMPLE_INF(
+   SYS_INF(
       "address (user address) = %p (%p) / caller = %p / size = %zu / time = %lu"
       , _address, static_cast< char* >( _address ) + sizeof( MemoryHeader ), p_header->caller, p_header->size, p_header->time
    );
@@ -57,27 +57,27 @@ MemoryMap::MemoryMap( const char* _path, const size_t _size )
    if( 0 > m_fd )
    {
       m_last_errno = errno;
-      SYS_SIMPLE_ERR( "open file error: %d", m_last_errno );
+      SYS_ERR( "open file error: %d", m_last_errno );
    }
    else
    {
-      SYS_SIMPLE_TRC( "log file opened: %s(%d)", m_path, m_fd );
+      SYS_TRC( "log file opened: %s(%d)", m_path, m_fd );
       int result = lseek( m_fd, 0, SEEK_END );
       if( -1 == result )
       {
          m_last_errno = errno;
-         SYS_SIMPLE_ERR( "lseek file error: %d", m_last_errno );
+         SYS_ERR( "lseek file error: %d", m_last_errno );
       }
       else
       {
-         SYS_SIMPLE_TRC( "descriptor file positioned: %d(%d)", m_fd, result );
+         SYS_TRC( "descriptor file positioned: %d(%d)", m_fd, result );
       }
    }
 }
 
 MemoryMap::~MemoryMap( )
 {
-   SYS_SIMPLE_TRC( );
+   SYS_TRC( );
    close( m_fd );
 }
 
@@ -88,7 +88,7 @@ void MemoryMap::set_track_size( const size_t _size )
 
 bool MemoryMap::insert( void* _address, void* _caller, size_t _size )
 {
-   // SYS_SIMPLE_TRC( "address = %p", _address );
+   // SYS_TRC( "address = %p", _address );
 
    if( nullptr == _address )
       return false;
@@ -113,7 +113,7 @@ bool MemoryMap::insert( void* _address, void* _caller, size_t _size )
 
 bool MemoryMap::remove( const void* _address )
 {
-   // SYS_SIMPLE_TRC( "address = %p", _address );
+   // SYS_TRC( "address = %p", _address );
 
    if( nullptr == _address )
       return false;
@@ -125,13 +125,13 @@ bool MemoryMap::remove( const void* _address )
          return true;
       }
 
-   // SYS_SIMPLE_WRN( "error address = %p", _address );
+   // SYS_WRN( "error address = %p", _address );
    return false;
 }
 
 size_t MemoryMap::find_free( ) const
 {
-   // SYS_SIMPLE_TRC( );
+   // SYS_TRC( );
 
    for( size_t i = 0; i < s_memory_map_size; ++i )
       if( nullptr == m_mem_map[i].address )
@@ -142,7 +142,7 @@ size_t MemoryMap::find_free( ) const
 
 void MemoryMap::dump( ) const
 {
-   SYS_SIMPLE_INF( "--------------- Start Dump ---------------" );
+   SYS_INF( "--------------- Start Dump ---------------" );
 
    for( size_t i = 0; i < s_memory_map_size; ++i )
    {
@@ -150,7 +150,7 @@ void MemoryMap::dump( ) const
          tHeaderType::dump( m_mem_map[i].address );
    }
 
-   SYS_SIMPLE_INF( "---------------- End Dump ----------------" );
+   SYS_INF( "---------------- End Dump ----------------" );
 }
 
 const size_t MemoryMap::records( ) const

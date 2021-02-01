@@ -12,9 +12,9 @@ import console
 
 
 
-project_path: str = "/home/scorpion/Source/RPC/"
+project_path: str = "/mnt/p4v/Source/RPC/"
 git: str = "cd " + project_path + "; git "
-archive_path: str = "/home/scorpion/Source/RPC_Archive/"
+archive_path: str = "/mnt/p4v/Source/RPC_Archive/"
 exceptions: list = [ ".git", "git.py", "base.py", "console.py", "__pycache__" ]
 
 

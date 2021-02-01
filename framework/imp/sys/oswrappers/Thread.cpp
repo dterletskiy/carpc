@@ -58,6 +58,21 @@ const Thread::ID Thread::current_id( )
    return iterator->second;
 }
 
+const linux::thread::tID Thread::current_thread_id( )
+{
+    return pthread_self( );
+}
+
+void Thread::name( const std::string& _name )
+{
+   m_name = _name;
+   int result = pthread_setname_np( m_thread_id, m_name.c_str( ) );
+   if( 0 != result )
+   {
+      SYS_ERR( "Unable to set thread name. Error: %d", result );
+   }
+}
+
 void* Thread::thread_loop( void* parameters )
 {
    thread_loop_mutex.lock( );
@@ -82,7 +97,7 @@ void* Thread::thread_loop( void* parameters )
    return static_cast< void* >( p_thread );
 }
 
-bool Thread::run( const std::string& name )
+bool Thread::run( const std::string& _name )
 {
    if( true == m_created )
    {
@@ -101,12 +116,7 @@ bool Thread::run( const std::string& name )
       SYS_ERR( "Thread was not created. Error: %d", result );
    }
 
-   m_name = name;
-   result = pthread_setname_np( m_thread_id, name.c_str( ) );
-   if( 0 != result )
-   {
-      SYS_ERR( "Unable to set thread name. Error: %d", result );
-   }
+   name( _name );
 
    return m_created;
 }

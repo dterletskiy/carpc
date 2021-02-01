@@ -50,7 +50,7 @@ void ThreadIPC::thread_loop( )
 bool ThreadIPC::start( )
 {
    SYS_INF( "'%s': starting", m_name.c_str( ) );
-   if( false == m_thread.run( ) )
+   if( false == m_thread.run( m_name ) )
    {
       SYS_ERR( "'%s': can't be started", m_name.c_str( ) );
       return false;
@@ -93,7 +93,7 @@ bool ThreadIPC::insert_event( const base::async::IAsync::tSptr p_event )
 
    if( false == is_subscribed( p_event ) )
    {
-      SYS_INF( "'%s': there are no consumers for event '%s'", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) )
+      SYS_INF( "'%s': there are no consumers for event '%s'", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       return false;
    }
 

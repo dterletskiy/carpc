@@ -117,7 +117,7 @@ Socket::eResult Socket::listen( )
 Socket::tSptr Socket::accept( )
 {
    sockaddr sa;
-   unsigned int len = sizeof( sa );
+   socklen_t len = sizeof( sa );
 
    linux::socket::tSocket socket = linux::socket::accept( m_socket, &sa, &len );
    if( linux::socket::InvalidSocket == socket )

@@ -34,7 +34,7 @@ namespace base::fsm {
       public:
          TStateManager( const std::string& );
          TStateManager( const tManager& ) = delete;
-         ~TStateManager( ) = default;
+         virtual ~TStateManager( ) = default;
 
       public:
          bool run( const std::optional < typename TYPES::tID >& state_uid_opt = std::nullopt );
@@ -93,6 +93,8 @@ namespace base::fsm {
                }
             };
             using tWptrSet = std::set< tWptr, Comparator >;
+
+            virtual ~Subscriber( ) = default;
 
             virtual void state_changed( const typename TYPES::tID& ) = 0;
          };

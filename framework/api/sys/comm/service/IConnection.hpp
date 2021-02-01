@@ -32,7 +32,7 @@ namespace base::service {
          virtual const bool is_connected( ) const = 0;
 
       private:
-         void process_event( const events::service::Status::Event& ) override;
+         void process_event( const events::service::Status::Event& ) override final;
 
       public:
          const Signature& signature( ) const;

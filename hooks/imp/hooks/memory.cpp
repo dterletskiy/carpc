@@ -30,14 +30,14 @@ extern "C" void* malloc( size_t size )
 {
    if( 0 == size )
    {
-      SYS_SIMPLE_WRN( "size = 0" );
+      SYS_WRN( "size = 0" );
       return nullptr;
    }
 
    void* address = __libc_malloc( size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
+   SYS_TRC( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 
@@ -46,14 +46,14 @@ extern "C" void* memalign( size_t alignment, size_t size )
 {
    if( 0 == size )
    {
-      SYS_SIMPLE_WRN( "size = 0" );
+      SYS_WRN( "size = 0" );
       return nullptr;
    }
 
    void* address = __libc_memalign( alignment, size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
+   SYS_TRC( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 
@@ -62,7 +62,7 @@ extern "C" void* realloc( void* address, size_t size )
 {
    if( 0 == size )
    {
-      SYS_SIMPLE_WRN( "size = 0" );
+      SYS_WRN( "size = 0" );
       return nullptr;
    }
 
@@ -73,7 +73,7 @@ extern "C" void* realloc( void* address, size_t size )
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    s_memory_map.insert( new_address, __builtin_return_address(0), size );
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
+   SYS_TRC( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
    return static_cast< void* >( static_cast< char* >( new_address ) + hook::memory::s_header_size );
 }
 
@@ -82,7 +82,7 @@ extern "C" void* calloc( size_t number, size_t size )
 {
    if( 0 == size || 0 == number )
    {
-      SYS_SIMPLE_WRN( "size = %zu / number = %zu", size, number );
+      SYS_WRN( "size = %zu / number = %zu", size, number );
       return nullptr;
    }
 
@@ -91,7 +91,7 @@ extern "C" void* calloc( size_t number, size_t size )
    memset( address, 0, number * size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), number * size );
 
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
+   SYS_TRC( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 
@@ -100,11 +100,11 @@ extern "C" void free( void* address )
 {
    if( nullptr == address )
    {
-      SYS_SIMPLE_WRN( "address = (nil)" );
+      SYS_WRN( "address = (nil)" );
       return;
    }
 
-   SYS_SIMPLE_TRC( "address = %p", address );
+   SYS_TRC( "address = %p", address );
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    __libc_free( static_cast< char* >( address ) - hook::memory::s_header_size );
 }
@@ -127,16 +127,16 @@ void* malloc( size_t size )
 {
    if( nullptr == __malloc )
    {
-      SYS_SIMPLE_WRN( " __malloc = nullptr" );
+      SYS_WRN( " __malloc = nullptr" );
       __malloc = ( tp_linux_malloc ) dlsym(RTLD_NEXT, "malloc");
       if( nullptr == __malloc )
       {
-         SYS_SIMPLE_ERR( " __malloc = nullptr" );
+         SYS_ERR( " __malloc = nullptr" );
          return nullptr;
       }
    }
    void* address = __malloc( size ) ;
-   SYS_SIMPLE_TRC( "address = %p / size = %zu", address, size );
+   SYS_TRC( "address = %p / size = %zu", address, size );
 
    return address;
 }
@@ -147,17 +147,17 @@ void* calloc( size_t number, size_t size )
 {
    if( nullptr == __calloc )
    {
-      SYS_SIMPLE_WRN( " __calloc = nullptr" );
+      SYS_WRN( " __calloc = nullptr" );
       __calloc = ( tp_linux_calloc ) dlsym(RTLD_NEXT, "calloc");
       char* error = dlerror( );
       if( nullptr == __calloc )
       {
-         SYS_SIMPLE_ERR( " __calloc = nullptr / error %s", error );
+         SYS_ERR( " __calloc = nullptr / error %s", error );
          return nullptr;
       }
    }
    void* address = __calloc( number, size ) ;
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / number = %zu", address, size, number );
+   SYS_TRC( "address = %p / size = %zu / number = %zu", address, size, number );
 
    return address;
 }
@@ -168,16 +168,16 @@ void* realloc( void* address, size_t size )
 {
    if( nullptr == __realloc )
    {
-      SYS_SIMPLE_WRN( " __realloc = nullptr" );
+      SYS_WRN( " __realloc = nullptr" );
       __realloc = ( tp_linux_realloc ) dlsym(RTLD_NEXT, "realloc");
       if( nullptr == __realloc )
       {
-         SYS_SIMPLE_ERR( " __realloc = nullptr" );
+         SYS_ERR( " __realloc = nullptr" );
          return nullptr;
       }
    }
    void* new_address = __realloc( address, size );
-   SYS_SIMPLE_TRC( "new address = %p / address = %p / size = %zu", new_address, address, size );
+   SYS_TRC( "new address = %p / address = %p / size = %zu", new_address, address, size );
 
    return new_address;
 }
@@ -188,15 +188,15 @@ void free( void* address )
 {
    if( nullptr == __free )
    {
-      SYS_SIMPLE_WRN( "__free = nullptr" );
+      SYS_WRN( "__free = nullptr" );
       __free = ( tp_linux_free ) dlsym(RTLD_NEXT, "free");
       if( nullptr == __free )
       {
-         SYS_SIMPLE_ERR( " __free = nullptr" );
+         SYS_ERR( " __free = nullptr" );
          return;
       }
    }
-   SYS_SIMPLE_TRC( "address = %p", address );
+   SYS_TRC( "address = %p", address );
    __free( address );
 }
 
@@ -205,7 +205,7 @@ void* operator new( size_t size )
    void* address = malloc( size );
    if( nullptr == address )
    {
-      SYS_SIMPLE_WRN( "bad_alloc" );
+      SYS_WRN( "bad_alloc" );
       throw std::bad_alloc();
    }
 
@@ -263,7 +263,7 @@ void* malloc( size_t size, const void* )
    __malloc_hook = glibc::malloc;
    void* address = ::malloc( size );
    __malloc_hook = memory::malloc;
-   SYS_SIMPLE_TRC( "address = %p / size = %zu", address, size );
+   SYS_TRC( "address = %p / size = %zu", address, size );
 
    return address;
 }
@@ -273,7 +273,7 @@ void* memalign( size_t alignment, size_t size, const void* )
    __memalign_hook = glibc::memalign;
    void* address = ::memalign( alignment, size );
    __memalign_hook = memory::memalign;
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / alignment = %zu", address, size, alignment );
+   SYS_TRC( "address = %p / size = %zu / alignment = %zu", address, size, alignment );
 
    return address;
 }
@@ -283,14 +283,14 @@ void* realloc( void* address, size_t size, const void* )
    __realloc_hook = glibc::realloc;
    void* new_address = ::realloc( address, size );
    __realloc_hook = memory::realloc;
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / new address = %p", address, size, new_address );
+   SYS_TRC( "address = %p / size = %zu / new address = %p", address, size, new_address );
 
    return new_address;
 }
 
 void free( void* address, const void* )
 {
-   SYS_SIMPLE_TRC( "address = %p", address );
+   SYS_TRC( "address = %p", address );
    __free_hook = glibc::free;
    ::free( address );
    __free_hook = memory::free;
@@ -301,7 +301,7 @@ void free( void* address, const void* )
 void* calloc( size_t number, size_t size )
 {
    void* address = ::malloc( number * size );
-   SYS_SIMPLE_TRC( "address = %p / size = %zu / number = %zu", address, size, number );
+   SYS_TRC( "address = %p / size = %zu / number = %zu", address, size, number );
    return address;
 }
 

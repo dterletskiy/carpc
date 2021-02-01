@@ -43,9 +43,9 @@ namespace memory {
 void boot( int argc, char** argv )
 {
    memory::dump( );
+   DBG_MSG( "argc = %d", argc );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
-   // REGISTER_EVENT( base::onoff::ipc::OnOffEvent );
    DUMP_IPC_EVENTS;
 
    base::application::Thread::Configuration::tVector services =
@@ -73,11 +73,11 @@ bool test( int argc, char* argv[ ] );
 
 
 
-#if OS == LINUX
+#if OS == OS_LINUX
 
    int main( int argc, char* argv[ ] )
    {
-      DBG_MSG( "argc = %d", argc );
+      base::trace::Logger::init( base::trace::eLogStrategy::DLT, "CORE" );
 
       if( test( argc, argv ) )
          boot( argc, argv );
@@ -85,12 +85,12 @@ bool test( int argc, char* argv[ ] );
       return 0;
    }
 
-#elif OS == ANDROID
+#elif OS == OS_ANDROID
 
    #include <jni.h>
    #include "api/sys/oswrappers/Thread.hpp"
 
-   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot };
+   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot, 1, nullptr };
 
    void __constructor__( ) __attribute__(( constructor(102) ));
    void __destructor__( ) __attribute__(( destructor(102) ));
@@ -101,6 +101,7 @@ bool test( int argc, char* argv[ ] );
    extern "C" JNIEXPORT jstring JNICALL
    Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
    {
+      base::trace::Logger::init( base::trace::eLogStrategy::ANDROID_T, "CORE" );
       DBG_TRC( "JNI" );
       boot_thread.run( );
 
@@ -113,127 +114,7 @@ bool test( int argc, char* argv[ ] );
 
 
 
-#include "api/sys/oswrappers/Socket.hpp"
-
 bool test( int argc, char* argv[ ] )
 {
    return true;
-
-
-
-   base::os::linux::socket::configuration confguration_core{ AF_UNIX, SOCK_STREAM, 0, "/tmp/core.socket", 5000 };
-   base::os::linux::socket::configuration confguration_controller{ AF_UNIX, SOCK_STREAM, 0, "/tmp/controller.socket", 5000 };
-
-   base::os::Socket::tSptr mp_socket_master = std::shared_ptr< base::os::Socket >( new base::os::Socket( confguration_core, 4096 ) );
-   if( base::os::Socket::eResult::ERROR == mp_socket_master->create( ) )
-      return false;
-   if( base::os::Socket::eResult::ERROR == mp_socket_master->bind( ) )
-      return false;
-   mp_socket_master->unblock( );
-   if( base::os::Socket::eResult::ERROR == mp_socket_master->listen( ) )
-      return false;
-   mp_socket_master->info( "Server socket created" );
-
-
-
-   base::os::Socket::tSptr mp_client_socket = std::shared_ptr< base::os::Socket >( new base::os::Socket( confguration_controller, 4096 ) );
-   if( base::os::Socket::eResult::ERROR == mp_client_socket->create( ) )
-      return false;
-   while( base::os::Socket::eResult::ERROR == mp_client_socket->connect( ) )
-      sleep( 1 );
-   mp_client_socket->unblock( );
-   mp_client_socket->info( "Client socket created" );
-
-
-
-   base::os::Socket::tSptrSet m_pending_sockets;
-
-
-
-
-
-   while( true )
-   {
-      // prepare select
-      DBG_TRC( "prepare select" );
-      base::os::linux::socket::fd fd_set;
-      fd_set.reset( );
-      fd_set.set( mp_socket_master->socket( ), base::os::linux::socket::fd::eType::READ );
-      base::os::linux::socket::tSocket max_socket = mp_socket_master->socket( );
-
-      fd_set.set( mp_client_socket->socket( ), base::os::linux::socket::fd::eType::READ );
-      if( mp_client_socket->socket( ) > max_socket )
-         max_socket = mp_client_socket->socket( );
-
-      for( const auto& p_socket : m_pending_sockets )
-      {
-         fd_set.set( p_socket->socket( ), base::os::linux::socket::fd::eType::READ );
-         if( p_socket->socket( ) > max_socket )
-            max_socket = p_socket->socket( );
-      }
-      SYS_INF( "max_socket = %d", max_socket );  
-
-      // select
-      DBG_TRC( "select" );
-      if( false == base::os::linux::socket::select( max_socket, fd_set ) )
-         continue;
-
-      // process select
-      DBG_TRC( "process select" );
-      for( auto iterator = m_pending_sockets.begin( ); iterator != m_pending_sockets.end( ); ++iterator )
-      {
-         auto p_socket = *iterator;
-         if( false == fd_set.is_set( p_socket->socket( ), base::os::linux::socket::fd::eType::READ ) )
-            continue;
-
-         const base::os::Socket::eResult result = p_socket->recv( );
-         if( base::os::Socket::eResult::DISCONNECTED == result )
-         {
-            p_socket->info( "Client disconnected" );
-
-            iterator = m_pending_sockets.erase( iterator );
-            if( m_pending_sockets.end( ) == iterator )
-               break;
-         }
-         else if( base::os::Socket::eResult::OK == result )
-         {
-            DBG_MSG( "reading pending socket" );
-            size_t recv_size = 0;
-            const void* const p_buffer = p_socket->buffer( recv_size );
-         }
-      }
-
-      if( true == fd_set.is_set( mp_socket_master->socket( ), base::os::linux::socket::fd::eType::READ ) )
-      {
-         if( auto p_socket = mp_socket_master->accept( ) )
-         {
-            m_pending_sockets.insert( p_socket );
-            p_socket->info( "Client connected" );
-            p_socket->unblock( );
-         }
-      }
-
-      if( true == fd_set.is_set( mp_client_socket->socket( ), base::os::linux::socket::fd::eType::READ ) )
-      {
-         const base::os::Socket::eResult result = mp_client_socket->recv( );
-         if( base::os::Socket::eResult::DISCONNECTED == result )
-         {
-            mp_client_socket->info( "Client socket disconnected" );
-         }
-         else if( base::os::Socket::eResult::OK == result )
-         {
-            DBG_MSG( "reading client socket" );
-            size_t recv_size = 0;
-            const void* const p_buffer = mp_client_socket->buffer( recv_size );
-         }
-      }
-   }
-
-
-
-
- 
-
-
-   return false;
 }

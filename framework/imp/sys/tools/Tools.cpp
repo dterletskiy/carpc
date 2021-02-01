@@ -142,7 +142,7 @@ namespace base::tools::cfg {
 
 #include <random>
 #include <sstream>
-#include "uuid/uuid.h"
+// #include "uuid/uuid.h"
 
 // link: https://stackoverflow.com/a/60198074/12978480
 namespace base::tools::uuid {

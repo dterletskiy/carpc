@@ -8,7 +8,7 @@
 
 namespace base::service {
 
-   struct Address
+   class Address
    {
       public:
          using tOpt = std::optional< Address >;

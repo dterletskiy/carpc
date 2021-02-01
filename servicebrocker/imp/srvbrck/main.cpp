@@ -18,6 +18,8 @@ namespace memory {
 
 int main( int argc, char *argv[] )
 {
+   base::trace::Logger::init( base::trace::eLogStrategy::DLT, "SBR" );
+
    base::tools::cmd::init( argc, argv );
    base::tools::cmd::print( );
    base::tools::cfg::init( base::tools::cmd::argument( "config" ).value_or( "servicebrocker.cfg" ) );

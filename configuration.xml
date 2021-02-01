@@ -16,11 +16,11 @@
 
       <setting type="include" value="/usr/local/include" status="inactive"/>
 
-      <setting type="define" name="LINUX" value="0" status="active"/>
-      <setting type="define" name="ANDROID" value="1" status="active"/>
-      <setting type="define" name="WINDOWS" value="2" status="active"/>
-      <setting type="define" name="STD" value="3" status="active"/>
-      <setting type="define" name="OS" value="LINUX" status="active"/>
+      <setting type="define" name="OS_LINUX" value="0" status="active"/>
+      <setting type="define" name="OS_ANDROID" value="1" status="active"/>
+      <setting type="define" name="OS_WINDOWS" value="2" status="active"/>
+      <setting type="define" name="OS_STD" value="3" status="active"/>
+      <setting type="define" name="OS" value="OS_LINUX" status="active"/>
 
       <setting type="define" name="SYS_TRACE" status="conditions">
          <condition type="config" name="SYS_TRACE" status="active"/>
@@ -61,7 +61,7 @@
 
    <settings type="link">
 
-      <setting type="include" value="/home/scorpion/Source/RPC/hooks_product/lib" status="conditions">
+      <setting type="include" value="/mnt/p4v/Source/RPC/hooks_product/lib" status="conditions">
          <condition type="config" name="MEMORY_HOOK" status="active"/>
       </setting>
 
@@ -73,6 +73,7 @@
       <setting type="flag" value="-ltbb" status="active"/>
       <setting type="flag" value="-lpthread" status="active"/>
       <setting type="flag" value="-luuid" status="inactive"/>
+      <setting type="flag" value="-ldlt" status="active"/>
       <setting type="flag" value="-lrt" status="conditions">
          <condition type="config" name="type" status="executable"/>
       </setting>

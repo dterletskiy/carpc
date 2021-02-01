@@ -59,8 +59,9 @@ os.system( "reset" )
 COMPILER=os.environ.get( 'CXX', "g++" )
 SESSION=os.environ.get( 'SESSION', "default" )
 
-ROOT = "/home/scorpion/Source/RPC"
-projects: list = [ "framework", "hooks", "servicebrocker", "application", "core", "controller", "hmi", "experimental" ]
+ROOT = "/mnt/p4v/Source/RPC"
+# projects: list = [ "framework", "hooks", "servicebrocker", "application", "core", "controller", "hmi", "experimental" ]
+projects: list = [ "framework", "servicebrocker", "application", "core", "controller", "hmi" ]
 # projects: list = [ "framework", "experimental" ]
 actions: dict = {
    'archive':        [ project.clean_all, archive.archive                        ],

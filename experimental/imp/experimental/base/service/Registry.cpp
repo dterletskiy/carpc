@@ -87,7 +87,7 @@ void Registry::register_stub( std::shared_ptr< IStub > p_stub )
       }
       else
       {
-         DBG_WRN( "stub for current service already registered" )
+         DBG_WRN( "stub for current service already registered" );
       }
       return;
    }

@@ -44,13 +44,13 @@ bool IEvent::serialize( dsi::tByteStream& stream, const IEvent& event )
 {
    if( s_registry.end( ) == s_registry.find( event.signature( )->type_id( ) ) )
    {
-      SYS_ERR( "event '%s' is not registered", event.signature( )->name( ).c_str( ) )
+      SYS_ERR( "event '%s' is not registered", event.signature( )->name( ).c_str( ) );
       return false;
    }
 
    if( false == event.to_stream( stream ) )
    {
-      SYS_ERR( "event '%s' serialization error", event.signature( )->name( ).c_str( ) )
+      SYS_ERR( "event '%s' serialization error", event.signature( )->name( ).c_str( ) );
       return false;
    }
 
@@ -69,14 +69,14 @@ IEvent::tSptr IEvent::deserialize( dsi::tByteStream& stream )
    auto iterator = s_registry.find( event_type );
    if( s_registry.end( ) == iterator )
    {
-      SYS_ERR( "event '%s' is not registered", event_type.c_str( ) )
+      SYS_ERR( "event '%s' is not registered", event_type.c_str( ) );
       return nullptr;
    }
 
    IEvent::tSptr p_event = iterator->second( );
    if( false == p_event->from_stream( stream ) )
    {
-      SYS_ERR( "event '%s' deserialization error", event_type.c_str( ) )
+      SYS_ERR( "event '%s' deserialization error", event_type.c_str( ) );
       return nullptr;
    }
 

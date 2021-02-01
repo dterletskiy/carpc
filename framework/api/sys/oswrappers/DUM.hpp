@@ -1,7 +1,6 @@
 #pragma once
 
 #include <curl/curl.h>
-#include "api/sys/oswrappers/Types.hpp"
 
 
 
@@ -75,7 +74,7 @@ namespace base::os {
 
 
 
-#if 0
+#if 0 // Examples
 
 struct CulrMemory
 {
@@ -122,8 +121,8 @@ int main( int argc, char** argv )
    const char* url = "https://www.example.com";
    const size_t port = 443;
 
-   const char* pHeaderFile = "/home/scorpion/Desktop/header";
-   const char* pDataFile = "/home/scorpion/Desktop/data";
+   const char* pHeaderFile = "/mnt/p4v/Desktop/header";
+   const char* pDataFile = "/mnt/p4v/Desktop/data";
 
    CulrMemory chunk_header;
    CulrMemory chunk_data;

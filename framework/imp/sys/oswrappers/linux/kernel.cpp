@@ -38,16 +38,16 @@ namespace base::os::linux {
       int nptrs = backtrace( buffer, buffer_size );
       if( buffer_size == nptrs )
       {
-         SYS_SIMPLE_WRN( "%s", wrn_duffer_size );
+         SYS_WRN( "%s", wrn_duffer_size );
          if( 0 < _fd )
             write( _fd, wrn_duffer_size, strlen( wrn_duffer_size ) );
       }
-      SYS_SIMPLE_MSG( "backtrace() returned %d addresses:", nptrs );
+      SYS_MSG( "backtrace() returned %d addresses:", nptrs );
 
 
       if( 0 < _fd )
       {
-         SYS_SIMPLE_MSG( "dump backtrace to %d", _fd );
+         SYS_MSG( "dump backtrace to %d", _fd );
          backtrace_symbols_fd( buffer, nptrs, _fd );
       }
       else
@@ -55,13 +55,13 @@ namespace base::os::linux {
          char** strings = backtrace_symbols( buffer, nptrs );
          if( strings == nullptr )
          {
-            SYS_SIMPLE_ERR( "backtrace_symbols" );
+            SYS_ERR( "backtrace_symbols" );
             return;
          }
 
          for( int i = 0; i < nptrs; ++i )
          {
-            SYS_SIMPLE_MSG( "%s", strings[ i ] );
+            SYS_MSG( "%s", strings[ i ] );
          }
          free( strings );
       }

@@ -71,7 +71,7 @@ void ConnectionProcessor::read_slave( base::os::Socket::tSptr p_socket )
       stream.pop( packet );
       for( base::dsi::Package& package : packet.packages( ) )
       {
-         SYS_INF( "processing package: %s", package.c_str( ) )
+         SYS_INF( "processing package: %s", package.c_str( ) );
          switch( package.command( ) )
          {
             case base::dsi::eCommand::BroadcastEvent:

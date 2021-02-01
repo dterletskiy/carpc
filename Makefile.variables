@@ -125,7 +125,7 @@ EXPERIMENTAL_MAKE_PARAMS      := PROJECT_NAME=$(PROJECT_EXPERIMENTAL_NAME) PROJE
 # Include directories
 INCLUDE      := -I/usr/local/include
 
-CONSTANTS    := -DLINUX=0 -DANDROID=1 -DWINDOWS=2 -DSTD=3 -DOS=LINUX
+CONSTANTS    := -DOS_LINUX=0 -DOS_ANDROID=1 -DOS_WINDOWS=2 -DSTD=3 -DOS=OS_LINUX
 
 CCONFIG      := -DCOLORED_TRACE
 ifeq ($(MEMORY_HOOK),1)
@@ -155,6 +155,8 @@ LDFLAGS      += -lrt -ldl -v
 ifeq ($(MEMORY_HOOK),1)
    LDFLAGS += -L$(PRODUCT_HOOKS_DIR)/lib -lhooks
 endif
+
+LD_LIBRARY_PATH=/usr/lib/:/usr/local/lib/
 
 
 

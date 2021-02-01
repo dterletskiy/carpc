@@ -43,9 +43,9 @@ namespace memory {
 void boot( int argc, char** argv )
 {
    memory::dump( );
+   DBG_MSG( "argc = %d", argc );
    DBG_MSG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
-   // REGISTER_EVENT( base::onoff::ipc::OnOffEvent );
    DUMP_IPC_EVENTS;
 
    base::application::Thread::Configuration::tVector services =
@@ -73,11 +73,11 @@ bool test( int argc, char* argv[ ] );
 
 
 
-#if OS == LINUX
+#if OS == OS_LINUX
 
    int main( int argc, char* argv[ ] )
    {
-      DBG_MSG( "argc = %d", argc );
+      base::trace::Logger::init( base::trace::eLogStrategy::DLT, "HMI" );
 
       if( test( argc, argv ) )
          boot( argc, argv );
@@ -85,12 +85,12 @@ bool test( int argc, char* argv[ ] );
       return 0;
    }
 
-#elif OS == ANDROID
+#elif OS == OS_ANDROID
 
    #include <jni.h>
    #include "api/sys/oswrappers/Thread.hpp"
 
-   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot };
+   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot, 1, nullptr };
 
    void __constructor__( ) __attribute__(( constructor(102) ));
    void __destructor__( ) __attribute__(( destructor(102) ));
@@ -101,6 +101,7 @@ bool test( int argc, char* argv[ ] );
    extern "C" JNIEXPORT jstring JNICALL
    Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
    {
+      base::trace::Logger::init( base::trace::eLogStrategy::ANDROID_T, "HMI" );
       DBG_TRC( "JNI" );
       boot_thread.run( );
 
@@ -112,8 +113,6 @@ bool test( int argc, char* argv[ ] );
 
 
 
-
-#include "api/sys/oswrappers/Socket.hpp"
 
 bool test( int argc, char* argv[ ] )
 {

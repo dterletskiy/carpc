@@ -9,7 +9,7 @@
    </configuration>
 
    <settings type="compilation">
-      <setting type="include" value="/home/scorpion/Source/RPC/framework" status="active"/>
+      <setting type="include" value="/mnt/p4v/Source/RPC/framework" status="active"/>
    </settings>
 
    <settings type="link">

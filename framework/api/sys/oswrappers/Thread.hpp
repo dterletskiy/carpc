@@ -29,6 +29,7 @@ namespace base::os {
          bool join( );
 
          static const ID current_id( );
+         static const linux::thread::tID current_thread_id( );
 
       public:
          const ID& id( ) const;
@@ -53,6 +54,7 @@ namespace base::os {
       public:
          const std::string& name( ) const;
       private:
+         void name( const std::string& );
          std::string                m_name = "NoName";
    };
 

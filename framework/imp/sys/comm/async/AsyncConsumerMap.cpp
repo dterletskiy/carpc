@@ -159,7 +159,7 @@ bool AsyncConsumerMap::finish_process( )
 void AsyncConsumerMap::dump( ) const
 {
    SYS_DUMP_START( );
-   SYS_INF( "%s:", m_name.c_str( ) )
+   SYS_INF( "%s:", m_name.c_str( ) );
    for( const auto pair : m_map )
    {
       printf( "%s => ", pair.first->name( ).c_str( ) );

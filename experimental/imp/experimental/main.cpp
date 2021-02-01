@@ -43,23 +43,23 @@ const bool run( int argc, char** argv );
 
 
 
-#if OS == LINUX
+#if OS == OS_LINUX
 
    int main( int argc, char* argv[ ] )
    {
-      DBG_MSG( "argc = %d", argc );
+      base::trace::Logger::init( base::trace::eLogStrategy::DLT, "EXP" );
 
       run( argc, argv );
 
       return 0;
    }
 
-#elif OS == ANDROID
+#elif OS == OS_ANDROID
 
    #include <jni.h>
    #include "api/sys/oswrappers/Thread.hpp"
 
-   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot };
+   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot, 1, nullptr };
 
    void __constructor__( ) __attribute__(( constructor(102) ));
    void __destructor__( ) __attribute__(( destructor(102) ));
@@ -70,6 +70,7 @@ const bool run( int argc, char** argv );
    extern "C" JNIEXPORT jstring JNICALL
    Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
    {
+      base::trace::Logger::init( base::trace::eLogStrategy::ANDROID_T, "EXP" );
       DBG_TRC( "JNI" );
       boot_thread.run( );
 
@@ -112,6 +113,8 @@ void thread_loop( const std::size_t index )
 
 const bool run( int argc, char** argv )
 {
+   DBG_MSG( "argc = %d", argc );
+
    // std::vector< base::os::Thread* > threads;
    // for( std::size_t index = 0; index < 100; ++index )
    //    threads.push_back( new base::os::Thread( thread_loop, index ) );

@@ -267,7 +267,7 @@ namespace base::service::fast::__private {
       }
       else
       {
-         SYS_WRN( "not processable event: %s", event.info( ).name( ).c_str( ) )
+         SYS_WRN( "not processable event: %s", event.info( ).name( ).c_str( ) );
       }
 
       m_processing_event_id.reset( );

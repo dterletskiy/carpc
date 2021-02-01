@@ -3,7 +3,7 @@
 
 
 
-#if OS == ANDROID
+#if OS == OS_ANDROID
 
 namespace base::trace::android {
 
@@ -21,4 +21,4 @@ namespace base::trace::android {
 
 } // namespace base::trace::android
 
-#endif // OS == ANDROID
+#endif // OS == OS_ANDROID

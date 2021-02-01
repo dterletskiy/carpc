@@ -268,7 +268,7 @@ namespace base::math {
          void print( ) const
          {
             DBG_MSG( "------------------------------ TMatrixS dump begin ------------------------------" );
-            DBG_MSG( "name: %s / dimention: %zu", m_name.c_str( ), ROWS * COLUMNS )
+            DBG_MSG( "name: %s / dimention: %zu", m_name.c_str( ), ROWS * COLUMNS );
             for( tRow row{ 0 }; row < ROWS; ++row )
                base::print( m_elements[ row.value( ) ], COLUMNS, true );
             DBG_MSG( "------------------------------- TMatrixS dump end -------------------------------" );

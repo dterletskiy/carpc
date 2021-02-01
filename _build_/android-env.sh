@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NDK=/mnt/p4v/Android/ndk/r20b
+NDK=/mnt/sdk/Android/ndk/r20b
 HOST_TAG=linux-x86_64
 
 export TOOLCHAIN=${NDK}/toolchains/llvm/prebuilt/${HOST_TAG}

@@ -10,12 +10,12 @@
    </configuration>
 
    <settings type="compilation">
-      <setting type="include" value="/home/scorpion/Source/RPC/core" status="active"/>
-      <setting type="include" value="/home/scorpion/Source/RPC/framework" status="active"/>
+      <setting type="include" value="/mnt/p4v/Source/RPC/core" status="active"/>
+      <setting type="include" value="/mnt/p4v/Source/RPC/framework" status="active"/>
    </settings>
 
    <settings type="link">
-      <setting type="include" value="/home/scorpion/Source/RPC/framework_product/lib" status="active"/>
+      <setting type="include" value="/mnt/p4v/Source/RPC/framework_product/lib" status="active"/>
       <setting type="flag" value="-lframework" status="active"/>
    </settings>
 

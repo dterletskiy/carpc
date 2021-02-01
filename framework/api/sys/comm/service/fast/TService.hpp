@@ -8,15 +8,15 @@
 namespace base::service::fast {
 
    template< typename TYPES, typename Enable = void >
-   class TGenerator;
+   struct TGenerator;
 
 
 
    #define IS_IPC_SERVICE std::is_same_v< typename TYPES::tIPC, IPC >
-   #define ENABVLE_IF_IPC_SERVICE std::enable_if_t< IS_IPC_SERVICE >
+   #define ENABLE_IF_IPC_SERVICE std::enable_if_t< IS_IPC_SERVICE >
 
    template< typename TYPES >
-   struct TGenerator< TYPES, ENABVLE_IF_IPC_SERVICE >
+   struct TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >
    {
       using tBaseData      = typename TYPES::tBaseData;
       using tBaseDataPtr = std::shared_ptr< tBaseData >;
@@ -54,17 +54,17 @@ namespace base::service::fast {
 
    template< typename TYPES >
    const async::tAsyncTypeID
-      TGenerator< TYPES, ENABVLE_IF_IPC_SERVICE >::interface_type_id =
-         TGenerator< TYPES, ENABVLE_IF_IPC_SERVICE >::Service::Signature::build_type_id( );
+      TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >::interface_type_id =
+         TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >::Service::Signature::build_type_id( );
 
    template< typename TYPES >
-   const typename RequestResponseIDs< typename TGenerator< TYPES, ENABVLE_IF_IPC_SERVICE >::tEventID >::tVector&
-      TGenerator< TYPES, ENABVLE_IF_IPC_SERVICE >::RR =
+   const typename RequestResponseIDs< typename TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >::tEventID >::tVector&
+      TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >::RR =
          TYPES::RR;
 
    template< typename TYPES >
-   const typename NotificationIDs< typename TGenerator< TYPES, ENABVLE_IF_IPC_SERVICE >::tEventID >::tVector&
-      TGenerator< TYPES, ENABVLE_IF_IPC_SERVICE >::N =
+   const typename NotificationIDs< typename TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >::tEventID >::tVector&
+      TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >::N =
          TYPES::N;
 
 

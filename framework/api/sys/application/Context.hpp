@@ -8,7 +8,7 @@
 
 namespace base::application {
 
-   struct Context
+   class Context
    {
       public:
          using tOpt = std::optional< Context >;

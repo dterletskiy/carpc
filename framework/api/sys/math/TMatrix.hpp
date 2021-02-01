@@ -370,7 +370,7 @@ namespace base::math {
          DBG_MSG( "%s", message.c_str( ) );
       }
 
-      DBG_MSG( "dimention: %zu x %zu", m_rows.value( ), m_columns.value( ) )
+      DBG_MSG( "dimention: %zu x %zu", m_rows.value( ), m_columns.value( ) );
       for( tRow row{ 0 }; row < m_rows; ++row )
          base::print( m_elements[ row.value( ) ], m_columns, true );
    }
