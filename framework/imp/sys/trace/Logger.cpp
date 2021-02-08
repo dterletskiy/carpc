@@ -21,23 +21,29 @@ Logger::Logger( const eLogStrategy& log_strategy, const char* const app_name )
    : mp_application_name( app_name )
    , m_log_strategy( log_strategy )
 {
-   #if OS == OF_LINUX
-      const auto registerAppStatus = dlt_register_app( mp_application_name, format_string( mp_application_name, " Application" ).c_str( ) );
-      if( DLT_RETURN_OK != registerAppStatus )
-         return;
+   #if OS == OS_LINUX
+      if( eLogStrategy::DLT == m_log_strategy )
+      {
+         const auto registerAppStatus = dlt_register_app( mp_application_name, format_string( mp_application_name, " Application" ).c_str( ) );
+         if( DLT_RETURN_OK != registerAppStatus )
+            return;
+      }
    #endif
 }
 
 Logger::~Logger( )
 {
-   #if OS == OF_LINUX
-      for( auto& pair : m_context_map )
-         dlt_unregister_context( &(pair.second) );
-      dlt_unregister_app( );
+   #if OS == OS_LINUX
+      if( eLogStrategy::DLT == m_log_strategy )
+      {
+         for( auto& pair : m_context_map )
+            dlt_unregister_context( &(pair.second) );
+         dlt_unregister_app( );
+      }
    #endif
 }
 
-#if OS == OF_LINUX
+#if OS == OS_LINUX
 DltContext& Logger::dlt_context( )
 {
    const auto [iterator, success] = m_context_map.insert( { pthread_self( ), DltContext{ } } );

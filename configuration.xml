@@ -6,7 +6,7 @@
 
    <configuration>
       <config name="SYS_TRACE" status="active"/>
-      <config name="DBG_TRACE" status="active"/>
+      <config name="MSG_TRACE" status="active"/>
       <config name="COLORED_TRACE" status="active"/>
       <config name="MEMORY_HOOK" status="inactive"/>
       <config name="USE_INSTRUMENTAL" status="inactive"/>
@@ -25,8 +25,8 @@
       <setting type="define" name="SYS_TRACE" status="conditions">
          <condition type="config" name="SYS_TRACE" status="active"/>
       </setting>
-      <setting type="define" name="DBG_TRACE" status="conditions">
-         <condition type="config" name="DBG_TRACE" status="active"/>
+      <setting type="define" name="MSG_TRACE" status="conditions">
+         <condition type="config" name="MSG_TRACE" status="active"/>
       </setting>
       <setting type="define" name="COLORED_TRACE" status="conditions">
          <condition type="config" name="COLORED_TRACE" status="active"/>

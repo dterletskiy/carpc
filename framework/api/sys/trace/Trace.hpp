@@ -154,7 +154,7 @@
 
 
 
-#define MARKER_LINE              "---------------------------------------------------------------------------"
+#define MARKER_LINE              "----------------------------------------------"
 
 #define SYS_MARKER( VALUE )      SYS_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
 #define SYS_DUMP_START( VALUE )  SYS_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )

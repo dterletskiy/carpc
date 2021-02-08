@@ -22,7 +22,7 @@
 
 MEMORY_HOOK := 0
 ACTIVE_SYS_TRACE := 1
-ACTIVE_DBG_TRACE := 1
+ACTIVE_MSG_TRACE := 1
 
 
 
@@ -134,8 +134,8 @@ endif
 ifeq ($(ACTIVE_SYS_TRACE),1)
    CCONFIG += -DSYS_TRACE
 endif
-ifeq ($(ACTIVE_DBG_TRACE),1)
-   CCONFIG += -DDBG_TRACE
+ifeq ($(ACTIVE_MSG_TRACE),1)
+   CCONFIG += -DMSG_TRACE
 endif
 
 CFLAGS       += $(CXXFLAGS)

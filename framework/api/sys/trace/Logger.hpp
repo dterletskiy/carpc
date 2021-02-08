@@ -37,9 +37,9 @@ namespace base::trace {
                }
                case eLogStrategy::DLT:
                {
-                  #if OS == OF_LINUX
+                  #if OS == OS_LINUX
                      DLT_LOG( dlt_context( ), to_dlt( log_level ), DLT_SIZED_CSTRING( p_buffer, size ) );
-                  #endif // OS == OF_LINUX
+                  #endif // OS == OS_LINUX
                   break;
                }
                case eLogStrategy::ANDROID_T:
@@ -159,13 +159,13 @@ namespace base::trace {
          }
 
       private:
-         #if OS == OF_LINUX
+         #if OS == OS_LINUX
             DltContext& dlt_context( );
          #endif
       private:
          const char* mp_application_name = nullptr;
          eLogStrategy m_log_strategy = eLogStrategy::CONSOLE;
-         #if OS == OF_LINUX
+         #if OS == OS_LINUX
             std::map< base::os::linux::thread::tID, DltContext > m_context_map;
          #endif
    };
