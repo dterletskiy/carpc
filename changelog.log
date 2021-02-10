@@ -1,3 +1,7 @@
+version 2.3.2
+   - Implemented Callable object for asynchronous calling function.
+   - Printing parameter pack in helpers implemented.
+
 version 2.3.1a
    - Fixes for version 2.3.1.
 

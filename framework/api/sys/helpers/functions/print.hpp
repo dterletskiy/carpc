@@ -115,4 +115,18 @@ namespace base {
       if( is_new_line ) printf( "\n" );
    }
 
+   inline
+   void print_pack( )
+   {
+      std::cout << std::endl;
+   }
+
+   template< typename T, typename...Ts >
+   void print_pack( T&& first, Ts&&... rest )
+   {
+      print( std::forward< T >( first ) );
+      printf( " " );
+      print_pack( std::forward< Ts >( rest )... );
+   }
+
 } // namespace base
