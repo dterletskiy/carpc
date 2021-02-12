@@ -12,55 +12,72 @@
 // parameters passed by reference.
 // WARNING: Functions with parameters passed by reference or pointers must be used very carefyle because
 // in current object will be samed corresponding refecences and pointers to these parameters, but these
-// parameters could be chnaged after this and defore calling this function via this object (example 8).
+// parameters could be chnaged after this and defore calling this function via this object (example 7).
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
 
-namespace base::async::callable {
+namespace base::async {
 
    template < typename ...Args >
    struct TCallable : public ICallable
    {
       public:
-         using tFunction = void (*)( Args... );
+         using tFunctionPtr = void (*)( Args... );
+         using tFunction = std::function< void( Args... ) >;
+         using tParameters = std::tuple< Args... >;
 
-      public:
-         TCallable( tFunction p_func, std::tuple< Args... > params )
-            : mp_func( p_func )
+      private:
+         TCallable( tFunctionPtr p_func, tParameters params )
+            : mp_function( p_func )
+            , m_params( params )
+         {
+         }
+
+         TCallable( tFunctionPtr p_func, Args&... args )
+            : mp_function( p_func )
+            , m_params( args... )
+         {
+         }
+
+         TCallable( tFunction p_func, tParameters params )
+            : m_function( p_func )
             , m_params( params )
          {
          }
 
          TCallable( tFunction p_func, Args&... args )
-            : mp_func( p_func )
+            : m_function( p_func )
             , m_params( args... )
          {
-            // print_pack( args... );
          }
 
-         TCallable( const TCallable& other )
-            : mp_func( other.mp_func )
-            , m_params( other.m_params )
+         TCallable( const TCallable& ) = delete;
+         TCallable& operator=( const TCallable& ) = delete;
+
+      public:
+         ~TCallable( ) override = default;
+
+         static tSptr const create( tFunctionPtr p_func, tParameters params )
          {
+            return std::shared_ptr< TCallable >( new TCallable( p_func, params ) );
          }
 
-         TCallable& operator=( const TCallable& other )
+         static tSptr const create( tFunctionPtr p_func, Args&... args )
          {
-            if( this == other )
-               return *this;
+            return std::shared_ptr< TCallable >( new TCallable( p_func, args...  ));
+         }
 
-            mp_func = other.mp_func;
-            m_params = other.m_params;
+         static tSptr const create( tFunction func, tParameters params )
+         {
+            return std::shared_ptr< TCallable >( new TCallable( func, params ) );
+         }
 
-            return *this;
+         static tSptr const create( tFunction func, Args&... args )
+         {
+            return std::shared_ptr< TCallable >( new TCallable( func, args...  ));
          }
 
       public:
-         static TCallable* const create( tFunction p_func, std::tuple< Args... > params )
-         {
-            return new TCallable( p_func, params );
-         }
-
          void call( ) const
          {
             return call_function( typename gen_sequence< sizeof...( Args ) >::type( ) );
@@ -71,15 +88,19 @@ namespace base::async::callable {
          void call_function( sequence< S... > ) const
          {
             // print_pack( std::get< S >( m_params )... );
-            return mp_func( std::get< S >( m_params )... );
+            if( nullptr != mp_function )
+               return mp_function( std::get< S >( m_params )... );
+            else if( m_function )
+               return m_function( std::get< S >( m_params )... );
          }
 
       private:
-         const tFunction mp_func;
-         std::tuple< Args... > m_params;
+         const tFunctionPtr      mp_function = nullptr;
+         const tFunction         m_function;
+         const tParameters       m_params;
    };
 
-} // namespace base::async::callable
+} // namespace base::async
 
 #pragma GCC pop_options
 
@@ -111,57 +132,51 @@ namespace base::async::callable {
 
    int main( int argc, char* argv[ ] )
    {
-      namespace base_v = base::async::callable;
+      namespace base_v = base::async;
 
       // Example 1
       {
-         base_v::TCallable< > callable( function_0 );
-         callable.call( );
+         auto callable = base_v::TCallable< >::create( function_0 );
+         callable->call( );
       }
 
       // Example 2
       {
          std::tuple< int > parameters = std::make_tuple( 111 );
-         base_v::TCallable< int > callable( function_1, parameters );
-         callable.call( );
+         auto callable = base_v::TCallable< int >::create( function_1, parameters );
+         callable->call( );
       }
 
       // Example 3
       {
-         base_v::TCallable< int > callable( function_1, 111 );
-         callable.call( );
+         auto callable = base_v::TCallable< int >::create( function_1, 111 );
+         callable->call( );
       }
 
       // Example 4
       {
-         const base_v::ICallable* const callable = base_v::TCallable< int >::create( function_1, 111 );
-         callable->call( );
+         std::tuple< int > parameters = std::make_tuple( 222 );
+         auto callable = base_v::TCallable< const int& >::create( function_2, parameters );
+         callable.call( );
       }
 
       // Example 5
       {
-         std::tuple< int > parameters = std::make_tuple( 222 );
-         base_v::TCallable< const int& > callable( function_2, parameters );
+         auto callable = base_v::TCallable< const int& >::create( function_2, 222 );
          callable.call( );
       }
 
       // Example 6
       {
-         base_v::TCallable< const int& > callable( function_2, 222 );
+         auto callable = base_v::TCallable< const std::size_t&, const std::string& >::create( function_3, 333, "framework" );
          callable.call( );
       }
 
       // Example 7
       {
-         base_v::TCallable< const std::size_t&, const std::string& > callable( function_3, 333, "framework" );
-         callable.call( );
-      }
-
-      // Example 8
-      {
          std::size_t id = 111;
          std::string name = "framework";
-         base_v::TCallable< const std::size_t&, const std::string& > callable( function_3, id, name );
+         auto callable = base_v::TCallable< const std::size_t&, const std::string& >::create( function_3, id, name );
          callable.call( );
          id = 222;
          name = "framework_1";

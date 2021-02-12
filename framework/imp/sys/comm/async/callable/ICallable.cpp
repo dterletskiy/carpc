@@ -1,16 +1,16 @@
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/application/Process.hpp"
-#include "api/sys/comm/async/runnable/IRunnable.hpp"
+#include "api/sys/comm/async/callable/ICallable.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "IRunnable"
+#define CLASS_ABBR "ICallable"
 
 
 using namespace base::async;
 
 
 
-const bool IRunnable::send( )
+const bool ICallable::send( )
 {
    application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
    if( nullptr == p_thread )
@@ -22,7 +22,7 @@ const bool IRunnable::send( )
    return p_thread->insert_event( shared_from_this( ) );
 }
 
-const bool IRunnable::send_to_context( application::IThread::tWptr pw_thread )
+const bool ICallable::send_to_context( application::IThread::tWptr pw_thread )
 {
    application::IThread::tSptr p_thread = pw_thread.lock( );
    if( nullptr == p_thread )
@@ -34,8 +34,7 @@ const bool IRunnable::send_to_context( application::IThread::tWptr pw_thread )
    return p_thread->insert_event( shared_from_this( ) );
 }
 
-void IRunnable::process( IAsync::IConsumer* p_consumer ) const
+void ICallable::process( IAsync::IConsumer* p_consumer ) const
 {
-   if( nullptr == m_operation ) return;
-   m_operation( );
+   call( );
 }

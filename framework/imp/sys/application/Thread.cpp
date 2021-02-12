@@ -108,44 +108,53 @@ base::async::IAsync::tSptr Thread::get_event( )
 
 void Thread::notify( const base::async::IAsync::tSptr p_event )
 {
-   // Processing runnable IAsync object
-   if( base::async::eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
+   switch( p_event->signature( )->type( ) )
    {
-      process_start( );
-      SYS_VRB( "'%s': start processing runnable at %ld (%s)",
-            m_name.c_str( ),
-            process_started( ),
-            p_event->signature( )->name( ).c_str( )
-         );
-      p_event->process( );
-      SYS_VRB( "'%s': finished processing runnable started at %ld (%s)",
-            m_name.c_str( ),
-            process_started( ),
-            p_event->signature( )->name( ).c_str( )
-         );
-      process_stop( );
-      return;
-   }
+      case async::eAsyncType::CALLABLE:
+      case async::eAsyncType::RUNNABLE:
+      {
+         process_start( );
+         SYS_VRB( "'%s': start processing runnable at %ld (%s)",
+               m_name.c_str( ),
+               process_started( ),
+               p_event->signature( )->name( ).c_str( )
+            );
+         p_event->process( );
+         SYS_VRB( "'%s': finished processing runnable started at %ld (%s)",
+               m_name.c_str( ),
+               process_started( ),
+               p_event->signature( )->name( ).c_str( )
+            );
+         process_stop( );
 
-   auto& consumers_set = m_consumers_map.start_process( p_event->signature( ) );
-   SYS_VRB( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
-   for( base::async::IAsync::IConsumer* p_consumer : consumers_set )
-   {
-      process_start( );
-      SYS_VRB( "'%s': start processing event at %ld (%s)",
-            m_name.c_str( ),
-            process_started( ),
-            p_event->signature( )->name( ).c_str( )
-         );
-      p_event->process( p_consumer );
-      SYS_VRB( "'%s': finished processing event started at %ld (%s)",
-            m_name.c_str( ),
-            process_started( ),
-            p_event->signature( )->name( ).c_str( )
-         );
+         break;
+      }
+      case async::eAsyncType::EVENT:
+      {
+         auto& consumers_set = m_consumers_map.start_process( p_event->signature( ) );
+         SYS_VRB( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
+         for( base::async::IAsync::IConsumer* p_consumer : consumers_set )
+         {
+            process_start( );
+            SYS_VRB( "'%s': start processing event at %ld (%s)",
+                  m_name.c_str( ),
+                  process_started( ),
+                  p_event->signature( )->name( ).c_str( )
+               );
+            p_event->process( p_consumer );
+            SYS_VRB( "'%s': finished processing event started at %ld (%s)",
+                  m_name.c_str( ),
+                  process_started( ),
+                  p_event->signature( )->name( ).c_str( )
+               );
+         }
+         process_stop( );
+         m_consumers_map.finish_process( );
+
+         break;
+      }
+      default: break;
    }
-   process_stop( );
-   m_consumers_map.finish_process( );
 }
 
 void Thread::set_notification( const base::async::IAsync::ISignature::tSptr p_signature, base::async::IAsync::IConsumer* p_consumer )
@@ -165,10 +174,13 @@ void Thread::clear_all_notifications( const base::async::IAsync::ISignature::tSp
 
 bool Thread::is_subscribed( const base::async::IAsync::tSptr p_event )
 {
-   if( base::async::eAsyncType::RUNNABLE == p_event->signature( )->type( ) )
-      return true;
-
-   return m_consumers_map.is_subscribed( p_event->signature( ) );
+   switch( p_event->signature( )->type( ) )
+   {
+      case async::eAsyncType::CALLABLE:
+      case async::eAsyncType::RUNNABLE:   return true;
+      case async::eAsyncType::EVENT:      return m_consumers_map.is_subscribed( p_event->signature( ) );
+   }
+   return false;
 }
 
 void Thread::dump( ) const

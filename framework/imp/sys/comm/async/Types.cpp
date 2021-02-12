@@ -9,6 +9,7 @@ namespace base::async {
       {
          case eAsyncType::EVENT:       return "base::eAsyncType::EVENT";
          case eAsyncType::RUNNABLE:    return "base::eAsyncType::RUNNABLE";
+         case eAsyncType::CALLABLE:    return "base::eAsyncType::CALLABLE";
          default:                      return "base::eAsyncType::UNEFINED";
       }
    }

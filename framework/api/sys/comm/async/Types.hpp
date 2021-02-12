@@ -166,7 +166,7 @@ namespace base::async {
    using NoServiceType = void;
    #define IS_IPC_EVENT ( false == std::is_same_v< tService, NoServiceType > )
 
-   enum class eAsyncType : size_t { EVENT, RUNNABLE, UNDEFINED };
+   enum class eAsyncType : size_t { EVENT, RUNNABLE, CALLABLE };
    const char* c_str( const eAsyncType );
 
 } // namespace base::async
