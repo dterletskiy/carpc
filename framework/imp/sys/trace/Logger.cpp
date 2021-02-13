@@ -17,11 +17,18 @@ using namespace base::trace;
 
 Logger* Logger::mp_instance = nullptr;
 
-Logger::Logger( const eLogStrategy& log_strategy, const char* const app_name )
-   : mp_application_name( app_name )
-   , m_log_strategy( log_strategy )
+Logger::Logger( )
+   : mp_application_name( "APPL" )
 {
-   #if OS == OS_LINUX
+   log_strategy( eLogStrategy::CONSOLE );
+}
+
+Logger::Logger( const eLogStrategy& _log_strategy, const char* const app_name )
+   : mp_application_name( app_name )
+{
+   log_strategy( _log_strategy );
+
+   #ifdef USE_DLT
       if( eLogStrategy::DLT == m_log_strategy )
       {
          const auto registerAppStatus = dlt_register_app( mp_application_name, format_string( mp_application_name, " Application" ).c_str( ) );
@@ -33,7 +40,7 @@ Logger::Logger( const eLogStrategy& log_strategy, const char* const app_name )
 
 Logger::~Logger( )
 {
-   #if OS == OS_LINUX
+   #ifdef USE_DLT
       if( eLogStrategy::DLT == m_log_strategy )
       {
          for( auto& pair : m_context_map )
@@ -41,9 +48,13 @@ Logger::~Logger( )
          dlt_unregister_app( );
       }
    #endif
+
+   // Set mp_instance to nullptr for using default logging strategy
+   if( this == mp_instance )
+      mp_instance = nullptr;
 }
 
-#if OS == OS_LINUX
+#ifdef USE_DLT
 DltContext& Logger::dlt_context( )
 {
    const auto [iterator, success] = m_context_map.insert( { pthread_self( ), DltContext{ } } );
@@ -93,6 +104,7 @@ bool Logger::init( const eLogStrategy& log_strategy, const char* const app_name 
 
 bool Logger::deinit( )
 {
-   delete mp_instance;
+   if( nullptr != mp_instance )
+      delete mp_instance;
    return true;
 }

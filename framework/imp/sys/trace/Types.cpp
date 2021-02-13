@@ -32,7 +32,9 @@ namespace base::trace {
       }
       return ANDROID_LOG_VERBOSE;
    }
-   #elif OS == OS_LINUX
+   #endif
+
+   #ifdef USE_DLT
    DltLogLevelType to_dlt( const eLogLevel& log_level )
    {
       switch( log_level )

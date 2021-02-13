@@ -43,6 +43,10 @@ namespace memory {
 void boot( int argc, char** argv )
 {
    memory::dump( );
+
+   SYS_TRACE_INFORMATION;
+   MSG_TRACE_INFORMATION;
+
    MSG_DBG( "argc = %d", argc );
    MSG_DBG( "SIGRTMIN = %d / SIGRTMAX = %d", SIGRTMIN, SIGRTMAX );
 
@@ -60,12 +64,6 @@ void boot( int argc, char** argv )
       p_process->boot( );
    }
 
-   MSG_VRB( "Main: program exiting." );
-   MSG_INF( "Main: program exiting." );
-   MSG_DBG( "Main: program exiting." );
-   MSG_WRN( "Main: program exiting." );
-   MSG_ERR( "Main: program exiting." );
-
    memory::dump( );
 }
 
@@ -75,10 +73,21 @@ bool test( int argc, char* argv[ ] );
 
 #if OS == OS_LINUX
 
+   void __constructor__( ) __attribute__(( constructor(101) ));
+   void __constructor__( )
+   {
+      MSG_INF( "starting..." );
+      base::trace::Logger::init( base::trace::eLogStrategy::DLT, "CORE" );
+   }
+
+   void __destructor__( ) __attribute__(( destructor(101) ));
+   void __destructor__( )
+   {
+      MSG_INF( "finishing..." );
+   }
+
    int main( int argc, char* argv[ ] )
    {
-      base::trace::Logger::init( base::trace::eLogStrategy::DLT, "CORE" );
-
       if( test( argc, argv ) )
          boot( argc, argv );
 
@@ -90,18 +99,24 @@ bool test( int argc, char* argv[ ] );
    #include <jni.h>
    #include "api/sys/oswrappers/Thread.hpp"
 
-   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (101) )) = { boot, 1, nullptr };
+   void __constructor__( ) __attribute__(( constructor(101) ));
+   void __constructor__( )
+   {
+      base::trace::Logger::init( base::trace::eLogStrategy::ANDROID, "APP" );
+      MSG_INF( "library loaded" );
+   }
 
-   void __constructor__( ) __attribute__(( constructor(102) ));
-   void __destructor__( ) __attribute__(( destructor(102) ));
+   void __destructor__( ) __attribute__(( destructor(101) ));
+   void __destructor__( )
+   {
+      MSG_INF( "library unloaded" );
+   }
 
-   void __constructor__( ) { MSG_INF( "library loaded" ); }
-   void __destructor__( ) { MSG_INF( "library unloaded" ); }
+   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (102) )) = { boot, 1, nullptr };
 
    extern "C" JNIEXPORT jstring JNICALL
    Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
    {
-      base::trace::Logger::init( base::trace::eLogStrategy::ANDROID_T, "CORE" );
       MSG_VRB( "JNI" );
       boot_thread.run( );
 

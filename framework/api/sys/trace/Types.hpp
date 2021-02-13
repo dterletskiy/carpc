@@ -6,7 +6,9 @@
 
 #if OS == OS_ANDROID
    #include <android/log.h>
-#elif OS == OS_LINUX
+#endif
+
+#ifdef USE_DLT
    #include <dlt/dlt.h>
 #endif
 
@@ -22,10 +24,11 @@ namespace base::trace {
    const char* const to_color( const eLogLevel& );
    #if OS == OS_ANDROID
       int to_android( const eLogLevel& );
-   #elif OS == OS_LINUX
+   #endif
+   #ifdef USE_DLT
       DltLogLevelType to_dlt( const eLogLevel& );
    #endif
 
-   enum class eLogStrategy : std::uint8_t { CONSOLE, CONSOLE_EXT, DLT, ANDROID_T, UNDEFINED };
+   enum class eLogStrategy : std::uint8_t { CONSOLE, CONSOLE_EXT, DLT, ANDROID, UNDEFINED };
 
 }

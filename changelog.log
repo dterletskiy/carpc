@@ -1,3 +1,7 @@
+version 2.3.4
+   - Minor changes and adaptations in logging.
+   - USE_DLT compilation flag introduced.
+
 version 2.3.3
    - Changes in CALLABLE object.
 

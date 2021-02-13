@@ -1,7 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dltfilter>
     <filter>
-        <type>0</type>
+        <type>2</type>
+        <name>ColoredLogLevel_Fatal</name>
+        <ecuid></ecuid>
+        <applicationid></applicationid>
+        <contextid></contextid>
+        <headertext></headertext>
+        <payloadtext></payloadtext>
+        <regex_search></regex_search>
+        <regex_replace></regex_replace>
+        <messageIdMin>0</messageIdMin>
+        <messageIdMax>0</messageIdMax>
+        <enableregexp_Appid>0</enableregexp_Appid>
+        <enableregexp_Context>0</enableregexp_Context>
+        <enableregexp_Header>0</enableregexp_Header>
+        <enableregexp_Payload>0</enableregexp_Payload>
+        <ignoreCase_Header>0</ignoreCase_Header>
+        <ignoreCase_Payload>0</ignoreCase_Payload>
+        <enablefilter>0</enablefilter>
+        <enableecuid>0</enableecuid>
+        <enableapplicationid>0</enableapplicationid>
+        <enablecontextid>0</enablecontextid>
+        <enableheadertext>0</enableheadertext>
+        <enablepayloadtext>0</enablepayloadtext>
+        <enablectrlmsgs>0</enablectrlmsgs>
+        <enableLogLevelMin>1</enableLogLevelMin>
+        <enableLogLevelMax>1</enableLogLevelMax>
+        <enableMarker>0</enableMarker>
+        <enableMessageId>0</enableMessageId>
+        <enableRegexSearchReplace>0</enableRegexSearchReplace>
+        <filterColour>#ff0000</filterColour>
+        <logLevelMax>1</logLevelMax>
+        <logLevelMin>1</logLevelMin>
+    </filter>
+    <filter>
+        <type>2</type>
         <name>ColoredLogLevel_Error</name>
         <ecuid></ecuid>
         <applicationid></applicationid>
@@ -18,7 +52,7 @@
         <enableregexp_Payload>0</enableregexp_Payload>
         <ignoreCase_Header>0</ignoreCase_Header>
         <ignoreCase_Payload>0</ignoreCase_Payload>
-        <enablefilter>1</enablefilter>
+        <enablefilter>0</enablefilter>
         <enableecuid>0</enableecuid>
         <enableapplicationid>0</enableapplicationid>
         <enablecontextid>0</enablecontextid>
@@ -27,11 +61,45 @@
         <enablectrlmsgs>0</enablectrlmsgs>
         <enableLogLevelMin>1</enableLogLevelMin>
         <enableLogLevelMax>1</enableLogLevelMax>
-        <enableMarker>1</enableMarker>
+        <enableMarker>0</enableMarker>
         <enableMessageId>0</enableMessageId>
         <enableRegexSearchReplace>0</enableRegexSearchReplace>
         <filterColour>#ff0000</filterColour>
         <logLevelMax>2</logLevelMax>
         <logLevelMin>2</logLevelMin>
+    </filter>
+    <filter>
+        <type>2</type>
+        <name>ColoredLogLevel_Warning</name>
+        <ecuid></ecuid>
+        <applicationid></applicationid>
+        <contextid></contextid>
+        <headertext></headertext>
+        <payloadtext></payloadtext>
+        <regex_search></regex_search>
+        <regex_replace></regex_replace>
+        <messageIdMin>0</messageIdMin>
+        <messageIdMax>0</messageIdMax>
+        <enableregexp_Appid>0</enableregexp_Appid>
+        <enableregexp_Context>0</enableregexp_Context>
+        <enableregexp_Header>0</enableregexp_Header>
+        <enableregexp_Payload>0</enableregexp_Payload>
+        <ignoreCase_Header>0</ignoreCase_Header>
+        <ignoreCase_Payload>0</ignoreCase_Payload>
+        <enablefilter>0</enablefilter>
+        <enableecuid>0</enableecuid>
+        <enableapplicationid>0</enableapplicationid>
+        <enablecontextid>0</enablecontextid>
+        <enableheadertext>0</enableheadertext>
+        <enablepayloadtext>0</enablepayloadtext>
+        <enablectrlmsgs>0</enablectrlmsgs>
+        <enableLogLevelMin>1</enableLogLevelMin>
+        <enableLogLevelMax>1</enableLogLevelMax>
+        <enableMarker>0</enableMarker>
+        <enableMessageId>0</enableMessageId>
+        <enableRegexSearchReplace>0</enableRegexSearchReplace>
+        <filterColour>#0000ff</filterColour>
+        <logLevelMax>3</logLevelMax>
+        <logLevelMin>3</logLevelMin>
     </filter>
 </dltfilter>

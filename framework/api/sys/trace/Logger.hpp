@@ -10,7 +10,7 @@ namespace base::trace {
    class Logger
    {
       private:
-         Logger( ) = default;
+         Logger( );
          Logger( const eLogStrategy&, const char* const );
          static Logger* mp_instance;
       public:
@@ -37,12 +37,12 @@ namespace base::trace {
                }
                case eLogStrategy::DLT:
                {
-                  #if OS == OS_LINUX
+                  #ifdef USE_DLT
                      DLT_LOG( dlt_context( ), to_dlt( log_level ), DLT_SIZED_CSTRING( p_buffer, size ) );
-                  #endif // OS == OS_LINUX
+                  #endif // OS == USE_DLT
                   break;
                }
-               case eLogStrategy::ANDROID_T:
+               case eLogStrategy::ANDROID:
                {
                   #if OS == OS_ANDROID
                      __android_log_print( to_android( log_level ), "TAG", "%s", p_buffer );
@@ -108,7 +108,7 @@ namespace base::trace {
                      );
                   break;
                }
-               case eLogStrategy::ANDROID_T:
+               case eLogStrategy::ANDROID:
                {
                   std::string full_format = std::string( "[%s:%s:%d] -> " ) + std::string( format );
                   message(
@@ -159,17 +159,55 @@ namespace base::trace {
          }
 
       private:
-         #if OS == OS_LINUX
-            DltContext& dlt_context( );
-         #endif
-      private:
          const char* mp_application_name = nullptr;
-         eLogStrategy m_log_strategy = eLogStrategy::CONSOLE;
-         #if OS == OS_LINUX
+
+      public:
+         const eLogStrategy& log_strategy( ) const;
+         void log_strategy( const eLogStrategy& );
+      private:
+         #if OS == OS_ANDROID
+            eLogStrategy m_log_strategy = eLogStrategy::ANDROID;
+         #else
+            eLogStrategy m_log_strategy = eLogStrategy::CONSOLE;
+         #endif
+
+      private:
+         #ifdef USE_DLT
+            DltContext& dlt_context( );
             std::map< base::os::linux::thread::tID, DltContext > m_context_map;
          #endif
    };
 
+
+
+   inline
+   const eLogStrategy& Logger::log_strategy( ) const
+   {
+      return m_log_strategy;
+   }
+
+   inline
+   void Logger::log_strategy( const eLogStrategy& _log_strategy )
+   {
+      m_log_strategy = _log_strategy;
+
+      #ifndef USE_DLT
+         // Prevent DLT logging startegy in case of DLT is not used
+         if( eLogStrategy::DLT == m_log_strategy )
+         {
+            #if OS == OS_ANDROID
+               m_log_strategy = eLogStrategy::ANDROID;
+            #else
+               m_log_strategy = eLogStrategy::CONSOLE;
+            #endif
+         }
+      #endif
+
+      #if OS != OS_ANDROID
+         if( eLogStrategy::ANDROID == m_log_strategy )
+            m_log_strategy = eLogStrategy::CONSOLE;
+      #endif
+   }
 
 } // namespace base::trace
 

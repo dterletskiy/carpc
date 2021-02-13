@@ -154,14 +154,32 @@
 
 
 
-#define MARKER_LINE              "----------------------------------------------"
+#define TRACE_MARKER_LINE        "----------------------------------------------"
 
-#define SYS_MARKER( VALUE )      SYS_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
-#define SYS_DUMP_START( VALUE )  SYS_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )
-#define SYS_DUMP_END( VALUE )    SYS_WRN( MARKER_LINE "  END DUMP:  %s " MARKER_LINE, #VALUE )
+#define SYS_MARKER( VALUE )      SYS_ERR( TRACE_MARKER_LINE " MARKER: %s " TRACE_MARKER_LINE, #VALUE )
+#define MSG_MARKER( VALUE )      MSG_ERR( TRACE_MARKER_LINE " MARKER: %s " TRACE_MARKER_LINE, #VALUE )
+
+#define SYS_DUMP_START( VALUE )  SYS_WRN( TRACE_MARKER_LINE " START DUMP: %s " TRACE_MARKER_LINE, #VALUE )
+#define SYS_DUMP_END( VALUE )    SYS_WRN( TRACE_MARKER_LINE "  END DUMP:  %s " TRACE_MARKER_LINE, #VALUE )
+#define MSG_DUMP_START( VALUE )  MSG_WRN( TRACE_MARKER_LINE " START DUMP: %s " TRACE_MARKER_LINE, #VALUE )
+#define MSG_DUMP_END( VALUE )    MSG_WRN( TRACE_MARKER_LINE "  END DUMP:  %s " TRACE_MARKER_LINE, #VALUE )
+
 #define SYS_SIZEOF( TYPE )       SYS_DBG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
-
-#define MSG_MARKER( VALUE )      MSG_ERR( MARKER_LINE " MARKER: %s " MARKER_LINE, #VALUE )
-#define MSG_DUMP_START( VALUE )  MSG_WRN( MARKER_LINE " START DUMP: %s " MARKER_LINE, #VALUE )
-#define MSG_DUMP_END( VALUE )    MSG_WRN( MARKER_LINE "  END DUMP:  %s " MARKER_LINE, #VALUE )
 #define MSG_SIZEOF( TYPE )       MSG_DBG( "sizeof( %s ) = %zu", #TYPE, sizeof( TYPE ) );
+
+#define SYS_TRACE_INFORMATION \
+   SYS_VRB( "system verbose level message" ); \
+   SYS_INF( "system information level message" ); \
+   SYS_DBG( "system debug level message" ); \
+   SYS_WRN( "system warning level message" ); \
+   SYS_ERR( "system error level message" ); \
+   SYS_FTL( "system fatal level message" );
+
+#define MSG_TRACE_INFORMATION \
+   MSG_VRB( "application verbose level message" ); \
+   MSG_INF( "application information level message" ); \
+   MSG_DBG( "application debug level message" ); \
+   MSG_WRN( "application warning level message" ); \
+   MSG_ERR( "application error level message" ); \
+   MSG_FTL( "application fatal level message" );
+

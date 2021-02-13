@@ -14,12 +14,23 @@ namespace memory {
    #endif
 }
 
+void __constructor__( ) __attribute__(( constructor(101) ));
+void __constructor__( )
+{
+   MSG_INF( "starting..." );
+   base::trace::Logger::init( base::trace::eLogStrategy::DLT, "SBR" );
+}
+
+void __destructor__( ) __attribute__(( destructor(101) ));
+void __destructor__( )
+{
+   MSG_INF( "finishing..." );
+}
+
 
 
 int main( int argc, char *argv[] )
 {
-   base::trace::Logger::init( base::trace::eLogStrategy::DLT, "SBR" );
-
    base::tools::cmd::init( argc, argv );
    base::tools::cmd::print( );
    base::tools::cfg::init( base::tools::cmd::argument( "config" ).value_or( "servicebrocker.cfg" ) );
