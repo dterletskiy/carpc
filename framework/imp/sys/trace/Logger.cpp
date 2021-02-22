@@ -64,11 +64,11 @@ DltContext& Logger::dlt_context( )
       if ( 0 != pthread_getname_np( iterator->first, thread_name, NAMELEN ) )
       {
          std::string thread_name_id = format_string( iterator->first ).c_str( );
-         dlt_register_context( &(iterator->second), thread_name_id.c_str( ), format_string( thread_name_id, " Context" ).c_str( ) );
+         dlt_register_context( &(iterator->second), thread_name_id.c_str( ), thread_name_id.c_str( ) );
       }
       else
       {
-         dlt_register_context( &(iterator->second), thread_name, format_string( thread_name, " Context" ).c_str( ) );
+         dlt_register_context( &(iterator->second), thread_name, thread_name );
       }
    }
 

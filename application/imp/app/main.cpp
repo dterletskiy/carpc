@@ -43,7 +43,7 @@ namespace memory {
 
 
 
-void boot( int argc, char** argv )
+void boot( int argc, char** argv, char** envp )
 {
    memory::dump( );
 
@@ -73,17 +73,72 @@ void boot( int argc, char** argv )
    memory::dump( );
 }
 
-bool test( int argc, char* argv[ ] );
+bool test( int argc, char** argv, char** envp );
 
 
 
 #if OS == OS_LINUX
 
+   void print_environment( int argc, char** argv, char** envp )
+   {
+      printf("-----------------------------------------------\n");
+
+      printf( "argc = %d\n", argc );
+      printf("\n");
+
+      for( int count = 0; count < argc; ++count )
+         printf( "argv[%d] = %s\n", count, argv[count] );
+      printf("\n");
+
+      for( int count = 0; envp[count] != nullptr; ++count )
+         printf( "envp[%d] = %s\n", count, envp[count] );
+      printf("\n");
+
+      printf("-----------------------------------------------\n");
+
+      std::map< std::string, std::string > cmd_line_map;
+      base::tools::cmd::init( argc, argv, cmd_line_map );
+      base::tools::cmd::print( cmd_line_map );
+      std::string string_trace_strategy = base::tools::cmd::argument( "trace", cmd_line_map ).value_or( "CONSOLE" );
+      base::trace::eLogStrategy trace_strategy = base::trace::eLogStrategy::CONSOLE;
+      if( "CONSOLE" == string_trace_strategy )
+         trace_strategy = base::trace::eLogStrategy::CONSOLE;
+      else if( "DLT" == string_trace_strategy )
+         trace_strategy = base::trace::eLogStrategy::DLT;
+      else
+         trace_strategy = base::trace::eLogStrategy::CONSOLE;
+      printf("%s\n", string_trace_strategy.c_str( ) );
+      base::trace::Logger::init( trace_strategy, "APP" );
+   }
+
+   using tStart = void (*)( int, char**, char** );
+   using tExit = void (*)( void );
+
+   void preinit( int argc, char** argv, char** envp )
+   {
+      printf( "%s\n", __FUNCTION__ );
+   }
+   __attribute__(( section(".preinit_array") )) tStart __preinit__ = preinit;
+
+   void init( int argc, char** argv, char** envp )
+   {
+      printf( "%s\n", __FUNCTION__ );
+      print_environment( argc, argv, envp );
+   }
+   __attribute__(( section(".init_array") )) tStart __init__ = init;
+
+   void fini( )
+   {
+      printf( "%s\n", __FUNCTION__ );
+   }
+   __attribute__(( section(".fini_array") )) tExit __fini__ = fini;
+
+
+
    void __constructor__( ) __attribute__(( constructor(101) ));
    void __constructor__( )
    {
       MSG_INF( "starting..." );
-      base::trace::Logger::init( base::trace::eLogStrategy::DLT, "APP" );
    }
 
    void __destructor__( ) __attribute__(( destructor(101) ));
@@ -92,10 +147,12 @@ bool test( int argc, char* argv[ ] );
       MSG_INF( "finishing..." );
    }
 
-   int main( int argc, char* argv[ ] )
+
+
+   int main( int argc, char** argv, char** envp )
    {
-      if( test( argc, argv ) )
-         boot( argc, argv );
+      if( test( argc, argv, envp ) )
+         boot( argc, argv, envp );
 
       return 0;
    }
@@ -135,7 +192,7 @@ bool test( int argc, char* argv[ ] );
 
 
 
-bool test( int argc, char* argv[ ] )
+bool test( int argc, char** argv, char** envp )
 {
    return true;
 }

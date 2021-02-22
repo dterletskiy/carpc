@@ -39,7 +39,7 @@ namespace base::service {
          const ID& id( ) const;
          bool is_valid( ) const;
       private:
-         application::Context    m_context = { };
+         application::Context    m_context = application::Context::internal_broadcast;
          ID                      m_id = ID::invalid( );
    };
 

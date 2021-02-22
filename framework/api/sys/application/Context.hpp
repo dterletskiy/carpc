@@ -16,33 +16,17 @@ namespace base::application {
          using tList = std::list< Context >;
          using tSet = std::set< Context >;
 
-         enum class eInitType : std::uint8_t { Default, Auto };
+         enum class eInitType : std::uint8_t { INTERNAL_BROADCAST, INTERNAL_LOCAL, CURRENT, INVALID };
 
       public:
-         struct process
-         {
-            using tID = application::process::ID;
-            static const tID broadcast;
-            static const tID local;
-         };
-         struct thread
-         {
-            using tID = application::thread::ID;
-            static const tID broadcast;
-            static const tID local;
-         };
-
-         static const Context& invalid( )
-         {
-            static Context context( process::tID::invalid( ), thread::tID::invalid( ) );
-            return context;
-         }
+         static const Context invalid;
+         static const Context internal_broadcast;
+         static const Context internal_local;
+         static Context current( );
 
       public:
-         Context( const eInitType init_type = eInitType::Default );
-         Context( const process::tID& );
-         Context( const thread::tID& );
-         Context( const process::tID&, const thread::tID& );
+         Context( const eInitType init_type );
+         Context( const process::ID&, const thread::ID& );
          Context( const Context& );
          ~Context( ) = default;
 
@@ -65,23 +49,23 @@ namespace base::application {
          bool is_valid( ) const;
 
       public:
-         const process::tID& pid( ) const;
-         const thread::tID& tid( ) const;
+         const process::ID& pid( ) const;
+         const thread::ID& tid( ) const;
       private:
-         process::tID m_pid = process::local;
-         thread::tID m_tid = thread::broadcast;
+         process::ID m_pid = process::ID::invalid( );
+         thread::ID m_tid = thread::ID::invalid( );
    };
 
 
 
    inline
-   const Context::process::tID& Context::pid( ) const
+   const process::ID& Context::pid( ) const
    {
       return m_pid;
    }
 
    inline
-   const Context::thread::tID& Context::tid( ) const
+   const thread::ID& Context::tid( ) const
    {
       return m_tid;
    }

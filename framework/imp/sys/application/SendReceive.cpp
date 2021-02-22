@@ -242,7 +242,7 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
          }
          else
          {
-            application::Context to_context;
+            application::Context to_context = application::Context::internal_broadcast;
             if( false == package.data( to_context ) )
             {
                SYS_ERR( "parce package error" );

@@ -17,6 +17,10 @@ namespace base::tools::cmd {
    const tCmdLineMap& map( );
    void print( );
 
+   void init( int argc, char** argv, tCmdLineMap& );
+   tCmdParamValue argument( const std::string& parameter, const tCmdLineMap& );
+   void print( const tCmdLineMap& );
+
 } // namespace base::tools::cmd
 
 

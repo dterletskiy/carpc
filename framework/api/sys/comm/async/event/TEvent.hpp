@@ -29,14 +29,12 @@ namespace base::async {
       protected:
          TEvent( const tUserSignature& signature, const tPriority& priority )
             : IEvent( )
-            , m_context( application::Context::eInitType::Auto )
             , m_priority( priority )
          {
             mp_signature = tSignature::create( signature );
          }
          TEvent( const tUserSignature& signature, const tData& data, const tPriority& priority )
             : IEvent( )
-            , m_context( application::Context::eInitType::Auto )
             , m_priority( priority )
          {
             mp_signature = tSignature::create( signature );
@@ -86,7 +84,7 @@ namespace base::async {
 
          static const bool create_send(
                const tUserSignature& signature,
-               const application::Context& to_context = application::Context( )
+               const application::Context& to_context = application::Context::internal_broadcast
             )
          {
             return create( signature )->send( to_context );
@@ -94,7 +92,7 @@ namespace base::async {
          static const bool create_send(
                const tUserSignature& signature,
                const tPriority& priority,
-               const application::Context& to_context = application::Context( )
+               const application::Context& to_context = application::Context::internal_broadcast
             )
          {
             return create( signature, priority )->send( to_context );
@@ -102,7 +100,7 @@ namespace base::async {
          static const bool create_send(
                const tUserSignature& signature,
                const tData& data,
-               const application::Context& to_context = application::Context( )
+               const application::Context& to_context = application::Context::internal_broadcast
             )
          {
             return create( signature, data )->send( to_context );
@@ -111,7 +109,7 @@ namespace base::async {
                const tUserSignature& signature,
                const tData& data,
                const tPriority& priority,
-               const application::Context& to_context = application::Context( )
+               const application::Context& to_context = application::Context::internal_broadcast
             )
          {
             return create( signature, data, priority )->send( to_context );
@@ -119,7 +117,7 @@ namespace base::async {
 
       // virual function
       public:
-         const bool send( const application::Context& to_context = application::Context( ) ) override
+         const bool send( const application::Context& to_context = application::Context::internal_broadcast ) override
          {
             return IEvent::send( TEvent< _Generator >::shared_from_this( ), to_context );
          }
@@ -195,7 +193,7 @@ namespace base::async {
       public:
          const application::Context& context( ) const override { return m_context; }
       private:
-         application::Context m_context;
+         application::Context m_context = application::Context::current( );
 
       public:
          const tPriority priority( ) const override { return m_priority; }

@@ -64,5 +64,5 @@ void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
 
    const auto& configuration = Process::instance( )->configuration( );
    dsi::Packet packet( command, service_passport, configuration.ipc_app );
-   m_service.send( packet, application::Context::invalid( ) );
+   m_service.send( packet, application::Context::invalid );
 }

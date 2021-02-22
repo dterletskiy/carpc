@@ -149,7 +149,7 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
 
       return std::static_pointer_cast< application::ThreadIPC >( p_thread_ipc )->send( p_event, to_context );
    }
-   else if( application::Context::thread::broadcast == to_context.tid( ) )
+   else if( application::thread::broadcast == to_context.tid( ) )
    {
       SYS_INF( "sending broadcast event to all application threads" );
       bool result = true;
@@ -168,7 +168,7 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
 
       return result;
    }
-   else if( application::Context::thread::local == to_context.tid( ) )
+   else if( application::thread::local == to_context.tid( ) )
    {
       SYS_INF( "sending event to current application thread" );
       application::IThread::tSptr p_thread = base::application::Process::instance( )->current_thread( );

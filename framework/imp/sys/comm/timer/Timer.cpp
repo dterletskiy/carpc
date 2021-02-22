@@ -53,7 +53,6 @@ void event_handler( union sigval sv )
 Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
    : m_name( name )
    , mp_consumer( p_consumer )
-   , m_context( application::Context::eInitType::Auto )
 {
    if( nullptr == mp_consumer )
    {
@@ -61,9 +60,9 @@ Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
       return;
    }
 
-   if( application::Context::thread::broadcast == m_context.tid( ) )
+   if( false == m_context.is_valid( ) )
    {
-      SYS_ERR( "application::Thread has not been found. Creating timer not in application thread" );
+      SYS_ERR( "Creating timer not in application thread" );
       return;
    }
 

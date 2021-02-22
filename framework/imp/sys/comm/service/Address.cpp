@@ -10,8 +10,7 @@ using namespace base::service;
 
 
 Address::Address( const ID& id )
-   : m_context( application::Context::eInitType::Auto )
-   , m_id( id )
+   : m_id( id )
 {
 }
 

@@ -58,7 +58,7 @@ archive:
 
 execute:
 	reset
-	export LD_LIBRARY_PATH=$(LD_PATH) ; $(TARGET_DIR)/$(PROJECT_NAME)
+	export LD_LIBRARY_PATH=$(LD_PATH) ; $(TARGET_DIR)/$(PROJECT_NAME) trace=CONSOLE
 
 pexecute:
 	reset

@@ -18,7 +18,7 @@ void __constructor__( ) __attribute__(( constructor(101) ));
 void __constructor__( )
 {
    MSG_INF( "starting..." );
-   base::trace::Logger::init( base::trace::eLogStrategy::DLT, "SBR" );
+   base::trace::Logger::init( base::trace::eLogStrategy::CONSOLE, "SBR" );
 }
 
 void __destructor__( ) __attribute__(( destructor(101) ));

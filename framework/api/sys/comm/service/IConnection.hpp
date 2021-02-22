@@ -42,7 +42,7 @@ namespace base::service {
       public:
          const application::Context& context( ) const;
       protected:
-         application::Context    m_context;
+         application::Context    m_context = application::Context::current( );
 
       public:
          const ID& id( ) const;

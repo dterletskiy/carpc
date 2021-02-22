@@ -69,8 +69,8 @@ namespace base::service::secure::__private {
             return sid < other.sid;
          }
 
-         application::Context::thread::tID   tid;
-         service::ID                         sid;
+         application::thread::ID    tid;
+         service::ID                sid;
       };
 
       public:
@@ -83,7 +83,7 @@ namespace base::service::secure::__private {
       public:
          std::shared_ptr< typename TYPES::tBaseData > data( ) const;
       private:
-         std::map< application::Context::process::tID, typename LocalContext::tSet > subscribers;
+         std::map< application::process::ID, typename LocalContext::tSet > subscribers;
          std::shared_ptr< typename TYPES::tBaseData > mp_data = nullptr;
    };
 
@@ -103,9 +103,9 @@ namespace base::service::secure::__private {
    void NotificationStatus< TYPES >::add_subscriber( const application::Context& context, const service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
-      // It is current process ID and appliocation::Context::process::local
+      // It is current process ID and appliocation::process::local
       // Here we should standartize what exact value should be stored in collection.
-      application::Context::process::tID pid = application::Context::process::local;
+      application::process::ID pid = application::process::local;
       if( context.is_external( ) )
          pid = context.pid( );
 
@@ -120,9 +120,9 @@ namespace base::service::secure::__private {
    void NotificationStatus< TYPES >::remove_subscriber( const application::Context& context, const service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
-      // It is current process ID and appliocation::Context::process::local
+      // It is current process ID and appliocation::process::local
       // Here we should standartize what exact value should be stored in collection.
-      application::Context::process::tID pid = application::Context::process::local;
+      application::process::ID pid = application::process::local;
       if( context.is_external( ) )
       {
          pid = context.pid( );

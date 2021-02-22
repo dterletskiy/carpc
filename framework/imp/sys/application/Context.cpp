@@ -9,36 +9,47 @@ using namespace base::application;
 
 
 
-const Context::process::tID Context::process::broadcast = Context::process::tID::invalid( );
-const Context::process::tID Context::process::local = Context::process::broadcast - Context::process::tID::VALUE_TYPE( 1 );
-
-const Context::thread::tID Context::thread::broadcast = Context::thread::tID::invalid( );
-const Context::thread::tID Context::thread::local = Context::thread::broadcast - Context::thread::tID::VALUE_TYPE( 1 );
+const Context Context::invalid{ Context::eInitType::INVALID };
+const Context Context::internal_broadcast{ Context::eInitType::INTERNAL_BROADCAST };
+const Context Context::internal_local{ Context::eInitType::INTERNAL_LOCAL };
 
 
 
 Context::Context( const eInitType init_type )
 {
-   if( eInitType::Auto == init_type )
+   switch( init_type )
    {
-      m_pid = Process::instance( )->id( );
-      IThread::tSptr thread = Process::instance( )->current_thread( );
-      if( nullptr != thread )
-         m_tid = thread->id( );
+      case eInitType::INTERNAL_BROADCAST:
+      {
+         m_pid = process::local;
+         m_tid = thread::broadcast;
+         break;
+      }
+      case eInitType::INTERNAL_LOCAL:
+      {
+         m_pid = process::local;
+         m_tid = thread::local;
+         break;
+      }
+      case eInitType::CURRENT:
+      {
+         m_pid = Process::instance( )->id( );
+         IThread::tSptr thread = Process::instance( )->current_thread( );
+         if( nullptr != thread )
+            m_tid = thread->id( );
+         break;
+      }
+      case eInitType::INVALID:
+      default:
+      {
+         m_pid = process::ID::invalid( );
+         m_tid = thread::ID::invalid( );
+         break;
+      }
    }
 }
 
-Context::Context( const process::tID& pid )
-   : m_pid( pid )
-{
-}
-
-Context::Context( const thread::tID& tid )
-   : m_tid( tid )
-{
-}
-
-Context::Context( const process::tID& pid, const thread::tID& tid )
+Context::Context( const process::ID& pid, const thread::ID& tid )
    : m_pid( pid )
    , m_tid( tid )
 {
@@ -48,6 +59,11 @@ Context::Context( const Context& other )
    : m_pid( other.m_pid )
    , m_tid( other.m_tid )
 {
+}
+
+Context Context::current( )
+{
+   return Context{ eInitType::CURRENT };
 }
 
 bool Context::is_local( ) const

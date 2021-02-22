@@ -77,7 +77,7 @@ bool test( int argc, char* argv[ ] );
    void __constructor__( )
    {
       MSG_INF( "starting..." );
-      base::trace::Logger::init( base::trace::eLogStrategy::DLT, "CTRL" );
+      base::trace::Logger::init( base::trace::eLogStrategy::CONSOLE, "CTRL" );
    }
 
    void __destructor__( ) __attribute__(( destructor(101) ));

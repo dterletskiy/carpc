@@ -30,7 +30,12 @@ namespace base::tools::cmd {
 
    void init( int argc, char** argv )
    {
-      if( false == s_cmd_line_map.empty( ) )
+      init( argc, argv, s_cmd_line_map );
+   }
+
+   void init( int argc, char** argv, tCmdLineMap& cmd_line_map )
+   {
+      if( false == cmd_line_map.empty( ) )
          return;
 
 
@@ -39,16 +44,21 @@ namespace base::tools::cmd {
          std::string argument( argv[ i ] );
          size_t position = argument.find( s_delimiter );
          if( std::string::npos == position )
-            s_cmd_line_map.emplace( argument, std::string( "" ) );
+            cmd_line_map.emplace( argument, std::string( "" ) );
          else
-            s_cmd_line_map.emplace( argument.substr( 0, position ), argument.substr( position + 1 ) );
+            cmd_line_map.emplace( argument.substr( 0, position ), argument.substr( position + 1 ) );
       }
    }
 
    tCmdParamValue argument( const std::string& parameter )
    {
-      const auto iterator = s_cmd_line_map.find( parameter );
-      if( s_cmd_line_map.end( ) == iterator )
+      return argument( parameter, s_cmd_line_map );
+   }
+
+   tCmdParamValue argument( const std::string& parameter, const tCmdLineMap& cmd_line_map )
+   {
+      const auto iterator = cmd_line_map.find( parameter );
+      if( cmd_line_map.end( ) == iterator )
          return std::nullopt;
 
       return iterator->second;
@@ -61,8 +71,13 @@ namespace base::tools::cmd {
 
    void print( )
    {
+      print( s_cmd_line_map );
+   }
+
+   void print( const tCmdLineMap& cmd_line_map )
+   {
       MSG_INF( "Command line parameters:" );
-      for( auto pair : s_cmd_line_map )
+      for( auto pair : cmd_line_map )
       {
          MSG_VRB( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
       }

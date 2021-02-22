@@ -65,7 +65,7 @@ namespace base {
 
       private:
          ITimerConsumer*         mp_consumer = nullptr;
-         application::Context    m_context;
+         application::Context    m_context = application::Context::current( );
    };
 
 

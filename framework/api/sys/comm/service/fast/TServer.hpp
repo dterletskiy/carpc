@@ -68,7 +68,7 @@ namespace base::service::fast::__private {
       public:
          std::shared_ptr< typename TYPES::tBaseData > data( ) const;
       private:
-         std::map< application::Context::process::tID, std::size_t > subscribers;
+         std::map< application::process::ID, std::size_t > subscribers;
          std::shared_ptr< typename TYPES::tBaseData > mp_data = nullptr;
    };
 
@@ -88,9 +88,9 @@ namespace base::service::fast::__private {
    void NotificationStatus< TYPES >::add_subscriber( const application::Context& context, const service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
-      // It is current process ID and appliocation::Context::process::local
+      // It is current process ID and appliocation::process::local
       // Here we should standartize what exact value should be stored in collection.
-      application::Context::process::tID pid = application::Context::process::local;
+      application::process::ID pid = application::process::local;
       if( context.is_external( ) )
          pid = context.pid( );
 
@@ -105,9 +105,9 @@ namespace base::service::fast::__private {
    void NotificationStatus< TYPES >::remove_subscriber( const application::Context& context, const service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
-      // It is current process ID and appliocation::Context::process::local
+      // It is current process ID and appliocation::process::local
       // Here we should standartize what exact value should be stored in collection.
-      application::Context::process::tID pid = application::Context::process::local;
+      application::process::ID pid = application::process::local;
       if( context.is_external( ) )
       {
          pid = context.pid( );
@@ -143,7 +143,7 @@ namespace base::service::fast::__private {
       // Notifying all subscribers by sending notification broadcast event to each process.
       for( const auto& subscriber : subscribers )
       {
-         p_event->send( application::Context( subscriber.first, application::Context::thread::broadcast ) );
+         p_event->send( application::Context( subscriber.first, application::thread::broadcast ) );
       }
    }
 
