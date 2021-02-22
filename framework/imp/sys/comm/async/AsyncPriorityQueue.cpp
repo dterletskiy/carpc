@@ -16,7 +16,7 @@ AsyncPriorityQueue::AsyncPriorityQueue( const tPriority& max_priority, const std
    SYS_VRB( "'%s': created", m_name.c_str( ) );
    SYS_VRB( "max priority: %u", max_priority.value( ) );
 
-   for( tPriority index = tPriority::zero( ); index < max_priority; ++index )
+   for( tPriority index = tPriority::zero; index < max_priority; ++index )
       m_collections.push_back( { } );
 }
 
@@ -60,7 +60,7 @@ IAsync::tSptr AsyncPriorityQueue::get( )
    // Check if there is any event with any priority starting from max priority to min.
    // Remember maximum priority where event has been found.
    std::optional< tPriority > priority_to_process = std::nullopt;
-   for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero( ); --index )
+   for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero; --index )
    {
       if( false == m_collections[ index ].empty( ) )
       {
@@ -80,7 +80,7 @@ IAsync::tSptr AsyncPriorityQueue::get( )
    // In case priority is not defined for what event exists collection should be iterated again.
    if( std::nullopt == priority_to_process )
    {
-      for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero( ); --index )
+      for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero; --index )
       {
          if( false == m_collections[ index ].empty( ) )
          {
@@ -107,7 +107,7 @@ void AsyncPriorityQueue::dump( ) const
 {
    SYS_DUMP_START( );
    SYS_INF( "%s:", m_name.c_str( ) );
-   for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero( ); --index )
+   for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero; --index )
    {
       SYS_INF( "   priority: %s", index.name( ).c_str( ) );
       for( auto p_async : m_collections[ index ] )

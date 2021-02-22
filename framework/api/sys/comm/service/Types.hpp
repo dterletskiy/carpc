@@ -21,7 +21,7 @@ namespace base::service {
       using ID = base::TID< Sequence >;
    };
    using tSequenceID = Sequence::ID;
-   const tSequenceID InvalidSequenceID = Sequence::ID::invalid( );
+   const tSequenceID InvalidSequenceID = Sequence::ID::invalid;
 
 
 

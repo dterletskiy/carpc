@@ -1,3 +1,7 @@
+version 2.3.6
+   - ID class refactoring.
+   - Priority class refactoring.
+
 version 2.3.5
    - Context class refactoring.
    - Example implementation __attribute__ in "application".

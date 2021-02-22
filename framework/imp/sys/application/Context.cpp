@@ -42,8 +42,8 @@ Context::Context( const eInitType init_type )
       case eInitType::INVALID:
       default:
       {
-         m_pid = process::ID::invalid( );
-         m_tid = thread::ID::invalid( );
+         m_pid = process::ID::invalid;
+         m_tid = thread::ID::invalid;
          break;
       }
    }

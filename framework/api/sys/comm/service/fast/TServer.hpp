@@ -135,7 +135,7 @@ namespace base::service::fast::__private {
       }
 
       typename TYPES::tEventUserSignature event_signature(
-         server.signature( ).role( ), tNotificationData::NOTIFICATION, server.id( ), service::ID::invalid( )
+         server.signature( ).role( ), tNotificationData::NOTIFICATION, server.id( ), service::ID::invalid
       );
       typename TYPES::tEventData event_data( mp_data );
       auto p_event = TYPES::tEvent::create( event_signature, event_data );
@@ -198,7 +198,7 @@ namespace base::service::fast::__private {
 
       private:
          tRequestStatusMap                         m_request_status_map;
-         tSequenceID                               m_seq_id = tSequenceID::zero( );
+         tSequenceID                               m_seq_id = tSequenceID::zero;
          std::optional< typename TYPES::tEventID > m_processing_event_id = std::nullopt;
          std::optional< tSequenceID >              m_processing_seq_id = std::nullopt;
          tAttributeStatusMap                       m_attribute_status_map;
@@ -217,7 +217,7 @@ namespace base::service::fast::__private {
          m_request_status_map.emplace( rr_item, RequestStatus{ } );
          TYPES::tEvent::set_notification(
             this,
-            typename TYPES::tEventUserSignature( signature( ).role( ), rr_item.request, service::ID::invalid( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), rr_item.request, service::ID::invalid, id( ) )
          );
       }
       for( auto n_item : TYPES::N )
@@ -225,11 +225,11 @@ namespace base::service::fast::__private {
          m_attribute_status_map.emplace( n_item.notification, tNotificationStatus{ } );
          TYPES::tEvent::set_notification(
             this,
-            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.subscribe, service::ID::invalid( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.subscribe, service::ID::invalid, id( ) )
          );
          TYPES::tEvent::set_notification(
             this,
-            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.unsubscribe, service::ID::invalid( ), id( ) )
+            typename TYPES::tEventUserSignature( signature( ).role( ), n_item.unsubscribe, service::ID::invalid, id( ) )
          );
       }
    }

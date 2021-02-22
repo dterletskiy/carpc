@@ -215,7 +215,7 @@ namespace base::service::secure::__private {
 
       private:
          tRequestStatusMap                         m_request_status_map;
-         tSequenceID                               m_seq_id = tSequenceID::zero( );
+         tSequenceID                               m_seq_id = tSequenceID::zero;
          std::optional< typename TYPES::tEventID > m_processing_event_id = std::nullopt;
          std::optional< tSequenceID >              m_processing_seq_id = std::nullopt;
          tAttributeStatusMap                       m_attribute_status_map;

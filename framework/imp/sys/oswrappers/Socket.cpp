@@ -81,7 +81,7 @@ Socket& Socket::operator=( Socket&& other )
    m_total_send_size = other.m_total_send_size;
 
    other.m_socket = linux::socket::InvalidSocket;
-   other.m_id = ID::invalid( );
+   other.m_id = ID::invalid;
    other.mp_buffer = nullptr;
 
    return *this;

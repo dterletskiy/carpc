@@ -19,7 +19,7 @@ namespace base::application {
 
       ID current( )
       {
-         ID tid{ ID::invalid( ) };
+         ID tid{ ID::invalid };
          IThread::tSptr thread = Process::instance( )->current_thread( );
          if( nullptr != thread )
             tid = thread->id( );

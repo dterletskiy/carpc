@@ -40,7 +40,7 @@ namespace base::service {
          bool is_valid( ) const;
       private:
          application::Context    m_context = application::Context::internal_broadcast;
-         ID                      m_id = ID::invalid( );
+         ID                      m_id = ID::invalid;
    };
 
 
@@ -60,7 +60,7 @@ namespace base::service {
    inline
    bool Address::is_valid( ) const
    {
-      return m_id != ID::invalid( );
+      return m_id != ID::invalid;
    }
 
 } // namespace base::service

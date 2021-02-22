@@ -53,7 +53,7 @@ const Thread::ID Thread::current_id( )
    os::MutexAutoLocker locker( s_registry_mutex );
    const auto iterator = s_registry.find( pthread_self( ) );
    if( s_registry.end( ) == iterator )
-      return ID::invalid( );
+      return ID::invalid;
 
    return iterator->second;
 }

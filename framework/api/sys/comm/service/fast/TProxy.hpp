@@ -52,7 +52,7 @@ namespace base::service::fast::__private {
          const bool response( const typename TYPES::tEvent& );
 
       private:
-         tSequenceID                                        m_seq_id = tSequenceID::zero( );
+         tSequenceID                                        m_seq_id = tSequenceID::zero;
          std::map< typename TYPES::tEventID, tRequestDB >   m_map;
          tProxy*                                            mp_proxy = nullptr;
    };

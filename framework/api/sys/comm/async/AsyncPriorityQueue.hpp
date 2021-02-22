@@ -22,7 +22,7 @@ namespace base::async {
           *    This is because of method base::Tpriority::check( )
           *
           **************/
-         AsyncPriorityQueue( const tPriority& max_priority = tPriority::max( ), const std::string& name = "NoName" );
+         AsyncPriorityQueue( const tPriority& max_priority = tPriority::max, const std::string& name = "NoName" );
          ~AsyncPriorityQueue( );
          AsyncPriorityQueue( const AsyncPriorityQueue& ) = delete;
          AsyncPriorityQueue& operator=( const AsyncPriorityQueue& ) = delete;

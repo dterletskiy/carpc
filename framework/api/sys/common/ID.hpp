@@ -17,35 +17,20 @@ namespace base {
          using VALUE_TYPE = std::uint64_t;
          using OBJECT_TYPE = T;
 
-         static constexpr VALUE_TYPE min_value = std::numeric_limits< VALUE_TYPE >::min( );
-         static constexpr VALUE_TYPE max_value = std::numeric_limits< VALUE_TYPE >::max( );
+         static constexpr VALUE_TYPE min_value     = std::numeric_limits< VALUE_TYPE >::min( );
+         static constexpr VALUE_TYPE max_value     = std::numeric_limits< VALUE_TYPE >::max( );
          static constexpr VALUE_TYPE invalid_value = max_value;
-         static constexpr VALUE_TYPE zero_value = 0;
+         static constexpr VALUE_TYPE zero_value    = 0;
+
+         static const tID min;
+         static const tID max;
+         static const tID invalid;
+         static const tID zero;
 
          static const tID generate( )
          {
             static tID id( zero_value );
             return ++id;
-         }
-         static const tID& min( )
-         {
-            static tID id( min_value );
-            return id;
-         }
-         static const tID& max( )
-         {
-            static tID id( max_value );
-            return id;
-         }
-         static const tID& invalid( )
-         {
-            static tID id( invalid_value );
-            return id;
-         }
-         static const tID& zero( )
-         {
-            static tID id( zero_value );
-            return id;
          }
 
       public:
@@ -149,6 +134,17 @@ namespace base {
    };
 
 
+
+   template< typename T >
+      const TID< T > TID< T >::min{ min_value };
+   template< typename T >
+      const TID< T > TID< T >::max{ max_value };
+   template< typename T >
+      const TID< T > TID< T >::invalid{ invalid_value };
+   template< typename T >
+      const TID< T > TID< T >::zero{ zero_value };
+
+
    struct Object { using ID = TID< Object >; };
    using tID = Object::ID;
 
@@ -213,7 +209,7 @@ namespace base {
       }
 
       {
-         A::ID id_a = A::ID::invalid( );
+         A::ID id_a = A::ID::invalid;
          MSG_DBG( "id_a: %s", id_a.name( ).c_str( ) );
       }
 

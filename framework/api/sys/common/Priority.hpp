@@ -24,26 +24,10 @@ namespace base {
          static constexpr T invalid_value = max_value;
          static constexpr T zero_value = 0;
 
-         static const tPriority min( )
-         {
-            static tPriority priority( min_value );
-            return priority;
-         }
-         static const tPriority max( )
-         {
-            static tPriority priority( max_value );
-            return priority;
-         }
-         static const tPriority invalid( )
-         {
-            static tPriority priority( invalid_value );
-            return priority;
-         }
-         static const tPriority zero( )
-         {
-            static tPriority priority( zero_value );
-            return priority;
-         }
+         static const tPriority min;
+         static const tPriority max;
+         static const tPriority invalid;
+         static const tPriority zero;
 
       public:
          TPriority( ) = default;
@@ -169,6 +153,20 @@ namespace base {
             }
          }
    };
+
+
+
+   template< typename T >
+      const TPriority< T > TPriority< T >::min{ min_value };
+   template< typename T >
+      const TPriority< T > TPriority< T >::max{ max_value };
+   template< typename T >
+      const TPriority< T > TPriority< T >::invalid{ invalid_value };
+   template< typename T >
+      const TPriority< T > TPriority< T >::zero{ zero_value };
+
+
+
    using tPriorityTYPE = std::uint16_t;
    using tPriority = TPriority< tPriorityTYPE >;
 

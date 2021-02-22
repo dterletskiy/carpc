@@ -52,8 +52,8 @@ namespace base::application {
          const process::ID& pid( ) const;
          const thread::ID& tid( ) const;
       private:
-         process::ID m_pid = process::ID::invalid( );
-         thread::ID m_tid = thread::ID::invalid( );
+         process::ID m_pid = process::ID::invalid;
+         thread::ID m_tid = thread::ID::invalid;
    };
 
 

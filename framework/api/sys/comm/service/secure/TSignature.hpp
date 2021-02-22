@@ -36,7 +36,7 @@ namespace base::service::secure {
          _ID m_id = { };
          service::ID m_from;
          service::ID m_to;
-         tSequenceID m_seq_id = tSequenceID::invalid( );
+         tSequenceID m_seq_id = tSequenceID::invalid;
    };
 
 
