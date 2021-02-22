@@ -14,7 +14,7 @@ using namespace application::components::onoff;
 
 struct Callback : public Manager::Subscriber
 {
-   void state_changed( const Types::tID& state_uid ) override
+   void state_action( const Types::tID& state_uid, const eAction& action ) override
    {
       MSG_MARKER( );
    }

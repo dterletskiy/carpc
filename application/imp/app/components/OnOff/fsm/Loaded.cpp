@@ -1,6 +1,9 @@
 #include "imp/app/components/OnOff/fsm/Manager.hpp"
 #include "imp/app/components/OnOff/fsm/Loaded.hpp"
 
+#include "api/sys/trace/Trace.hpp"
+#define CLASS_ABBR "LOADED"
+
 
 
 using namespace application::components::onoff;
@@ -25,5 +28,6 @@ void Loaded::leave( )
 
 const std::optional< Types::tID > Loaded::process( const Data& data )
 {
+   MSG_VRB( );
    return NoTransition;
 }

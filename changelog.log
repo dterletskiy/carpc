@@ -1,3 +1,6 @@
+version 2.3.7
+   - FSM refactoring.
+
 version 2.3.6
    - ID class refactoring.
    - Priority class refactoring.

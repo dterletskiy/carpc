@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/application/Context.hpp"
 #include "api/sys/fsm/Types.hpp"
 #include "api/sys/fsm/TState.hpp"
 
@@ -23,7 +24,6 @@ namespace base::fsm {
    class TStateManager
       : public TStateManagerBase< TYPES >
       , public TStateManagerBase< TYPES >::Signal::Consumer
-      , public TState< TYPES >::State::Consumer
    {
       private:
          using tBase = TStateManagerBase< TYPES >;
@@ -56,6 +56,9 @@ namespace base::fsm {
       private:
          std::string m_name;
 
+      private:
+         application::Context m_context = application::Context::current( );
+
       public:
          enum class eStatus : std::uint8_t { CREATED, RUNNING, PAUSED, STOPPED };
          const char* const c_str( const eStatus& ) const;
@@ -67,7 +70,6 @@ namespace base::fsm {
          void signal( const typename TYPES::tData& data );
       private:
          void process_event( const typename tBase::Signal::Event& ) override;
-         void process_event( const typename tState::State::Event& ) override;
          void set_state( const std::optional < typename TYPES::tID >& );
       private:
          typename tState::tSptr get_state( const typename TYPES::tID& ) const;
@@ -80,6 +82,8 @@ namespace base::fsm {
             using tCallback = std::function< void( const typename state::tID& ) >;
             using tSptr = std::shared_ptr< Subscriber >;
             using tWptr = std::weak_ptr< Subscriber >;
+
+            enum class eAction : std::uint8_t { IN, OUT };
 
             struct Comparator
             {
@@ -96,12 +100,13 @@ namespace base::fsm {
 
             virtual ~Subscriber( ) = default;
 
-            virtual void state_changed( const typename TYPES::tID& ) = 0;
+            virtual void state_action( const typename TYPES::tID&, const eAction& ) = 0;
          };
          void subscribe( const typename Subscriber::tSptr );
          void unsubscribe( const typename Subscriber::tSptr );
+         void notify( const typename TYPES::tID&, const typename Subscriber::eAction& );
       private:
-         typename Subscriber::tWptrSet                                 m_subscribers;
+         typename Subscriber::tWptrSet       m_subscribers;
    };
 
 
@@ -192,8 +197,6 @@ namespace base::fsm {
       SYS_VRB( "%s: started", m_name.c_str( ) );
 
       tBase::Signal::Event::set_notification( this, { m_id } );
-      for( const auto pair : m_states )
-         tState::State::Event::set_notification( this, { pair.first } );
 
       SYS_VRB( "%s: running", m_name.c_str( ) );
       m_status = eStatus::RUNNING;
@@ -213,7 +216,6 @@ namespace base::fsm {
       }
 
       tBase::Signal::Event::clear_all_notifications( this );
-      tState::State::Event::clear_all_notifications( this );
 
       SYS_VRB( "%s: stopped", m_name.c_str( ) );
       m_status = eStatus::STOPPED;
@@ -271,51 +273,53 @@ namespace base::fsm {
          return;
 
       auto p_next_state = get_state( state_uid );
+      if( nullptr == p_next_state )
+         return;
 
+      // Leave current state
       if( mp_current_state )
+      {
          mp_current_state->out( );
+         notify( mp_current_state->uid( ), Subscriber::eAction::OUT );
+      }
 
+      // Enter new state
       mp_current_state = p_next_state;
-      const auto p_next_state_uid_opt = mp_current_state->in( );
-      if( p_next_state_uid_opt )
-         set_state( p_next_state_uid_opt );
+      const auto next_state_uid_opt = mp_current_state->in( );
+      notify( mp_current_state->uid( ), Subscriber::eAction::IN );
+
+      // Set next state in case if entering new state leads to immidiate transition.
+      set_state( next_state_uid_opt );
    }
 
    template< typename TYPES >
    void TStateManager< TYPES >::signal( const typename TYPES::tData& data )
    {
-      tBase::Signal::Event::create_send( { m_id }, data );
+      // Sending signal event to consumer (this manager) plased in context
+      //where it has been created
+      tBase::Signal::Event::create_send( { m_id }, data, m_context );
    }
 
    template< typename TYPES >
    void TStateManager< TYPES >::process_event( const typename tBase::Signal::Event& event )
    {
-      if( nullptr == event.data( ) )
-         return;
       if( false == is_running( ) )
+      {
+         SYS_WRN( "%s: not running", m_name.c_str( ) );
          return;
+      }
+      if( m_id != event.info( ).id( ) )
+      {
+         SYS_WRN( "%s: not my id", m_name.c_str( ) );
+         return;
+      }
+      if( nullptr == event.data( ) )
+      {
+         SYS_WRN( "%s: there is no event data", m_name.c_str( ) );
+         return;
+      }
 
       set_state( mp_current_state->process( *event.data( ) ) );
-   }
-
-   template< typename TYPES >
-   void TStateManager< TYPES >::process_event( const typename tState::State::Event& event )
-   {
-      const auto& state_uid = event.info( ).id( );
-
-      for( auto iterator = m_subscribers.begin( ); iterator != m_subscribers.end( ); ++iterator )
-      {
-         if( auto sp_subscriber = iterator->lock( ) )
-         {
-            sp_subscriber->state_changed( state_uid );
-         }
-         else
-         {
-            iterator = m_subscribers.erase( iterator );
-            if( m_subscribers.end( ) == iterator )
-               break;
-         }
-      }
    }
 
    template< typename TYPES >
@@ -328,6 +332,24 @@ namespace base::fsm {
    void TStateManager< TYPES >::unsubscribe( const typename Subscriber::tSptr p_subscriber )
    {
       m_subscribers.erase( p_subscriber );
+   }
+
+   template< typename TYPES >
+   void TStateManager< TYPES >::notify( const typename TYPES::tID& state_uid, const typename Subscriber::eAction& action )
+   {
+      for( auto iterator = m_subscribers.begin( ); iterator != m_subscribers.end( ); ++iterator )
+      {
+         if( auto sp_subscriber = iterator->lock( ) )
+         {
+            sp_subscriber->state_action( state_uid, action );
+         }
+         else
+         {
+            iterator = m_subscribers.erase( iterator );
+            if( m_subscribers.end( ) == iterator )
+               break;
+         }
+      }
    }
 
 } // namespace base::events

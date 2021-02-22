@@ -25,9 +25,6 @@ namespace base::fsm {
          using tSptr = std::shared_ptr< tState >;
          using tManager = TStateManager< TYPES >;
          static constexpr std::optional< typename TYPES::tID > NoTransition = std::nullopt;
-      // private:
-         struct DummyData { };
-         DEFINE_EVENT_S( State, DummyData, base::async::id::TSignature< typename TYPES::tID > );
 
       public:
          TState( const typename TYPES::tID&, const std::string& );
@@ -60,7 +57,7 @@ namespace base::fsm {
          const tManager& manager( ) const;
       private:
          void manager( const tManager& );
-         const tManager* mp_manager;
+         const tManager* mp_manager = nullptr;
    };
 
 
@@ -110,7 +107,6 @@ namespace base::fsm {
    {
       SYS_VRB( "%s: enter", m_name.c_str( ) );
       auto p_next_state = enter( );
-      State::Event::create_send( { m_uid } );
       return p_next_state;
    }
 

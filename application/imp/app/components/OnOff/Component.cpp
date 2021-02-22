@@ -59,8 +59,10 @@ void Component::on_timer( const base::Timer::ID id )
    auto operation = [ this ]( )
    {
       MSG_DBG( "operation" );
-      events::AppEvent::Event::create_send( { events::eAppEventID::BOOT }, { "booting" } );
+      // events::AppEvent::Event::create_send( { events::eAppEventID::BOOT }, { "booting" } );
       m_timer.start( 20000000000, 1 );
    };
    base::async::Runnable::create_send( operation );
+
+   m_fsm.signal( { } );
 }
