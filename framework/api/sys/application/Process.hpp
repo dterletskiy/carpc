@@ -9,6 +9,7 @@
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/Types.hpp"
 #include "api/sys/dsi/Types.hpp"
+#include "api/sys/tools/Tools.hpp"
 
 
 
@@ -26,16 +27,16 @@ namespace base::application {
       public:
          static Process& invalid( )
          {
-            static Process process( 0, nullptr );
+            static Process process( 0, nullptr, nullptr );
             return process;
          }
          bool operator==( const Process& other ) const { return this == &other; }
 
       public:
          ~Process( );
-         static tSptr instance( int argc = 0, char** argv = nullptr );
+         static tSptr instance( int argc = 0, char** argv = nullptr, char** envp = nullptr );
       private:
-         Process( int argc, char** argv );
+         Process( int argc, char** argv, char** envp );
          Process( const Process& ) = delete;
          Process& operator=( const Process& ) = delete;
          static tSptr mp_instance;
@@ -86,6 +87,11 @@ namespace base::application {
          const Configuration& configuration( ) const;
       private:
          Configuration m_configuration;
+
+      public:
+         const tools::PCE& pce( ) const;
+      private:
+         tools::PCE m_pce;
    };
 
 
@@ -118,6 +124,12 @@ namespace base::application {
    const Process::Configuration& Process::configuration( ) const
    {
       return m_configuration;
+   }
+
+   inline
+   const tools::PCE& Process::pce( ) const
+   {
+      return m_pce;
    }
 
 } // namespace base::application

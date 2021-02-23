@@ -14,6 +14,12 @@ namespace base::os::linux::signals {
       { true, { pthread_sigmask, "pthread_sigmask" } }
    };
 
+   void info( )
+   {
+      SYS_DBG( "SIGRTMIN = %d", SIGRTMIN );
+      SYS_DBG( "SIGRTMAX = %d", SIGRTMAX );
+   }
+
    bool block( const std::vector< tSignal >& signals, const bool is_thread )
    {
       if( signals.empty( ) )

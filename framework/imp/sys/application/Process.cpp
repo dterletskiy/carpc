@@ -8,7 +8,6 @@
 #include "api/sys/application/ThreadIPC.hpp"
 #include "api/sys/application/Process.hpp"
 #include "api/sys/events/Events.hpp"
-#include "api/sys/tools/Tools.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvcProc"
@@ -44,36 +43,33 @@ using namespace base::application;
 
 Process::tSptr Process::mp_instance = nullptr;
 
-Process::Process( int argc, char** argv )
+Process::Process( int argc, char** argv, char** envp )
    : m_id( getpid( ) ) // @TDA: should be unique for all computers in the network
+   , m_pce( argc, argv, envp )
 {
    SYS_VRB( "created" );
 
-   std::string file_name = std::filesystem::path( *argv ).filename( );
-   file_name += std::string( ".cfg" );
-
-   base::tools::cmd::init( argc, argv );
-   base::tools::cmd::print( );
-   base::tools::cfg::init( base::tools::cmd::argument( "config" ).value_or( file_name.c_str( ) ) );
-   base::tools::cfg::print( );
+   m_pce.print( );
 
    m_configuration.ipc_sb = dsi::SocketCongiguration {
       AF_UNIX,
       SOCK_STREAM,
-      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_protocole" ).value( ) ) ),
-      base::tools::cfg::argument( "ipc_servicebrocker_address" ).value( ),
-      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_port" ).value( ) ) )
+      static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
+      m_pce.value( "ipc_servicebrocker_address" ).value( ),
+      static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_port" ).value( ) ) )
    };
-   m_configuration.ipc_sb_buffer_size = static_cast< size_t >( std::stoll( base::tools::cfg::argument( "ipc_servicebrocker_buffer_size" ).value( ) ) );
+   m_configuration.ipc_sb_buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) ) );
 
    m_configuration.ipc_app = dsi::SocketCongiguration {
       AF_UNIX,
       SOCK_STREAM,
-      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_application_protocole" ).value( ) ) ),
-      base::tools::cfg::argument( "ipc_application_address" ).value( ),
-      static_cast< int >( std::stoll( base::tools::cfg::argument( "ipc_application_port" ).value( ) ) )
+      static_cast< int >( std::stoll( m_pce.value( "ipc_application_protocole" ).value( ) ) ),
+      m_pce.value( "ipc_application_address" ).value( ),
+      static_cast< int >( std::stoll( m_pce.value( "ipc_application_port" ).value( ) ) )
    };
-   m_configuration.ipc_app_buffer_size = static_cast< size_t >( std::stoll( base::tools::cfg::argument( "ipc_application_buffer_size" ).value( ) ) );
+   m_configuration.ipc_app_buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_application_buffer_size" ).value( ) ) );
+
+   DUMP_IPC_EVENTS;
 }
 
 Process::~Process( )
@@ -82,7 +78,7 @@ Process::~Process( )
 }
 
 namespace { base::os::Mutex s_mutex; }
-Process::tSptr Process::instance( int argc, char** argv )
+Process::tSptr Process::instance( int argc, char** argv, char** envp )
 {
    // First call of this function must be done from main function => should not be race condition.
    // os::MutexAutoLocker locker( s_mutex );
@@ -93,7 +89,7 @@ Process::tSptr Process::instance( int argc, char** argv )
          SYS_ERR( "called not from 'main( int argc, char** argv )' function" );
          return nullptr;
       }
-      mp_instance.reset( new Process( argc, argv ) );
+      mp_instance.reset( new Process( argc, argv, envp ) );
    }
 
    return mp_instance;

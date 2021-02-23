@@ -295,8 +295,8 @@ namespace base::fsm {
    template< typename TYPES >
    void TStateManager< TYPES >::signal( const typename TYPES::tData& data )
    {
-      // Sending signal event to consumer (this manager) plased in context
-      //where it has been created
+      // Sending signal event to consumer (this manager) placed in context
+      // where it has been created
       tBase::Signal::Event::create_send( { m_id }, data, m_context );
    }
 

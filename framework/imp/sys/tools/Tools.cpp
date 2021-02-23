@@ -5,6 +5,213 @@
 
 
 
+#include <filesystem>
+namespace base::tools {
+
+   BasePCE::BasePCE( const std::string& dump_message )
+      : m_dump_message( dump_message )
+   {
+   }
+
+   BasePCE::tValueOpt BasePCE::value( const tParameter& parameter ) const
+   {
+      const auto iterator = m_map.find( parameter );
+      if( m_map.end( ) == iterator )
+         return std::nullopt;
+
+      return iterator->second;
+   }
+
+   void BasePCE::print( ) const
+   {
+      const char* line = "----------------------------------------------";
+      MSG_WRN( "%s BEGIN: %s %s", line, m_dump_message.c_str( ), line );
+      for( auto pair : m_map )
+      {
+         MSG_VRB( "   '%s' = '%s'", pair.first.c_str( ), pair.second.c_str( ) );
+      }
+      MSG_WRN( "%s  END:  %s %s", line, m_dump_message.c_str( ), line );
+   }
+
+
+
+   Parameters::Parameters( )
+      : BasePCE( "Parameters" )
+   {
+   }
+
+   Parameters::Parameters( int argc, char** argv, const std::string& delimiter )
+      : BasePCE( "Parameters" )
+   {
+      init( argc, argv, delimiter );
+   }
+
+   void Parameters::init( int argc, char** argv, const std::string& delimiter )
+   {
+      for( int count = 0; count < argc; ++count )
+      {
+         tArgument argument( argv[ count ] );
+         std::size_t position = argument.find( delimiter );
+         if( std::string::npos == position )
+            m_map.emplace( argument, std::string( "" ) );
+         else
+            m_map.emplace( argument.substr( 0, position ), argument.substr( position + 1 ) );
+      }
+   }
+
+
+
+   Environment::Environment( )
+      : BasePCE( "Environment" )
+   {
+   }
+
+   Environment::Environment( char** envp, const std::string& delimiter )
+      : BasePCE( "Environment" )
+   {
+      init( envp, delimiter );
+   }
+
+   void Environment::init( char** envp, const std::string& delimiter )
+   {
+      for( int count = 0; nullptr != envp[ count ]; ++count )
+      {
+         tArgument argument( envp[ count ] );
+         std::size_t position = argument.find( delimiter );
+         if( std::string::npos == position )
+            m_map.emplace( argument, std::string( "" ) );
+         else
+            m_map.emplace( argument.substr( 0, position ), argument.substr( position + 1 ) );
+      }
+   }
+
+
+
+   Configuration::Configuration( )
+      : BasePCE( "Configuration" )
+   {
+   }
+
+   Configuration::Configuration( const std::string& file, const std::string& delimiter )
+      : BasePCE( "Configuration" )
+   {
+      init( file, delimiter );
+   }
+
+   void Configuration::init( const std::string& file, const std::string& delimiter )
+   {
+      // std::string file = std::filesystem::path( *argv ).filename( );
+      // file += std::string( ".cfg" );
+
+      std::ifstream file_stream;
+      file_stream.open( file.c_str( ) );
+      // std::cout << file_stream.rdbuf( ) << std::endl;
+
+      if( false == file_stream.is_open( ) )
+      {
+         MSG_WRN( "configuration file '%s' can't be found", file.c_str( ) );
+         return;
+      }
+
+      while( file_stream )
+      {
+         std::string line;
+         std::getline( file_stream, line, '\n' );
+
+         if( true == line.empty( ) )
+            continue;
+
+         size_t position = line.find( delimiter );
+         if( std::string::npos == position )
+            m_map.emplace( line, std::string("") );
+         else
+            m_map.emplace( line.substr( 0, position ), line.substr( position + 1 ) );
+      }
+
+      file_stream.close( );
+   }
+
+
+
+   PCE::PCE( int argc, char** argv, char** envp, const std::string& delimiter )
+      : Parameters( argc, argv, delimiter )
+      , Environment( envp, delimiter )
+      , Configuration( )
+   {
+      std::string file_name = std::filesystem::path( *argv ).filename( );
+      file_name += std::string( ".cfg" );
+      file_name = Parameters::value( "config" ).value_or( file_name );
+
+      Configuration::init( file_name, delimiter );
+   }
+
+   void PCE::init( int argc, char** argv, char** envp, const std::string& delimiter )
+   {
+      Parameters::init( argc, argv, delimiter );
+      Environment::init( envp, delimiter );
+
+      std::string file_name = std::filesystem::path( *argv ).filename( );
+      file_name += std::string( ".cfg" );
+      file_name = Parameters::value( "config" ).value_or( file_name );
+
+      Configuration::init( file_name, delimiter );
+   }
+
+   void PCE::print( const eType& type ) const
+   {
+      switch( type )
+      {
+         case eType::CMD:
+         {
+            Parameters::print( );
+            break;
+         }
+         case eType::ENV:
+         {
+            Environment::print( );
+            break;
+         }
+         case eType::CFG:
+         {
+            Configuration::print( );
+            break;
+         }
+         default:
+         {
+            Parameters::print( );
+            Environment::print( );
+            Configuration::print( );
+            break;
+         }
+      }
+   }
+
+   PCE::tValueOpt PCE::value( const tParameter& parameter, const eType& type ) const
+   {
+      switch( type )
+      {
+         case eType::CMD: return Parameters::value( parameter );
+         case eType::ENV: return Environment::value( parameter );
+         case eType::CFG: return Configuration::value( parameter );
+         default: break;
+      }
+
+      tValueOpt value_opt = Parameters::value( parameter );
+      if( std::nullopt != value_opt )
+         return value_opt;
+
+      value_opt = Environment::value( parameter );
+      if( std::nullopt != value_opt )
+         return value_opt;
+
+      value_opt = Configuration::value( parameter );
+      return value_opt;
+   }
+
+} // namespace base::tools
+
+
+
 namespace base::tools::cmd {
 
    char* get_option( int argc, char** begin, const std::string & option )
@@ -23,135 +230,7 @@ namespace base::tools::cmd {
       return std::find( begin, end, option ) != end;
    }
 
-
-
-   tCmdLineMap s_cmd_line_map;
-   std::string s_delimiter = "=";
-
-   void init( int argc, char** argv )
-   {
-      init( argc, argv, s_cmd_line_map );
-   }
-
-   void init( int argc, char** argv, tCmdLineMap& cmd_line_map )
-   {
-      if( false == cmd_line_map.empty( ) )
-         return;
-
-
-      for( int i = 0; i < argc; ++i )
-      {
-         std::string argument( argv[ i ] );
-         size_t position = argument.find( s_delimiter );
-         if( std::string::npos == position )
-            cmd_line_map.emplace( argument, std::string( "" ) );
-         else
-            cmd_line_map.emplace( argument.substr( 0, position ), argument.substr( position + 1 ) );
-      }
-   }
-
-   tCmdParamValue argument( const std::string& parameter )
-   {
-      return argument( parameter, s_cmd_line_map );
-   }
-
-   tCmdParamValue argument( const std::string& parameter, const tCmdLineMap& cmd_line_map )
-   {
-      const auto iterator = cmd_line_map.find( parameter );
-      if( cmd_line_map.end( ) == iterator )
-         return std::nullopt;
-
-      return iterator->second;
-   }
-
-   const tCmdLineMap& map( )
-   {
-      return s_cmd_line_map;
-   }
-
-   void print( )
-   {
-      print( s_cmd_line_map );
-   }
-
-   void print( const tCmdLineMap& cmd_line_map )
-   {
-      MSG_INF( "Command line parameters:" );
-      for( auto pair : cmd_line_map )
-      {
-         MSG_VRB( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
-      }
-   }
-
 } // namespace base::tools::cmd
-
-
-
-namespace base::tools::cfg {
-
-   tCfgLineMap s_cfg_line_map;
-   std::string s_delimiter = "=";
-   std::string s_file;
-
-   void init( const std::string& file )
-   {
-      if( false == s_cfg_line_map.empty( ) )
-         return;
-
-      s_file = file;
-
-      std::ifstream file_stream;
-      file_stream.open( s_file.c_str( ) );
-      // std::cout << file_stream.rdbuf( ) << std::endl;
-
-      if( false == file_stream.is_open( ) )
-      {
-         MSG_WRN( "configuration file '%s' can't be found", s_file.c_str( ) );
-         return;
-      }
-
-      while( file_stream )
-      {
-         std::string line;
-         std::getline( file_stream, line, '\n' );
-
-         if( true == line.empty( ) )
-            continue;
-
-         size_t position = line.find( s_delimiter );
-         if( std::string::npos == position )
-            s_cfg_line_map.emplace( line, std::string("") );
-         else
-            s_cfg_line_map.emplace( line.substr( 0, position ), line.substr( position + 1 ) );
-      }
-
-      file_stream.close( );
-   }
-
-   tCfgParamValue argument( const std::string& parameter )
-   {
-      const auto iterator = s_cfg_line_map.find( parameter );
-      if( s_cfg_line_map.end( ) == iterator )
-         return std::nullopt;
-
-      return iterator->second;
-   }
-
-   const tCfgLineMap& map( )
-   {
-      return s_cfg_line_map;
-   }
-
-   void print( )
-   {
-      MSG_INF( "Configuration file parameters (%s):", s_file.c_str( ) );
-      for( auto pair : s_cfg_line_map )
-      {
-         MSG_VRB( "   %s = %s", pair.first.c_str( ), pair.second.c_str( ) );
-      }
-   }
-
-} // namespace base::tools::cfg
 
 
 
@@ -185,4 +264,4 @@ namespace base::tools::uuid {
       _uuid = ss.str( );
    }
 
-}
+} // base::tools::uuid

@@ -58,16 +58,16 @@ archive:
 
 execute:
 	reset
-	export LD_LIBRARY_PATH=$(LD_PATH) ; $(TARGET_DIR)/$(PROJECT_NAME)
+	export LD_LIBRARY_PATH=$(LD_PATH) ; $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
 
 pexecute:
 	reset
-	export LD_LIBRARY_PATH=$(LD_PATH) ; valgrind --tool=callgrind $(TARGET_DIR)/$(PROJECT_NAME)
-# 	export LD_LIBRARY_PATH=$(LD_PATH) ; valgrind --leak-check=yes $(TARGET_DIR)/$(PROJECT_NAME)
+	export LD_LIBRARY_PATH=$(LD_PATH) ; valgrind --tool=callgrind $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
+# 	export LD_LIBRARY_PATH=$(LD_PATH) ; valgrind --leak-check=yes $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
 
 debug:
 	reset
-	export LD_LIBRARY_PATH=$(LD_PATH) ; $(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME)
+	export LD_LIBRARY_PATH=$(LD_PATH) ; $(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
 
 disassm:
 	$(DISASSEMBLER) -S --disassemble $(TARGET_DIR)/$(PROJECT_NAME) > $(TARGET_DIR)/$(PROJECT_NAME).s

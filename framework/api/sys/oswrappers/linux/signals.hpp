@@ -10,6 +10,8 @@ namespace base::os::linux::signals {
    using tSignal = int;
    using tHandler = void(*)( tSignal, siginfo_t*, void* );
 
+   void info( );
+
    /****************************************************************************
     *
     * Function for blocking Linux signals.

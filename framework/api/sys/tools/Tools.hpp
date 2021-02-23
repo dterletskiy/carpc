@@ -4,40 +4,85 @@
 
 
 
+namespace base::tools {
+
+   class BasePCE
+   {
+      public:
+         using tArgument = std::string;
+         using tParameter = std::string;
+         using tValue = std::string;
+         using tValueOpt = std::optional< std::string >;
+         using tMap = std::map< tParameter, tValue >;
+
+      public:
+         BasePCE( const std::string& );
+         ~BasePCE( ) = default;
+
+      public:
+         tValueOpt value( const tParameter& ) const;
+         void print( ) const;
+
+      protected:
+         tMap        m_map;
+         std::string m_dump_message;
+   };
+
+   class Parameters : public BasePCE
+   {
+      public:
+         Parameters( );
+         Parameters( int argc, char** argv, const std::string& delimiter = "=" );
+         ~Parameters( ) = default;
+
+         void init( int argc, char** argv, const std::string& delimiter = "=" );
+   };
+
+   class Environment : public BasePCE
+   {
+      public:
+         Environment( );
+         Environment( char** envp, const std::string& delimiter = "=" );
+         ~Environment( ) = default;
+
+         void init( char** envp, const std::string& delimiter = "=" );
+   };
+
+   class Configuration : public BasePCE
+   {
+      public:
+         Configuration( );
+         Configuration( const std::string&, const std::string& delimiter = "=" );
+         ~Configuration( ) = default;
+
+         void init( const std::string&, const std::string& delimiter = "=" );
+   };
+
+   class PCE : public Parameters, public Environment, public Configuration
+   {
+      public:
+         enum class eType : std::uint8_t { CMD, ENV, CFG, DEFAULT };
+
+      public:
+         PCE( ) = default;
+         PCE( int argc, char** argv, char** envp, const std::string& delimiter = "=" );
+
+         void init( int argc, char** argv, char** envp, const std::string& delimiter = "=" );
+
+         tValueOpt value( const tParameter&, const eType& type = eType::DEFAULT ) const;
+         void print( const eType& type = eType::DEFAULT ) const;
+   };
+
+} // namespace base::tools
+
+
+
 namespace base::tools::cmd {
 
    char* get_option( int, char**, const std::string& );
    bool is_option_exists( int , char**, const std::string&  );
 
-   using tCmdLineMap = std::map< std::string, std::string >;
-   using tCmdParamValue = std::optional< std::string >;
-
-   void init( int argc, char** argv );
-   tCmdParamValue argument( const std::string& parameter );
-   const tCmdLineMap& map( );
-   void print( );
-
-   void init( int argc, char** argv, tCmdLineMap& );
-   tCmdParamValue argument( const std::string& parameter, const tCmdLineMap& );
-   void print( const tCmdLineMap& );
-
 } // namespace base::tools::cmd
-
-
-
-namespace base::tools::cfg {
-
-   using tCfgLineMap = std::map< std::string, std::string >;
-   using tCfgParamValue = std::optional< std::string >;
-
-   void init( const std::string& );
-   tCfgParamValue argument( const std::string& parameter );
-   const tCfgLineMap& map( );
-   void print( );
-
-} // namespace base::tools::cfg
-
-
 
 
 
