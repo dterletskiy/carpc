@@ -1,5 +1,30 @@
-Revert all changes to latest baseline:
+# links:
+# https://stackoverflow.com/questions/1146973/how-do-i-revert-all-local-changes-in-git-managed-project-to-previous-state
+# https://stackoverflow.com/questions/40503417/how-to-add-a-file-to-the-last-commit-in-git
+
+
+
+# Revert changes made to your working copy, do this:
+git checkout .
+
+# Revert changes made to the index (i.e., that you have added), do this. Warning this will reset all of your unpushed commits to master!:
+git reset
+
+# Revert a change that you have committed, do this:
+git revert <commit 1> <commit 2>
+
+# Remove untracked files (e.g., new files, generated files):
+git clean -f
+
+# Remove untracked directories (e.g., new or automatically generated directories):
+git clean -fd
+
+# Add files to last commit:
+git add the_left_out_file
+git commit --amend --no-edit
+
+# Revert all changes to latest baseline:
 git reset --hard
 
-Diff between file in HEAD and file in transaction:
+# Diff between file in HEAD and file in transaction:
 git diff --cached changelog.log

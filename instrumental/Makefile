@@ -16,14 +16,15 @@ PERF_DIR         := $(PRODUCT_DIR)/perf
 
 INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR)
 LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
-LD_PATH           =  $(LD_LIBRARY_PATH):$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib/:$(PRODUCT_INSTRUMENTAL_DIR)/lib/
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
 #---------------------------------------------------------------------------------
-SOURCE_FILES     := $(shell find $(SOURCE_DIR) -type f -name *.$(SRC_EXT))
-OBJECT_FILES     := $(patsubst $(SOURCE_DIR)/%,$(OBJECT_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(OBJ_EXT)))
-GENERATED_FILES  := $(patsubst $(SOURCE_DIR)/%,$(GENERATED_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(SRC_EXT)))
+SOURCE_FILES         := $(shell find $(SOURCE_DIR) -type f -name *.$(SRC_EXT))
+OBJECT_FILES         := $(patsubst $(SOURCE_DIR)/%,$(OBJECT_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(OBJ_EXT)))
+OBJECT_PIC_FILES     := $(patsubst $(SOURCE_DIR)/%,$(OBJECT_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(OBJ_PIC_EXT)))
+GENERATED_FILES      := $(patsubst $(SOURCE_DIR)/%,$(GENERATED_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(SRC_EXT)))
+GENERATED_PIC_FILES  := $(patsubst $(SOURCE_DIR)/%,$(GENERATED_DIR)/%,$(SOURCE_FILES:.$(SRC_EXT)=.$(SRC_PIC_EXT)))
 
 
 
@@ -35,45 +36,41 @@ $(GENERATED_DIR)/%.$(SRC_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
 $(OBJECT_DIR)/%.$(OBJ_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
 	$(call compile,$(CXX),$(CFLAGS),$(INCLUDE),$@,$<)
 
-#Link
+# Link
 $(PROJECT_NAME): $(OBJECT_FILES)
-	$(call link,$(CXX),$(LDFLAGS),$(TARGET_DIR)/$(PROJECT_NAME),$^)
+	ar rcs $(LIBRARY_DIR)/lib$(PROJECT_NAME).a $(OBJECT_FILES)
+
+# Generate PIC
+$(GENERATED_DIR)/%.$(SRC_PIC_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
+	$(call generate,$(CXX),$(CFLAGS) -fPIC,$(INCLUDE),$@,$<)
+
+# Compile PIC
+$(OBJECT_DIR)/%.$(OBJ_PIC_EXT): $(SOURCE_DIR)/%.$(SRC_EXT)
+	$(call compile,$(CXX),$(CFLAGS) -fPIC,$(INCLUDE),$@,$<)
+
+#Link PIC
+$(PROJECT_NAME)_PIC: $(OBJECT_PIC_FILES)
+	$(call link,$(CXX),-g -shared,$(LIBRARY_DIR)/lib$(PROJECT_NAME).so,$^)
 
 
 
 config:
-	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR) $(TARGET_DIR))
+	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR) $(TARGET_DIR) $(GENERATED_DIR))
 
 clean:
 	$(call delete_directories,$(PRODUCT_DIR))
 
 generate: config $(GENERATED_FILES)
 
-build: config $(PROJECT_NAME)
+build: config $(PROJECT_NAME) $(PROJECT_NAME)_PIC
 
 clean_build: clean build
 
 archive:
 	@$(TAR) -cvf $(SOURCE_DIR)/../$(PROJECT_NAME)_$(DATE)_$(TIME).tar $(SOURCE_DIR)
 
-execute:
-	reset
-	export LD_LIBRARY_PATH=$(LD_PATH) ; $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
-
-pexecute:
-	reset
-	export LD_LIBRARY_PATH=$(LD_PATH) ; valgrind --tool=callgrind $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
-# 	export LD_LIBRARY_PATH=$(LD_PATH) ; valgrind --leak-check=yes $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
-
-debug:
-	reset
-	export LD_LIBRARY_PATH=$(LD_PATH) ; $(DEBUGGER) $(TARGET_DIR)/$(PROJECT_NAME) trace=$(TRACE)
-
-disassm:
-	$(DISASSEMBLER) -S --disassemble $(TARGET_DIR)/$(PROJECT_NAME) > $(TARGET_DIR)/$(PROJECT_NAME).s
-
 info:
-	$(call print_info,$(PROJECT_NAME),$(PROJECT_DIR),$(PRODUCT_DIR),$(SOURCE_FILES),$(GENERATED_FILES),$(OBJECT_FILES))
+	$(call print_info,$(PROJECT_NAME),$(PROJECT_DIR),$(PRODUCT_DIR),$(SOURCE_FILES),$(GENERATED_FILES),$(OBJECT_FILES),$(OBJECT_PIC_FILES))
 
 
 

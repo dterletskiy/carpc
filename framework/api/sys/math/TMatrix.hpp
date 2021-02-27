@@ -1,6 +1,8 @@
 #pragma once
 
-#include <omp.h>
+#ifdef USE_OPENMP
+   #include <omp.h>
+#endif
 #include <stdexcept>
 
 #include "api/sys/helpers/functions/format.hpp"
@@ -654,7 +656,9 @@ namespace base::math {
       }
 
       TMatrix< TYPE > result( rows( ), matrix.columns( ) );
-      #pragma omp parallel for shared( result ) schedule( dynamic, 1 )
+      #ifdef USE_OPENMP
+         #pragma omp parallel for shared( result ) schedule( dynamic, 1 )
+      #endif
          for( tRow row = tRow( 0 ); row < rows( ); ++row )
             for( tColumn column{ 0 }; column < matrix.columns( ); ++column )
                for( std::size_t index = 0; index < columns( ) /* matrix.rows( ) */; ++index )

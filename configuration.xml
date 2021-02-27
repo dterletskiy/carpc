@@ -9,14 +9,19 @@
       <config name="SYS_TRACE" status="active"/>
       <config name="MSG_TRACE" status="active"/>
       <config name="COLORED_TRACE" status="active"/>
-      <config name="MEMORY_HOOK" status="inactive"/>
-      <config name="USE_INSTRUMENTAL" status="inactive"/>
+      <config name="USE_MEMORY_HOOK" status="inactive"/>
+      <config name="USE_INSTRUMENTAL" status="active"/>
+      <config name="USE_OPENMP" status="inactive"/>
+      <config name="USE_INTEL_TBB" status="inactive"/>
+      <config name="USE_GBP" status="inactive"/>
    </configuration>
 
    <settings type="compilation">
 
+      <!-- Compiler include section -->
       <setting type="include" value="/usr/local/include" status="inactive"/>
 
+      <!-- Compiler define section -->
       <setting type="define" name="OS_LINUX" value="0" status="active"/>
       <setting type="define" name="OS_ANDROID" value="1" status="active"/>
       <setting type="define" name="OS_WINDOWS" value="2" status="active"/>
@@ -37,17 +42,18 @@
       </setting>
 
       <setting type="define" name="HOOK_MEMORY_ALLOCATOR" status="conditions">
-         <condition type="config" name="MEMORY_HOOK" status="active"/>
+         <condition type="config" name="USE_MEMORY_HOOK" status="active"/>
       </setting>
 
       <setting type="define" name="USE_INSTRUMENTAL" status="conditions">
          <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
       </setting>
 
-      <setting type="flag" value="-fPIC" status="conditions">
-         <condition type="config" name="type" status="shared"/>
+      <setting type="define" name="USE_OPENMP" status="conditions">
+         <condition type="config" name="USE_OPENMP" status="active"/>
       </setting>
 
+      <!-- Compiler flag section -->
       <setting type="flag" value="-std=c++17" status="active"/>
       <setting type="flag" value="-Wall" status="active"/>
       <setting type="flag" value="-Wextra" status="inactive"/>
@@ -55,8 +61,16 @@
       <setting type="flag" value="-g3" status="inactive"/>
       <setting type="flag" value="-ggdb" status="inactive"/>
       <setting type="flag" value="-rdynamic" status="inactive"/>
-      <setting type="flag" value="-fopenmp" status="active"/>
       <setting type="flag" value="-time" status="inactive"/>
+
+      <setting type="flag" value="-fPIC" status="conditions">
+         <condition type="config" name="type" status="shared"/>
+      </setting>
+
+      <setting type="flag" value="-fopenmp" status="conditions">
+         <condition type="config" name="USE_OPENMP" status="active"/>
+      </setting>
+
       <setting type="flag" value="-finstrument-functions" status="conditions">
          <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
       </setting>
@@ -65,20 +79,33 @@
 
    <settings type="link">
 
+      <!-- Linker include section -->
       <setting type="include" value="/mnt/p4v/Source/RPC/hooks_product/lib" status="conditions">
-         <condition type="config" name="MEMORY_HOOK" status="active"/>
+         <condition type="config" name="USE_MEMORY_HOOK" status="active"/>
       </setting>
 
+      <setting type="include" value="/mnt/p4v/Source/RPC/instrumental_product/lib" status="conditions">
+         <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
+      </setting>
+
+      <!-- Linker flag section -->
       <setting type="flag" value="-ldl" status="inactive"/>
       <setting type="flag" value="-lm" status="inactive"/>
       <setting type="flag" value="-larmadillo" status="inactive"/>
-      <setting type="flag" value="-lprotobuf" status="inactive"/>
-      <setting type="flag" value="-fopenmp" status="active"/>
-      <setting type="flag" value="-ltbb" status="active"/>
       <setting type="flag" value="-lpthread" status="active"/>
       <setting type="flag" value="-luuid" status="inactive"/>
+
+      <setting type="flag" value="-fopenmp" status="conditions">
+         <condition type="config" name="USE_OPENMP" status="active"/>
+      </setting>
+      <setting type="flag" value="-ltbb" status="conditions">
+         <condition type="config" name="USE_INTEL_TBB" status="active"/>
+      </setting>
       <setting type="flag" value="-ldlt" status="conditions">
          <condition type="config" name="USE_DLT" status="active"/>
+      </setting>
+      <setting type="flag" value="-lprotobuf" status="conditions">
+         <condition type="config" name="USE_GBP" status="active"/>
       </setting>
       <setting type="flag" value="-lrt" status="conditions">
          <condition type="config" name="type" status="executable"/>
@@ -90,7 +117,10 @@
          <condition type="config" name="type" status="shared"/>
       </setting>
       <setting type="flag" value="-lhooks" status="conditions">
-         <condition type="config" name="MEMORY_HOOK" status="active"/>
+         <condition type="config" name="USE_MEMORY_HOOK" status="active"/>
+      </setting>
+      <setting type="flag" value="-linstrumental" status="conditions">
+         <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
       </setting>
 
       <setting type="flag" value="-llog" status="inactive" comment="Android"/>

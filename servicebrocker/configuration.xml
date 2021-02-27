@@ -6,7 +6,7 @@
 
    <configuration>
       <config name="type" status="executable"/>
-      <config name="MEMORY_HOOK" status="inactive"/>
+      <config name="USE_MEMORY_HOOK" status="inactive"/>
    </configuration>
 
    <settings type="compilation">

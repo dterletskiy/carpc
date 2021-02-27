@@ -20,5 +20,6 @@ const char* const application_name{ "APP" };
 
 bool test( int argc, char** argv, char** envp )
 {
+   return false;
    return true;
 }

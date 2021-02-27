@@ -17,25 +17,6 @@ namespace memory {
 
 
 
-#ifdef USE_INSTRUMENTAL
-   #include "api/sys/asm/cpu.hpp"
-   extern "C" {
-      void __cyg_profile_func_enter( void* this_fn, void* call_site ) __attribute__(( no_instrument_function ));
-      void __cyg_profile_func_exit( void* this_fn, void* call_site ) __attribute__(( no_instrument_function ));
-
-      void __cyg_profile_func_enter( void* this_fn, void* call_site )
-      {
-         printf( "ENTER: %p, <-- %p: %lld\n", this_fn, call_site, __rdtsc( ) );
-      }
-      void __cyg_profile_func_exit( void* this_fn, void* call_site )
-      {
-         printf( "EXIT:  %p, --> %p: %lld\n", this_fn, call_site, __rdtsc( ) );
-      }
-   }
-#endif
-
-
-
 extern const base::application::Thread::Configuration::tVector services;
 extern const char* const application_name;
 
