@@ -1,3 +1,6 @@
+version 2.3.10
+   - Remove "experimental" project.
+
 version 2.3.9
    - Instrumental library implemented.
    - Some adaptations in configutation.xml.
