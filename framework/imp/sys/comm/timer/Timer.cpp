@@ -15,37 +15,43 @@ using namespace base;
 static base::os::Mutex mutex_consumer_map;
 static std::map< base::os::linux::timer::tID, Timer* > consumer_map;
 
-void timer_processor( const base::os::linux::timer::tID timer_id )
-{
-   SYS_VRB( "processing timer: %#lx", (long)timer_id );
+namespace {
 
-   mutex_consumer_map.lock( );
-   auto iterator = consumer_map.find( timer_id );
-   if( consumer_map.end( ) == iterator )
+   void timer_processor( const base::os::linux::timer::tID timer_id )
    {
+      SYS_VRB( "processing timer: %#lx", (long)timer_id );
+
+      mutex_consumer_map.lock( );
+      auto iterator = consumer_map.find( timer_id );
+      if( consumer_map.end( ) == iterator )
+      {
+         mutex_consumer_map.unlock( );
+         SYS_ERR( "Timer has not been found" );
+         return;
+      }
+      Timer* p_timer = iterator->second;
       mutex_consumer_map.unlock( );
-      SYS_ERR( "Timer has not been found" );
-      return;
+
+      p_timer->process( timer_id );
    }
-   Timer* p_timer = iterator->second;
-   mutex_consumer_map.unlock( );
 
-   p_timer->process( timer_id );
-}
+   void timer_handler( union sigval sv )
+   {
+      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( sv.sival_ptr );
+      SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
+      timer_processor( *timer_id );
+   }
 
-void signal_handler( int signal, siginfo_t* si, void* uc )
-{
-   SYS_VRB( "signal: %d / si->si_signo: %d", signal, si->si_signo );
-   SYS_VRB( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
+   void signal_handler( int signal, siginfo_t* si, void* uc )
+   {
+      SYS_VRB( "signal: %d / si->si_signo: %d", signal, si->si_signo );
+      SYS_VRB( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
 
-   base::os::linux::timer::tID* timer_id = (base::os::linux::timer::tID*)si->si_value.sival_ptr;
-   SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
-   timer_processor( *timer_id );
-}
+      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( si->si_value.sival_ptr );
+      SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
+      timer_processor( *timer_id );
+   }
 
-void event_handler( union sigval sv )
-{
-   SYS_VRB( "sv.sival_ptr: %p(%#lx) / sv.sival_int: %#x", sv.sival_ptr, *static_cast< size_t* >( sv.sival_ptr ), sv.sival_int );
 }
 
 
@@ -66,8 +72,11 @@ Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
       return;
    }
 
-   os::linux::signals::set_handler( SIGRTMIN, signal_handler );
-   if( false == os::linux::timer::create( m_timer_id, SIGRTMIN ) )
+   // Variant with "timer_handler" should be used because of in some cases linux can create several timers with the same id
+   // in case of using variant with "signal_handler".
+   // os::linux::signals::set_handler( SIGRTMIN, signal_handler );
+   // if( false == os::linux::timer::create( m_timer_id, SIGRTMIN ) )
+   if( false == os::linux::timer::create( m_timer_id, timer_handler ) )
    {
       SYS_ERR( "create timer error" );
       return;

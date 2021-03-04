@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <chrono>
 #include <thread>
+#include "api/sys/oswrappers/linux/signals.hpp"
 #include "api/sys/oswrappers/Mutex.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/ThreadIPC.hpp"
@@ -16,11 +17,8 @@
 
 namespace {
 
-   void timer_handler( union sigval sv )
+   void process_watchdog( )
    {
-      timer_t* timer_id = static_cast< timer_t* >( sv.sival_ptr );
-      SYS_INF( "WhatchDog timer: %#lx", (long) *timer_id );
-
       for( const auto& p_thread : base::application::Process::instance( )->thread_list( ) )
       {
          time_t time_stamp = p_thread->process_started( );
@@ -30,9 +28,24 @@ namespace {
          if( p_thread->wd_timeout( ) > static_cast< size_t >( time( nullptr ) - time_stamp ) )
             continue;
 
-         SYS_ERR( "WhatchDog error: '%s'", p_thread->name( ).c_str( ) );
+         SYS_ERR( "WatchDog error: '%s'", p_thread->name( ).c_str( ) );
       }
    }
+
+   void timer_handler( union sigval sv )
+   {
+      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( sv.sival_ptr );
+      SYS_INF( "WatchDog timer: %#lx", (long) *timer_id );
+      process_watchdog( );
+   }
+
+   void signal_handler( int signal, siginfo_t* si, void* uc )
+   {
+      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( si->si_value.sival_ptr );
+      SYS_INF( "WatchDog timer: %#lx", (long) *timer_id );
+      process_watchdog( );
+   }
+
 }
 
 

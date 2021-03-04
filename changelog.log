@@ -1,3 +1,8 @@
+version 2.3.12
+   - Fixing issue with timer when linux creats several timers with the same ID in case of using variant with:
+         sev.sigev_notify = SIGEV_SIGNAL;
+     Previously this issue was not observed. Perhaps this is linux issue.
+
 version 2.3.11
    - Bug reporting for skipping request from client to server in case of using "secure" implementation.
 
