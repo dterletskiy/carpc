@@ -250,6 +250,13 @@ namespace base::service::secure::__private {
    {
       for( auto rr_item : TYPES::RR )
       {
+         // @TDA-BUG: Here and in similar places could be a problem because we subscribe for notification from client just right now.
+         // This means that we process event about connection status for new client.
+         // But in case if service thread where this client is created has more time quantums for running this will lead to situation
+         // when notification event about connected server will be processed by this client => this client can send some request
+         // to the server from method "connected" => corresponding event will be created and sent but will not be inserted to current
+         // service thread where this server is created because  "set_notification" method below is not called yet.
+         // This issue is not relevant to "fast" implementation.
          TYPES::tEvent::set_notification(
             this,
             typename TYPES::tEventUserSignature( signature( ).role( ), rr_item.request, proxy_address.id( ), id( ) )

@@ -171,7 +171,7 @@ Registry::eResult Registry::register_client( const Signature& signature, const A
    SYS_INF( "registered paired client: %s", signature.name( ).c_str( ) );
 
    // Send notification event to server about registered client with current signature
-   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address );
+   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address ); // @TDA-IMPROVE: here and in similar places should be send not broadcast event but addresed.
    // Send notification events to client about registered server with current signature
    ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerConnected }, connection.server );
 
