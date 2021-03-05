@@ -8,6 +8,31 @@ namespace base {
 
    /****************************************************************************************************
     * 
+    * Print formated message to console without dynamic memory allocation (instead of "printf")
+    * 
+    ***************************************************************************************************/
+   template< typename... Args >
+   void write( const char* const format, Args&&... args )
+   {
+      // static thread_local char* p_buffer = (char*)malloc( 1024 );
+      static thread_local char p_buffer[1024];
+      auto size = ::sprintf( p_buffer, format, args... );
+      ::write( STDOUT_FILENO, p_buffer, size );
+   }
+
+   template< typename... Args >
+   void write( int fd, const char* const format, Args&&... args )
+   {
+      if( 0 > fd ) fd = STDOUT_FILENO;
+
+      // static thread_local char* p_buffer = (char*)malloc( 1024 );
+      static thread_local char p_buffer[1024];
+      auto size = ::sprintf( p_buffer, format, args... );
+      ::write( fd, p_buffer, size );
+   }
+
+   /****************************************************************************************************
+    * 
     * Print std containers and types
     * 
     ***************************************************************************************************/

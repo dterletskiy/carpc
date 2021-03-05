@@ -1,3 +1,6 @@
+version 2.3.13
+   - "api/sys/helpers/functions/print.hpp" implementation extended.
+
 version 2.3.12
    - Fixing issue with timer when linux creats several timers with the same ID in case of using variant with:
          sev.sigev_notify = SIGEV_SIGNAL;
