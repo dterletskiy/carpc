@@ -7,12 +7,22 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 
-#include "imp/hooks/MemoryMap.hpp"
-
+#include "api/sys/helpers/functions/print.hpp"
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/time.hpp"
+#include "imp/hooks/MemoryMap.hpp"
+
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "MEMORY"
+
+
+
+// #define DEBUG
+#ifdef DEBUG
+   #define MESSAGE( FORMAT, ... ) base::write( FORMAT, ##__VA_ARGS__ );
+#else
+   #define MESSAGE( FORMAT, ... )
+#endif
 
 
 
@@ -20,7 +30,7 @@ const mode_t AccessPerms = (mode_t)0600;
 
 
 
-namespace hook::memory {
+using namespace hook::memory;
 
 
 
@@ -29,25 +39,57 @@ MemoryHeader* MemoryHeader::cast( void* p )
    return reinterpret_cast< MemoryHeader* >( p );
 }
 
-void MemoryHeader::dump( void* _address )
+void MemoryHeader::dump( void* _address, const int fd, const char* const message )
 {
    MemoryHeader* p_header = cast( _address );
-   SYS_INF(
-      "address (user address) = %p (%p) / caller = %p / size = %zu / time = %lu"
-      , _address, static_cast< char* >( _address ) + sizeof( MemoryHeader ), p_header->caller, p_header->size, p_header->time
-   );
+
+   if( 0 < fd )
+   {
+      base::write(
+           fd
+         , "%s: address (user address) = %p (%p) / caller = %p / size = %zu / time = %lu / thread = %#lx\n"
+         , message
+         , _address, static_cast< char* >( _address ) + sizeof( MemoryHeader )
+         , p_header->caller
+         , p_header->size
+         , p_header->time
+         , p_header->thread
+      );
+   }
+   else
+   {
+      SYS_INF(
+         "%s: address (user address) = %p (%p) / caller = %p / size = %zu / time = %lu / thread = %#lx"
+         , message
+         , _address, static_cast< char* >( _address ) + sizeof( MemoryHeader )
+         , p_header->caller
+         , p_header->size
+         , p_header->time
+         , p_header->thread
+      );
+   }
 }
 
-void MemoryHeader::write( void* _address, void* _caller, const size_t _size, const uint64_t _time )
+void MemoryHeader::write( void* _address, void* _caller, const std::size_t _size, const uint64_t _time, const pthread_t _thread )
 {
-   *cast( _address ) = { _caller, _size, _time };
+   *cast( _address ) = { _caller, _size, _time, _thread };
 }
 
 
 
-MemoryMap::MemoryMap( const char* _path, const size_t _size )
+MemoryMap::MemoryMap( const char* _path, const std::size_t _size )
    : m_min_track_size( _size )
    , m_path( _path )
+{
+   init( );
+}
+
+MemoryMap::~MemoryMap( )
+{
+   deinit( );
+}
+
+void MemoryMap::init( )
 {
    if( nullptr == strchr( m_path, '/' ) )
       m_fd = shm_open( m_path, O_RDWR | O_CREAT, AccessPerms );
@@ -57,36 +99,43 @@ MemoryMap::MemoryMap( const char* _path, const size_t _size )
    if( 0 > m_fd )
    {
       m_last_errno = errno;
-      SYS_ERR( "open file error: %d", m_last_errno );
+      // SYS_ERR( "open file error: %d", m_last_errno );
    }
    else
    {
-      SYS_VRB( "log file opened: %s(%d)", m_path, m_fd );
+      // SYS_VRB( "log file opened: %s(%d)", m_path, m_fd );
       int result = lseek( m_fd, 0, SEEK_END );
       if( -1 == result )
       {
          m_last_errno = errno;
-         SYS_ERR( "lseek file error: %d", m_last_errno );
+         // SYS_ERR( "lseek file error: %d", m_last_errno );
       }
       else
       {
-         SYS_VRB( "descriptor file positioned: %d(%d)", m_fd, result );
+         // SYS_VRB( "descriptor file positioned: %d(%d)", m_fd, result );
       }
    }
 }
 
-MemoryMap::~MemoryMap( )
+void MemoryMap::deinit( )
 {
-   SYS_VRB( );
+   // SYS_VRB( );
    close( m_fd );
 }
 
-void MemoryMap::set_track_size( const size_t _size )
+void MemoryMap::set_track_file( const char* const _path )
+{
+   deinit( );
+   m_path = _path;
+   init( );
+}
+
+void MemoryMap::set_track_size( const std::size_t _size )
 {
    m_min_track_size = _size;
 }
 
-bool MemoryMap::insert( void* _address, void* _caller, size_t _size )
+bool MemoryMap::insert( void* _address, void* _caller, std::size_t _size )
 {
    // SYS_VRB( "address = %p", _address );
 
@@ -94,19 +143,20 @@ bool MemoryMap::insert( void* _address, void* _caller, size_t _size )
       return false;
 
    uint64_t time_stamp = base::os::linux::time( base::os::linux::eGranularity::miliseconds );
+   tHeaderType::write( _address, _caller, _size, time_stamp, pthread_self( ) );
+   m_common_size += _size;
+
    if( 0 != m_min_track_size && m_min_track_size < _size )
    {
-      char buffer[ 256 ];
-      ::write( m_fd, buffer, sprintf( buffer, "\ntime: %lu / caller: %p / address: %p / size: %zu\n", time_stamp, _caller, _address, _size ) );
+      tHeaderType::dump( _address, m_fd, "\n" );
       base::os::linux::back_trace( m_fd );
    }
 
-   tHeaderType::write( _address, _caller, _size, time_stamp );
-
-   size_t index = find_free( );
+   std::size_t index = find_free( );
    if( s_invalid_entry == index )
       return false;
 
+   ++m_records;
    m_mem_map[ index ] = { _address };
    return true;
 }
@@ -118,22 +168,27 @@ bool MemoryMap::remove( const void* _address )
    if( nullptr == _address )
       return false;
 
-   for( size_t i = 0; i < s_memory_map_size; ++i )
+   for( std::size_t i = 0; i < s_memory_map_size; ++i )
+   {
       if( _address == m_mem_map[i].address )
       {
+         m_common_size -= tHeaderType::cast( m_mem_map[i].address )->size;
+         --m_records;
          m_mem_map[i] = { };
          return true;
       }
+   }
 
    // SYS_WRN( "error address = %p", _address );
    return false;
 }
 
-size_t MemoryMap::find_free( ) const
+std::size_t MemoryMap::find_free( ) const
 {
-   // SYS_VRB( );
+   if( m_records == s_memory_map_size )
+      return s_invalid_entry;
 
-   for( size_t i = 0; i < s_memory_map_size; ++i )
+   for( std::size_t i = 0; i < s_memory_map_size; ++i )
       if( nullptr == m_mem_map[i].address )
          return i;
 
@@ -142,27 +197,20 @@ size_t MemoryMap::find_free( ) const
 
 void MemoryMap::dump( ) const
 {
-   SYS_INF( "--------------- Start Dump ---------------" );
+   SYS_DUMP_START( "HEAP" );
 
-   for( size_t i = 0; i < s_memory_map_size; ++i )
+   SYS_INF( "Allocated heap size: %zu bytes", m_common_size );
+   SYS_INF( "Unreleased allocations: %zu", m_records );
+   for( std::size_t i = 0; i < s_memory_map_size; ++i )
    {
       if( nullptr != m_mem_map[i].address )
          tHeaderType::dump( m_mem_map[i].address );
    }
 
-   SYS_INF( "---------------- End Dump ----------------" );
+   SYS_DUMP_END( "HEAP" );
 }
 
-const size_t MemoryMap::records( ) const
+const std::size_t MemoryMap::records( ) const
 {
-   size_t records = 0;
-   for( size_t i = 0; i < s_memory_map_size; ++i )
-      if( nullptr != m_mem_map[i].address )
-         ++records;
-
-   return records;
+   return m_records;
 }
-
-
-
-} // namespace hook::memory

@@ -1,3 +1,8 @@
+version 2.3.14
+   - Memory hook refactoring.
+   - Instrumental project library created.
+   - Some other minor implementations.
+
 version 2.3.13
    - "api/sys/helpers/functions/print.hpp" implementation extended.
 

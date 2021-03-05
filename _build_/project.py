@@ -149,7 +149,7 @@ class ProjectSettings:
       start_compile: int = int( round(time.time() * 1000) )
 
       console.debug.header( self.__delimeter )
-      console.debug.info( "Processing:", target.source( ) )
+      console.debug.info( "Processing: ", target.source( ) )
       source_time = file.file_time( target.source( ) )
       object_time = file.file_time( target.object( ) )
 

@@ -6,13 +6,33 @@
 
 
 namespace memory {
-   #ifdef HOOK_MEMORY_ALLOCATOR
+
+   #ifdef USE_MEMORY_HOOK
+
       extern void dump( );
       extern void set_track_size( const size_t );
+      extern void set_track_file( const char* );
+
    #else
-      inline void dump( ) { }
-      inline void set_track_size( const size_t ) { }
+
+      inline
+      void dump( )
+      {
+         SYS_WRN( "hooks for mmemory allocators are not activated" );
+      }
+      inline
+      void set_track_size( const size_t )
+      {
+         SYS_WRN( "hooks for mmemory allocators are not activated" );
+      }
+      inline
+      void set_track_file( const char* )
+      {
+         SYS_WRN( "hooks for mmemory allocators are not activated" );
+      }
+
    #endif
+
 }
 
 

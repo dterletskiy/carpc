@@ -6,16 +6,6 @@
 
 
 
-namespace memory {
-   #ifdef HOOK_MEMORY_ALLOCATOR
-      extern void dump( );
-   #else
-      inline void dump( ) { }
-   #endif
-}
-
-
-
 using tStart = void (*)( int, char**, char** );
 using tExit = void (*)( void );
 

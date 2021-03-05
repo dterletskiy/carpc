@@ -28,3 +28,26 @@ git reset --hard
 
 # Diff between file in HEAD and file in transaction:
 git diff --cached changelog.log
+
+# Checkout latest comit in the branch:
+git checkout <branch_name>
+
+# To go to the most recent commit:
+git checkout $(git log --branches -1 --pretty=format:"%H")
+# Explanation:
+# git log --branches shows log of commits from all local branches
+# -1 limit to one commit → most recent commit
+# --pretty=format:"%H" format to only show commit hash
+# git checkout $(...) use output of subshell as argument for checkout
+
+# Show all branches and commit
+git log --branches --oneline
+
+# Show last commit
+git log --branches -1 --oneline
+
+# Show before last commit
+git log --branches -2 --oneline
+
+# To see what other commits your HEAD (or any other ref) has pointed to in the past:
+git reflog

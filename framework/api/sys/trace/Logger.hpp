@@ -24,7 +24,7 @@ namespace base::trace {
          template< typename... Args >
          void message( const eLogLevel& log_level, const char* const format, Args... args )
          {
-            static thread_local char* p_buffer = (char*)malloc( 1024 );
+            char p_buffer[1024];
             auto size = ::sprintf( p_buffer, format, args... );
 
             switch( m_log_strategy )

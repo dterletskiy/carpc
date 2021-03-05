@@ -13,7 +13,7 @@ namespace base::os {
          using ID = base::TID< Mutex >;
 
       public:
-         Mutex( const bool auto_lock = false, const char* name = "mutex_no_name" );
+         Mutex( const bool auto_lock = false, const bool recursive = true, const char* name = "mutex_no_name" );
          Mutex( const Mutex& ) = delete;
          virtual ~Mutex( );
 
@@ -29,7 +29,6 @@ namespace base::os {
          void unlock( );
       private:
          bool        m_locked = false;
-         bool        m_auto_lock = false;
 
       public:
          pthread_mutex_t& mutex( );

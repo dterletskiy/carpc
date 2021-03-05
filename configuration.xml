@@ -5,15 +5,15 @@
    <version major="0" minor="1" patch="0"/>
 
    <configuration>
-      <config name="USE_DLT" status="active"/>
-      <config name="SYS_TRACE" status="active"/>
-      <config name="MSG_TRACE" status="active"/>
-      <config name="COLORED_TRACE" status="active"/>
-      <config name="USE_MEMORY_HOOK" status="inactive"/>
-      <config name="USE_INSTRUMENTAL" status="active"/>
-      <config name="USE_OPENMP" status="inactive"/>
-      <config name="USE_INTEL_TBB" status="inactive"/>
-      <config name="USE_GBP" status="inactive"/>
+      <config name="SYS_TRACE"         status="active"/>
+      <config name="MSG_TRACE"         status="active"/>
+      <config name="COLORED_TRACE"     status="active"/>
+      <config name="USE_DLT"           status="active"/>
+      <config name="USE_MEMORY_HOOK"   status="inactive"/>
+      <config name="USE_INSTRUMENTAL"  status="inactive"/>
+      <config name="USE_OPENMP"        status="inactive"/>
+      <config name="USE_INTEL_TBB"     status="inactive"/>
+      <config name="USE_GBP"           status="inactive"/>
    </configuration>
 
    <settings type="compilation">
@@ -41,7 +41,7 @@
          <condition type="config" name="COLORED_TRACE" status="active"/>
       </setting>
 
-      <setting type="define" name="HOOK_MEMORY_ALLOCATOR" status="conditions">
+      <setting type="define" name="USE_MEMORY_HOOK" status="conditions">
          <condition type="config" name="USE_MEMORY_HOOK" status="active"/>
       </setting>
 

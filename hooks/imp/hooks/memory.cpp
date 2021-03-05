@@ -6,6 +6,8 @@
 #include <malloc.h>
 #include <cstddef>
 
+#include "api/sys/helpers/functions/print.hpp"
+#include "api/sys/oswrappers/Mutex.hpp"
 #include "imp/hooks/MemoryMap.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -14,13 +16,28 @@
 
 
 
+// #define DEBUG
+#ifdef DEBUG
+   #define MESSAGE( FORMAT, ... ) base::write( FORMAT, ##__VA_ARGS__ );
+#else
+   #define MESSAGE( FORMAT, ... )
+#endif
+
+
+
 namespace {
+
    hook::memory::MemoryMap s_memory_map __attribute__ (( section ("MEMORY"), init_priority (101) )) = { "/tmp/backtrace", 1024 * 1024 };
+   base::os::Mutex s_mutex; 
+
 }
 
 namespace memory {
-   void dump( ) { s_memory_map.dump( ); }
-   void set_track_size( const size_t size ) { s_memory_map.set_track_size( size ); }
+
+   void dump( )                              { s_memory_map.dump( ); }
+   void set_track_size( const size_t size )  { s_memory_map.set_track_size( size ); }
+   void set_track_file( const char* path )   { s_memory_map.set_track_file( path ); }
+
 }
 
 
@@ -29,43 +46,47 @@ extern "C" void* __libc_malloc( size_t size );
 extern "C" void* malloc( size_t size )
 {
    if( 0 == size )
-   {
-      SYS_WRN( "size = 0" );
       return nullptr;
-   }
 
+   base::os::MutexAutoLocker locker( s_mutex );
    void* address = __libc_malloc( size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   SYS_VRB( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
+   // SYS_VRB( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
+   MESSAGE( "malloc: address = %p / size = %zu\n", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
+}
+extern "C" void* malloc_u( size_t size )
+{
+   return __libc_malloc( size );
 }
 
 extern "C" void* __libc_memalign( size_t alignment, size_t size );
 extern "C" void* memalign( size_t alignment, size_t size )
 {
    if( 0 == size )
-   {
-      SYS_WRN( "size = 0" );
       return nullptr;
-   }
 
+   base::os::MutexAutoLocker locker( s_mutex );
    void* address = __libc_memalign( alignment, size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   SYS_VRB( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
+   // SYS_VRB( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
+   MESSAGE( "memalign: address = %p / size = %zu / alignment = %zu\n", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
+}
+extern "C" void* memalign_u( size_t alignment, size_t size )
+{
+   return __libc_memalign( alignment, size );   
 }
 
 extern "C" void* __libc_realloc( void* address, size_t size );
 extern "C" void* realloc( void* address, size_t size )
 {
    if( 0 == size )
-   {
-      SYS_WRN( "size = 0" );
       return nullptr;
-   }
 
+   base::os::MutexAutoLocker locker( s_mutex );
    void* new_address = __libc_realloc(
         address ? static_cast< void* >(static_cast< char* >( address ) - hook::memory::s_header_size) : address
       , (size + hook::memory::s_header_size)
@@ -73,40 +94,51 @@ extern "C" void* realloc( void* address, size_t size )
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    s_memory_map.insert( new_address, __builtin_return_address(0), size );
 
-   SYS_VRB( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
+   // SYS_VRB( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
+   MESSAGE( "realloc: address = %p / size = %zu / new address = %p\n", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
    return static_cast< void* >( static_cast< char* >( new_address ) + hook::memory::s_header_size );
+}
+extern "C" void* realloc_u( void* address, size_t size )
+{
+   return __libc_realloc( address, size );
 }
 
 extern "C" void* __libc_calloc( size_t number, size_t size );
 extern "C" void* calloc( size_t number, size_t size )
 {
    if( 0 == size || 0 == number )
-   {
-      SYS_WRN( "size = %zu / number = %zu", size, number );
       return nullptr;
-   }
 
+   base::os::MutexAutoLocker locker( s_mutex );
    // void* address = __libc_calloc( number, size );
    void* address = __libc_malloc( number * size + hook::memory::s_header_size );
    memset( address, 0, number * size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), number * size );
 
-   SYS_VRB( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
+   // SYS_VRB( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
+   MESSAGE( "calloc: address = %p / size = %zu / number = %zu\n", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
+}
+extern "C" void* calloc_u( size_t number, size_t size )
+{
+   return __libc_calloc( number, size );
 }
 
 extern "C" void* __libc_free( void* address );
 extern "C" void free( void* address )
 {
    if( nullptr == address )
-   {
-      SYS_WRN( "address = (nil)" );
       return;
-   }
 
-   SYS_VRB( "address = %p", address );
+   base::os::MutexAutoLocker locker( s_mutex );
+   // SYS_VRB( "address = %p", address );
+   MESSAGE( "free: address = %p\n", address );
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    __libc_free( static_cast< char* >( address ) - hook::memory::s_header_size );
+}
+extern "C" void free_u( void* address )
+{
+   __libc_free( address );
 }
 
 
