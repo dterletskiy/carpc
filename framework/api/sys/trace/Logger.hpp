@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string.h>
 #include <map>
 #include "api/sys/trace/Types.hpp"
 
@@ -60,17 +61,20 @@ namespace base::trace {
                      const char* const format, Args... args
             )
          {
+            const std::size_t full_format_max_size = 1024;
+
             switch( m_log_strategy )
             {
                case eLogStrategy::CONSOLE:
                {
-                  std::string full_format =
-                           std::string( PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE ) +
-                           std::string( to_color( log_level ) ) +
-                           std::string( format ) +
-                           std::string( NEW_LINE );
+                  char full_format[ full_format_max_size ] = { 0 };
+                  strcat( full_format, PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE );
+                  strcat( full_format, to_color( log_level ) );
+                  strcat( full_format, format );
+                  strcat( full_format, "\n" );
+
                   message(
-                        log_level, full_format.c_str( ),
+                        log_level, full_format,
                         ::base::os::linux::microseconds( ), getpid( ), pthread_self( ),
                         file, function, line,
                         args...
@@ -83,13 +87,14 @@ namespace base::trace {
                   std::size_t milliseconds = 0;
                   ::base::os::linux::local_time_of_date( time_tm, milliseconds );
 
-                  std::string full_format =
-                           std::string( PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE ) +
-                           std::string( to_color( log_level ) ) +
-                           std::string( format ) +
-                           std::string( NEW_LINE );
+                  char full_format[ full_format_max_size ] = { 0 };
+                  strcat( full_format, PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE );
+                  strcat( full_format, to_color( log_level ) );
+                  strcat( full_format, format );
+                  strcat( full_format, "\n" );
+
                   message(
-                        log_level, full_format.c_str( ),
+                        log_level, full_format,
                         time_tm->tm_year + 1900, time_tm->tm_mon + 1, time_tm->tm_mday,
                         time_tm->tm_hour, time_tm->tm_min, time_tm->tm_sec, milliseconds,
                         getpid( ), pthread_self( ),
@@ -100,22 +105,22 @@ namespace base::trace {
                }
                case eLogStrategy::DLT:
                {
-                  std::string full_format = std::string( "[%s:%s:%d] -> " ) + std::string( format );
-                  message(
-                        log_level, full_format.c_str( ),
-                        file, function, line,
-                        args...
-                     );
+                  char full_format[ full_format_max_size ] = { 0 };
+                  strcat( full_format, "[%s:%s:%d] -> " );
+                  strcat( full_format, format );
+                  strcat( full_format, "\n" );
+
+                  message( log_level, full_format, file, function, line, args... );
                   break;
                }
                case eLogStrategy::ANDROID:
                {
-                  std::string full_format = std::string( "[%s:%s:%d] -> " ) + std::string( format );
-                  message(
-                        log_level, full_format.c_str( ),
-                        file, function, line,
-                        args...
-                     );
+                  char full_format[ full_format_max_size ] = { 0 };
+                  strcat( full_format, "[%s:%s:%d] -> " );
+                  strcat( full_format, format );
+                  strcat( full_format, "\n" );
+
+                  message( log_level, full_format, file, function, line, args... );
                   break;
                }
                default: break;
