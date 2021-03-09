@@ -16,15 +16,6 @@
 
 
 
-// #define DEBUG
-#ifdef DEBUG
-   #define MESSAGE( FORMAT, ... ) base::write( FORMAT, ##__VA_ARGS__ );
-#else
-   #define MESSAGE( FORMAT, ... )
-#endif
-
-
-
 namespace {
 
    hook::memory::MemoryMap s_memory_map __attribute__ (( section ("MEMORY"), init_priority (101) )) = { "/tmp/backtrace", 1024 * 1024 };
@@ -52,8 +43,7 @@ extern "C" void* malloc( size_t size )
    void* address = __libc_malloc( size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   // SYS_VRB( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
-   MESSAGE( "malloc: address = %p / size = %zu\n", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
+   SYS_VRB( "address = %p / size = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 extern "C" void* malloc_u( size_t size )
@@ -71,8 +61,7 @@ extern "C" void* memalign( size_t alignment, size_t size )
    void* address = __libc_memalign( alignment, size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
-   // SYS_VRB( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
-   MESSAGE( "memalign: address = %p / size = %zu / alignment = %zu\n", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
+   SYS_VRB( "address = %p / size = %zu / alignment = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, alignment );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 extern "C" void* memalign_u( size_t alignment, size_t size )
@@ -94,8 +83,7 @@ extern "C" void* realloc( void* address, size_t size )
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    s_memory_map.insert( new_address, __builtin_return_address(0), size );
 
-   // SYS_VRB( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
-   MESSAGE( "realloc: address = %p / size = %zu / new address = %p\n", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
+   SYS_VRB( "address = %p / size = %zu / new address = %p", address, size, (static_cast< char* >( new_address ) + hook::memory::s_header_size) );
    return static_cast< void* >( static_cast< char* >( new_address ) + hook::memory::s_header_size );
 }
 extern "C" void* realloc_u( void* address, size_t size )
@@ -115,8 +103,7 @@ extern "C" void* calloc( size_t number, size_t size )
    memset( address, 0, number * size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), number * size );
 
-   // SYS_VRB( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
-   MESSAGE( "calloc: address = %p / size = %zu / number = %zu\n", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
+   SYS_VRB( "address = %p / size = %zu / number = %zu", (static_cast< char* >( address ) + hook::memory::s_header_size), size, number );
    return static_cast< void* >( static_cast< char* >( address ) + hook::memory::s_header_size );
 }
 extern "C" void* calloc_u( size_t number, size_t size )
@@ -131,8 +118,7 @@ extern "C" void free( void* address )
       return;
 
    base::os::MutexAutoLocker locker( s_mutex );
-   // SYS_VRB( "address = %p", address );
-   MESSAGE( "free: address = %p\n", address );
+   SYS_VRB( "address = %p", address );
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    __libc_free( static_cast< char* >( address ) - hook::memory::s_header_size );
 }

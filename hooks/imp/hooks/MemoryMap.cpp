@@ -99,27 +99,27 @@ void MemoryMap::init( )
    if( 0 > m_fd )
    {
       m_last_errno = errno;
-      // SYS_ERR( "open file error: %d", m_last_errno );
+      SYS_ERR( "open file error: %d", m_last_errno );
    }
    else
    {
-      // SYS_VRB( "log file opened: %s(%d)", m_path, m_fd );
+      SYS_VRB( "log file opened: %s(%d)", m_path, m_fd );
       int result = lseek( m_fd, 0, SEEK_END );
       if( -1 == result )
       {
          m_last_errno = errno;
-         // SYS_ERR( "lseek file error: %d", m_last_errno );
+         SYS_ERR( "lseek file error: %d", m_last_errno );
       }
       else
       {
-         // SYS_VRB( "descriptor file positioned: %d(%d)", m_fd, result );
+         SYS_VRB( "descriptor file positioned: %d(%d)", m_fd, result );
       }
    }
 }
 
 void MemoryMap::deinit( )
 {
-   // SYS_VRB( );
+   SYS_VRB( );
    close( m_fd );
 }
 
@@ -137,7 +137,7 @@ void MemoryMap::set_track_size( const std::size_t _size )
 
 bool MemoryMap::insert( void* _address, void* _caller, std::size_t _size )
 {
-   // SYS_VRB( "address = %p", _address );
+   SYS_VRB( "address = %p", _address );
 
    if( nullptr == _address )
       return false;
@@ -163,7 +163,7 @@ bool MemoryMap::insert( void* _address, void* _caller, std::size_t _size )
 
 bool MemoryMap::remove( const void* _address )
 {
-   // SYS_VRB( "address = %p", _address );
+   SYS_VRB( "address = %p", _address );
 
    if( nullptr == _address )
       return false;
@@ -179,7 +179,7 @@ bool MemoryMap::remove( const void* _address )
       }
    }
 
-   // SYS_WRN( "error address = %p", _address );
+   SYS_WRN( "error address = %p", _address );
    return false;
 }
 

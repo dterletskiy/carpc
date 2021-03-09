@@ -1,3 +1,6 @@
+version 2.4.1
+   - Activate tracing in memory hooks.
+
 version 2.4.0
    - Tracing moved from "framework" to new project "tracing".
 
