@@ -1,3 +1,6 @@
+version 2.4.2
+   - "Command" initial implementation.
+
 version 2.4.1
    - Activate tracing in memory hooks.
 
