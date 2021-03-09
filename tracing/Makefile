@@ -14,9 +14,7 @@ GENERATED_DIR    := $(PRODUCT_DIR)/gen
 TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
-INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR) -I$(PROJECT_TRACING_DIR)
-LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
-LDFLAGS          += -L$(PRODUCT_TRACING_DIR)/lib -ltracing
+INCLUDE          += -I$(SOURCE_DIR)
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
@@ -56,7 +54,7 @@ $(PROJECT_NAME)_PIC: $(OBJECT_PIC_FILES)
 
 
 config:
-	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR) $(TARGET_DIR) $(GENERATED_DIR))
+	$(call create_directories,$(LIBRARY_DIR) $(OBJECT_DIR) $(GENERATED_DIR))
 
 clean:
 	$(call delete_directories,$(PRODUCT_DIR))

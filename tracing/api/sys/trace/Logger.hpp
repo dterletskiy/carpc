@@ -75,7 +75,7 @@ namespace base::trace {
 
                   message(
                         log_level, full_format,
-                        ::base::os::linux::microseconds( ), getpid( ), pthread_self( ),
+                        time( eGranularity::microseconds ), getpid( ), pthread_self( ),
                         file, function, line,
                         args...
                      );
@@ -85,7 +85,7 @@ namespace base::trace {
                {
                   tm* time_tm;
                   std::size_t milliseconds = 0;
-                  ::base::os::linux::local_time_of_date( time_tm, milliseconds );
+                  local_time_of_date( time_tm, milliseconds );
 
                   char full_format[ full_format_max_size ] = { 0 };
                   strcat( full_format, PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE );
@@ -179,7 +179,7 @@ namespace base::trace {
       private:
          #ifdef USE_DLT
             DltContext& dlt_context( );
-            std::map< base::os::linux::thread::tID, DltContext > m_context_map;
+            std::map< pthread_t, DltContext > m_context_map;
          #endif
    };
 

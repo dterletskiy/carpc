@@ -14,9 +14,10 @@ GENERATED_DIR    := $(PRODUCT_DIR)/gen
 TARGET_DIR       := $(PRODUCT_DIR)/exe
 PERF_DIR         := $(PRODUCT_DIR)/perf
 
-INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR)
+INCLUDE          += -I$(SOURCE_DIR) -I$(PROJECT_FRAMEWORK_DIR) -I$(PROJECT_TRACING_DIR)
 LDFLAGS          += -L$(PRODUCT_FRAMEWORK_DIR)/lib -lframework
-LD_PATH           =  $(LD_LIBRARY_PATH):$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib/
+LDFLAGS          += -L$(PRODUCT_TRACING_DIR)/lib -ltracing
+LD_PATH           =  $(LD_LIBRARY_PATH):$(PRODUCT_TRACING_DIR)/lib/:$(PRODUCT_FRAMEWORK_DIR)/lib/:$(PRODUCT_HOOKS_DIR)/lib/:$(PRODUCT_INSTRUMENTAL_DIR)/lib/
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE

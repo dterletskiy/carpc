@@ -1,4 +1,3 @@
-#include "api/sys/helpers/functions/format.hpp"
 #include "api/sys/trace/Logger.hpp"
 
 
@@ -31,7 +30,7 @@ Logger::Logger( const eLogStrategy& _log_strategy, const char* const app_name )
    #ifdef USE_DLT
       if( eLogStrategy::DLT == m_log_strategy )
       {
-         const auto registerAppStatus = dlt_register_app( mp_application_name, format_string( mp_application_name, " Application" ).c_str( ) );
+         const auto registerAppStatus = dlt_register_app( mp_application_name, "Application" );
          if( DLT_RETURN_OK != registerAppStatus )
             return;
       }
@@ -63,8 +62,9 @@ DltContext& Logger::dlt_context( )
       static thread_local char* const thread_name = new char [ NAMELEN ];
       if ( 0 != pthread_getname_np( iterator->first, thread_name, NAMELEN ) )
       {
-         std::string thread_name_id = format_string( iterator->first ).c_str( );
-         dlt_register_context( &(iterator->second), thread_name_id.c_str( ), thread_name_id.c_str( ) );
+         char thread_name_id[ 8 ] = {0};
+         sprintf( thread_name_id, "%ld", iterator->first );
+         dlt_register_context( &(iterator->second), thread_name_id, thread_name_id );
       }
       else
       {

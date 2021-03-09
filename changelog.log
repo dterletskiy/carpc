@@ -1,3 +1,6 @@
+version 2.4.0
+   - Tracing moved from "framework" to new project "tracing".
+
 version 2.3.15
    - Performance improvement for tracing by replacing "springf" by "strcat" for strings concatination.
 

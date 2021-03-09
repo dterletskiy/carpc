@@ -8,7 +8,6 @@
       <config name="SYS_TRACE"         status="active"/>
       <config name="MSG_TRACE"         status="active"/>
       <config name="COLORED_TRACE"     status="active"/>
-      <config name="USE_DLT"           status="active"/>
       <config name="USE_MEMORY_HOOK"   status="inactive"/>
       <config name="USE_INSTRUMENTAL"  status="inactive"/>
       <config name="USE_OPENMP"        status="inactive"/>
@@ -20,6 +19,7 @@
 
       <!-- Compiler include section -->
       <setting type="include" value="/usr/local/include" status="inactive"/>
+      <setting type="include" value="/mnt/p4v/Source/RPC/tracing" status="active"/>
 
       <!-- Compiler define section -->
       <setting type="define" name="OS_LINUX" value="0" status="active"/>
@@ -28,9 +28,6 @@
       <setting type="define" name="OS_STD" value="3" status="active"/>
       <setting type="define" name="OS" value="OS_LINUX" status="active"/>
 
-      <setting type="define" name="USE_DLT" status="conditions">
-         <condition type="config" name="USE_DLT" status="active"/>
-      </setting>
       <setting type="define" name="SYS_TRACE" status="conditions">
          <condition type="config" name="SYS_TRACE" status="active"/>
       </setting>
@@ -88,6 +85,8 @@
          <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
       </setting>
 
+      <setting type="include" value="/mnt/p4v/Source/RPC/tracing_product/lib" status="active"/>
+
       <!-- Linker flag section -->
       <setting type="flag" value="-ldl" status="inactive"/>
       <setting type="flag" value="-lm" status="inactive"/>
@@ -100,9 +99,6 @@
       </setting>
       <setting type="flag" value="-ltbb" status="conditions">
          <condition type="config" name="USE_INTEL_TBB" status="active"/>
-      </setting>
-      <setting type="flag" value="-ldlt" status="conditions">
-         <condition type="config" name="USE_DLT" status="active"/>
       </setting>
       <setting type="flag" value="-lprotobuf" status="conditions">
          <condition type="config" name="USE_GBP" status="active"/>
@@ -123,7 +119,7 @@
          <condition type="config" name="USE_INSTRUMENTAL" status="active"/>
       </setting>
 
-      <setting type="flag" value="-llog" status="inactive" comment="Android"/>
+      <setting type="flag" value="-ltracing" status="active"/>
 
    </settings>
 
