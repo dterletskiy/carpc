@@ -47,7 +47,7 @@ namespace base::command {
 
       private:
          void parent_id( const queue::tID& );
-         queue::tID m_parent_id = queue::tID::invalid( );
+         queue::tID m_parent_id = queue::tID::invalid;
    };
 
 
