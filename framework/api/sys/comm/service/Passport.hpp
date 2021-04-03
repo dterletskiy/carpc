@@ -17,8 +17,8 @@ namespace base::service {
 
       const std::string name( ) const;
 
-      bool to_stream( base::dsi::tByteStream& ) const;
-      bool from_stream( base::dsi::tByteStream& );
+      bool to_stream( base::ipc::tStream& ) const;
+      bool from_stream( base::ipc::tStream& );
 
       Signature   signature;
       Address     address;

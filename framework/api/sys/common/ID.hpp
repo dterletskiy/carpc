@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <limits>
 #include "api/sys/helpers/functions/format.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/IPC.hpp"
 
 
 
@@ -43,11 +43,11 @@ namespace base {
          ~TID( ) = default;
 
       public:
-         bool to_stream( dsi::tByteStream& stream ) const
+         bool to_stream( ipc::tStream& stream ) const
          {
             return stream.push( m_value );
          }
-         bool from_stream( dsi::tByteStream& stream )
+         bool from_stream( ipc::tStream& stream )
          {
             return stream.pop( m_value );
          }

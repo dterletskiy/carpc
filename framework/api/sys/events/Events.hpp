@@ -61,8 +61,8 @@ namespace base::events {
          public:
             const std::string name( ) const;
             bool operator<( const SignatureStatus& ) const;
-            const bool to_stream( dsi::tByteStream& ) const;
-            const bool from_stream( dsi::tByteStream& );
+            const bool to_stream( ipc::tStream& ) const;
+            const bool from_stream( ipc::tStream& );
 
          public:
             const base::service::Signature& signature( ) const;

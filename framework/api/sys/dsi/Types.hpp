@@ -2,20 +2,19 @@
 
 #include <cstdlib>
 #include "api/sys/oswrappers/linux/socket.hpp"
-#include "api/sys/common/ByteStream.hpp"
+#include "api/sys/common/IPC.hpp"
 
 
 
 namespace base::dsi {
 
-   using tByteStream = base::ByteStream;
-
    struct SocketCongiguration : public os::linux::socket::configuration
    {
-      const std::string name( ) const;
+      SocketCongiguration( ) = default;
+      SocketCongiguration( const os::linux::socket::configuration& );
 
-      bool to_stream( tByteStream& stream ) const;
-      bool from_stream( tByteStream& stream );
+      bool to_stream( ipc::tStream& stream ) const;
+      bool from_stream( ipc::tStream& stream );
    };
 
 
@@ -51,8 +50,8 @@ namespace base::dsi {
          ~Package( );
 
       public:
-         bool to_stream( tByteStream& stream ) const;
-         bool from_stream( tByteStream& stream );
+         bool to_stream( ipc::tStream& stream ) const;
+         bool from_stream( ipc::tStream& stream );
 
       public:
          size_t size( ) const;
@@ -60,12 +59,12 @@ namespace base::dsi {
 
       public:
          eCommand command( ) const;
-         tByteStream& data( );
+         ipc::tStream& data( );
          template< typename ... TYPES >
             bool data( TYPES& ... args );
       private:
          eCommand       m_command = eCommand::Undefined;
-         tByteStream    m_data;
+         ipc::tStream   m_data;
    };
 
 
@@ -97,7 +96,7 @@ namespace base::dsi {
    }
 
    inline
-   tByteStream& Package::data( )
+   ipc::tStream& Package::data( )
    {
       return m_data;
    }
@@ -126,9 +125,9 @@ namespace base::dsi {
          ~Packet( );
 
       public:
-         bool to_stream( tByteStream& ) const;
-         bool from_stream( tByteStream& );
-         bool test_stream( tByteStream& ) const;
+         bool to_stream( ipc::tStream& ) const;
+         bool from_stream( ipc::tStream& );
+         bool test_stream( ipc::tStream& ) const;
 
       public:
          void add_package( Package&& );

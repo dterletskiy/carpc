@@ -66,7 +66,7 @@ namespace base::application {
       private:
          void prepare_select( os::linux::socket::tSocket&, os::linux::socket::fd& );
          void process_select( os::linux::socket::tSocket&, os::linux::socket::fd& );
-         bool process_stream( dsi::tByteStream&, os::Socket::tSptr );
+         bool process_stream( ipc::tStream&, os::Socket::tSptr );
          bool process_packet( dsi::Packet&, os::Socket::tSptr );
          bool process_package( dsi::Package&, os::Socket::tSptr );
    };

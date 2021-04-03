@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/common/Includes.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/IPC.hpp"
 #include "api/sys/helpers/functions/format.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -28,8 +28,8 @@ namespace base_v1 {
          bool operator<( const TBaseAsyncTypeID< TYPE >& type_id ) const { return m_value < type_id.m_value; }
 
       public:
-         const bool to_stream( base::dsi::tByteStream& stream ) const { return stream.push( m_value ); }
-         const bool from_stream( base::dsi::tByteStream& stream ) { return stream.pop( m_value ); }
+         const bool to_stream( base::ipc::tStream& stream ) const { return stream.push( m_value ); }
+         const bool from_stream( base::ipc::tStream& stream ) { return stream.pop( m_value ); }
 
       public:
          const TYPE& value( ) const { return m_value; }
@@ -83,8 +83,8 @@ namespace base_v1 {
          ~TAsyncTypeID( ) = default;
 
       public:
-         const bool to_stream( base::dsi::tByteStream& stream ) const { return stream.push( TAsyncTypeID< TYPE >::m_value, m_name ); }
-         const bool from_stream( base::dsi::tByteStream& stream ) { return stream.pop( TAsyncTypeID< TYPE >::m_value, m_name ); }
+         const bool to_stream( base::ipc::tStream& stream ) const { return stream.push( TAsyncTypeID< TYPE >::m_value, m_name ); }
+         const bool from_stream( base::ipc::tStream& stream ) { return stream.pop( TAsyncTypeID< TYPE >::m_value, m_name ); }
 
       public:
          template< typename T >
@@ -125,8 +125,8 @@ namespace base_v2 {
          bool operator<( const TAsyncTypeID< T >& type_id ) const { return m_value < type_id.m_value; }
 
       public:
-         const bool to_stream( base::dsi::tByteStream& stream ) const { return stream.push( m_value ); }
-         const bool from_stream( base::dsi::tByteStream& stream ) { return stream.pop( m_value ); }
+         const bool to_stream( base::ipc::tStream& stream ) const { return stream.push( m_value ); }
+         const bool from_stream( base::ipc::tStream& stream ) { return stream.pop( m_value ); }
 
       public:
          template< typename TYPE >

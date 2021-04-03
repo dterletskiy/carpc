@@ -34,11 +34,11 @@ namespace base::async {
                }
 
             public:
-               const bool to_stream( dsi::tByteStream& ) const override
+               const bool to_stream( ipc::tStream& ) const override
                {
                   return false;
                }
-               const bool from_stream( dsi::tByteStream& ) override
+               const bool from_stream( ipc::tStream& ) override
                {
                   return false;
                }

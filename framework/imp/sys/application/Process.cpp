@@ -64,23 +64,23 @@ Process::Process( int argc, char** argv, char** envp )
 
    m_pce.print( );
 
-   m_configuration.ipc_sb = dsi::SocketCongiguration {
+   m_configuration.ipc_sb.socket = os::linux::socket::configuration {
       AF_UNIX,
       SOCK_STREAM,
       static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
       m_pce.value( "ipc_servicebrocker_address" ).value( ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_port" ).value( ) ) )
    };
-   m_configuration.ipc_sb_buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) ) );
+   m_configuration.ipc_sb.buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) ) );
 
-   m_configuration.ipc_app = dsi::SocketCongiguration {
+   m_configuration.ipc_app.socket = os::linux::socket::configuration {
       AF_UNIX,
       SOCK_STREAM,
       static_cast< int >( std::stoll( m_pce.value( "ipc_application_protocole" ).value( ) ) ),
       m_pce.value( "ipc_application_address" ).value( ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_application_port" ).value( ) ) )
    };
-   m_configuration.ipc_app_buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_application_buffer_size" ).value( ) ) );
+   m_configuration.ipc_app.buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_application_buffer_size" ).value( ) ) );
 
    DUMP_IPC_EVENTS;
 }

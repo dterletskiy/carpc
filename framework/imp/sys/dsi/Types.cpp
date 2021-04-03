@@ -35,17 +35,17 @@ using namespace base::dsi;
 
 
 
-const std::string SocketCongiguration::name( ) const
+SocketCongiguration::SocketCongiguration( const os::linux::socket::configuration& configuration )
+   : os::linux::socket::configuration( configuration )
 {
-   return base::format_string( domain, ".", type, ".", protocole, "-", address, ":", port );
 }
 
-bool SocketCongiguration::to_stream( tByteStream& stream ) const
+bool SocketCongiguration::to_stream( ipc::tStream& stream ) const
 {
    return stream.push( domain, type, protocole, address, port );
 }
 
-bool SocketCongiguration::from_stream( tByteStream& stream )
+bool SocketCongiguration::from_stream( ipc::tStream& stream )
 {
    return stream.pop( domain, type, protocole, address, port );
 }
@@ -66,12 +66,12 @@ Package::~Package( )
 {
 }
 
-bool Package::to_stream( tByteStream& _stream ) const
+bool Package::to_stream( ipc::tStream& _stream ) const
 {
    return _stream.push( m_command, m_data );
 }
 
-bool Package::from_stream( tByteStream& _stream )
+bool Package::from_stream( ipc::tStream& _stream )
 {
    return _stream.pop( m_command, m_data );
 }
@@ -86,13 +86,13 @@ Packet::~Packet( )
 {
 }
 
-bool Packet::to_stream( tByteStream& _stream ) const
+bool Packet::to_stream( ipc::tStream& _stream ) const
 {
    // here will be calculated CRC
    return _stream.push( m_begin_sign, m_size, m_packages, m_crc, m_end_sign );
 }
 
-bool Packet::from_stream( tByteStream& _stream )
+bool Packet::from_stream( ipc::tStream& _stream )
 {
    // if( false == test_stream( _stream ) )
    //    return false;
@@ -102,7 +102,7 @@ bool Packet::from_stream( tByteStream& _stream )
    return _stream.pop( begin_sign, m_size, m_packages, m_crc, end_sign );
 }
 
-bool Packet::test_stream( tByteStream& _stream ) const
+bool Packet::test_stream( ipc::tStream& _stream ) const
 {
    // size_t begin_sign = 0;
    // if( false == _stream.get( 0, begin_sign ) )

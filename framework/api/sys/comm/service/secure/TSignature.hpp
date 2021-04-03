@@ -21,8 +21,8 @@ namespace base::service::secure {
       public:
          const std::string name( ) const;
          bool operator<( const TSignature& ) const;
-         const bool to_stream( dsi::tByteStream& ) const;
-         const bool from_stream( dsi::tByteStream& );
+         const bool to_stream( ipc::tStream& ) const;
+         const bool from_stream( ipc::tStream& );
 
       public:
          const tServiceName& role( ) const;
@@ -90,13 +90,13 @@ namespace base::service::secure {
    }
 
    template< typename _ID >
-   const bool TSignature< _ID >::to_stream( dsi::tByteStream& stream ) const
+   const bool TSignature< _ID >::to_stream( ipc::tStream& stream ) const
    {
       return stream.push( m_role, m_id, m_from, m_to, m_seq_id );
    }
 
    template< typename _ID >
-   const bool TSignature< _ID >::from_stream( dsi::tByteStream& stream )
+   const bool TSignature< _ID >::from_stream( ipc::tStream& stream )
    {
       return stream.pop( m_role, m_id, m_from, m_to, m_seq_id );
    }

@@ -10,7 +10,7 @@
 
 namespace local {
 
-   bool send( base::os::Socket::tSptr p_socket, base::dsi::tByteStream& stream )
+   bool send( base::os::Socket::tSptr p_socket, base::ipc::tStream& stream )
    {
       size_t size = 0;
       const void* buffer = nullptr;
@@ -62,7 +62,7 @@ void ConnectionProcessor::read_slave( base::os::Socket::tSptr p_socket )
    const void* const p_buffer = p_socket->buffer( recv_size );
    // p_socket->send( p_buffer, recv_size );
 
-   base::dsi::tByteStream stream;
+   base::ipc::tStream stream;
    stream.push( p_buffer, recv_size );
    while( 0 < stream.size( ) )
    {
@@ -157,7 +157,7 @@ void ConnectionProcessor::process_broadcast_event( base::os::Socket::tSptr p_soc
 {
    base::dsi::Packet packet;
    packet.add_package( std::move( package ) );
-   base::dsi::tByteStream stream;
+   base::ipc::tStream stream;
    stream.push( packet );
 
    local::send( p_socket, stream );
@@ -206,7 +206,7 @@ void ConnectionProcessor::register_server( base::os::Socket::tSptr p_socket, bas
    SYS_INF( "notifying clients due to registered server with service signature '%s'", service_passport.name( ).c_str( ) );
    base::dsi::Packet packet;
    packet.add_package( base::dsi::eCommand::DetectedServer, service_passport, inet_address );
-   base::dsi::tByteStream stream;
+   base::ipc::tStream stream;
    stream.push( packet );
    for( auto connection : service_connection.clients )
       local::send( connection.socket, stream );
@@ -307,7 +307,7 @@ void ConnectionProcessor::register_client( base::os::Socket::tSptr p_socket, bas
       base::service::Passport( service_passport.signature, server.service_address ),
       server.inet_address
    );
-   base::dsi::tByteStream stream;
+   base::ipc::tStream stream;
    stream.push( packet );
    local::send( p_socket, stream );
 }

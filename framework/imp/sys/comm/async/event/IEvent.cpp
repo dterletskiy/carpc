@@ -35,12 +35,12 @@ void IEvent::dump( )
    }
 }
 
-bool IEvent::serialize( dsi::tByteStream& stream, IEvent::tSptr p_event )
+bool IEvent::serialize( ipc::tStream& stream, IEvent::tSptr p_event )
 {
    return IEvent::serialize( stream, *p_event );
 }
 
-bool IEvent::serialize( dsi::tByteStream& stream, const IEvent& event )
+bool IEvent::serialize( ipc::tStream& stream, const IEvent& event )
 {
    if( s_registry.end( ) == s_registry.find( event.signature( )->type_id( ) ) )
    {
@@ -57,7 +57,7 @@ bool IEvent::serialize( dsi::tByteStream& stream, const IEvent& event )
    return true;
 }
 
-IEvent::tSptr IEvent::deserialize( dsi::tByteStream& stream )
+IEvent::tSptr IEvent::deserialize( ipc::tStream& stream )
 {
    tAsyncTypeID event_type;
    if( false == stream.get( event_type ) )

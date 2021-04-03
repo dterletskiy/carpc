@@ -2,7 +2,7 @@
 
 #include "api/sys/application/Context.hpp"
 #include "api/sys/comm/service/Types.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/IPC.hpp"
 
 
 
@@ -22,8 +22,8 @@ namespace base::service {
          ~Address( ) = default;
 
       public:
-         bool to_stream( base::dsi::tByteStream& ) const;
-         bool from_stream( base::dsi::tByteStream& );
+         bool to_stream( base::ipc::tStream& ) const;
+         bool from_stream( base::ipc::tStream& );
 
       public:
          Address& operator=( const Address& );

@@ -2,7 +2,7 @@
 
 #include "api/sys/common/Includes.hpp"
 #include "api/sys/application/Types.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/IPC.hpp"
 
 
 
@@ -31,8 +31,8 @@ namespace base::application {
          ~Context( ) = default;
 
       public:
-         bool to_stream( base::dsi::tByteStream& ) const;
-         bool from_stream( base::dsi::tByteStream& );
+         bool to_stream( ipc::tStream& ) const;
+         bool from_stream( base::ipc::tStream& );
 
       public:
          Context& operator=( const Context& );

@@ -22,8 +22,8 @@ namespace base::async {
             ISignature( const ISignature& ) = default;
             virtual ~ISignature( ) = default;
 
-            virtual const bool to_stream( dsi::tByteStream& ) const = 0;
-            virtual const bool from_stream( dsi::tByteStream& ) = 0;
+            virtual const bool to_stream( ipc::tStream& ) const = 0;
+            virtual const bool from_stream( ipc::tStream& ) = 0;
 
             virtual bool operator<( const ISignature& ) const = 0;
 

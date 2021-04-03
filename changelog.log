@@ -1,5 +1,9 @@
+version 2.4.3
+   - IPC stream type definitione moved to "/commen/IPC.hpp" from "/dsi/Types.hpp"
+   - Refactoring with includes of "/dsi/Types.hpp"
+
 version 2.4.2a
-    - Build fix for version 2.4.2
+   - Build fix for version 2.4.2
 
 version 2.4.2
    - "Command" initial implementation.

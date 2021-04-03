@@ -4,7 +4,6 @@
 #include "api/sys/application/ThreadIPC.hpp"
 #include "imp/sys/application/SystemEventConsumer.hpp"
 #include "imp/sys/application/ServiceEventConsumer.hpp"
-#include "api/sys/dsi/Types.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "SrvIPC"
@@ -35,7 +34,7 @@ void ThreadIPC::thread_loop( )
    m_started = true;
 
    SystemEventConsumer system_event_consumer( *this );
-   ServiceEventConsumer service_event_consumer( *this );
+   ServiceEventConsumer service_event_consumer( m_send_receive );
 
    while( started( ) )
    {
@@ -194,9 +193,4 @@ void ThreadIPC::dump( ) const
 bool ThreadIPC::send( const base::async::IAsync::tSptr p_event, const application::Context& to_context )
 {
    return m_send_receive.send( std::static_pointer_cast< async::IEvent >( p_event ), to_context );
-}
-
-bool ThreadIPC::send( const dsi::Packet& packet, const application::Context& to_context )
-{
-   return m_send_receive.send( packet, to_context );
 }

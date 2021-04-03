@@ -61,12 +61,12 @@ namespace base::events::service {
       return m_id < other.m_id;
    }
 
-   const bool SignatureStatus::to_stream( dsi::tByteStream& stream ) const
+   const bool SignatureStatus::to_stream( ipc::tStream& stream ) const
    {
       return stream.push( m_signature, m_id );
    }
 
-   const bool SignatureStatus::from_stream( dsi::tByteStream& stream )
+   const bool SignatureStatus::from_stream( ipc::tStream& stream )
    {
       return stream.pop( m_signature, m_id );
    }

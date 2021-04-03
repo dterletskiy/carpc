@@ -54,7 +54,6 @@ namespace base::application {
 
       public:
          bool send( const base::async::IAsync::tSptr, const application::Context& );
-         bool send( const dsi::Packet&, const application::Context& );
       private:
          SendReceive                                  m_send_receive;
    };

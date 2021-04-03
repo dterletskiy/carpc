@@ -3,6 +3,7 @@
 
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
+#include "api/sys/helpers/functions/format.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Socket"
@@ -14,6 +15,11 @@ namespace base::os::linux::socket {
    int error = 0;
 
 
+
+   const std::string configuration::name( ) const
+   {
+      return base::format_string( domain, ".", type, ".", protocole, "-", address, ":", port );
+   }
 
    void configuration::print( const std::string& _message ) const
    {

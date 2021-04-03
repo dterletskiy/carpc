@@ -16,11 +16,11 @@ SendReceive::SendReceive( )
    : m_thread( std::bind( &SendReceive::thread_loop, this ) )
 {
    mp_socket_sb = std::shared_ptr< os::Socket >(
-      new os::Socket( Process::instance( )->configuration( ).ipc_sb, Process::instance( )->configuration( ).ipc_sb_buffer_size )
+      new os::Socket( Process::instance( )->configuration( ).ipc_sb.socket, Process::instance( )->configuration( ).ipc_sb.buffer_size )
    );
 
    mp_socket_master = std::shared_ptr< os::Socket >(
-      new os::Socket( Process::instance( )->configuration( ).ipc_app, Process::instance( )->configuration( ).ipc_app_buffer_size )
+      new os::Socket( Process::instance( )->configuration( ).ipc_app.socket, Process::instance( )->configuration( ).ipc_app.buffer_size )
    );
 }
 
@@ -134,7 +134,7 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
       {
          size_t recv_size = 0;
          const void* const p_buffer = mp_socket_sb->buffer( recv_size );
-         dsi::tByteStream stream;
+         ipc::tStream stream;
          stream.push( p_buffer, recv_size );
          process_stream( stream, mp_socket_sb );
       }
@@ -188,7 +188,7 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
       {
          size_t recv_size = 0;
          const void* const p_buffer = p_socket->buffer( recv_size );
-         dsi::tByteStream stream;
+         ipc::tStream stream;
          stream.push( p_buffer, recv_size );
          process_stream( stream, p_socket );
       }
@@ -206,7 +206,7 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
    }
 }
 
-bool SendReceive::process_stream( dsi::tByteStream& stream, os::Socket::tSptr p_socket_from )
+bool SendReceive::process_stream( ipc::tStream& stream, os::Socket::tSptr p_socket_from )
 {
    bool result = true;
    while( 0 < stream.size( ) )
@@ -272,7 +272,7 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
          }
          else
          {
-            p_socket = std::make_shared< os::Socket >( inet_address, Process::instance( )->configuration( ).ipc_app_buffer_size );
+            p_socket = std::make_shared< os::Socket >( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
             if( os::Socket::eResult::ERROR == p_socket->create( ) )
                return false;
             if( os::Socket::eResult::ERROR == p_socket->connect( ) )
@@ -284,7 +284,7 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
             dsi::Packet packet(
                dsi::eCommand::RegisterProcess,
                application::Process::instance( )->id( ),
-               Process::instance( )->configuration( ).ipc_app
+               static_cast< dsi::SocketCongiguration >( Process::instance( )->configuration( ).ipc_app.socket )
             );
             send( packet, p_socket );
          }
@@ -331,7 +331,7 @@ bool SendReceive::process_package( dsi::Package& package, os::Socket::tSptr p_so
          }
          else
          {
-            p_socket = std::make_shared< os::Socket >( inet_address, Process::instance( )->configuration( ).ipc_app_buffer_size );
+            p_socket = std::make_shared< os::Socket >( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
             if( os::Socket::eResult::ERROR == p_socket->create( ) )
                return false;
             if( os::Socket::eResult::ERROR == p_socket->connect( ) )
@@ -473,7 +473,7 @@ bool SendReceive::send( const RawBuffer& buffer, const application::Context& to_
 
 bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
 {
-   RawBuffer buffer = dsi::tByteStream::serialize( packet );
+   RawBuffer buffer = ipc::tStream::serialize( packet );
    bool result = send( buffer, p_socket );
    buffer.free( );
 
@@ -482,7 +482,7 @@ bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
 
 bool SendReceive::send( const dsi::Packet& packet, const application::Context& to_context )
 {
-   RawBuffer buffer = dsi::tByteStream::serialize( packet );
+   RawBuffer buffer = ipc::tStream::serialize( packet );
    bool result = send( buffer, socket( to_context ) );
    buffer.free( );
 

@@ -40,12 +40,12 @@ namespace base::onoff::ipc {
          virtual ~BaseData( ) = default;
 
       public:
-         static tSptr create( base::dsi::tByteStream& );
-         bool serrialize( base::dsi::tByteStream& );
+         static tSptr create( base::ipc::tStream& );
+         bool serrialize( base::ipc::tStream& );
 
       private:
-         virtual bool to_stream( base::dsi::tByteStream& ) = 0;
-         virtual bool from_stream( base::dsi::tByteStream& ) = 0;
+         virtual bool to_stream( base::ipc::tStream& ) = 0;
+         virtual bool from_stream( base::ipc::tStream& ) = 0;
          virtual const eOnOff id( ) const = 0;
    };
 
@@ -67,8 +67,8 @@ namespace base::onoff::ipc {
          std::size_t delay = 0;
 
       private:
-         bool to_stream( base::dsi::tByteStream& ) override;
-         bool from_stream( base::dsi::tByteStream& ) override;
+         bool to_stream( base::ipc::tStream& ) override;
+         bool from_stream( base::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };
@@ -90,8 +90,8 @@ namespace base::onoff::ipc {
          bool result = false;
 
       private:
-         bool to_stream( base::dsi::tByteStream& ) override;
-         bool from_stream( base::dsi::tByteStream& ) override;
+         bool to_stream( base::ipc::tStream& ) override;
+         bool from_stream( base::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };
@@ -110,8 +110,8 @@ namespace base::onoff::ipc {
          ~RequestStartData( ) override = default;
 
       private:
-         bool to_stream( base::dsi::tByteStream& ) override;
-         bool from_stream( base::dsi::tByteStream& ) override;
+         bool to_stream( base::ipc::tStream& ) override;
+         bool from_stream( base::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };
@@ -133,8 +133,8 @@ namespace base::onoff::ipc {
          std::string state = "";
 
       private:
-         bool to_stream( base::dsi::tByteStream& ) override;
-         bool from_stream( base::dsi::tByteStream& ) override;
+         bool to_stream( base::ipc::tStream& ) override;
+         bool from_stream( base::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };

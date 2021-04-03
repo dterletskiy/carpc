@@ -19,12 +19,12 @@ Signature::Signature( const Signature& other )
    , m_role( other.m_role )
 { }
 
-bool Signature::to_stream( base::dsi::tByteStream& stream ) const
+bool Signature::to_stream( base::ipc::tStream& stream ) const
 {
    return stream.push( m_type_id, m_role );
 }
 
-bool Signature::from_stream( base::dsi::tByteStream& stream )
+bool Signature::from_stream( base::ipc::tStream& stream )
 {
    return stream.pop( m_type_id, m_role );
 }

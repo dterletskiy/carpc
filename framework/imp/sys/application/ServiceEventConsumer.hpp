@@ -6,14 +6,14 @@
 
 namespace base::application {
 
-   class ThreadIPC;
+   class SendReceive;
 
 
 
    class ServiceEventConsumer : public events::service::Action::Consumer
    {
       public:
-         ServiceEventConsumer( ThreadIPC& );
+         ServiceEventConsumer( SendReceive& );
          ~ServiceEventConsumer( ) override;
       private:
          ServiceEventConsumer( const ServiceEventConsumer& ) = delete;
@@ -23,7 +23,7 @@ namespace base::application {
          void process_event( const events::service::Action::Event& ) override;
 
       private:
-         ThreadIPC& m_service;
+         SendReceive& m_send_receive;
    };
 
 } // namespace base::application

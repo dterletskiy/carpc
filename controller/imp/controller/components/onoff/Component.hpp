@@ -3,7 +3,6 @@
 // Framework
 #include "api/sys/component/RootComponent.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
-#include "api/sys/dsi/Types.hpp"
 // Application
 #include "imp/controller/components/onoff/server/Server.hpp"
 #include "imp/controller/components/onoff/client/Client.hpp"
@@ -17,8 +16,8 @@ namespace controller::event {
 
    struct Data
    {
-      bool to_stream( base::dsi::tByteStream& _stream ) const { return true; }
-      bool from_stream( base::dsi::tByteStream& _stream ) { return true; }
+      bool to_stream( base::ipc::tStream& _stream ) const { return true; }
+      bool from_stream( base::ipc::tStream& _stream ) { return true; }
    };
 
    DEFINE_IPC_EVENT( App, Data, base::async::id::TSignature< eID > );

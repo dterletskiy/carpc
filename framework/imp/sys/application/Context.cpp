@@ -81,12 +81,12 @@ bool Context::is_valid( ) const
    return m_pid.is_valid( ) && m_tid.is_valid( );
 }
 
-bool Context::to_stream( base::dsi::tByteStream& stream ) const
+bool Context::to_stream( base::ipc::tStream& stream ) const
 {
    return stream.push( m_pid, m_tid );
 }
 
-bool Context::from_stream( base::dsi::tByteStream& stream )
+bool Context::from_stream( base::ipc::tStream& stream )
 {
    return stream.pop( m_pid, m_tid );
 }

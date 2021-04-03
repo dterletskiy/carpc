@@ -1,6 +1,6 @@
 #include "api/sys/dsi/Types.hpp"
 #include "api/sys/application/Process.hpp"
-#include "api/sys/application/ThreadIPC.hpp"
+#include "api/sys/application/SendReceive.hpp"
 #include "imp/sys/application/ServiceEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -13,8 +13,8 @@ using namespace base::application;
 
 
 
-ServiceEventConsumer::ServiceEventConsumer( ThreadIPC& service )
-   : m_service( service )
+ServiceEventConsumer::ServiceEventConsumer( SendReceive& send_receive )
+   : m_send_receive( send_receive )
 {
    ev_i::Action::Event::set_notification( this, { ev_i::eAction::RegisterServer } );
    ev_i::Action::Event::set_notification( this, { ev_i::eAction::UnregisterServer } );
@@ -62,7 +62,7 @@ void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
    if( dsi::eCommand::Undefined == command )
       return;
 
-   const auto& configuration = Process::instance( )->configuration( );
-   dsi::Packet packet( command, service_passport, configuration.ipc_app );
-   m_service.send( packet, application::Context::invalid );
+   const dsi::SocketCongiguration configuration = static_cast< dsi::SocketCongiguration >( Process::instance( )->configuration( ).ipc_app.socket );
+   dsi::Packet packet( command, service_passport, configuration );
+   m_send_receive.send( packet, application::Context::invalid );
 }

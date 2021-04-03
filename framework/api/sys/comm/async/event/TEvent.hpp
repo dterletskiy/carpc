@@ -128,7 +128,7 @@ namespace base::async {
 
       // serialization / deserialization
       public:
-         const bool to_stream( dsi::tByteStream& stream ) const override final
+         const bool to_stream( ipc::tStream& stream ) const override final
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
@@ -152,7 +152,7 @@ namespace base::async {
 
             return false;
          }
-         const bool from_stream( dsi::tByteStream& stream ) override final
+         const bool from_stream( ipc::tStream& stream ) override final
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {

@@ -8,7 +8,6 @@
 #include "api/sys/comm/service/Registry.hpp"
 #include "api/sys/application/Thread.hpp"
 #include "api/sys/application/Types.hpp"
-#include "api/sys/dsi/Types.hpp"
 #include "api/sys/tools/Tools.hpp"
 
 
@@ -76,10 +75,13 @@ namespace base::application {
       public:
          struct Configuration
          {
-            dsi::SocketCongiguration ipc_sb;
-            size_t ipc_sb_buffer_size;
-            dsi::SocketCongiguration ipc_app;
-            size_t ipc_app_buffer_size;
+            struct IPC
+            {
+               os::linux::socket::configuration socket;
+               std::size_t                      buffer_size;
+            };
+            IPC ipc_sb;
+            IPC ipc_app;
 
             const tPriority max_priority = priority( ePriority::MAX );
          };

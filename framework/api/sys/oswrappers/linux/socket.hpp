@@ -25,6 +25,7 @@ namespace base::os::linux::socket {
 
    struct configuration
    {
+      const std::string name( ) const;
       void print( const std::string& _message = "" ) const;
 
       bool operator==( const configuration& ) const;

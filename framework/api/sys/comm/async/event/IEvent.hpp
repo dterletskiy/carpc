@@ -49,9 +49,9 @@ namespace base::async {
 
          static bool check_in( const tAsyncTypeID&, tCreator );
          static void dump( );
-         static bool serialize( dsi::tByteStream&, IEvent::tSptr );
-         static bool serialize( dsi::tByteStream&, const IEvent& );
-         static tSptr deserialize( dsi::tByteStream& );
+         static bool serialize( ipc::tStream&, IEvent::tSptr );
+         static bool serialize( ipc::tStream&, const IEvent& );
+         static tSptr deserialize( ipc::tStream& );
 
       public:
          virtual const bool send( const application::Context& ) = 0;
@@ -63,8 +63,8 @@ namespace base::async {
       public:
          // serialization / deserialization methods should
          // serialize / deserialize all data exapt of type_id and communication type
-         virtual const bool to_stream( dsi::tByteStream& ) const = 0;
-         virtual const bool from_stream( dsi::tByteStream& ) = 0;
+         virtual const bool to_stream( ipc::tStream& ) const = 0;
+         virtual const bool from_stream( ipc::tStream& ) = 0;
 
       public:
          virtual const bool is_ipc( ) const = 0;

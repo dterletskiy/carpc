@@ -28,12 +28,12 @@ namespace base::service::fast {
 
          tBaseDataPtr ptr = nullptr;
 
-         bool to_stream( base::dsi::tByteStream& stream ) const
+         bool to_stream( base::ipc::tStream& stream ) const
          {
             if( nullptr == ptr ) return true;
             return ptr->serrialize( stream );
          }
-         bool from_stream( base::dsi::tByteStream& stream )
+         bool from_stream( base::ipc::tStream& stream )
          {
             ptr = tBaseData::create( stream );
             return nullptr != ptr;

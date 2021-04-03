@@ -61,7 +61,7 @@ namespace base::async {
 
             return m_user_signature < static_cast< const tSignature& >( other ).m_user_signature;
          }
-         const bool to_stream( dsi::tByteStream& stream ) const override
+         const bool to_stream( ipc::tStream& stream ) const override
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
@@ -69,7 +69,7 @@ namespace base::async {
             }
             return false;
          }
-         const bool from_stream( dsi::tByteStream& stream ) override
+         const bool from_stream( ipc::tStream& stream ) override
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
@@ -114,11 +114,11 @@ namespace base::async::simple {
          {
             return false;
          }
-         const bool to_stream( dsi::tByteStream& stream ) const
+         const bool to_stream( ipc::tStream& stream ) const
          {
             return true;
          }
-         const bool from_stream( dsi::tByteStream& stream )
+         const bool from_stream( ipc::tStream& stream )
          {
             return true;
          }
@@ -149,11 +149,11 @@ namespace base::async::id {
          {
             return m_id < other.m_id;
          }
-         const bool to_stream( dsi::tByteStream& stream ) const
+         const bool to_stream( ipc::tStream& stream ) const
          {
             return stream.push( m_id );
          }
-         const bool from_stream( dsi::tByteStream& stream )
+         const bool from_stream( ipc::tStream& stream )
          {
             return stream.pop( m_id );
          }

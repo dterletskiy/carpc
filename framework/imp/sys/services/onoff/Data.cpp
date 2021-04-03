@@ -24,7 +24,7 @@ namespace base::onoff::ipc {
 
 
 
-   BaseData::tSptr BaseData::create( base::dsi::tByteStream& stream )
+   BaseData::tSptr BaseData::create( base::ipc::tStream& stream )
    {
       eOnOff id = eOnOff::Undefined;
       if( false == stream.pop( id ) )
@@ -45,7 +45,7 @@ namespace base::onoff::ipc {
       return  ptr;
    }
 
-   bool BaseData::serrialize( base::dsi::tByteStream& stream )
+   bool BaseData::serrialize( base::ipc::tStream& stream )
    {
       if( false == stream.push( id( ) ) )
          return false;
@@ -65,8 +65,8 @@ namespace base::onoff::ipc {
    const eOnOff RequestTriggerStateData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestTriggerStateData::id( ) const { return ID; }
 
-   bool RequestTriggerStateData::to_stream( base::dsi::tByteStream& stream ) { return stream.push( state, delay ); }
-   bool RequestTriggerStateData::from_stream( base::dsi::tByteStream& stream ) { return stream.pop( state, delay ); }
+   bool RequestTriggerStateData::to_stream( base::ipc::tStream& stream ) { return stream.push( state, delay ); }
+   bool RequestTriggerStateData::from_stream( base::ipc::tStream& stream ) { return stream.pop( state, delay ); }
 
 
 
@@ -80,8 +80,8 @@ namespace base::onoff::ipc {
    const eOnOff ResponseTriggerStateData::ID = eOnOff::ResponseTriggerState;
    const eOnOff ResponseTriggerStateData::id( ) const { return ID; }
 
-   bool ResponseTriggerStateData::to_stream( base::dsi::tByteStream& stream ) { return stream.push( result ); }
-   bool ResponseTriggerStateData::from_stream( base::dsi::tByteStream& stream ) { return stream.pop( result ); }
+   bool ResponseTriggerStateData::to_stream( base::ipc::tStream& stream ) { return stream.push( result ); }
+   bool ResponseTriggerStateData::from_stream( base::ipc::tStream& stream ) { return stream.pop( result ); }
 
 
 
@@ -92,8 +92,8 @@ namespace base::onoff::ipc {
    const eOnOff RequestStartData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestStartData::id( ) const { return ID; }
 
-   bool RequestStartData::to_stream( base::dsi::tByteStream& stream ) { return true; }
-   bool RequestStartData::from_stream( base::dsi::tByteStream& stream ) { return true; }
+   bool RequestStartData::to_stream( base::ipc::tStream& stream ) { return true; }
+   bool RequestStartData::from_stream( base::ipc::tStream& stream ) { return true; }
 
 
 
@@ -107,8 +107,8 @@ namespace base::onoff::ipc {
    const eOnOff NotificationCurrentStateData::ID = eOnOff::NotificationCurrentState;
    const eOnOff NotificationCurrentStateData::id( ) const { return ID; }
 
-   bool NotificationCurrentStateData::to_stream( base::dsi::tByteStream& stream ) { return stream.push( state ); }
-   bool NotificationCurrentStateData::from_stream( base::dsi::tByteStream& stream ) { return stream.pop( state ); }
+   bool NotificationCurrentStateData::to_stream( base::ipc::tStream& stream ) { return stream.push( state ); }
+   bool NotificationCurrentStateData::from_stream( base::ipc::tStream& stream ) { return stream.pop( state ); }
 
 } // namespace base::onoff::ipc
 

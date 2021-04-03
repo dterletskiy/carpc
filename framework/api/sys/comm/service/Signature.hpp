@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/comm/async/Types.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/IPC.hpp"
 
 
 
@@ -20,8 +20,8 @@ namespace base::service {
          ~Signature( ) = default;
 
       public:
-         bool to_stream( base::dsi::tByteStream& ) const;
-         bool from_stream( base::dsi::tByteStream& );
+         bool to_stream( base::ipc::tStream& ) const;
+         bool from_stream( base::ipc::tStream& );
 
       public:
          Signature& operator=( const Signature& );

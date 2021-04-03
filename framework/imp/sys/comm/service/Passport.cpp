@@ -25,12 +25,12 @@ const std::string Passport::name( ) const
 }
 
 
-bool Passport::to_stream( base::dsi::tByteStream& stream ) const
+bool Passport::to_stream( base::ipc::tStream& stream ) const
 {
    return stream.push( signature, address );
 }
 
-bool Passport::from_stream( base::dsi::tByteStream& stream )
+bool Passport::from_stream( base::ipc::tStream& stream )
 {
    return stream.pop( signature, address );
 }
