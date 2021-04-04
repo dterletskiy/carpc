@@ -1,3 +1,6 @@
+version 2.4.4
+   - Helper functionality for calling member function of some object if it is defined implemented.
+
 version 2.4.3
    - IPC stream type definitione moved to "/commen/IPC.hpp" from "/dsi/Types.hpp"
    - Refactoring with includes of "/dsi/Types.hpp"
