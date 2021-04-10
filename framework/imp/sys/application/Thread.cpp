@@ -108,7 +108,7 @@ base::async::IAsync::tSptr Thread::get_event( )
 
 void Thread::notify( const base::async::IAsync::tSptr p_event )
 {
-   switch( p_event->signature( )->type( ) )
+   switch( p_event->type( ) )
    {
       case async::eAsyncType::CALLABLE:
       case async::eAsyncType::RUNNABLE:
@@ -174,7 +174,7 @@ void Thread::clear_all_notifications( const base::async::IAsync::ISignature::tSp
 
 bool Thread::is_subscribed( const base::async::IAsync::tSptr p_event )
 {
-   switch( p_event->signature( )->type( ) )
+   switch( p_event->type( ) )
    {
       case async::eAsyncType::CALLABLE:
       case async::eAsyncType::RUNNABLE:   return true;

@@ -30,7 +30,6 @@ namespace base::async {
             virtual const std::string name( ) const = 0;
 
             virtual const tAsyncTypeID& type_id( ) const = 0;
-            virtual const eAsyncType type( ) const = 0;
          };
 
          struct IConsumer
@@ -47,6 +46,7 @@ namespace base::async {
          virtual void process( IConsumer* p_consumer = nullptr ) const = 0;
          virtual const ISignature::tSptr signature( ) const = 0;
          virtual const tPriority priority( ) const = 0;
+         virtual const eAsyncType type( ) const = 0;
    };
 
 } // namespace base::async

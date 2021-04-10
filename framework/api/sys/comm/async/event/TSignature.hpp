@@ -43,7 +43,7 @@ namespace base::async {
       public:
          const std::string name( ) const override
          {
-            static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", type: ", c_str( type( ) ), ", " );
+            static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", " );
             return s_name + m_user_signature.name( );
          }
          const tAsyncTypeID& type_id( ) const override
@@ -55,9 +55,6 @@ namespace base::async {
          {
             if( other.type_id( ) != type_id( ) )
                return type_id( ) < other.type_id( );
-
-            if( other.type( ) != type( ) )
-               return type( ) < other.type( );
 
             return m_user_signature < static_cast< const tSignature& >( other ).m_user_signature;
          }

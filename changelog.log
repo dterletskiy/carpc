@@ -1,3 +1,6 @@
+version 2.4.5
+   - Moved AsyncType from IAsync::ISignature to IAsync.
+
 version 2.4.4
    - Helper functionality for calling member function of some object if it is defined implemented.
 

@@ -45,24 +45,17 @@ namespace base::async {
 
                bool operator<( const IAsync::ISignature& signature ) const override
                {
-                  if( signature.type_id( ) != type_id( ) )
-                     return type_id( ) < signature.type_id( );
-
-                  return type( ) < signature.type( );
+                  return type_id( ) < signature.type_id( );
                }
                const std::string name( ) const override
                {
-                  static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", type: ", c_str( type( ) ) );
+                  static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ) );
                   return s_name;
                }
                const tAsyncTypeID& type_id( ) const override final
                {
                   static const tAsyncTypeID s_type_id = tAsyncTypeID::generate< Signature >( );
                   return s_type_id;
-               }
-               const eAsyncType type( ) const override final
-               {
-                  return eAsyncType::RUNNABLE;
                }
          };
 
@@ -76,6 +69,7 @@ namespace base::async {
 
       private:
          void process( IAsync::IConsumer* ) const override;
+         const eAsyncType type( ) const override final;
 
       private:
          const IAsync::ISignature::tSptr signature( ) const override;
@@ -97,6 +91,12 @@ namespace base::async {
       : m_priority( priority )
       , m_operation( operation )
    {
+   }
+
+   inline
+   const eAsyncType IRunnable::type( ) const
+   {
+      return eAsyncType::RUNNABLE;
    }
 
    inline

@@ -24,7 +24,6 @@ namespace base::async {
       public:
          struct ISignature : public IAsync::ISignature
          {
-            const eAsyncType type( ) const override final { return eAsyncType::EVENT; }
          };
 
          template< typename _EventType >
@@ -59,6 +58,7 @@ namespace base::async {
       private:
          void process( IAsync::IConsumer* ) const override;
          virtual void process_event( IAsync::IConsumer* ) const = 0;
+         const eAsyncType type( ) const override final;
 
       public:
          // serialization / deserialization methods should
@@ -70,5 +70,13 @@ namespace base::async {
          virtual const bool is_ipc( ) const = 0;
          virtual const application::Context& context( ) const = 0;
    };
+
+
+
+   inline
+   const eAsyncType IEvent::type( ) const
+   {
+      return eAsyncType::EVENT;
+   }
 
 } // namespace base::async
