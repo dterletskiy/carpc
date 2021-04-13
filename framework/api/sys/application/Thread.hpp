@@ -43,6 +43,7 @@ namespace base::application {
 
       private:
          bool insert_event( const base::async::IAsync::tSptr ) override;
+         bool send( const base::async::IAsync::tSptr, const application::Context& ) override;
          base::async::IAsync::tSptr get_event( );
          tEventCollection                             m_event_queue;
 

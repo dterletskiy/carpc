@@ -1,4 +1,3 @@
-#include "api/sys/application/Process.hpp"
 #include "api/sys/comm/async/runnable/Runnable.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -14,12 +13,7 @@ Runnable::tSptr Runnable::create( const tOperation operation )
    return std::make_shared< Runnable >( operation );
 }
 
-const bool Runnable::create_send( const tOperation operation )
+const bool Runnable::create_send( const tOperation operation, const application::Context& to_context )
 {
-   return create( operation )->send( );
-}
-
-const bool Runnable::create_send_to_context( const tOperation operation, application::IThread::tWptr pw_thread )
-{
-   return create( operation )->send_to_context( pw_thread );
+   return create( operation )->send( to_context );
 }

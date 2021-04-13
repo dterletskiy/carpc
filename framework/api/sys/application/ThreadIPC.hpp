@@ -53,7 +53,7 @@ namespace base::application {
          void dump( ) const override;
 
       public:
-         bool send( const base::async::IAsync::tSptr, const application::Context& );
+         bool send( const base::async::IAsync::tSptr, const application::Context& ) override;
       private:
          SendReceive                                  m_send_receive;
    };

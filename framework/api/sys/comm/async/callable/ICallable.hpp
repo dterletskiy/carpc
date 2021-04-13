@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/application/IThread.hpp"
+#include "api/sys/application/Context.hpp"
 #include "api/sys/comm/async/Types.hpp"
 #include "api/sys/comm/async/IAsync.hpp"
 
@@ -74,8 +74,7 @@ namespace base::async {
          virtual ~ICallable( ) = default;
 
       public:
-         const bool send( );
-         const bool send_to_context( application::IThread::tWptr );
+         const bool send( const application::Context& to_context = application::Context::internal_local );
 
       public:
          virtual void call( ) const = 0;

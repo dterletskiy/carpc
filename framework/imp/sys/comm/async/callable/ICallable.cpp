@@ -1,4 +1,3 @@
-#include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/application/Process.hpp"
 #include "api/sys/comm/async/callable/ICallable.hpp"
 
@@ -10,28 +9,64 @@ using namespace base::async;
 
 
 
-const bool ICallable::send( )
+const bool ICallable::send( const application::Context& to_context )
 {
-   application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
-   if( nullptr == p_thread )
+   auto p_callable = shared_from_this( );
+   SYS_VRB( "callable: %s", p_callable->signature( )->name( ).c_str( ) );
+
+   if( to_context.is_external( ) )
    {
-      SYS_ERR( "sending runnable not from application thread" );
+      SYS_WRN( "callable can't be sent as external" );
       return false;
    }
-
-   return p_thread->insert_event( shared_from_this( ) );
-}
-
-const bool ICallable::send_to_context( application::IThread::tWptr pw_thread )
-{
-   application::IThread::tSptr p_thread = pw_thread.lock( );
-   if( nullptr == p_thread )
+   if( application::thread::broadcast == to_context.tid( ) )
    {
-      SYS_ERR( "sending runnable to not valid application thread" );
-      return false;
+      SYS_INF( "sending broadcast callable to all application threads" );
+      bool result = true;
+
+      application::IThread::tSptr p_thread_ipc = application::Process::instance( )->thread_ipc( );
+      if( nullptr == p_thread_ipc )
+      {
+         SYS_ERR( "application IPC thread is not started" );
+         result = false;
+      }
+      else
+      {
+         result &= p_thread_ipc->insert_event( p_callable );
+      }
+
+      application::IThread::tSptrList thread_list = base::application::Process::instance( )->thread_list( );
+      for( auto p_thread : thread_list )
+         result &= p_thread->insert_event( p_callable );
+
+      return result;
+   }
+   else if( application::thread::local == to_context.tid( ) )
+   {
+      SYS_INF( "sending callable to current application thread: %s", to_context.tid( ).name( ).c_str( ) );
+      application::IThread::tSptr p_thread = base::application::Process::instance( )->current_thread( );
+      if( nullptr == p_thread )
+      {
+         SYS_ERR( "sending callable not from application thread" );
+         return false;
+      }
+
+      return p_thread->insert_event( p_callable );
+   }
+   else
+   {
+      SYS_INF( "sending callable to %s application thread", to_context.tid( ).name( ).c_str( ) );
+      application::IThread::tSptr p_thread = base::application::Process::instance( )->thread( to_context.tid( ) );
+      if( nullptr == p_thread )
+      {
+         SYS_ERR( "sending callable to unknown application thread" );
+         return false;
+      }
+
+      return p_thread->insert_event( p_callable );
    }
 
-   return p_thread->insert_event( shared_from_this( ) );
+   return true;
 }
 
 void ICallable::process( IAsync::IConsumer* p_consumer ) const

@@ -1,8 +1,4 @@
-#include "api/sys/oswrappers/Thread.hpp"
-#include "api/sys/application/ThreadIPC.hpp"
-#include "api/sys/application/Thread.hpp"
 #include "api/sys/application/Process.hpp"
-#include "api/sys/application/Context.hpp"
 #include "api/sys/comm/async/event/IEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -130,11 +126,9 @@ const bool IEvent::clear_all_notifications( IAsync::IConsumer* p_consumer, const
    return true;
 }
 
-const bool IEvent::send( tSptr p_event, const application::Context& to_context )
+const bool IEvent::send( const application::Context& to_context )
 {
-   if( !p_event ) return false;
-   if( !( p_event->signature( ) ) ) return false;
-
+   auto p_event = shared_from_this( );
    SYS_VRB( "event: %s", p_event->signature( )->name( ).c_str( ) );
 
    if( to_context.is_external( ) )
@@ -147,7 +141,7 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
          return false;
       }
 
-      return std::static_pointer_cast< application::ThreadIPC >( p_thread_ipc )->send( p_event, to_context );
+      return p_thread_ipc->send( p_event, to_context );
    }
    else if( application::thread::broadcast == to_context.tid( ) )
    {
@@ -158,9 +152,12 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
       if( nullptr == p_thread_ipc )
       {
          SYS_ERR( "application IPC thread is not started" );
-         return false;
+         result = false;
       }
-      result &= p_thread_ipc->insert_event( p_event );
+      else
+      {
+         result &= p_thread_ipc->insert_event( p_event );
+      }
 
       application::IThread::tSptrList thread_list = base::application::Process::instance( )->thread_list( );
       for( auto p_thread : thread_list )
@@ -170,11 +167,11 @@ const bool IEvent::send( tSptr p_event, const application::Context& to_context )
    }
    else if( application::thread::local == to_context.tid( ) )
    {
-      SYS_INF( "sending event to current application thread" );
+      SYS_INF( "sending event to current application thread: %s", to_context.tid( ).name( ).c_str( ) );
       application::IThread::tSptr p_thread = base::application::Process::instance( )->current_thread( );
       if( nullptr == p_thread )
       {
-         SYS_ERR( "sending event to unknown application thread" );
+         SYS_ERR( "sending event not from application thread" );
          return false;
       }
 

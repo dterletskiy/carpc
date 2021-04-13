@@ -6,6 +6,7 @@
 #include "api/sys/comm/async/AsyncQueue.hpp"
 #include "api/sys/comm/async/AsyncPriorityQueue.hpp"
 #include "api/sys/comm/async/AsyncConsumerMap.hpp"
+#include "api/sys/application/Context.hpp"
 #include "api/sys/application/Types.hpp"
 
 
@@ -45,6 +46,7 @@ namespace base::application {
          virtual void clear_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
          virtual void clear_all_notifications( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
          virtual bool insert_event( const base::async::IAsync::tSptr ) = 0;
+         virtual bool send( const base::async::IAsync::tSptr, const application::Context& ) = 0;
 
       public:
          const thread::ID& id( ) const;

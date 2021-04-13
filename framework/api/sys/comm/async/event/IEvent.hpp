@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/application/Context.hpp"
 #include "api/sys/comm/async/Types.hpp"
 #include "api/sys/comm/async/IAsync.hpp"
 
@@ -44,7 +45,6 @@ namespace base::async {
          static const bool set_notification( IAsync::IConsumer*, const ISignature::tSptr );
          static const bool clear_notification( IAsync::IConsumer*, const ISignature::tSptr );
          static const bool clear_all_notifications( IAsync::IConsumer*, const ISignature::tSptr );
-         static const bool send( tSptr, const application::Context& );
 
          static bool check_in( const tAsyncTypeID&, tCreator );
          static void dump( );
@@ -53,7 +53,7 @@ namespace base::async {
          static tSptr deserialize( ipc::tStream& );
 
       public:
-         virtual const bool send( const application::Context& ) = 0;
+         const bool send( const application::Context& to_context = application::Context::internal_broadcast );
 
       private:
          void process( IAsync::IConsumer* ) const override;

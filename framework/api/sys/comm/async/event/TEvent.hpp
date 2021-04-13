@@ -1,6 +1,5 @@
 #pragma once
 
-#include "api/sys/application/Context.hpp"
 #include "api/sys/comm/async/event/IEvent.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -117,10 +116,6 @@ namespace base::async {
 
       // virual function
       public:
-         const bool send( const application::Context& to_context = application::Context::internal_broadcast ) override
-         {
-            return IEvent::send( TEvent< _Generator >::shared_from_this( ), to_context );
-         }
          void process_event( IAsync::IConsumer* p_consumer ) const override
          {
             static_cast< tConsumer* >( p_consumer )->process_event( *this );

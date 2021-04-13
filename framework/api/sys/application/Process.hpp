@@ -60,6 +60,7 @@ namespace base::application {
       public:
          IThread::tSptr thread( const thread::ID& ) const;
          IThread::tSptr current_thread( ) const;
+         Context current_context( ) const;
          IThread::tSptrList thread_list( ) const;
       private:
          IThread::tSptrList  m_thread_list;

@@ -232,8 +232,8 @@ namespace base::timer {
 
    base::Timer::ID start( const size_t milliseconds, const size_t count, tCallback callback, const bool asynchronous )
    {
-      application::IThread::tSptr p_thread = application::Process::instance( )->current_thread( );
-      if( !p_thread )
+      application::Context context = application::Process::instance( )->current_context( );
+      if( application::Context::invalid == context )
       {
          SYS_ERR( "application::Thread has not been found. Creating timer not in application thread" );
          return 0;
@@ -250,7 +250,7 @@ namespace base::timer {
                for( size_t ticks = 0; ticks < count; ++ticks )
                {
                   std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-                  base::async::Runnable::create_send_to_context( on_timer, p_thread );
+                  base::async::Runnable::create_send( on_timer, context );
                }
             }
          ).detach( );
@@ -260,7 +260,7 @@ namespace base::timer {
          for( size_t ticks = 0; ticks < count; ++ticks )
          {
             std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-            base::async::Runnable::create_send_to_context( on_timer, p_thread );
+            base::async::Runnable::create_send( on_timer, context );
          }
       }
 
