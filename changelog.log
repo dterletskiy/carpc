@@ -1,3 +1,7 @@
+version 2.4.7
+   - Changed event notification order for server and clients in case of registered server.
+     This done to avoid possible bugs when client will receive notification about connected server and performe some action to server before server will receive notification about connected client.
+
 version 2.4.6
    - "send_to_context" for Callable and Runnable removed.
    - "send" for Callable and Runnable implemented with Context parameter (similar to Event).

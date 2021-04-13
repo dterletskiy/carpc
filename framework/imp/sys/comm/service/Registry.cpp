@@ -89,12 +89,12 @@ Registry::eResult Registry::register_server( const Signature& signature, const A
    }
    SYS_INF( "registered paired server: %s", signature.name( ).c_str( ) );
 
-   // Send notification event to clients about registered server with current signature
-   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerConnected }, ev_i::Status::Data( address ) );
-
    // Send notification events to server about each registered client with current signature
    for( const auto& address_client : connection.clients )
       ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address_client );
+
+   // Send notification event to clients about registered server with current signature
+   ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerConnected }, ev_i::Status::Data( address ) );
 
    return eResult::OK_Paired;
 }
