@@ -100,7 +100,7 @@ namespace base::service::secure::__private {
       if( const tResponseData* p_data = mp_proxy->template get_event_data< tResponseData >( event ) )
          return p_data;
 
-      SYS_ERR( "missing data for response/notification ID: %s", to_string( event.info( ).id( ) ).c_str( ) );
+      SYS_ERR( "missing data for response/notification ID: %s", event.info( ).id( ).c_str( ) );
       return nullptr;
    }
 

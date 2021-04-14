@@ -1,3 +1,11 @@
+version 2.5.0
+   - Implemented special structure for "enum" and "class enum" substitution.
+     This structure has the same meaning as "class enum" but extended by member functions what allow to use it in:
+     "switch", "rage for", printing and other additional scopes where usual "enum" and "class enum" can't be used.
+   - Changed service TProxy and TServer implementation according to new rule what means that event ID since now is implemented
+     not like "enum" or "class enum" but like newly implemented structure (mentioned above).
+     This allowes to have more clear and simple debugging tracing.
+
 version 2.4.7
    - Changed event notification order for server and clients in case of registered server.
      This done to avoid possible bugs when client will receive notification about connected server and performe some action to server before server will receive notification about connected client.

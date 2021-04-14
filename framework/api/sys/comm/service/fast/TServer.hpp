@@ -130,7 +130,7 @@ namespace base::service::fast::__private {
 
       if( false == is_subscribed( ) )
       {
-         SYS_VRB( "there are no subscribers to notify: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+         SYS_VRB( "there are no subscribers to notify: %s", tNotificationData::NOTIFICATION.c_str( ) );
          return;
       }
 
@@ -286,7 +286,7 @@ namespace base::service::fast::__private {
       auto iterator_status_map = m_request_status_map.find( tRequestResponseIDs( event_id ) );
       if( m_request_status_map.end( ) == iterator_status_map )
       {
-         SYS_WRN( "not a request ID: %s", to_string( event_id ).c_str( ) );
+         SYS_WRN( "not a request ID: %s", event_id.c_str( ) );
          return false;
       }
       auto& rrIDs = iterator_status_map->first;
@@ -300,7 +300,7 @@ namespace base::service::fast::__private {
       // Check request status for current request ID
       if( eRequestStatus::BUSY == request_status.status )
       {
-         SYS_WRN( "request busy: %s", to_string( event_id ).c_str( ) );
+         SYS_WRN( "request busy: %s", event_id.c_str( ) );
          // Sending event with request busy id
          TYPES::tEvent::create_send(
             typename TYPES::tEventUserSignature( signature( ).role( ), rrIDs.busy, id( ), from_id, seq_id ), from_context
@@ -325,7 +325,7 @@ namespace base::service::fast::__private {
       auto iterator_status_map = m_request_status_map.find( tRequestResponseIDs( tResponseData::REQUEST ) );
       if( m_request_status_map.end( ) == iterator_status_map )
       {
-         SYS_WRN( "not a request ID: %s", to_string( tResponseData::REQUEST ).c_str( ) );
+         SYS_WRN( "not a request ID: %s", tResponseData::REQUEST.c_str( ) );
          return std::nullopt;
       }
       auto& request_status = iterator_status_map->second;
@@ -362,7 +362,7 @@ namespace base::service::fast::__private {
       auto iterator_status_map = m_request_status_map.find( tRequestResponseIDs( m_processing_event_id.value( ) ) );
       if( m_request_status_map.end( ) == iterator_status_map )
       {
-         SYS_WRN( "not a request ID: %s", to_string( m_processing_event_id.value( ) ).c_str( ) );
+         SYS_WRN( "not a request ID: %s", m_processing_event_id.value( ).c_str( ) );
          return InvalidSequenceID;
       }
       auto& request_status = iterator_status_map->second;
@@ -409,11 +409,11 @@ namespace base::service::fast::__private {
          auto iterator = m_attribute_status_map.find( item.notification );
          if( m_attribute_status_map.end( ) == iterator )
          {
-            SYS_WRN( "was not found notification ID: %s", to_string( item.notification ).c_str( ) );
+            SYS_WRN( "was not found notification ID: %s", item.notification.c_str( ) );
             return false;
          }
 
-         SYS_VRB( "notification subscribe/unsubscribe ID: %s", to_string( event_id ).c_str( ) );
+         SYS_VRB( "notification subscribe/unsubscribe ID: %s", event_id.c_str( ) );
          tNotificationStatus& notification_status = iterator->second;
          if( item.subscribe == event_id )
          {
@@ -434,7 +434,7 @@ namespace base::service::fast::__private {
          return true;
       }
 
-      SYS_WRN( "not a notification subscribe/unsubscribe ID: %s", to_string( event_id ).c_str( ) );
+      SYS_WRN( "not a notification subscribe/unsubscribe ID: %s", event_id.c_str( ) );
       return false;
    }
 
@@ -445,7 +445,7 @@ namespace base::service::fast::__private {
       auto iterator = m_attribute_status_map.find( tNotificationData::NOTIFICATION );
       if( m_attribute_status_map.end( ) == iterator )
       {
-         SYS_WRN( "not a notification ID: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+         SYS_WRN( "not a notification ID: %s", tNotificationData::NOTIFICATION.c_str( ) );
          return;
       }
 
@@ -460,7 +460,7 @@ namespace base::service::fast::__private {
       auto iterator = m_attribute_status_map.find( tNotificationData::NOTIFICATION );
       if( m_attribute_status_map.end( ) == iterator )
       {
-         SYS_WRN( "not a notification ID: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+         SYS_WRN( "not a notification ID: %s", tNotificationData::NOTIFICATION.c_str( ) );
          return nullptr;
       }
 
@@ -474,7 +474,7 @@ namespace base::service::fast::__private {
       if( const tRequestData* p_data = static_cast< tRequestData* >( event.data( )->ptr.get( ) ) )
          return p_data;
 
-      SYS_ERR( "missing request data for request ID: %s", to_string( event.info( ).id( ) ).c_str( ) );
+      SYS_ERR( "missing request data for request ID: %s", event.info( ).id( ).c_str( ) );
       return nullptr;
    }
 

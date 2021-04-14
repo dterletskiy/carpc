@@ -83,7 +83,7 @@ namespace base::service::fast::__private {
       auto event_id_iterator = m_map.find( tRequestData::REQUEST );
       if( m_map.end( ) == event_id_iterator )
       {
-         SYS_WRN( "request id does not exist: %s", to_string( tRequestData::REQUEST ).c_str( ) );
+         SYS_WRN( "request id does not exist: %s", tRequestData::REQUEST.c_str( ) );
          return InvalidSequenceID;
       }
 
@@ -154,7 +154,7 @@ namespace base::service::fast::__private {
          auto event_id_iterator = m_map.find( item.request );
          if( m_map.end( ) == event_id_iterator )
          {
-            SYS_WRN( "request id does not exist: %s", to_string( item.request ).c_str( ) );
+            SYS_WRN( "request id does not exist: %s", item.request.c_str( ) );
             return false;
          }
 
@@ -199,7 +199,7 @@ namespace base::service::fast::__private {
          return true;
       }
 
-      // SYS_WRN( "related request id has not been found for %s", to_string( event_id ).c_str( ) );
+      // SYS_WRN( "related request id has not been found for %s", event_id.c_str( ) );
       return false;
    }
 
@@ -271,7 +271,7 @@ namespace base::service::fast::__private {
       auto event_id_iterator = m_map.find( tNotificationData::NOTIFICATION );
       if( m_map.end( ) == event_id_iterator )
       {
-         SYS_WRN( "notification id does not exist: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+         SYS_WRN( "notification id does not exist: %s", tNotificationData::NOTIFICATION.c_str( ) );
          return false;
       }
 
@@ -324,7 +324,7 @@ namespace base::service::fast::__private {
       auto event_id_iterator = m_map.find( tNotificationData::NOTIFICATION );
       if( m_map.end( ) == event_id_iterator )
       {
-         SYS_WRN( "notification id does not exist: %s", to_string( tNotificationData::NOTIFICATION ).c_str( ) );
+         SYS_WRN( "notification id does not exist: %s", tNotificationData::NOTIFICATION.c_str( ) );
          return false;
       }
 
@@ -364,7 +364,7 @@ namespace base::service::fast::__private {
       auto event_id_iterator = m_map.find( event_id );
       if( m_map.end( ) == event_id_iterator )
       {
-         // SYS_WRN( "notification id does not exist: %s", to_string( event_id ).c_str( ) );
+         // SYS_WRN( "notification id does not exist: %s", event_id.c_str( ) );
          return false;
       }
 
@@ -545,7 +545,7 @@ namespace base::service::fast::__private {
       if( const tResponseData* p_data = static_cast< tResponseData* >( event.data( )->ptr.get( ) ) )
          return p_data;
 
-      SYS_ERR( "missing data for response/notification ID: %s", to_string( event.info( ).id( ) ).c_str( ) );
+      SYS_ERR( "missing data for response/notification ID: %s", event.info( ).id( ).c_str( ) );
       return nullptr;
    }
 

@@ -70,7 +70,7 @@ namespace base::service::secure {
    {
       return base::format_string(
          "role: ", m_role,
-         ", id: ", std::size_t(m_id),
+         ", id: ", m_id.c_str( ),
          ", from: ", m_from.name( ),
          ", to: ", m_to.name( ),
          ", seq_id: ", m_seq_id.name( )
