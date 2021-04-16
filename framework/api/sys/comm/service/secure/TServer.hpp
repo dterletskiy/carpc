@@ -2,7 +2,7 @@
 
 #include "api/sys/application/Process.hpp"
 #include "api/sys/comm/service/IServer.hpp"
-#include "api/sys/comm/service/secure/TService.hpp"
+#include "api/sys/comm/service/secure/TGenerator.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TServerSecure"

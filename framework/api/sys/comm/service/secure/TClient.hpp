@@ -2,7 +2,7 @@
 
 #include "api/sys/comm/service/IClient.hpp"
 #include "api/sys/comm/service/secure/TProxy.hpp"
-#include "api/sys/comm/service/secure/TService.hpp"
+#include "api/sys/comm/service/secure/TGenerator.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TClientSecure"

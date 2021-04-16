@@ -1,3 +1,6 @@
+version 2.5.2
+   - Renamint "TService" file with "TGenerator" structure to "TGenerator" file name.
+
 version 2.5.1
    - "DEFINE_ENUMERATION" and "DEFINE_ENUM" macros optimized by changing "to_string" function what return "std::string"
      to "c_str" function what returns "const char* const".

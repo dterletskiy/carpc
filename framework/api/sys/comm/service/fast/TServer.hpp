@@ -2,7 +2,7 @@
 
 #include "api/sys/application/Process.hpp"
 #include "api/sys/comm/service/IServer.hpp"
-#include "api/sys/comm/service/fast/TService.hpp"
+#include "api/sys/comm/service/fast/TGenerator.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TServerFast"

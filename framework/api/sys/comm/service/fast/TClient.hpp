@@ -2,7 +2,7 @@
 
 #include "api/sys/comm/service/IClient.hpp"
 #include "api/sys/comm/service/fast/TProxy.hpp"
-#include "api/sys/comm/service/fast/TService.hpp"
+#include "api/sys/comm/service/fast/TGenerator.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "TClientFast"
