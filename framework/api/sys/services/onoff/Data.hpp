@@ -18,117 +18,12 @@
 
 namespace base::onoff {
 
-   struct eOnOff
-   {
-      using TYPE = std::size_t;
-      enum eValue : TYPE
-      {
-         RequestTriggerState = 0,
-         RequestTriggerStateBusy,
-         ResponseTriggerState,
-
-         RequestStart,
-         RequestStartBusy,
-
-         SubscribeCurrentState,
-         UnsubscribeCurrentState,
-         NotificationCurrentState,
-
-         Undefined, // Must present always for all interfaces
-
-         _COUNT_,
-         _FIRST_ = 0,
-         _LAST_ = _COUNT_
-      };
-
-      eOnOff( ) = default;
-      constexpr eOnOff( eValue _value )
-         : value( _value )
-      {
-      }
-
-      // Allow switch and comparisons.
-      operator eValue( ) const
-      {
-         return value;
-      }
-
-      explicit operator bool( ) const
-      {
-         return eOnOff::Undefined != value;
-      }
-
-      constexpr bool operator==( const eOnOff& other ) const
-      {
-         return value == other.value;
-      }
-
-      constexpr bool operator!=( const eOnOff& other ) const
-      {
-         return value != other.value;
-      }
-
-      constexpr bool operator<( const eOnOff& other ) const
-      {
-         return value < other.value;
-      }
-
-      constexpr bool operator>( const eOnOff& other ) const
-      {
-         return value > other.value;
-      }
-
-      eOnOff& operator++( )
-      {
-         value = ( eValue )( static_cast< TYPE >( value ) + 1 );
-         return *this;
-      };
-
-      eOnOff& operator*( )
-      {
-         return *this;
-      };
-
-      eOnOff begin( )
-      {
-         return eOnOff::_FIRST_;
-      }
-
-      eOnOff end( )
-      {
-         return eOnOff::_LAST_;
-      }
-
-      const char* const c_str( ) const
-      {
-         switch( value )
-         {
-            case eOnOff::RequestTriggerState:      return "RequestTriggerState";
-            case eOnOff::RequestTriggerStateBusy:  return "RequestTriggerStateBusy";
-            case eOnOff::ResponseTriggerState:     return "ResponseTriggerState";
-            case eOnOff::RequestStart:             return "RequestStart";
-            case eOnOff::RequestStartBusy:         return "RequestStartBusy";
-            case eOnOff::SubscribeCurrentState:    return "SubscribeCurrentState";
-            case eOnOff::UnsubscribeCurrentState:  return "UnsubscribeCurrentState";
-            case eOnOff::NotificationCurrentState: return "NotificationCurrentState";
-            case eOnOff::Undefined:                return "Undefined";
-            default:                               return "Undefined";
-         }
-         return "Undefined";
-      }
-
-      bool to_stream( base::ipc::tStream& stream ) const
-      {
-         return stream.push( value );
-      }
-
-      bool from_stream( base::ipc::tStream& stream )
-      {
-         return stream.pop( value );
-      }
-
-      eValue value = eOnOff::Undefined;
-   };
+   DEFINE_ENUMERATION( eOnOff, std::size_t
+      , RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState
+      , RequestStart, RequestStartBusy
+      , SubscribeCurrentState, UnsubscribeCurrentState, NotificationCurrentState
+      , Undefined // Must present always for all interfaces
+   );
 
 }
 

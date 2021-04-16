@@ -1,3 +1,7 @@
+version 2.5.1
+   - "DEFINE_ENUMERATION" and "DEFINE_ENUM" macros optimized by changing "to_string" function what return "std::string"
+     to "c_str" function what returns "const char* const".
+
 version 2.5.0
    - Implemented special structure for "enum" and "class enum" substitution.
      This structure has the same meaning as "class enum" but extended by member functions what allow to use it in:
