@@ -1,5 +1,8 @@
+version 2.5.3
+   - request failed reason introduced.
+
 version 2.5.2
-   - Renamint "TService" file with "TGenerator" structure to "TGenerator" file name.
+   - Renaming "TService" file with "TGenerator" structure to "TGenerator" file name.
 
 version 2.5.1
    - "DEFINE_ENUMERATION" and "DEFINE_ENUM" macros optimized by changing "to_string" function what return "std::string"

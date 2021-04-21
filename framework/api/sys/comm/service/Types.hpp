@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/sys/common/ID.hpp"
+#include "api/sys/helpers/macros/enum.hpp"
 
 
 
@@ -27,6 +28,10 @@ namespace base::service {
 
    class IPC;
    class NO_IPC;
+
+
+
+   DEFINE_ENUMERATION( eError, std::uint8_t, RequestBusy, EmptyData );
 
 
 

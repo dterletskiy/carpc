@@ -22,7 +22,7 @@ namespace application::clients::onoff {
 
       private:
          void response_trigger_state( const bool ) override;
-         void request_trigger_state_failed( ) override;
+         void request_trigger_state_failed( const base::service::eError& ) override;
          void on_current_state( const std::string& ) override;
 
       public:

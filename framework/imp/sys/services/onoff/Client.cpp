@@ -64,13 +64,13 @@ void Client::process_response_event( const tService::Event& event )
          }
          else
          {
-            request_trigger_state_failed( );
+            request_trigger_state_failed( base::service::eError::EmptyData );
          }
          break;
       }
       case eOnOff::RequestTriggerStateBusy:
       {
-         request_trigger_state_failed( );
+         request_trigger_state_failed( base::service::eError::RequestBusy );
          break;
       }
       default: break;

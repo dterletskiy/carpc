@@ -65,9 +65,9 @@ void Client::request_trigger_state( const std::string& state, const size_t delay
    base::onoff::Client::request_trigger_state( state, delay );
 }
 
-void Client::request_trigger_state_failed( )
+void Client::request_trigger_state_failed( const base::service::eError& error )
 {
-   MSG_ERR( "request failed" );
+   MSG_ERR( "request error: %s", error.c_str( ) );
 }
 
 void Client::on_current_state( const std::string& state )

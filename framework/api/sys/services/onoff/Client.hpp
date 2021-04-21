@@ -27,13 +27,18 @@ namespace base::onoff {
          void process_notification_event( const tService::Event& ) override;
 
       public:
-         void request_start( );
          const base::service::tSequenceID request_trigger_state( const std::string&, const std::size_t );
+      private:
+         virtual void request_trigger_state_failed( const base::service::eError& ) = 0;
+         virtual void response_trigger_state( const bool ) = 0;
+
+      public:
+         void request_start( );
+
+      public:
          void subscribe_current_state( );
          void unsubscribe_current_state( );
       private:
-         virtual void request_trigger_state_failed( ) = 0;
-         virtual void response_trigger_state( const bool ) = 0;
          virtual void on_current_state( const std::string& ) = 0;
    };
 
