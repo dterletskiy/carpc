@@ -29,7 +29,7 @@ namespace base::os {
          bool join( );
 
          static const ID current_id( );
-         static const linux::thread::tID current_thread_id( );
+         static const os_linux::thread::tID current_thread_id( );
 
       public:
          const ID& id( ) const;
@@ -37,9 +37,9 @@ namespace base::os {
          ID                         m_id = ID::generate( );
 
       public:
-         const linux::thread::tID& thread_id( ) const;
+         const os_linux::thread::tID& thread_id( ) const;
       private:
-         linux::thread::tID         m_thread_id;
+         os_linux::thread::tID         m_thread_id;
 
       public:
          const pthread_attr_t& attr( ) const;
@@ -74,7 +74,7 @@ namespace base::os {
    }
 
    inline
-   const linux::thread::tID& Thread::thread_id( ) const
+   const os_linux::thread::tID& Thread::thread_id( ) const
    {
       return m_thread_id;
    }

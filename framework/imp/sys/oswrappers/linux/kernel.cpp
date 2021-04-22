@@ -13,7 +13,7 @@
 
 
 
-namespace base::os::linux {
+namespace base::os::os_linux {
 
    int set_nonblock( int fd )
    {
@@ -68,4 +68,4 @@ namespace base::os::linux {
    #endif
    }
 
-} // namespace base::os::linux
+} // namespace base::os::os_linux

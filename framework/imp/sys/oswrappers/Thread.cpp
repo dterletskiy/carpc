@@ -58,7 +58,7 @@ const Thread::ID Thread::current_id( )
    return iterator->second;
 }
 
-const linux::thread::tID Thread::current_thread_id( )
+const os_linux::thread::tID Thread::current_thread_id( )
 {
     return pthread_self( );
 }

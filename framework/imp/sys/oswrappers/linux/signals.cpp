@@ -6,7 +6,7 @@
 
 
 
-namespace base::os::linux::signals {
+namespace base::os::os_linux::signals {
 
    typedef int ( *fpSignalMask ) ( int, const sigset_t*, sigset_t* );
    std::map< bool, std::pair< fpSignalMask, const char* > > map = {
@@ -177,4 +177,4 @@ namespace base::os::linux::signals {
    }
 
 
-} // namespace base::os::linux::signals
+} // namespace base::os::os_linux::signals

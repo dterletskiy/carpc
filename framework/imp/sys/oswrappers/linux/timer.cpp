@@ -5,7 +5,7 @@
 
 
 
-namespace base::os::linux::timer {
+namespace base::os::os_linux::timer {
 
 
 
@@ -104,4 +104,4 @@ namespace base::os::linux::timer {
 
 
 
-} // namespace base::os::linux::timer
+} // namespace base::os::os_linux::timer

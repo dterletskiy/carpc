@@ -35,8 +35,8 @@ using namespace base::dsi;
 
 
 
-SocketCongiguration::SocketCongiguration( const os::linux::socket::configuration& configuration )
-   : os::linux::socket::configuration( configuration )
+SocketCongiguration::SocketCongiguration( const os::os_linux::socket::configuration& configuration )
+   : os::os_linux::socket::configuration( configuration )
 {
 }
 

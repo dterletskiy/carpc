@@ -32,7 +32,7 @@ namespace base {
 
          bool start( const std::size_t nanoseconds, const std::size_t count = CONTINIOUS );
          bool stop( );
-         void process( const base::os::linux::timer::tID );
+         void process( const base::os::os_linux::timer::tID );
 
       public:
          const std::string& name( ) const;
@@ -50,9 +50,9 @@ namespace base {
          bool                    m_is_running = false;
 
       public:
-         const base::os::linux::timer::tID timer_id( ) const;
+         const base::os::os_linux::timer::tID timer_id( ) const;
       private:
-         base::os::linux::timer::tID   m_timer_id = nullptr;
+         base::os::os_linux::timer::tID   m_timer_id = nullptr;
 
       public:
          std::size_t nanoseconds( ) const;
@@ -83,7 +83,7 @@ namespace base {
    }
 
    inline
-   const base::os::linux::timer::tID Timer::timer_id( ) const
+   const base::os::os_linux::timer::tID Timer::timer_id( ) const
    {
       return m_timer_id;
    }

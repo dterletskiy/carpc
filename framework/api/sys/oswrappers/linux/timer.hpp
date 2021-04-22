@@ -9,7 +9,7 @@
 
 
 
-namespace base::os::linux::timer {
+namespace base::os::os_linux::timer {
 
    enum class eTimerType : size_t { single = 0, continious };
 
@@ -22,7 +22,7 @@ namespace base::os::linux::timer {
    bool start( const tID& timer_id, long int freq_nanosecs, eTimerType type = eTimerType::single );
    bool stop( const tID& timer_id );
 
-} // namespace base::os::linux::timer
+} // namespace base::os::os_linux::timer
 
 
 
@@ -69,15 +69,15 @@ namespace base::os::linux::timer {
       MSG_DBG( );
 
       tID timer_id;
-      if( false == base::os::linux::timer::create( timer_id, SIGRTMIN ) )
+      if( false == base::os::os_linux::timer::create( timer_id, SIGRTMIN ) )
          return;
       MSG_DBG( "Timer ID: %#lx", (long) timer_id );
-      if( false == base::os::linux::timer::start( timer_id, 1000000000, eTimerType::continious ) )
+      if( false == base::os::os_linux::timer::start( timer_id, 1000000000, eTimerType::continious ) )
          return;
 
       while( true ) { }
 
-      base::os::linux::timer::remove( timer_id );
+      base::os::os_linux::timer::remove( timer_id );
    }
 
    void thread_loop_2( )
@@ -85,15 +85,15 @@ namespace base::os::linux::timer {
       MSG_DBG( );
 
       tID timer_id;
-      if( false == base::os::linux::timer::create( timer_id, event_handler ) )
+      if( false == base::os::os_linux::timer::create( timer_id, event_handler ) )
          return;
       MSG_DBG( "Timer ID: %#lx", (long) timer_id );
-      if( false == base::os::linux::timer::start( timer_id, 1500000000, eTimerType::continious ) )
+      if( false == base::os::os_linux::timer::start( timer_id, 1500000000, eTimerType::continious ) )
          return;
 
       while( true ) { }
 
-      base::os::linux::timer::remove( timer_id );
+      base::os::os_linux::timer::remove( timer_id );
    }
 
 
@@ -151,7 +151,7 @@ namespace base::os::linux::timer {
 
 
 
-   namespace bos = base::os::linux;
+   namespace bos = base::os::os_linux;
 
 
 

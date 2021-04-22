@@ -64,8 +64,8 @@ namespace base::application {
          tProcessMapping            m_process_mapping;
 
       private:
-         void prepare_select( os::linux::socket::tSocket&, os::linux::socket::fd& );
-         void process_select( os::linux::socket::tSocket&, os::linux::socket::fd& );
+         void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& );
+         void process_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& );
          bool process_stream( ipc::tStream&, os::Socket::tSptr );
          bool process_packet( dsi::Packet&, os::Socket::tSptr );
          bool process_package( dsi::Package&, os::Socket::tSptr );

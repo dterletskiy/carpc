@@ -9,7 +9,7 @@
 
 
 
-namespace base::os::linux {
+namespace base::os::os_linux {
 
    struct File
    {
@@ -29,4 +29,4 @@ namespace base::os::linux {
       int error;
    };
 
-} // namespace base::os::linux
+} // namespace base::os::os_linux

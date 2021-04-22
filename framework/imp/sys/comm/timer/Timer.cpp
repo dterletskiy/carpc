@@ -13,11 +13,11 @@ using namespace base;
 
 
 static base::os::Mutex mutex_consumer_map;
-static std::map< base::os::linux::timer::tID, Timer* > consumer_map;
+static std::map< base::os::os_linux::timer::tID, Timer* > consumer_map;
 
 namespace {
 
-   void timer_processor( const base::os::linux::timer::tID timer_id )
+   void timer_processor( const base::os::os_linux::timer::tID timer_id )
    {
       SYS_VRB( "processing timer: %#lx", (long)timer_id );
 
@@ -37,7 +37,7 @@ namespace {
 
    void timer_handler( union sigval sv )
    {
-      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( sv.sival_ptr );
+      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( sv.sival_ptr );
       SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
       timer_processor( *timer_id );
    }
@@ -47,7 +47,7 @@ namespace {
       SYS_VRB( "signal: %d / si->si_signo: %d", signal, si->si_signo );
       SYS_VRB( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
 
-      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( si->si_value.sival_ptr );
+      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( si->si_value.sival_ptr );
       SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
       timer_processor( *timer_id );
    }
@@ -74,9 +74,9 @@ Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
 
    // Variant with "timer_handler" should be used because of in some cases linux can create several timers with the same id
    // in case of using variant with "signal_handler".
-   // os::linux::signals::set_handler( SIGRTMIN, signal_handler );
-   // if( false == os::linux::timer::create( m_timer_id, SIGRTMIN ) )
-   if( false == os::linux::timer::create( m_timer_id, timer_handler ) )
+   // os::os_linux::signals::set_handler( SIGRTMIN, signal_handler );
+   // if( false == os::os_linux::timer::create( m_timer_id, SIGRTMIN ) )
+   if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
    {
       SYS_ERR( "create timer error" );
       return;
@@ -88,7 +88,7 @@ Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
    if( false == success )
    {
       SYS_ERR( "insert error" );
-      if( false == os::linux::timer::remove( m_timer_id ) )
+      if( false == os::os_linux::timer::remove( m_timer_id ) )
       {
          SYS_ERR( "remove timer error" );
       }
@@ -115,7 +115,7 @@ Timer::~Timer( )
       SYS_WRN( "%zu timers have been founded", result );
    }
 
-   if( false == os::linux::timer::remove( m_timer_id ) )
+   if( false == os::os_linux::timer::remove( m_timer_id ) )
    {
       SYS_ERR( "remove timer error" );
    }
@@ -147,9 +147,9 @@ bool Timer::start( const std::size_t nanoseconds, const std::size_t count )
    m_nanoseconds = nanoseconds;
    m_count = count;
    m_ticks = 0;
-   os::linux::timer::eTimerType type = os::linux::timer::eTimerType::single;
-   if( CONTINIOUS == m_count ) type = os::linux::timer::eTimerType::continious;
-   if( false == os::linux::timer::start( m_timer_id, (long int)m_nanoseconds, type ) )
+   os::os_linux::timer::eTimerType type = os::os_linux::timer::eTimerType::single;
+   if( CONTINIOUS == m_count ) type = os::os_linux::timer::eTimerType::continious;
+   if( false == os::os_linux::timer::start( m_timer_id, (long int)m_nanoseconds, type ) )
    {
       SYS_ERR( "start timer error" );
       return false;
@@ -173,7 +173,7 @@ bool Timer::stop( )
    m_count = 0;
    m_ticks = 0;
 
-   if( false == os::linux::timer::stop( m_timer_id ) )
+   if( false == os::os_linux::timer::stop( m_timer_id ) )
    {
       SYS_ERR( "stop timer error" );
       return false;
@@ -183,7 +183,7 @@ bool Timer::stop( )
    return true;  
 }
 
-void Timer::process( const base::os::linux::timer::tID id )
+void Timer::process( const base::os::os_linux::timer::tID id )
 {
    if( id != m_timer_id )
    {

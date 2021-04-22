@@ -21,20 +21,20 @@ const char* Socket::c_str( const eResult comm_type )
    }
 }
 
-Socket::Socket( const linux::socket::configuration& configuration, const size_t buffer_capacity )
+Socket::Socket( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
    : m_configuration( configuration )
    , m_buffer_capacity( buffer_capacity )
 {
    mp_buffer = malloc( m_buffer_capacity );
 }
 
-Socket::Socket( linux::socket::tSocket socket, const size_t buffer_capacity )
+Socket::Socket( os_linux::socket::tSocket socket, const size_t buffer_capacity )
    : m_socket( socket )
    , m_buffer_capacity( buffer_capacity )
 {
    mp_buffer = malloc( m_buffer_capacity );
 
-   linux::socket::info( m_socket, m_configuration );
+   os_linux::socket::info( m_socket, m_configuration );
 }
 
 Socket::Socket( Socket&& other )
@@ -47,7 +47,7 @@ Socket::Socket( Socket&& other )
    , m_total_recv_size( other.m_total_recv_size )
    , m_total_send_size( other.m_total_send_size )
 {
-   other.m_socket = linux::socket::InvalidSocket;
+   other.m_socket = os_linux::socket::InvalidSocket;
    other.mp_buffer = nullptr;
 }
 
@@ -80,7 +80,7 @@ Socket& Socket::operator=( Socket&& other )
    m_total_recv_size = other.m_total_recv_size;
    m_total_send_size = other.m_total_send_size;
 
-   other.m_socket = linux::socket::InvalidSocket;
+   other.m_socket = os_linux::socket::InvalidSocket;
    other.m_id = ID::invalid;
    other.mp_buffer = nullptr;
 
@@ -89,29 +89,29 @@ Socket& Socket::operator=( Socket&& other )
 
 void Socket::close( )
 {
-   linux::socket::close( m_socket );
+   os_linux::socket::close( m_socket );
 }
 
 void Socket::info( const std::string& message ) const
 {
-   linux::socket::info( m_socket, message.c_str( ) );
+   os_linux::socket::info( m_socket, message.c_str( ) );
 }
 
 Socket::eResult Socket::create( )
 {
-   m_socket = linux::socket::socket( m_configuration );
-   return linux::socket::InvalidSocket != m_socket ? eResult::OK : eResult::ERROR;
+   m_socket = os_linux::socket::socket( m_configuration );
+   return os_linux::socket::InvalidSocket != m_socket ? eResult::OK : eResult::ERROR;
 }
 
 Socket::eResult Socket::bind( )
 {
    unlink( m_configuration.address.c_str( ) );
-   return linux::socket::bind( m_socket, m_configuration ) ? eResult::OK : eResult::ERROR;
+   return os_linux::socket::bind( m_socket, m_configuration ) ? eResult::OK : eResult::ERROR;
 }
 
 Socket::eResult Socket::listen( )
 {
-   return linux::socket::listen( m_socket ) ? eResult::OK : eResult::ERROR;
+   return os_linux::socket::listen( m_socket ) ? eResult::OK : eResult::ERROR;
 }
 
 Socket::tSptr Socket::accept( )
@@ -119,23 +119,23 @@ Socket::tSptr Socket::accept( )
    sockaddr sa;
    socklen_t len = sizeof( sa );
 
-   linux::socket::tSocket socket = linux::socket::accept( m_socket, &sa, &len );
-   if( linux::socket::InvalidSocket == socket )
+   os_linux::socket::tSocket socket = os_linux::socket::accept( m_socket, &sa, &len );
+   if( os_linux::socket::InvalidSocket == socket )
       return nullptr;
 
-   linux::socket::print( &sa );
+   os_linux::socket::print( &sa );
 
    return tSptr( new Socket( socket, m_buffer_capacity ) );
 }
 
 Socket::eResult Socket::connect( )
 {
-   return linux::socket::connect( m_socket, m_configuration ) ? eResult::OK : eResult::ERROR;
+   return os_linux::socket::connect( m_socket, m_configuration ) ? eResult::OK : eResult::ERROR;
 }
 
 Socket::eResult Socket::send( const void* p_buffer, const size_t size, const int flags )
 {
-   ssize_t send_size = linux::socket::send( m_socket, p_buffer, size, flags );
+   ssize_t send_size = os_linux::socket::send( m_socket, p_buffer, size, flags );
    m_total_send_size += send_size;
    return send_size == static_cast< ssize_t >( size ) ? eResult::OK : eResult::ERROR;
 }
@@ -143,11 +143,11 @@ Socket::eResult Socket::send( const void* p_buffer, const size_t size, const int
 Socket::eResult Socket::recv( const int flags )
 {
    fill_buffer( );
-   ssize_t recv_size = linux::socket::recv( m_socket, mp_buffer, m_buffer_capacity, flags );
+   ssize_t recv_size = os_linux::socket::recv( m_socket, mp_buffer, m_buffer_capacity, flags );
    if( 0 >= recv_size )
    {
       m_buffer_size = 0;
-      return linux::socket::error != EAGAIN ? eResult::DISCONNECTED : eResult::ERROR;
+      return os_linux::socket::error != EAGAIN ? eResult::DISCONNECTED : eResult::ERROR;
    }
 
    m_total_recv_size += recv_size;
@@ -175,7 +175,7 @@ void Socket::fill_buffer( const char symbol )
 
 
 
-SocketClient::SocketClient( const linux::socket::configuration& configuration, const size_t buffer_capacity )
+SocketClient::SocketClient( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
    : Socket( configuration, buffer_capacity )
 {
 }
@@ -186,7 +186,7 @@ SocketClient::~SocketClient( )
 
 
 
-SocketServer::SocketServer( const linux::socket::configuration& configuration, const size_t buffer_capacity )
+SocketServer::SocketServer( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
    : Socket( configuration, buffer_capacity )
 {
    // unlink( configuration.address );
@@ -203,11 +203,11 @@ void SocketServer::fd_reset( )
 
 void SocketServer::fd_init( )
 {
-   m_fd.set( socket( ), linux::socket::fd::eType::READ );
+   m_fd.set( socket( ), os_linux::socket::fd::eType::READ );
    m_max_socket = socket( );
    for( const auto& p_slave_socket : m_slave_sockets )
    {
-      m_fd.set( p_slave_socket->socket( ), linux::socket::fd::eType::READ );
+      m_fd.set( p_slave_socket->socket( ), os_linux::socket::fd::eType::READ );
       if( p_slave_socket->socket( ) > m_max_socket )
          m_max_socket = p_slave_socket->socket( );
    }
@@ -225,12 +225,12 @@ bool SocketServer::select( )
 {
    fd_reset( );
    fd_init( );
-   if( false == linux::socket::select( m_max_socket, m_fd ) )
+   if( false == os_linux::socket::select( m_max_socket, m_fd ) )
       return false;
 
    for( auto iterator = m_slave_sockets.begin( ); iterator != m_slave_sockets.end( ); ++iterator )
    {
-      if( false == m_fd.is_set( (*iterator)->socket( ), linux::socket::fd::eType::READ ) )
+      if( false == m_fd.is_set( (*iterator)->socket( ), os_linux::socket::fd::eType::READ ) )
          continue;
 
       const eResult result = (*iterator)->recv( );
@@ -248,7 +248,7 @@ bool SocketServer::select( )
       }
    }
 
-   if( true == m_fd.is_set( socket( ), linux::socket::fd::eType::READ ) )
+   if( true == m_fd.is_set( socket( ), os_linux::socket::fd::eType::READ ) )
    {
       if( auto p_socket = accept( ) )
       {

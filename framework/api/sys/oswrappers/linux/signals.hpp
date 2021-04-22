@@ -5,7 +5,7 @@
 
 
 
-namespace base::os::linux::signals {
+namespace base::os::os_linux::signals {
 
    using tSignal = int;
    using tHandler = void(*)( tSignal, siginfo_t*, void* );
@@ -84,4 +84,4 @@ namespace base::os::linux::signals {
     ***************************************************************************/
    bool wait( const std::vector< tSignal >& signals, tSignal* p_signal = nullptr );
 
-} // namespace base::os::linux::signals
+} // namespace base::os::os_linux::signals

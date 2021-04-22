@@ -74,14 +74,14 @@ void SendReceive::thread_loop( )
    SYS_INF( "enter" );
    m_started = true;
 
-   os::linux::socket::fd fd_set;
-   os::linux::socket::tSocket max_socket = os::linux::socket::InvalidSocket;
+   os::os_linux::socket::fd fd_set;
+   os::os_linux::socket::tSocket max_socket = os::os_linux::socket::InvalidSocket;
 
    while( started( ) )
    {
       prepare_select( max_socket, fd_set );
 
-      if( false == os::linux::socket::select( max_socket, fd_set ) )
+      if( false == os::os_linux::socket::select( max_socket, fd_set ) )
          continue;
 
       process_select( max_socket, fd_set );
@@ -90,21 +90,21 @@ void SendReceive::thread_loop( )
    SYS_INF( "exit" );
 }
 
-void SendReceive::prepare_select( os::linux::socket::tSocket& max_socket, os::linux::socket::fd& fd_set )
+void SendReceive::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
 {
    fd_set.reset( );
 
-   fd_set.set( mp_socket_sb->socket( ), os::linux::socket::fd::eType::READ );
+   fd_set.set( mp_socket_sb->socket( ), os::os_linux::socket::fd::eType::READ );
    max_socket = mp_socket_sb->socket( );
 
-   fd_set.set( mp_socket_master->socket( ), os::linux::socket::fd::eType::READ );
+   fd_set.set( mp_socket_master->socket( ), os::os_linux::socket::fd::eType::READ );
    if( mp_socket_master->socket( ) > max_socket )
       max_socket = mp_socket_master->socket( );
 
    for( const auto& pair : m_pending_sockets )
    {
       auto p_socket = pair.first;
-      fd_set.set( p_socket->socket( ), os::linux::socket::fd::eType::READ );
+      fd_set.set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ );
       if( p_socket->socket( ) > max_socket )
          max_socket = p_socket->socket( );
    }
@@ -112,7 +112,7 @@ void SendReceive::prepare_select( os::linux::socket::tSocket& max_socket, os::li
    for( const auto& pair : m_process_mapping )
    {
       auto p_socket = pair.second.socket;
-      fd_set.set( p_socket->socket( ), os::linux::socket::fd::eType::READ );
+      fd_set.set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ );
       if( p_socket->socket( ) > max_socket )
          max_socket = p_socket->socket( );
    }
@@ -120,10 +120,10 @@ void SendReceive::prepare_select( os::linux::socket::tSocket& max_socket, os::li
    SYS_INF( "max_socket = %d", max_socket );
 }
 
-void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::linux::socket::fd& fd_set )
+void SendReceive::process_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
 {
    // process service brocker sockets
-   if( true == fd_set.is_set( mp_socket_sb->socket( ), os::linux::socket::fd::eType::READ ) )
+   if( true == fd_set.is_set( mp_socket_sb->socket( ), os::os_linux::socket::fd::eType::READ ) )
    {
       const os::Socket::eResult result = mp_socket_sb->recv( );
       if( os::Socket::eResult::DISCONNECTED == result )
@@ -144,7 +144,7 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
    for( auto iterator = m_process_mapping.begin( ); iterator != m_process_mapping.end( ); ++iterator )
    {
       auto p_socket = iterator->second.socket;
-      if( false == fd_set.is_set( p_socket->socket( ), os::linux::socket::fd::eType::READ ) )
+      if( false == fd_set.is_set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ ) )
          continue;
 
       const os::Socket::eResult result = p_socket->recv( );
@@ -169,7 +169,7 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
    for( auto iterator = m_pending_sockets.begin( ); iterator != m_pending_sockets.end( ); ++iterator )
    {
       auto p_socket = iterator->first;
-      if( false == fd_set.is_set( p_socket->socket( ), os::linux::socket::fd::eType::READ ) )
+      if( false == fd_set.is_set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ ) )
          continue;
 
       const os::Socket::eResult result = p_socket->recv( );
@@ -195,7 +195,7 @@ void SendReceive::process_select( os::linux::socket::tSocket& max_socket, os::li
    }
 
    // process master sockets
-   if( true == fd_set.is_set( mp_socket_master->socket( ), os::linux::socket::fd::eType::READ ) )
+   if( true == fd_set.is_set( mp_socket_master->socket( ), os::os_linux::socket::fd::eType::READ ) )
    {
       if( auto p_socket = mp_socket_master->accept( ) )
       {

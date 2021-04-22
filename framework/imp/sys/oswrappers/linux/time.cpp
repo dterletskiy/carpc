@@ -1,7 +1,7 @@
 #include "api/sys/oswrappers/linux/time.hpp"
 
 
-namespace base::os::linux {
+namespace base::os::os_linux {
 
 
 
@@ -43,4 +43,4 @@ uint64_t nanoseconds( clockid_t clk_id )
 
 
 
-} // namespace base::os::linux
+} // namespace base::os::os_linux

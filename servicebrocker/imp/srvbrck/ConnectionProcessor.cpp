@@ -28,7 +28,7 @@ namespace local {
 
 
 
-ConnectionProcessor::ConnectionProcessor( const base::os::linux::socket::configuration& configuration, const size_t buffer_size )
+ConnectionProcessor::ConnectionProcessor( const base::os::os_linux::socket::configuration& configuration, const size_t buffer_size )
    : base::os::SocketServer( configuration, buffer_size )
 {
 }

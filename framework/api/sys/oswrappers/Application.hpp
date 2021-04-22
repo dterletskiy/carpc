@@ -2,7 +2,7 @@
 
 
 
-namespace base::os::linux {
+namespace base::os::os_linux {
 
    struct Application : public File
    {
@@ -14,4 +14,4 @@ namespace base::os::linux {
       } proc;
    };
 
-} // namespace base::os::linux
+} // namespace base::os::os_linux

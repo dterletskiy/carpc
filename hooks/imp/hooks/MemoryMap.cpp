@@ -142,14 +142,14 @@ bool MemoryMap::insert( void* _address, void* _caller, std::size_t _size )
    if( nullptr == _address )
       return false;
 
-   uint64_t time_stamp = base::os::linux::time( base::os::linux::eGranularity::miliseconds );
+   uint64_t time_stamp = base::os::os_linux::time( base::os::os_linux::eGranularity::miliseconds );
    tHeaderType::write( _address, _caller, _size, time_stamp, pthread_self( ) );
    m_common_size += _size;
 
    if( 0 != m_min_track_size && m_min_track_size < _size )
    {
       tHeaderType::dump( _address, m_fd, "\n" );
-      base::os::linux::back_trace( m_fd );
+      base::os::os_linux::back_trace( m_fd );
    }
 
    std::size_t index = find_free( );

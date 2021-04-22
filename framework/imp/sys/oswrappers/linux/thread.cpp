@@ -7,7 +7,7 @@
 
 
 
-namespace base::os::linux::thread {
+namespace base::os::os_linux::thread {
 
    const std::uint64_t convert( const tID& tid )
    {
@@ -17,4 +17,4 @@ namespace base::os::linux::thread {
       return uint64_id;
    }
 
-} // namespace base::os::linux::thread
+} // namespace base::os::os_linux::thread

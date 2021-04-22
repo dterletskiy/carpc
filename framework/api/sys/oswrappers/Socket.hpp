@@ -28,12 +28,12 @@ namespace base::os {
          using tRecvCallback = std::function< void( void*, const size_t, const eResult ) >;
 
       public:
-         Socket( const linux::socket::configuration&, const size_t );
+         Socket( const os_linux::socket::configuration&, const size_t );
          Socket( const Socket& ) = delete;
          Socket( Socket&& );
          ~Socket( );
       protected:
-         Socket( linux::socket::tSocket, const size_t );
+         Socket( os_linux::socket::tSocket, const size_t );
 
       public:
          const bool operator<( const Socket& ) const;
@@ -57,10 +57,10 @@ namespace base::os {
          void unblock( ) const;
 
       public:
-         linux::socket::tSocket socket( ) const;
+         os_linux::socket::tSocket socket( ) const;
          bool is_valid( ) const;
       protected:
-         linux::socket::tSocket        m_socket = linux::socket::InvalidSocket;
+         os_linux::socket::tSocket        m_socket = os_linux::socket::InvalidSocket;
 
       public:
          ID id( ) const;
@@ -68,9 +68,9 @@ namespace base::os {
          ID                            m_id = ID::generate( );
 
       public:
-         const linux::socket::configuration& configuration( ) const;
+         const os_linux::socket::configuration& configuration( ) const;
       protected:
-         linux::socket::configuration  m_configuration = { };
+         os_linux::socket::configuration  m_configuration = { };
 
       public:
          const void* const buffer( size_t& ) const;
@@ -87,7 +87,7 @@ namespace base::os {
 
 
    inline
-   linux::socket::tSocket Socket::socket( ) const
+   os_linux::socket::tSocket Socket::socket( ) const
    {
       return m_socket;
    }
@@ -95,7 +95,7 @@ namespace base::os {
    inline
    bool Socket::is_valid( ) const
    {
-      return linux::socket::InvalidSocket != m_socket;
+      return os_linux::socket::InvalidSocket != m_socket;
    }
 
    inline
@@ -112,11 +112,11 @@ namespace base::os {
    inline
    void Socket::unblock( ) const
    {
-      linux::set_nonblock( m_socket );
+      os_linux::set_nonblock( m_socket );
    }
 
    inline
-   const linux::socket::configuration& Socket::configuration( ) const
+   const os_linux::socket::configuration& Socket::configuration( ) const
    {
       return m_configuration;
    }
@@ -130,7 +130,7 @@ namespace base::os {
    class SocketClient: public Socket
    {
       public:
-         SocketClient( const linux::socket::configuration&, const size_t );
+         SocketClient( const os_linux::socket::configuration&, const size_t );
          ~SocketClient( );
    };
 
@@ -143,7 +143,7 @@ namespace base::os {
    class SocketServer: public Socket
    {
       public:
-         SocketServer( const linux::socket::configuration&, const size_t );
+         SocketServer( const os_linux::socket::configuration&, const size_t );
          ~SocketServer( );
 
       public:
@@ -159,20 +159,20 @@ namespace base::os {
          virtual void disconnected( tSptr );
 
       public:
-         linux::socket::tSocket max_socket( ) const;
+         os_linux::socket::tSocket max_socket( ) const;
       private:
          void calc_max( );
-         linux::socket::tSocket     m_max_socket = -1;
+         os_linux::socket::tSocket     m_max_socket = -1;
 
       private:
          tSptrList                  m_slave_sockets;
-         linux::socket::fd          m_fd;
+         os_linux::socket::fd          m_fd;
    };
 
 
 
    inline
-   linux::socket::tSocket SocketServer::max_socket( ) const
+   os_linux::socket::tSocket SocketServer::max_socket( ) const
    {
       return m_max_socket;
    }

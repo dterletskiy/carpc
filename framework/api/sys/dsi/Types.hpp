@@ -8,10 +8,10 @@
 
 namespace base::dsi {
 
-   struct SocketCongiguration : public os::linux::socket::configuration
+   struct SocketCongiguration : public os::os_linux::socket::configuration
    {
       SocketCongiguration( ) = default;
-      SocketCongiguration( const os::linux::socket::configuration& );
+      SocketCongiguration( const os::os_linux::socket::configuration& );
 
       bool to_stream( ipc::tStream& stream ) const;
       bool from_stream( ipc::tStream& stream );

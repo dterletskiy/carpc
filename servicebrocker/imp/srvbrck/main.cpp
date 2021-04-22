@@ -59,7 +59,7 @@ int main( int argc, char** argv, char** envp )
    std::string address = configuration.value( "ipc_servicebrocker_address" ).value( );
    int port = static_cast< int >( std::stoll( configuration.value( "ipc_servicebrocker_port" ).value( ) ) );
    int protocole = static_cast< int >( std::stoll( configuration.value( "ipc_servicebrocker_protocole" ).value( ) ) );
-   base::os::linux::socket::configuration socket_configuration{ AF_UNIX, SOCK_STREAM, protocole, address, port };
+   base::os::os_linux::socket::configuration socket_configuration{ AF_UNIX, SOCK_STREAM, protocole, address, port };
 
    size_t buffer_size = static_cast< size_t >( std::stoll( configuration.value( "ipc_servicebrocker_buffer_size" ).value( ) ) );
 

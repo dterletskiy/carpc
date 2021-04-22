@@ -1,3 +1,7 @@
+version 2.5.4
+   - Changing namespace "linux" to "os_linux" because of first one is used as predefine in some compilers.
+   - Removed depricated tracing implementation.
+
 version 2.5.3
    - request failed reason introduced.
 

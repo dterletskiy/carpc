@@ -71,14 +71,14 @@ namespace base::application {
          service::Registry m_service_registry;
 
       private:
-         os::linux::timer::tID      m_timer_id;
+         os::os_linux::timer::tID      m_timer_id;
 
       public:
          struct Configuration
          {
             struct IPC
             {
-               os::linux::socket::configuration socket;
+               os::os_linux::socket::configuration socket;
                std::size_t                      buffer_size;
             };
             IPC ipc_sb;

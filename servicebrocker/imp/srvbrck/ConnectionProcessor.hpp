@@ -35,7 +35,7 @@ class ConnectionProcessor : public base::os::SocketServer
       enum class eRead : size_t { OK, ERROR, DISCONNECTED };
 
    public:
-      ConnectionProcessor( const base::os::linux::socket::configuration& configuration, const size_t buffer_size );
+      ConnectionProcessor( const base::os::os_linux::socket::configuration& configuration, const size_t buffer_size );
       ~ConnectionProcessor( );
 
       bool init( );

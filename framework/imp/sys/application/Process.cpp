@@ -34,14 +34,14 @@ namespace {
 
    void timer_handler( union sigval sv )
    {
-      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( sv.sival_ptr );
+      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( sv.sival_ptr );
       SYS_INF( "WatchDog timer: %#lx", (long) *timer_id );
       process_watchdog( );
    }
 
    void signal_handler( int signal, siginfo_t* si, void* uc )
    {
-      base::os::linux::timer::tID* timer_id = static_cast< base::os::linux::timer::tID* >( si->si_value.sival_ptr );
+      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( si->si_value.sival_ptr );
       SYS_INF( "WatchDog timer: %#lx", (long) *timer_id );
       process_watchdog( );
    }
@@ -64,7 +64,7 @@ Process::Process( int argc, char** argv, char** envp )
 
    m_pce.print( );
 
-   m_configuration.ipc_sb.socket = os::linux::socket::configuration {
+   m_configuration.ipc_sb.socket = os::os_linux::socket::configuration {
       AF_UNIX,
       SOCK_STREAM,
       static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
@@ -73,7 +73,7 @@ Process::Process( int argc, char** argv, char** envp )
    };
    m_configuration.ipc_sb.buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) ) );
 
-   m_configuration.ipc_app.socket = os::linux::socket::configuration {
+   m_configuration.ipc_app.socket = os::os_linux::socket::configuration {
       AF_UNIX,
       SOCK_STREAM,
       static_cast< int >( std::stoll( m_pce.value( "ipc_application_protocole" ).value( ) ) ),
@@ -180,9 +180,9 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout all application threads is started before booting system
 
    // Watchdog timer
-   if( false == os::linux::timer::create( m_timer_id, timer_handler ) )
+   if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
       return false;
-   if( false == os::linux::timer::start( m_timer_id, 1000000000, os::linux::timer::eTimerType::continious ) )
+   if( false == os::os_linux::timer::start( m_timer_id, 1000000000, os::os_linux::timer::eTimerType::continious ) )
       return false;
 
    return true;
@@ -195,7 +195,7 @@ bool Process::stop( )
    m_thread_list.clear( );
    mp_thread_ipc->stop( );
 
-   os::linux::timer::remove( m_timer_id );
+   os::os_linux::timer::remove( m_timer_id );
 
    return true;
 }
@@ -213,7 +213,7 @@ void Process::boot( )
    mp_thread_ipc->wait( );
    SYS_DBG( "IPC thread is stopped" );
 
-   os::linux::timer::remove( m_timer_id );
+   os::os_linux::timer::remove( m_timer_id );
 
    m_thread_list.clear( );
    mp_thread_ipc.reset( );
