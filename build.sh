@@ -20,6 +20,56 @@ else
 fi
 
 
-echo ${CXX}
-echo ${CC}
-./_build_/build.py
+# echo ${CXX}
+# echo ${CC}
+# ./_build_/build.py
+
+
+
+
+
+
+
+ROOT_DIR=${PWD}
+BUILD_DIR=${PWD}/"build"
+TARGET=${1}
+
+function clean( )
+{
+   local BUILD_DIR=${1}
+
+   rm -R ${BUILD_DIR}
+   mkdir ${BUILD_DIR}
+}
+
+function configure( )
+{
+   local SOURCE_DIR=${1}
+   local BUILD_DIR=${2}
+
+   # cd ${BUILD_DIR}
+   # cmake ${SOURCE_DIR}
+   # cd ${SOURCE_DIR}
+
+   cmake -B${BUILD_DIR} -S${SOURCE_DIR}
+}
+
+function build( )
+{
+   local BUILD_DIR=${1}
+   local TARGETS=${2}
+
+   cmake --build ${BUILD_DIR} --target ${TARGETS}
+}
+
+
+
+STARTED=$(($(date +%s%N)/1000000))
+
+clean ${BUILD_DIR}
+configure ${ROOT_DIR} ${BUILD_DIR}
+build ${BUILD_DIR} ${TARGET}
+
+FINISHED=$(($(date +%s%N)/1000000))
+
+echo "Build time duration:" $((FINISHED - STARTED)) "miliseconds"

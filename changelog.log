@@ -1,3 +1,6 @@
+version 2.6.0
+   - Introduce cmake build system for the project.
+
 version 2.5.4
    - Changing namespace "linux" to "os_linux" because of first one is used as predefine in some compilers.
    - Removed depricated tracing implementation.

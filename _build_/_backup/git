@@ -23,6 +23,13 @@ git clean -fd
 git add the_left_out_file
 git commit --amend --no-edit
 
+# Remove files from last commit:
+# link: https://stackoverflow.com/questions/12481639/remove-files-from-git-commit
+git reset --soft HEAD^
+   # or git reset --soft HEAD~1
+git reset HEAD path/to/unwanted_file
+git commit -c ORIG_HEAD
+
 # Revert all changes to latest baseline:
 git reset --hard
 
