@@ -68,3 +68,5 @@ message( STATUS "SOURCE_FILES = " ${SOURCE_FILES} )
 add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
+
+install( TARGETS ${TARGET_NAME} DESTINATION lib )

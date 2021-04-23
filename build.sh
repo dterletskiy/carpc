@@ -6,40 +6,53 @@
 
 
 
-# Check if 'ENVIRONMENT_SETUP' is set
-# https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
-if [ -z ${ENVIRONMENT_SETUP+x} ]; then
-   echo "ENVIRONMENT_SETUP is unset";
-else
-   echo "ENVIRONMENT_SETUP is set to '${ENVIRONMENT_SETUP}'";
-   if [ ! -f "${ENVIRONMENT_SETUP}" ]; then
-      echo "'${ENVIRONMENT_SETUP}' file does not exist"
-      exit
+readonly CLEAN="clean"
+readonly CONFIGURE="configure"
+readonly BUILD="build"
+readonly CLEAN_BUILD="clean_build"
+readonly INSTALL="install"
+readonly OLD="old"
+
+readonly ROOT_DIR=${PWD}
+readonly ROOT_DIR_NAME=${PWD##*/}
+readonly PRODUCT_DIR=${ROOT_DIR}/../${ROOT_DIR_NAME}"_product"
+readonly BUILD_DIR=${PRODUCT_DIR}/build
+readonly DELIVERY_DIR=${PRODUCT_DIR}/delivery
+readonly DOCUMENTATION_DIR=${PRODUCT_DIR}/documentation
+
+ACTION=${1}
+TARGET=${2}
+
+
+
+function setup_sdk( )
+{
+   local SDK=${1}
+
+   # Check if 'SDK' is set
+   # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+   if [ -z ${SDK+x} ]; then
+      echo "SDK is unset";
+   elif [ -z ${SDK} ]; then
+      echo "SDK is empty";
+   else
+      echo "SDK is set to '${SDK}'";
+      if [ ! -f "${SDK}" ]; then
+         echo "'${SDK}' file does not exist"
+         exit
+      fi
+      source ${SDK}
    fi
-   source ${ENVIRONMENT_SETUP}
-fi
 
-
-# echo ${CXX}
-# echo ${CC}
-# ./_build_/build.py
-
-
-
-
-
-
-
-ROOT_DIR=${PWD}
-BUILD_DIR=${PWD}/"build"
-TARGET=${1}
+   echo "CXX:" ${CXX}
+   echo "CC:" ${CC}
+}
 
 function clean( )
 {
-   local BUILD_DIR=${1}
+   local DIR=${1}
 
-   rm -R ${BUILD_DIR}
-   mkdir ${BUILD_DIR}
+   rm -R ${DIR}
 }
 
 function configure( )
@@ -51,7 +64,7 @@ function configure( )
    # cmake ${SOURCE_DIR}
    # cd ${SOURCE_DIR}
 
-   cmake -B${BUILD_DIR} -S${SOURCE_DIR}
+   cmake -B ${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${DELIVERY_DIR} -S ${SOURCE_DIR} --graphviz=${DOCUMENTATION_DIR}/graph
 }
 
 function build( )
@@ -61,15 +74,62 @@ function build( )
 
    cmake --build ${BUILD_DIR} --target ${TARGETS}
 }
+   
+function install( )
+{
+   local BUILD_DIR=${1}
+
+   cmake --build ${BUILD_DIR} --target install
+   # cmake --install ${BUILD_DIR} --prefix ${DELIVERY_DIR}
+}
+
+function main( )
+{
+   STARTED=$(($(date +%s%N)/1000000))
+
+   setup_sdk ${ENVIRONMENT_SETUP}
+
+   case ${ACTION} in
+      ${CLEAN})
+         echo "clean"
+         clean ${PRODUCT_DIR}
+      ;;
+      ${CONFIGURE})
+         echo "configure"
+         configure ${ROOT_DIR} ${BUILD_DIR}
+      ;;
+      ${BUILD})
+         echo "build"
+         build ${BUILD_DIR} ${TARGET}
+      ;;
+      ${CLEAN_BUILD})
+         echo "clean build"
+         clean ${PRODUCT_DIR}
+         configure ${ROOT_DIR} ${BUILD_DIR}
+         build ${BUILD_DIR} ${TARGET}
+      ;;
+      ${INSTALL})
+         echo "install"
+         install ${BUILD_DIR}
+      ;;
+      ${OLD})
+         echo "using old build system"
+         ./_build_/build.py
+      ;;
+      *)
+         echo "clean build and install"
+         clean ${PRODUCT_DIR}
+         configure ${ROOT_DIR} ${BUILD_DIR}
+         build ${BUILD_DIR} ${TARGET}
+         install ${BUILD_DIR}
+      ;;
+   esac
+
+   FINISHED=$(($(date +%s%N)/1000000))
+   echo "Build time duration:" $((FINISHED - STARTED)) "miliseconds"
+}
 
 
 
-STARTED=$(($(date +%s%N)/1000000))
 
-clean ${BUILD_DIR}
-configure ${ROOT_DIR} ${BUILD_DIR}
-build ${BUILD_DIR} ${TARGET}
-
-FINISHED=$(($(date +%s%N)/1000000))
-
-echo "Build time duration:" $((FINISHED - STARTED)) "miliseconds"
+main

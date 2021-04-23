@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
-set(CMAKE_C_COMPILER "/usr/bin/gcc")
-set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+set( CMAKE_C_COMPILER "/usr/bin/gcc" )
+set( CMAKE_CXX_COMPILER "/usr/bin/g++" )
 
 project( RPC )
 
@@ -19,7 +19,6 @@ option( COLORED_TRACE            "Enable colored tracing for console"           
 #                                                                                         #
 ###########################################################################################
 # set(CMAKE_GENERATOR "Sublime Text 2 - Unix Makefiles")
-# specify the C++ standard
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED True )
 set( CMAKE_VERBOSE_MAKEFILE on )
@@ -93,6 +92,7 @@ message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
 message( NOTICE "CMAKE_GENERATOR = " ${CMAKE_GENERATOR} )
 message( NOTICE "RPC_SOURCE_DIR = " ${RPC_SOURCE_DIR} )
 message( NOTICE "RPC_BINARY_DIR = " ${RPC_BINARY_DIR} )
+message( NOTICE "CMAKE_INSTALL_PREFIX = " ${CMAKE_INSTALL_PREFIX} )
 
 
 
