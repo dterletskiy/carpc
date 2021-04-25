@@ -119,9 +119,19 @@ function archive( )
    local -n LOCAL_ARCHIVE__PROJECT=${1}
 
    ARCHIVE_NAME=${LOCAL_ARCHIVE__PROJECT[ROOT_DIR_NAME]}_$(date +'%Y-%m-%d_%H-%M-%S')
-   zip -r ../${ARCHIVE_NAME} ../${ROOT_DIR_NAME}
+   zip -r ../${ARCHIVE_NAME} ../${LOCAL_ARCHIVE__PROJECT[ROOT_DIR_NAME]}
    echo ${ARCHIVE_NAME}
 }
+
+function gpb_generate( )
+{
+   local SOURCE_DIR=${1}
+   local DESTINATION_DIR=${2}
+   local PROTO_FILE=${3}
+
+   protoc -I=${SOURCE_DIR} --cpp_out=${DESTINATION_DIR} ${SOURCE_DIR}/${PROTO_FILE}
+}
+
 
 SERVICEBROCKER=servicebrocker
 HMI=hmi
@@ -241,11 +251,12 @@ function main( )
          ./_build_/build.py
       ;;
       *)
-         echo "clean build and install"
-         clean ${PROJECT[PRODUCT_DIR]}
-         configure PROJECT
-         build PROJECT
-         install PROJECT
+         echo "undefined commend"
+         # echo "clean build and install"
+         # clean ${PROJECT[PRODUCT_DIR]}
+         # configure PROJECT
+         # build PROJECT
+         # install PROJECT
       ;;
    esac
 

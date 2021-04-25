@@ -1,3 +1,7 @@
+version 2.6.3
+   - Improvement cmake build system.
+   - Some fixes for cmake build system.
+
 version 2.6.2
    - Improvement cmake build system.
 
