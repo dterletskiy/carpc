@@ -6,19 +6,29 @@
 
 
 
-readonly CLEAN="clean"
-readonly CONFIGURE="configure"
-readonly BUILD="build"
-readonly CLEAN_BUILD="clean_build"
-readonly INSTALL="install"
-readonly OLD="old"
+declare -A COMMAND=(
+   [INFO]="info"
+   [CLEAN]="clean"
+   [CONFIGURE]="configure"
+   [BUILD]="build"
+   [CLEAN_BUILD]="clean_build"
+   [INSTALL]="install"
+   [ARCHIVE]="archive"
+   [START]="start"
+   [STOP]="stop"
+   [OLD]="old"
+)
 
-readonly ROOT_DIR=${PWD}
-readonly ROOT_DIR_NAME=${PWD##*/}
-readonly PRODUCT_DIR=${ROOT_DIR}/../${ROOT_DIR_NAME}"_product"
-readonly BUILD_DIR=${PRODUCT_DIR}/build
-readonly DELIVERY_DIR=${PRODUCT_DIR}/delivery
-readonly DOCUMENTATION_DIR=${PRODUCT_DIR}/documentation
+readonly PROJECT_ROOT_DIR=${PWD}
+readonly PROJECT_ROOT_DIR_NAME=${PWD##*/}
+readonly PROJECT_PRODUCT_DIR=${PROJECT_ROOT_DIR}/../${PROJECT_ROOT_DIR_NAME}"_product"
+readonly PROJECT_BUILD_DIR=${PROJECT_PRODUCT_DIR}/build
+readonly PROJECT_DELIVERY_DIR=${PROJECT_PRODUCT_DIR}/delivery
+readonly PROJECT_DOCUMENTATION_DIR=${PROJECT_PRODUCT_DIR}/documentation
+
+declare -A PROJECT
+
+
 
 ACTION=${1}
 TARGET=${2}
@@ -43,9 +53,35 @@ function setup_sdk( )
       fi
       source ${SDK}
    fi
+}
+
+function print( )
+{
+   local -n LOCAL_PRINT__PROJECT=${1}
+
+   echo "ROOT_DIR:           ${LOCAL_PRINT__PROJECT[ROOT_DIR]}"
+   echo "ROOT_DIR_NAME:      ${LOCAL_PRINT__PROJECT[ROOT_DIR_NAME]}"
+   echo "SOURCE_DIR:         ${LOCAL_PRINT__PROJECT[SOURCE_DIR]}"
+   echo "PRODUCT_DIR:        ${LOCAL_PRINT__PROJECT[PRODUCT_DIR]}"
+   echo "BUILD_DIR:          ${LOCAL_PRINT__PROJECT[BUILD_DIR]}"
+   echo "DELIVERY_DIR:       ${LOCAL_PRINT__PROJECT[DELIVERY_DIR]}"
+   echo "DOCUMENTATION_DIR:  ${LOCAL_PRINT__PROJECT[DOCUMENTATION_DIR]}"
 
    echo "CXX:" ${CXX}
    echo "CC:" ${CC}
+}
+
+function setup( )
+{
+   local -n LOCAL_SETUP__PROJECT=${1}
+
+   LOCAL_SETUP__PROJECT[ROOT_DIR]=${PWD}
+   LOCAL_SETUP__PROJECT[ROOT_DIR_NAME]=${PWD##*/}
+   LOCAL_SETUP__PROJECT[SOURCE_DIR]=${LOCAL_SETUP__PROJECT[ROOT_DIR]}
+   LOCAL_SETUP__PROJECT[PRODUCT_DIR]=${LOCAL_SETUP__PROJECT[ROOT_DIR]}/../${LOCAL_SETUP__PROJECT[ROOT_DIR_NAME]}"_product"
+   LOCAL_SETUP__PROJECT[BUILD_DIR]=${LOCAL_SETUP__PROJECT[PRODUCT_DIR]}/build
+   LOCAL_SETUP__PROJECT[DELIVERY_DIR]=${LOCAL_SETUP__PROJECT[PRODUCT_DIR]}/delivery
+   LOCAL_SETUP__PROJECT[DOCUMENTATION_DIR]=${LOCAL_SETUP__PROJECT[PRODUCT_DIR]}/documentation
 }
 
 function clean( )
@@ -57,71 +93,159 @@ function clean( )
 
 function configure( )
 {
-   local SOURCE_DIR=${1}
-   local BUILD_DIR=${2}
+   local -n LOCAL_CONFIGURE__PROJECT=${1}
 
-   # cd ${BUILD_DIR}
-   # cmake ${SOURCE_DIR}
-   # cd ${SOURCE_DIR}
-
-   cmake -B ${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${DELIVERY_DIR} -S ${SOURCE_DIR} --graphviz=${DOCUMENTATION_DIR}/graph
+   cmake -B ${LOCAL_CONFIGURE__PROJECT[BUILD_DIR]} -DCMAKE_INSTALL_PREFIX=${LOCAL_CONFIGURE__PROJECT[DELIVERY_DIR]} -S ${LOCAL_CONFIGURE__PROJECT[SOURCE_DIR]} --graphviz=${LOCAL_CONFIGURE__PROJECT[DOCUMENTATION_DIR]}/graph
 }
 
 function build( )
 {
-   local BUILD_DIR=${1}
-   local TARGETS=${2}
+   local -n LOCAL_BUILD__PROJECT=${1}
+   local LOCAL_TARGETS=${2}
 
-   cmake --build ${BUILD_DIR} --target ${TARGETS}
+   cmake --build ${LOCAL_BUILD__PROJECT[BUILD_DIR]} --target ${LOCAL_TARGETS}
 }
    
 function install( )
 {
-   local BUILD_DIR=${1}
+   local -n LOCAL_INSTALL__PROJECT=${1}
 
-   cmake --build ${BUILD_DIR} --target install
-   # cmake --install ${BUILD_DIR} --prefix ${DELIVERY_DIR}
+   cmake --build ${LOCAL_INSTALL__PROJECT[BUILD_DIR]} --target install
+   # cmake --install ${LOCAL_INSTALL__PROJECT[BUILD_DIR]} --prefix ${LOCAL_INSTALL__PROJECT[DELIVERY_DIR]}
 }
+
+function archive( )
+{
+   local -n LOCAL_ARCHIVE__PROJECT=${1}
+
+   ARCHIVE_NAME=${LOCAL_ARCHIVE__PROJECT[ROOT_DIR_NAME]}_$(date +'%Y-%m-%d_%H-%M-%S')
+   zip -r ../${ARCHIVE_NAME} ../${ROOT_DIR_NAME}
+   echo ${ARCHIVE_NAME}
+}
+
+SERVICEBROCKER=servicebrocker
+HMI=hmi
+CONTROLLER=controller
+CORE=core
+DLT_DAEMON="dlt-daemon"
+
+function start_delivery_process( )
+{
+   local -n LOCAL_SDP__PROJECT=${1}
+   local LOCAL_PROCESS_NAME=${2}
+
+   local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
+   if [ -z "${LOCAL_PROCESS_PID}" ]; then
+      echo "starting" ${LOCAL_PROCESS_NAME}
+      ${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/bin/${LOCAL_PROCESS_NAME} config=${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/etc/${LOCAL_PROCESS_NAME}.cfg trace=DLT &
+      echo ${LOCAL_PROCESS_NAME} "started successfully with PID" $!
+   else
+      echo ${LOCAL_PROCESS_NAME} "has been started with PID" ${LOCAL_PROCESS_PID}
+   fi
+}
+
+function start_delivery( )
+{
+   local -n LOCAL_SD__PROJECT=${1}
+
+   LD_PATH=${LD_LIBRARY_PATH}:${LOCAL_SD__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
+   export LD_LIBRARY_PATH=${LD_PATH}
+
+   start_delivery_process LOCAL_SD__PROJECT ${SERVICEBROCKER}
+   start_delivery_process LOCAL_SD__PROJECT ${HMI}
+   start_delivery_process LOCAL_SD__PROJECT ${CONTROLLER}
+   start_delivery_process LOCAL_SD__PROJECT ${CORE}
+}
+
+function stop_delivery( )
+{
+   killall ${CORE}
+   killall ${CONTROLLER}
+   killall ${HMI}
+   killall ${SERVICEBROCKER}
+}
+
+function start_dlt_daemon( )
+{
+   local -n LOCAL_SDLT__PROJECT=${1}
+   local LOCAL_PROCESS_NAME=${DLT_DAEMON}
+
+   local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
+   if [ -z "${LOCAL_PROCESS_PID}" ]; then
+      echo "starting" ${LOCAL_PROCESS_NAME}
+      ${LOCAL_PROCESS_NAME} -d -c ${LOCAL_SDLT__PROJECT[DELIVERI_DIR]}/etc/dlt.conf
+      echo ${LOCAL_PROCESS_NAME} "started successfully with PID" $!
+   else
+      echo ${LOCAL_PROCESS_NAME} "has been started with PID" ${LOCAL_PROCESS_PID}
+   fi
+}
+
+function stop_dlt_daemon( )
+{
+   local LOCAL_PROCESS_NAME=${DLT_DAEMON}
+
+   killall ${LOCAL_PROCESS_NAME}
+}
+
+
 
 function main( )
 {
    STARTED=$(($(date +%s%N)/1000000))
 
+   setup PROJECT
    setup_sdk ${ENVIRONMENT_SETUP}
 
    case ${ACTION} in
-      ${CLEAN})
+      ${COMMAND[INFO]})
+         print PROJECT
+      ;;
+      ${COMMAND[CLEAN]})
          echo "clean"
-         clean ${PRODUCT_DIR}
+         clean ${PROJECT[PRODUCT_DIR]}
       ;;
-      ${CONFIGURE})
+      ${COMMAND[CONFIGURE]})
          echo "configure"
-         configure ${ROOT_DIR} ${BUILD_DIR}
+         configure PROJECT
       ;;
-      ${BUILD})
+      ${COMMAND[BUILD]})
          echo "build"
-         build ${BUILD_DIR} ${TARGET}
+         build PROJECT
       ;;
-      ${CLEAN_BUILD})
+      ${COMMAND[CLEAN_BUILD]})
          echo "clean build"
-         clean ${PRODUCT_DIR}
-         configure ${ROOT_DIR} ${BUILD_DIR}
-         build ${BUILD_DIR} ${TARGET}
+         clean ${PROJECT[PRODUCT_DIR]}
+         configure PROJECT
+         build PROJECT
       ;;
-      ${INSTALL})
+      ${COMMAND[INSTALL]})
          echo "install"
-         install ${BUILD_DIR}
+         install PROJECT
       ;;
-      ${OLD})
+      ${COMMAND[ARCHIVE]})
+         echo "archive"
+         archive PROJECT
+      ;;
+      ${COMMAND[START]})
+         echo "start"
+         start_dlt_daemon PROJECT
+         start_delivery PROJECT
+      ;;
+      ${COMMAND[STOP]})
+         echo "stop"
+         stop_delivery PROJECT
+         stop_dlt_daemon
+      ;;
+      ${COMMAND[OLD]})
          echo "using old build system"
          ./_build_/build.py
       ;;
       *)
          echo "clean build and install"
-         clean ${PRODUCT_DIR}
-         configure ${ROOT_DIR} ${BUILD_DIR}
-         build ${BUILD_DIR} ${TARGET}
-         install ${BUILD_DIR}
+         clean ${PROJECT[PRODUCT_DIR]}
+         configure PROJECT
+         build PROJECT
+         install PROJECT
       ;;
    esac
 

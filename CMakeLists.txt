@@ -105,3 +105,5 @@ add_subdirectory( application )
 add_subdirectory( controller )
 add_subdirectory( core )
 add_subdirectory( hmi )
+
+install( FILES ${PROJECT_SOURCE_DIR}/.configuration/dlt.conf DESTINATION etc )
