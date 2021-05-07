@@ -1,3 +1,8 @@
+version 2.6.4
+   - Improvement cmake build system.
+   - Removed depricated self build system.
+   - Removed depricated Make build system.
+
 version 2.6.3
    - Improvement cmake build system.
    - Some fixes for cmake build system.

@@ -2,20 +2,20 @@
 
 # ENVIRONMENT_SETUP=/mnt/p4v/Audi_MIB3/NavCtrl/DevDef/packages/sdk/mib3h/installed/environment-setup-aarch64-poky-linux
 # ENVIRONMENT_SETUP=/mnt/p4v/Audi_HCP3/NavCtrl/DevDef/packages/sdk/hcp3sim/installed/environment-setup-core2-64-hcp3-linux-musl
-# ENVIRONMENT_SETUP=./_build_/android-env.sh
+# ENVIRONMENT_SETUP=./.configuration/android-env.sh
 
 
 
 declare -A COMMAND=(
-   [INFO]="info"
-   [CLEAN]="clean"
-   [CONFIGURE]="configure"
-   [BUILD]="build"
-   [CLEAN_BUILD]="clean_build"
-   [INSTALL]="install"
-   [ARCHIVE]="archive"
-   [START]="start"
-   [STOP]="stop"
+   [INFO]="--info"                  [INFO_S]="-i"
+   [CLEAN]="--clean"                [CLEAN_S]="-c"
+   [CONFIGURE]="--configure"        [CONFIGURE_S]="-s"
+   [BUILD]="--build"                [BUILD_S]="-b"
+   [CLEAN_BUILD]="--clean_build"    [CLEAN_BUILD_S]="-x"
+   [INSTALL]="--install"            [INSTALL_S]="-d"
+   [ARCHIVE]="--archive"            [ARCHIVE_S]="-a"
+   [START]="--start"                [START_S]="-r"
+   [STOP]="--stop"                  [STOP_S]="-f"
    [OLD]="old"
 )
 
@@ -207,41 +207,41 @@ function main( )
    setup_sdk ${ENVIRONMENT_SETUP}
 
    case ${ACTION} in
-      ${COMMAND[INFO]})
+      ${COMMAND[INFO]} | ${COMMAND[INFO_S]})
          print PROJECT
       ;;
-      ${COMMAND[CLEAN]})
+      ${COMMAND[CLEAN]} | ${COMMAND[CLEAN_S]})
          echo "clean"
          clean ${PROJECT[PRODUCT_DIR]}
       ;;
-      ${COMMAND[CONFIGURE]})
+      ${COMMAND[CONFIGURE]} | ${COMMAND[CONFIGURE_S]})
          echo "configure"
          configure PROJECT
       ;;
-      ${COMMAND[BUILD]})
+      ${COMMAND[BUILD]} | ${COMMAND[BUILD_S]})
          echo "build"
          build PROJECT
       ;;
-      ${COMMAND[CLEAN_BUILD]})
+      ${COMMAND[CLEAN_BUILD]} | ${COMMAND[CLEAN_BUILD_S]})
          echo "clean build"
          clean ${PROJECT[PRODUCT_DIR]}
          configure PROJECT
          build PROJECT
       ;;
-      ${COMMAND[INSTALL]})
+      ${COMMAND[INSTALL]} | ${COMMAND[INSTALL_S]})
          echo "install"
          install PROJECT
       ;;
-      ${COMMAND[ARCHIVE]})
+      ${COMMAND[ARCHIVE]} | ${COMMAND[ARCHIVE_S]})
          echo "archive"
          archive PROJECT
       ;;
-      ${COMMAND[START]})
+      ${COMMAND[START]} | ${COMMAND[START_S]})
          echo "start"
          start_dlt_daemon PROJECT
          start_delivery PROJECT
       ;;
-      ${COMMAND[STOP]})
+      ${COMMAND[STOP]} | ${COMMAND[STOP_S]})
          echo "stop"
          stop_delivery PROJECT
          stop_dlt_daemon
@@ -251,12 +251,15 @@ function main( )
          ./_build_/build.py
       ;;
       *)
-         echo "undefined commend"
-         # echo "clean build and install"
-         # clean ${PROJECT[PRODUCT_DIR]}
-         # configure PROJECT
-         # build PROJECT
-         # install PROJECT
+         echo "   --info         | -i     print info"
+         echo "   --clean        | -c     clean product folder"
+         echo "   --configure    | -s     configure build"
+         echo "   --build        | -b     build project"
+         echo "   --clean_build  | -x     clean build project"
+         echo "   --install      | -d     install built project"
+         echo "   --archive      | -a     archive project"
+         echo "   --start        | -r     start installed project"
+         echo "   --stop         | -f     stop installed project"
       ;;
    esac
 
