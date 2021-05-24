@@ -21,7 +21,7 @@ namespace base::os::os_linux::socket {
    using tSocketSet = std::set< tSocket >;
 
    const tSocket InvalidSocket = -1;
-   extern int error;
+   extern thread_local int error;
 
    struct configuration
    {

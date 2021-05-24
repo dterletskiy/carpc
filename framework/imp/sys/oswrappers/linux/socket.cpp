@@ -12,7 +12,7 @@
 
 namespace base::os::os_linux::socket {
 
-   int error = 0;
+   int thread_local error = 0;
 
 
 

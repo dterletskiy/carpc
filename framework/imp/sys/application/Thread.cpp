@@ -104,6 +104,7 @@ bool Thread::insert_event( const base::async::IAsync::tSptr p_event )
 bool Thread::send( const base::async::IAsync::tSptr, const application::Context& )
 {
    SYS_WRN( "not supported for not IPC thread" );
+   return false;
 }
 
 base::async::IAsync::tSptr Thread::get_event( )

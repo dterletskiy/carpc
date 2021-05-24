@@ -54,6 +54,7 @@ add_definitions( -Wno-ignored-qualifiers )
 add_definitions( -Wno-unused-parameter )
 add_definitions( -Wno-unused-but-set-variable )
 add_definitions( -Wno-unused-function )
+add_definitions( -Wno-comment )
 
 add_compile_definitions( OS_ANDROID=0 )
 add_compile_definitions( OS_LINUX=1 )
