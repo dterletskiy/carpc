@@ -1,3 +1,6 @@
+version 2.6.7
+   - Removed depricated tracing stuff.
+
 version 2.6.6
    - Filesystem wrappers implementation.
    - Some minor changes.
