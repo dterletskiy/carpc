@@ -80,4 +80,5 @@
    "editor.tabCompletion": "on",
    "editor.codeLens": false,
    "editor.fontSize": 18,
+   "cmake.configureOnOpen": true,
 }

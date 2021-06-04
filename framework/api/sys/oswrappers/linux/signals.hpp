@@ -7,8 +7,30 @@
 
 namespace base::os::os_linux::signals {
 
+   extern thread_local int error;
    using tSignal = int;
    using tHandler = void(*)( tSignal, siginfo_t*, void* );
+
+   bool sigwait( const sigset_t* const set, tSignal* const signo );
+   bool kill( const pid_t pid, const tSignal signo );
+   bool tkill( const pid_t tid, const tSignal signo );
+   bool tgkill( const pid_t tgid, const pid_t tid, const tSignal signo );
+   int pthread_kill( const pthread_t thread, const int signo );
+
+   bool sigprocmask( const int how, const sigset_t* const set, sigset_t* const oldset );
+   bool pthread_sigmask( const int how, const sigset_t* const set, sigset_t* const oldset );
+
+   bool sigismember( const sigset_t* const set, const tSignal signo );
+   bool sigaddset( sigset_t* const set, const tSignal signo );
+   bool sigdelset( sigset_t* const set, const tSignal signo );
+   bool sigfillset( sigset_t* const set );
+   bool sigemptyset( sigset_t* const set );
+
+}
+
+
+
+namespace base::os::os_linux::signals {
 
    void info( );
 
@@ -19,7 +41,7 @@ namespace base::os::os_linux::signals {
     *    - signals - list of signals to be blocked
     *
     ***************************************************************************/
-   bool block( const std::vector< tSignal >& signals, const bool is_thread = false );
+   bool block( const std::vector< tSignal >& signals );
 
    /****************************************************************************
     *
@@ -28,7 +50,7 @@ namespace base::os::os_linux::signals {
     *    - signals - list of signals to be blocked
     *
     ***************************************************************************/
-   bool rblock( const std::vector< tSignal >& signals, const bool is_thread = false );
+   bool rblock( const std::vector< tSignal >& signals );
 
    /****************************************************************************
     *
@@ -37,14 +59,14 @@ namespace base::os::os_linux::signals {
     *    - signals - list of signals to be unblocked
     *
     ***************************************************************************/
-   bool unblock( const std::vector< tSignal >& signals, const bool is_thread = false );
+   bool unblock( const std::vector< tSignal >& signals );
 
    /****************************************************************************
     *
     * Function for unblocking all Linux signals.
     *
     ***************************************************************************/
-   bool unblock_all( const bool is_thread = false );
+   bool unblock_all( );
 
    /****************************************************************************
     *

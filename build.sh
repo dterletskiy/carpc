@@ -149,11 +149,26 @@ function start_delivery_process( )
    local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
    if [ -z "${LOCAL_PROCESS_PID}" ]; then
       echo "starting" ${LOCAL_PROCESS_NAME}
+      echo ${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/bin/${LOCAL_PROCESS_NAME} config=${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/etc/${LOCAL_PROCESS_NAME}.cfg trace=${LOCAL_TRACE} &
       ${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/bin/${LOCAL_PROCESS_NAME} config=${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/etc/${LOCAL_PROCESS_NAME}.cfg trace=${LOCAL_TRACE} &
       echo ${LOCAL_PROCESS_NAME} "started successfully with PID" $!
    else
       echo ${LOCAL_PROCESS_NAME} "has been started with PID" ${LOCAL_PROCESS_PID}
    fi
+}
+
+function start( )
+{
+   # start_dlt_daemon PROJECT
+   # start_delivery PROJECT
+   start_test PROJECT
+}
+
+function stop( )
+{
+   # stop_delivery PROJECT
+   # stop_dlt_daemon
+   stop_test PROJECT
 }
 
 function start_delivery( )
@@ -182,6 +197,7 @@ function start_test( )
    local -n LOCAL_SD__PROJECT=${1}
 
    LD_PATH=${LD_LIBRARY_PATH}:${LOCAL_SD__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
+   echo export LD_LIBRARY_PATH=${LD_PATH}
    export LD_LIBRARY_PATH=${LD_PATH}
 
    start_delivery_process LOCAL_SD__PROJECT ${APPLICATION} "CONSOLE"
@@ -257,15 +273,11 @@ function main( )
       ;;
       ${COMMAND[START]} | ${COMMAND[START_S]})
          echo "start"
-         # start_dlt_daemon PROJECT
-         # start_delivery PROJECT
-         start_test PROJECT
+         start
       ;;
       ${COMMAND[STOP]} | ${COMMAND[STOP_S]})
          echo "stop"
-         # stop_delivery PROJECT
-         # stop_dlt_daemon
-         stop_test PROJECT
+         stop
       ;;
       ${COMMAND[OLD]})
          echo "using old build system"

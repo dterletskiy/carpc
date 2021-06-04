@@ -1,3 +1,6 @@
+version 2.6.8
+   - Linux kernel signal wrappers extended.
+
 version 2.6.7
    - Removed depricated tracing stuff.
 
