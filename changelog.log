@@ -1,3 +1,9 @@
+version 2.6.9
+   - Some updates for Android jni calls.
+   - Fixing for "RESET" style and color in tracing for console.
+   - Some minor changes in build system.
+   - Project "experimental" implemented with opencv and dlib experiments.
+
 version 2.6.8
    - Linux kernel signal wrappers extended.
 

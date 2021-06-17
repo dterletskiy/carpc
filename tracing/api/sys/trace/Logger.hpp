@@ -71,6 +71,7 @@ namespace base::trace {
                   strcat( full_format, PREFIX_FORMAT_MICROSECONDS_PID_TID_CODE );
                   strcat( full_format, to_color( log_level ) );
                   strcat( full_format, format );
+                  strcat( full_format, RESET );
                   strcat( full_format, "\n" );
 
                   message(
@@ -91,6 +92,7 @@ namespace base::trace {
                   strcat( full_format, PREFIX_FORMAT_DATE_TIME_MILLISECONDS_PID_TID_CODE );
                   strcat( full_format, to_color( log_level ) );
                   strcat( full_format, format );
+                  strcat( full_format, RESET );
                   strcat( full_format, "\n" );
 
                   message(

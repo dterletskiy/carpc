@@ -120,11 +120,19 @@ bool test( int argc, char** argv, char** envp );
 
    base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (102) )) = { boot, 1, nullptr, nullptr };
 
-   extern "C" JNIEXPORT jstring JNICALL
-   Java_com_tda_framework_MainActivity_jniStartFramework( JNIEnv* env, jobject /* this */ )
+   extern "C"
+   JNIEXPORT jstring JNICALL Java_com_tda_carpc_start( JNIEnv* env, jobject obj, jint id )
    {
-      MSG_VRB( "JNI" );
+      MSG_VRB( "starting carpc framework: %d", id );
       boot_thread.run( );
+
+      return env->NewStringUTF( "@TDA: Hello from C++" );
+   }
+
+   extern "C"
+   JNIEXPORT jstring JNICALL Java_com_tda_carpc_stop( JNIEnv* env, jobject obj )
+   {
+      MSG_VRB( "stopping carpc framework" );
 
       return env->NewStringUTF( "@TDA: Hello from C++" );
    }

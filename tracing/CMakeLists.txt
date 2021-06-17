@@ -63,7 +63,9 @@ message( STATUS "SOURCE_FILES = " ${SOURCE_FILES} )
 
 add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
 
-target_link_libraries( ${TARGET_NAME} dlt )
+if( DLT_TRACE )
+   target_link_libraries( ${TARGET_NAME} dlt )
+endif( )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )
 install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION . )

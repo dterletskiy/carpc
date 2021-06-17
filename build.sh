@@ -19,13 +19,6 @@ declare -A COMMAND=(
    [OLD]="old"
 )
 
-readonly PROJECT_ROOT_DIR=${PWD}
-readonly PROJECT_ROOT_DIR_NAME=${PWD##*/}
-readonly PROJECT_PRODUCT_DIR=${PROJECT_ROOT_DIR}/../${PROJECT_ROOT_DIR_NAME}"_product"
-readonly PROJECT_BUILD_DIR=${PROJECT_PRODUCT_DIR}/build
-readonly PROJECT_DELIVERY_DIR=${PROJECT_PRODUCT_DIR}/delivery
-readonly PROJECT_DOCUMENTATION_DIR=${PROJECT_PRODUCT_DIR}/documentation
-
 declare -A PROJECT
 
 
@@ -95,7 +88,10 @@ function configure( )
 {
    local -n LOCAL_CONFIGURE__PROJECT=${1}
 
-   cmake -B ${LOCAL_CONFIGURE__PROJECT[BUILD_DIR]} -DCMAKE_INSTALL_PREFIX=${LOCAL_CONFIGURE__PROJECT[DELIVERY_DIR]} -S ${LOCAL_CONFIGURE__PROJECT[SOURCE_DIR]} --graphviz=${LOCAL_CONFIGURE__PROJECT[DOCUMENTATION_DIR]}/graph
+   cmake -B ${LOCAL_CONFIGURE__PROJECT[BUILD_DIR]} \
+      -DCMAKE_INSTALL_PREFIX=${LOCAL_CONFIGURE__PROJECT[DELIVERY_DIR]} \
+      -S ${LOCAL_CONFIGURE__PROJECT[SOURCE_DIR]} \
+      --graphviz=${LOCAL_CONFIGURE__PROJECT[DOCUMENTATION_DIR]}/graph
 }
 
 function build( )
@@ -133,6 +129,8 @@ function gpb_generate( )
 }
 
 
+
+EXPERIMENTAL=experimental
 APPLICATION=application
 SERVICEBROCKER=servicebrocker
 HMI=hmi
@@ -140,7 +138,7 @@ CONTROLLER=controller
 CORE=core
 DLT_DAEMON="dlt-daemon"
 
-function start_delivery_process( )
+function start_process( )
 {
    local -n LOCAL_SDP__PROJECT=${1}
    local LOCAL_PROCESS_NAME=${2}
@@ -157,55 +155,43 @@ function start_delivery_process( )
    fi
 }
 
-function start( )
+function stop_process( )
 {
-   # start_dlt_daemon PROJECT
-   # start_delivery PROJECT
-   start_test PROJECT
-}
+   local LOCAL_PROCESS_NAME=${1}
 
-function stop( )
-{
-   # stop_delivery PROJECT
-   # stop_dlt_daemon
-   stop_test PROJECT
+   killall ${LOCAL_PROCESS_NAME}
 }
 
 function start_delivery( )
 {
    local -n LOCAL_SD__PROJECT=${1}
 
-   LD_PATH=${LD_LIBRARY_PATH}:${LOCAL_SD__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
-   export LD_LIBRARY_PATH=${LD_PATH}
-
-   start_delivery_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "DLT"
-   start_delivery_process LOCAL_SD__PROJECT ${HMI} "DLT"
-   start_delivery_process LOCAL_SD__PROJECT ${CONTROLLER} "DLT"
-   start_delivery_process LOCAL_SD__PROJECT ${CORE} "DLT"
+   start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "DLT"
+   start_process LOCAL_SD__PROJECT ${HMI} "DLT"
+   start_process LOCAL_SD__PROJECT ${CONTROLLER} "DLT"
+   start_process LOCAL_SD__PROJECT ${CORE} "DLT"
 }
 
 function stop_delivery( )
 {
-   killall ${CORE}
-   killall ${CONTROLLER}
-   killall ${HMI}
-   killall ${SERVICEBROCKER}
+   stop_process ${CORE}
+   stop_process ${CONTROLLER}
+   stop_process ${HMI}
+   stop_process ${SERVICEBROCKER}
 }
 
 function start_test( )
 {
    local -n LOCAL_SD__PROJECT=${1}
 
-   LD_PATH=${LD_LIBRARY_PATH}:${LOCAL_SD__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
-   echo export LD_LIBRARY_PATH=${LD_PATH}
-   export LD_LIBRARY_PATH=${LD_PATH}
-
-   start_delivery_process LOCAL_SD__PROJECT ${APPLICATION} "CONSOLE"
+   start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "CONSOLE"
+   start_process LOCAL_SD__PROJECT ${APPLICATION} "CONSOLE"
 }
 
 function stop_test( )
 {
-   killall ${APPLICATION}
+   stop_process ${APPLICATION}
+   stop_process ${SERVICEBROCKER}
 }
 
 function start_dlt_daemon( )
@@ -227,7 +213,29 @@ function stop_dlt_daemon( )
 {
    local LOCAL_PROCESS_NAME=${DLT_DAEMON}
 
-   killall ${LOCAL_PROCESS_NAME}
+   stop_process ${LOCAL_PROCESS_NAME}
+}
+
+function start( )
+{
+   local -n LOCAL_START__PROJECT=${1}
+
+   LD_PATH=${LD_LIBRARY_PATH}:${LOCAL_START__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
+   echo export LD_LIBRARY_PATH=${LD_PATH}
+   export LD_LIBRARY_PATH=${LD_PATH}
+
+   # start_dlt_daemon LOCAL_START__PROJECT
+   # start_delivery LOCAL_START__PROJECT
+   start_test LOCAL_START__PROJECT
+}
+
+function stop( )
+{
+   local -n LOCAL_STOP__PROJECT=${1}
+
+   # stop_delivery LOCAL_STOP__PROJECT
+   # stop_dlt_daemon
+   stop_test LOCAL_STOP__PROJECT
 }
 
 
@@ -273,11 +281,11 @@ function main( )
       ;;
       ${COMMAND[START]} | ${COMMAND[START_S]})
          echo "start"
-         start
+         start PROJECT
       ;;
       ${COMMAND[STOP]} | ${COMMAND[STOP_S]})
          echo "stop"
-         stop
+         stop PROJECT
       ;;
       ${COMMAND[OLD]})
          echo "using old build system"
