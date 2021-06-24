@@ -28,15 +28,19 @@ namespace base::os {
          using tRecvCallback = std::function< void( void*, const size_t, const eResult ) >;
 
       public:
-         Socket( const os_linux::socket::configuration&, const size_t );
-         Socket( const Socket& ) = delete;
-         Socket( Socket&& );
          ~Socket( );
       protected:
-         Socket( os_linux::socket::tSocket, const size_t );
+         Socket( const os_linux::socket::configuration&, const size_t );
+         Socket( const os_linux::socket::tSocket, const size_t );
+         Socket( const Socket& ) = delete;
+         Socket( Socket&& );
+      public:
+         static tSptr create_shared( const os_linux::socket::configuration&, const size_t );
+         static tSptr create_shared( const os_linux::socket::tSocket, const size_t );
 
       public:
          const bool operator<( const Socket& ) const;
+      protected:
          Socket& operator=( const Socket& ) = delete;
          Socket& operator=( Socket&& );
 
@@ -60,7 +64,7 @@ namespace base::os {
          os_linux::socket::tSocket socket( ) const;
          bool is_valid( ) const;
       protected:
-         os_linux::socket::tSocket        m_socket = os_linux::socket::InvalidSocket;
+         os_linux::socket::tSocket     m_socket = os_linux::socket::InvalidSocket;
 
       public:
          ID id( ) const;
@@ -130,8 +134,14 @@ namespace base::os {
    class SocketClient: public Socket
    {
       public:
-         SocketClient( const os_linux::socket::configuration&, const size_t );
+         using tSptr = std::shared_ptr< SocketClient >;
+
+      public:
          ~SocketClient( );
+      private:
+         SocketClient( const os_linux::socket::configuration&, const size_t );
+      public:
+         static tSptr create_shared( const os_linux::socket::configuration&, const size_t );
    };
 
 }
@@ -143,20 +153,28 @@ namespace base::os {
    class SocketServer: public Socket
    {
       public:
-         SocketServer( const os_linux::socket::configuration&, const size_t );
+         using tSptr = std::shared_ptr< SocketServer >;
+
+         struct IConsumer
+         {
+            virtual void connected( Socket::tSptr ) = 0;
+            virtual void disconnected( Socket::tSptr ) = 0;
+            virtual void read_slave( Socket::tSptr ) = 0;
+         };
+
+      public:
          ~SocketServer( );
+      private:
+         SocketServer( const os_linux::socket::configuration&, const size_t, IConsumer& );
+      public:
+         static tSptr create_shared( const os_linux::socket::configuration&, const size_t, IConsumer& );
 
       public:
          bool select( );
 
       private:
-         virtual void read_slave( tSptr );
          void fd_reset( );
          void fd_init( );
-
-      private:
-         virtual void connected( tSptr );
-         virtual void disconnected( tSptr );
 
       public:
          os_linux::socket::tSocket max_socket( ) const;
@@ -165,8 +183,9 @@ namespace base::os {
          os_linux::socket::tSocket     m_max_socket = -1;
 
       private:
-         tSptrList                  m_slave_sockets;
+         tSptrList                     m_slave_sockets;
          os_linux::socket::fd          m_fd;
+         IConsumer&                    m_consumer;
    };
 
 

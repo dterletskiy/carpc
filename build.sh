@@ -159,6 +159,7 @@ function stop_process( )
 {
    local LOCAL_PROCESS_NAME=${1}
 
+   echo "stopping" ${LOCAL_PROCESS_NAME}
    killall ${LOCAL_PROCESS_NAME}
 }
 
@@ -166,6 +167,7 @@ function start_delivery( )
 {
    local -n LOCAL_SD__PROJECT=${1}
 
+   start_dlt_daemon LOCAL_SD__PROJECT
    start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "DLT"
    start_process LOCAL_SD__PROJECT ${HMI} "DLT"
    start_process LOCAL_SD__PROJECT ${CONTROLLER} "DLT"
@@ -178,6 +180,7 @@ function stop_delivery( )
    stop_process ${CONTROLLER}
    stop_process ${HMI}
    stop_process ${SERVICEBROCKER}
+   stop_dlt_daemon
 }
 
 function start_test( )
@@ -224,18 +227,16 @@ function start( )
    echo export LD_LIBRARY_PATH=${LD_PATH}
    export LD_LIBRARY_PATH=${LD_PATH}
 
-   # start_dlt_daemon LOCAL_START__PROJECT
-   # start_delivery LOCAL_START__PROJECT
-   start_test LOCAL_START__PROJECT
+   start_delivery LOCAL_START__PROJECT
+   # start_test LOCAL_START__PROJECT
 }
 
 function stop( )
 {
    local -n LOCAL_STOP__PROJECT=${1}
 
-   # stop_delivery LOCAL_STOP__PROJECT
-   # stop_dlt_daemon
-   stop_test LOCAL_STOP__PROJECT
+   stop_delivery LOCAL_STOP__PROJECT
+   # stop_test LOCAL_STOP__PROJECT
 }
 
 

@@ -28,7 +28,7 @@ Socket::Socket( const os_linux::socket::configuration& configuration, const size
    mp_buffer = malloc( m_buffer_capacity );
 }
 
-Socket::Socket( os_linux::socket::tSocket socket, const size_t buffer_capacity )
+Socket::Socket( const os_linux::socket::tSocket socket, const size_t buffer_capacity )
    : m_socket( socket )
    , m_buffer_capacity( buffer_capacity )
 {
@@ -57,6 +57,30 @@ Socket::~Socket( )
    free( mp_buffer );
    SYS_INF( "total recv size: %zu", m_total_recv_size );
    SYS_INF( "total send size: %zu", m_total_send_size );
+}
+
+Socket::tSptr Socket::create_shared( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
+{
+   struct make_shared_enabler : public Socket
+   {
+      make_shared_enabler( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
+         : Socket( configuration, buffer_capacity )
+      { }
+   };
+
+   return std::make_shared< make_shared_enabler >( configuration, buffer_capacity );
+}
+
+Socket::tSptr Socket::create_shared( const os_linux::socket::tSocket socket, const size_t buffer_capacity )
+{
+   struct make_shared_enabler : public Socket
+   {
+      make_shared_enabler( const os_linux::socket::tSocket socket, const size_t buffer_capacity )
+         : Socket( socket, buffer_capacity )
+      { }
+   };
+
+   return std::make_shared< make_shared_enabler >( socket, buffer_capacity );
 }
 
 const bool Socket::operator<( const Socket& other ) const
@@ -125,7 +149,7 @@ Socket::tSptr Socket::accept( )
 
    os_linux::socket::print( &sa );
 
-   return tSptr( new Socket( socket, m_buffer_capacity ) );
+   return Socket::create_shared( socket, m_buffer_capacity );
 }
 
 Socket::eResult Socket::connect( )
@@ -184,16 +208,43 @@ SocketClient::~SocketClient( )
 {
 }
 
+SocketClient::tSptr SocketClient::create_shared( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
+{
+   struct make_shared_enabler : public SocketClient
+   {
+      make_shared_enabler( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
+         : SocketClient( configuration, buffer_capacity )
+      { }
+   };
+
+   return std::make_shared< make_shared_enabler >( configuration, buffer_capacity );
+}
 
 
-SocketServer::SocketServer( const os_linux::socket::configuration& configuration, const size_t buffer_capacity )
+
+SocketServer::SocketServer( const os_linux::socket::configuration& configuration, const size_t buffer_capacity, IConsumer& consumer )
    : Socket( configuration, buffer_capacity )
+   , m_consumer( consumer )
 {
    // unlink( configuration.address );
 }
 
 SocketServer::~SocketServer( )
 {
+}
+
+SocketServer::tSptr SocketServer::create_shared(
+            const os_linux::socket::configuration& configuration, const size_t buffer_capacity, IConsumer& consumer
+         )
+{
+   struct make_shared_enabler : public SocketServer
+   {
+      make_shared_enabler( const os_linux::socket::configuration& configuration, const size_t buffer_capacity, IConsumer& consumer )
+         : SocketServer( configuration, buffer_capacity, consumer )
+      { }
+   };
+
+   return std::make_shared< make_shared_enabler >( configuration, buffer_capacity, consumer );
 }
 
 void SocketServer::fd_reset( )
@@ -213,14 +264,6 @@ void SocketServer::fd_init( )
    }
 }
 
-void SocketServer::connected( tSptr )
-{
-}
-
-void SocketServer::disconnected( tSptr )
-{
-}
-
 bool SocketServer::select( )
 {
    fd_reset( );
@@ -237,14 +280,14 @@ bool SocketServer::select( )
       if( eResult::DISCONNECTED == result )
       {
          (*iterator)->info( "Host disconnected" );
-         disconnected( *iterator );
+         m_consumer.disconnected( *iterator );
          iterator = m_slave_sockets.erase( iterator );
          if( m_slave_sockets.end( ) == iterator )
             break;
       }
       else if( eResult::OK == result )
       {
-         read_slave( *iterator );
+         m_consumer.read_slave( *iterator );
       }
    }
 
@@ -255,22 +298,17 @@ bool SocketServer::select( )
          m_slave_sockets.push_back( p_socket );
          p_socket->info( "Host connected" );
          p_socket->unblock( );
-         connected( p_socket );
+         m_consumer.connected( p_socket );
       }
    }
 
    return true;
 }
 
-void SocketServer::read_slave( tSptr socket )
-{
-
-}
-
 void SocketServer::calc_max( )
 {
    m_max_socket = socket( );
-   for( const auto p_socket : m_slave_sockets )
+   for( const auto& p_socket : m_slave_sockets )
       if( p_socket->socket( ) > m_max_socket )
          m_max_socket = p_socket->socket( );
 }

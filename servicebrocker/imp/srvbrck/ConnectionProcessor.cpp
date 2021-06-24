@@ -29,8 +29,8 @@ namespace local {
 
 
 ConnectionProcessor::ConnectionProcessor( const base::os::os_linux::socket::configuration& configuration, const size_t buffer_size )
-   : base::os::SocketServer( configuration, buffer_size )
 {
+   mp_socket = base::os::SocketServer::create_shared( configuration, buffer_size, *this );
 }
 
 ConnectionProcessor::~ConnectionProcessor( )
@@ -39,14 +39,14 @@ ConnectionProcessor::~ConnectionProcessor( )
 
 bool ConnectionProcessor::init( )
 {
-   if( eResult::ERROR == create( ) )
+   if( base::os::Socket::eResult::ERROR == mp_socket->create( ) )
       return false;
-   if( eResult::ERROR == bind( ) )
+   if( base::os::Socket::eResult::ERROR == mp_socket->bind( ) )
       return false;
-   unblock( );
-   if( eResult::ERROR == listen( ) )
+   mp_socket->unblock( );
+   if( base::os::Socket::eResult::ERROR == mp_socket->listen( ) )
       return false;
-   info( "Connection created" );
+   mp_socket->info( "Connection created" );
 
    return true;
 }
@@ -74,7 +74,7 @@ void ConnectionProcessor::read_slave( base::os::Socket::tSptr p_socket )
          SYS_INF( "processing package: %s", package.c_str( ) );
          switch( package.command( ) )
          {
-            case base::dsi::eCommand::BroadcastEvent:
+            case base::dsi::eCommand::IpcEvent:
             {
                process_broadcast_event( p_socket, package );
                break;
@@ -149,7 +149,7 @@ void ConnectionProcessor::connection_loop( )
 {
    while( true )
    {
-      select( );
+      mp_socket->select( );
    }
 }
 

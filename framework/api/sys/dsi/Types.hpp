@@ -31,7 +31,7 @@ namespace base::dsi {
       RegisterProcessAck,
       RegisterClientProcess,
       RegisterServerProcess,
-      BroadcastEvent,
+      IpcEvent,
       Undefined
    };
    const char* c_str( const eCommand );

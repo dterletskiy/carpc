@@ -22,7 +22,7 @@ namespace base::dsi {
          case eCommand::RegisterProcessAck:     return "RegisterProcessAck";
          case eCommand::RegisterClientProcess:  return "RegisterClientProcess";
          case eCommand::RegisterServerProcess:  return "RegisterServerProcess";
-         case eCommand::BroadcastEvent:         return "BroadcastEvent";
+         case eCommand::IpcEvent:               return "IpcEvent";
          default:                               return "Undefined";
       }
       return "Undefined";

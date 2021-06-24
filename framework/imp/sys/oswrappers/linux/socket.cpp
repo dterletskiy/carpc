@@ -469,10 +469,10 @@ namespace base::os::os_linux::socket {
       error = errno;
       if( -1 == result )
       {
-         SYS_ERR( "select(%d) error: %d", _max_socket + 1, error );
+         SYS_ERR( "select(%d + 1) error: %d", _max_socket, error );
          return false;
       }
-      SYS_VRB( "select(%d)", _max_socket + 1 );
+      SYS_VRB( "select(%d + 1)", _max_socket );
       return true;
    }
 

@@ -1,3 +1,9 @@
+version 3.0.0
+   - Redesign IPC protocole.
+   - SendReceive class redesigned.
+   - base::os::Socket could be created only as smart pointer.
+   - Other minor changes.
+
 version 2.6.9
    - Some updates for Android jni calls.
    - Fixing for "RESET" style and color in tracing for console.

@@ -29,11 +29,8 @@ struct ServiceConnection
    Connection::tSet clients;
 };
 
-class ConnectionProcessor : public base::os::SocketServer
+class ConnectionProcessor : public base::os::SocketServer::IConsumer
 {
-   private:
-      enum class eRead : size_t { OK, ERROR, DISCONNECTED };
-
    public:
       ConnectionProcessor( const base::os::os_linux::socket::configuration& configuration, const size_t buffer_size );
       ~ConnectionProcessor( );
@@ -41,7 +38,6 @@ class ConnectionProcessor : public base::os::SocketServer
       bool init( );
       bool shutdown( );
       void connection_loop( );
-      int execute( );
 
    private:
       void read_slave( base::os::Socket::tSptr ) override;
@@ -56,5 +52,6 @@ class ConnectionProcessor : public base::os::SocketServer
       void unregister_client( base::os::Socket::tSptr p_socket, base::dsi::Package& package );
 
    private:
-      std::map< base::service::Signature, ServiceConnection > m_service_map;
+      base::os::SocketServer::tSptr                            mp_socket;
+      std::map< base::service::Signature, ServiceConnection >  m_service_map;
 };
