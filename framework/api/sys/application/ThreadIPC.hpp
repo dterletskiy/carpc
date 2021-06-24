@@ -1,7 +1,6 @@
 #pragma once
 
 #include "api/sys/component/IComponent.hpp"
-#include "api/sys/application/SendReceive.hpp"
 #include "api/sys/application/IThread.hpp"
 
 
@@ -9,6 +8,7 @@
 namespace base::application {
 
    class Context;
+   class SendReceive;
 
 
 
@@ -55,7 +55,7 @@ namespace base::application {
       public:
          bool send( const base::async::IAsync::tSptr, const application::Context& ) override;
       private:
-         SendReceive                                  m_send_receive;
+         SendReceive*                                 mp_send_receive;
    };
 
 
@@ -70,14 +70,6 @@ namespace base::application {
    bool ThreadIPC::started( ) const
    {
       return m_started;
-   }
-
-   inline
-   bool ThreadIPC::wait( )
-   {
-      m_started = m_thread.join( );
-      const bool stopped = m_send_receive.wait( );
-      return !m_started && !stopped;
    }
 
 } // namespace base::application

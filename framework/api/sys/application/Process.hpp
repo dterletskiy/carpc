@@ -79,7 +79,7 @@ namespace base::application {
             struct IPC
             {
                os::os_linux::socket::configuration socket;
-               std::size_t                      buffer_size;
+               std::size_t                         buffer_size;
             };
             IPC ipc_sb;
             IPC ipc_app;

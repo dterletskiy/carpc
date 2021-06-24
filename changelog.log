@@ -1,3 +1,7 @@
+version 3.0.1
+   - Moving SendReceive header to "imp".
+   - Fixing some compilation warnings.
+
 version 3.0.0
    - Redesign IPC protocole.
    - SendReceive class redesigned.

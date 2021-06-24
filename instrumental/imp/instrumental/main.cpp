@@ -26,8 +26,9 @@ bool init( )
 
    call_chain[0] = strdup( "root" );
 
-   char log_file[ sizeof( elf->app.path ) ];
-   snprintf( log_file, sizeof( log_file ), "%s.%d.log", elf->app.path, getpid( ) );
+   pid_t pid = getpid( );
+   char log_file[ sizeof( elf->app.path ) + sizeof( pid_t ) + 4 /* for '.log' below */ ];
+   snprintf( log_file, sizeof( log_file ), "%s.%d.log", elf->app.path, pid );
    if( nullptr == ( log_file_handle  = fopen( log_file, "a" ) ) )
    {
       printf( "open(%s) error: %s\n", log_file, strerror( errno ) );
@@ -90,7 +91,7 @@ extern "C" {
          if( nullptr != p_extra_info )
          {
             printf( "extra_info: %p\n", (link_map*)p_extra_info );
-            printf( "extra_info.l_addr: %p\n", ( (link_map*)p_extra_info )->l_addr );
+            printf( "extra_info.l_addr: %ld\n", ( (link_map*)p_extra_info )->l_addr );
             printf( "extra_info.l_name: %s\n", ( (link_map*)p_extra_info )->l_name );
             printf( "extra_info.l_ld: %p\n", ( (link_map*)p_extra_info )->l_ld );
             printf( "extra_info.l_next: %p\n", ( (link_map*)p_extra_info )->l_next );

@@ -52,7 +52,7 @@ void AsyncQueue::dump( ) const
 {
    SYS_WRN( "------------------------- START DUMP -------------------------" );
    SYS_INF( "%s:", m_name.c_str( ) );
-   for( const auto element : m_collection )
+   for( const auto& element : m_collection )
    {
       SYS_INF( "%s", element->signature( )->name( ).c_str( ) );
    }

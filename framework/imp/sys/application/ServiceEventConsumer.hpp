@@ -13,7 +13,7 @@ namespace base::application {
    class ServiceEventConsumer : public events::service::Action::Consumer
    {
       public:
-         ServiceEventConsumer( SendReceive& );
+         ServiceEventConsumer( SendReceive* const );
          ~ServiceEventConsumer( ) override;
       private:
          ServiceEventConsumer( const ServiceEventConsumer& ) = delete;
@@ -23,7 +23,7 @@ namespace base::application {
          void process_event( const events::service::Action::Event& ) override;
 
       private:
-         SendReceive& m_send_receive;
+         SendReceive* mp_send_receive;
    };
 
 } // namespace base::application

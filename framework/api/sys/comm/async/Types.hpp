@@ -78,7 +78,7 @@ namespace base_v1 {
          { }
          TAsyncTypeID( const TAsyncTypeID< TYPE >& _other )
             : TBaseAsyncTypeID< TYPE >( _other.m_value )
-            , m_name( base::format_string( "0x", std::hex, _other.m_value ) )
+            , m_name( _other.m_name )
          { }
          ~TAsyncTypeID( ) = default;
 

@@ -174,7 +174,7 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    }
    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout IPC thread is started before other application threads
    // Starting application threads
-   for( const auto p_thread : m_thread_list )
+   for( const auto& p_thread : m_thread_list )
       if( false == p_thread->start( ) )
          return false;
    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout all application threads is started before booting system

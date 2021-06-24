@@ -1,6 +1,6 @@
 #include "api/sys/dsi/Types.hpp"
 #include "api/sys/application/Process.hpp"
-#include "api/sys/application/SendReceive.hpp"
+#include "imp/sys/application/SendReceive.hpp"
 #include "imp/sys/application/ServiceEventConsumer.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -13,8 +13,8 @@ using namespace base::application;
 
 
 
-ServiceEventConsumer::ServiceEventConsumer( SendReceive& send_receive )
-   : m_send_receive( send_receive )
+ServiceEventConsumer::ServiceEventConsumer( SendReceive* const p_send_receive )
+   : mp_send_receive( p_send_receive )
 {
    ev_i::Action::Event::set_notification( this, { ev_i::eAction::RegisterServer } );
    ev_i::Action::Event::set_notification( this, { ev_i::eAction::UnregisterServer } );
@@ -64,5 +64,6 @@ void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
 
    const dsi::SocketCongiguration configuration = static_cast< dsi::SocketCongiguration >( Process::instance( )->configuration( ).ipc_app.socket );
    dsi::Packet packet( command, service_passport, configuration );
-   m_send_receive.send( packet, application::Context::invalid );
+   const bool result = mp_send_receive->send( packet, application::Context::invalid );
+   SYS_INF( "result = %d", result );
 }

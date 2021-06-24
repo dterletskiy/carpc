@@ -386,7 +386,7 @@ namespace base {
    ByteStream::pop( TYPE& value )
    {
       using ENUM_TYPE = std::underlying_type_t< TYPE >;
-      ENUM_TYPE _value;
+      ENUM_TYPE _value{ };
       if( false == pop( _value ) )
          return false;
       value = static_cast< TYPE >( _value );
