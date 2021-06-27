@@ -187,14 +187,14 @@ function start_test( )
 {
    local -n LOCAL_SD__PROJECT=${1}
 
-   start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "CONSOLE"
-   start_process LOCAL_SD__PROJECT ${APPLICATION} "CONSOLE"
+   # start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "CONSOLE"
+   start_process LOCAL_SD__PROJECT ${EXPERIMENTAL} "CONSOLE"
 }
 
 function stop_test( )
 {
-   stop_process ${APPLICATION}
-   stop_process ${SERVICEBROCKER}
+   stop_process ${EXPERIMENTAL}
+   # stop_process ${SERVICEBROCKER}
 }
 
 function start_dlt_daemon( )
@@ -227,16 +227,16 @@ function start( )
    echo export LD_LIBRARY_PATH=${LD_PATH}
    export LD_LIBRARY_PATH=${LD_PATH}
 
-   start_delivery LOCAL_START__PROJECT
-   # start_test LOCAL_START__PROJECT
+   # start_delivery LOCAL_START__PROJECT
+   start_test LOCAL_START__PROJECT
 }
 
 function stop( )
 {
    local -n LOCAL_STOP__PROJECT=${1}
 
-   stop_delivery LOCAL_STOP__PROJECT
-   # stop_test LOCAL_STOP__PROJECT
+   # stop_delivery LOCAL_STOP__PROJECT
+   stop_test LOCAL_STOP__PROJECT
 }
 
 

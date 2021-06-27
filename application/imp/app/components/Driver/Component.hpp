@@ -1,7 +1,7 @@
 #pragma once
 
 // Framework
-#include "api/sys/component/Component.hpp"
+#include "api/sys/application/Component.hpp"
 // Application
 #include "imp/app/events/AppEvent.hpp"
 #include "imp/app/clients/OnOff/Client.hpp"
@@ -11,14 +11,14 @@
 namespace application::components::driver {
 
    class Component
-      : public base::component::Component
+      : public base::application::Component
       , public events::AppEvent::Consumer
    {
       public:
-         static base::component::IComponent::tSptr creator( base::application::IThread& service );
+         static base::application::IComponent::tSptr creator( );
 
       private:
-         Component( base::application::IThread& service, const std::string& );
+         Component( const std::string& );
       public:
          ~Component( ) override;
 

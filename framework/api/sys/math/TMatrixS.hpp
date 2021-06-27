@@ -4,9 +4,6 @@
 #include "api/sys/helpers/functions/print.hpp"
 #include "api/sys/math/Common.hpp"
 
-#include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "MATH"
-
 
 
 #if __cplusplus > 201703L // C++2a
@@ -113,11 +110,11 @@ namespace base::math {
 
          void print( ) const
          {
-            MSG_DBG( "------------------------------ TMatrixS dump begin ------------------------------" );
-            MSG_DBG( "name: %s / dimention: %zu", m_name.c_str( ), ROWS * COLUMNS )
+            print( "------------------------------ TMatrixS dump begin ------------------------------\n" );
+            print( "name: %s / dimention: %zu\n", m_name.c_str( ), ROWS * COLUMNS )
             for( tRow row{ 0 }; row < ROWS; ++row )
                base::print( m_elements[ row.value( ) ], COLUMNS, true );
-            MSG_DBG( "------------------------------- TMatrixS dump end -------------------------------" );
+            print( "------------------------------- TMatrixS dump end -------------------------------\n" );
          }
 
       private:
@@ -267,11 +264,11 @@ namespace base::math {
 
          void print( ) const
          {
-            MSG_DBG( "------------------------------ TMatrixS dump begin ------------------------------" );
-            MSG_DBG( "name: %s / dimention: %zu", m_name.c_str( ), ROWS * COLUMNS );
+            print( "------------------------------ TMatrixS dump begin ------------------------------\n" );
+            print( "name: %s / dimention: %zu\n", m_name.c_str( ), ROWS * COLUMNS );
             for( tRow row{ 0 }; row < ROWS; ++row )
                base::print( m_elements[ row.value( ) ], COLUMNS, true );
-            MSG_DBG( "------------------------------- TMatrixS dump end -------------------------------" );
+            print( "------------------------------- TMatrixS dump end -------------------------------\n" );
          }
 
       private:

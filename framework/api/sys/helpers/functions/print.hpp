@@ -1,6 +1,13 @@
 #pragma once
 
-#include "api/sys/common/Includes.hpp"
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <list>
+#include <set>
+#include <map>
+#include <unistd.h>
 
 
 
@@ -36,7 +43,7 @@ namespace base {
     * Print std containers and types
     * 
     ***************************************************************************************************/
-   void print( const void* p_buffer, const size_t size, const bool is_new_line = false );
+   void print( const void* p_buffer, const std::size_t size, const bool is_new_line = false );
 
    void print( const std::string& string, const bool is_new_line = false );
 
@@ -58,10 +65,10 @@ namespace base {
 
 
    template< typename TYPE >
-   void print( const TYPE* array, const size_t size, const bool is_new_line = false )
+   void print( const TYPE* array, const std::size_t size, const bool is_new_line = false )
    {
       printf( "{ " );
-      for ( size_t index = 0; index < size; ++index )
+      for ( std::size_t index = 0; index < size; ++index )
       {
          print( array[ index ] );
          printf( " " );

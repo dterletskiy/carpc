@@ -1,5 +1,4 @@
-#include "api/sys/oswrappers/Mutex.hpp"
-#include "api/sys/component/RootComponent.hpp"
+#include "api/sys/application/RootComponent.hpp"
 #include "api/sys/events/Events.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -7,22 +6,19 @@
 
 
 
-using namespace base::component;
+using namespace base::application;
 
 
 
-RootComponent::RootComponent( application::IThread& app_thread, const std::string& name )
-   : Component( app_thread, name )
+RootComponent::RootComponent( const std::string& name )
+   : IComponent( name )
 {
-   SYS_INF( "%p", this );
+   MSG_DBG( "Created: %s", m_name.c_str( ) );
 }
 
 RootComponent::~RootComponent( )
 {
-}
-
-void RootComponent::boot( const std::string& message )
-{
+   MSG_DBG( "Destroyed: %s", m_name.c_str( ) );
 }
 
 void RootComponent::shutdown( const std::string& message )

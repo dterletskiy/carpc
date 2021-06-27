@@ -3,14 +3,12 @@
 #ifdef USE_OPENMP
    #include <omp.h>
 #endif
+#include <functional>
 #include <stdexcept>
 
 #include "api/sys/helpers/functions/format.hpp"
 #include "api/sys/helpers/functions/print.hpp"
 #include "api/sys/math/Common.hpp"
-
-#include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "MATH"
 
 
 
@@ -369,10 +367,10 @@ namespace base::math {
    {
       if( false == message.empty( ) )
       {
-         MSG_DBG( "%s", message.c_str( ) );
+         print( "%s\n", message.c_str( ) );
       }
 
-      MSG_DBG( "dimention: %zu x %zu", m_rows.value( ), m_columns.value( ) );
+      print( "dimention: %zu x %zu\n", m_rows.value( ), m_columns.value( ) );
       for( tRow row{ 0 }; row < m_rows; ++row )
          base::print( m_elements[ row.value( ) ], m_columns, true );
    }

@@ -1,7 +1,7 @@
 #pragma once
 
 // Framework
-#include "api/sys/component/RootComponent.hpp"
+#include "api/sys/application/RootComponent.hpp"
 #include "api/sys/comm/timer/Timer.hpp"
 // Application
 #include "imp/core/components/onoff/server/Server.hpp"
@@ -28,15 +28,15 @@ namespace core::event {
 namespace core::components::onoff {
 
    class Component
-      : public base::component::RootComponent
+      : public base::application::RootComponent
       , public base::ITimerConsumer
       , public core::event::App::Consumer
    {
       public:
-         static base::component::IComponent::tSptr creator( base::application::IThread& service );
+         static base::application::IComponent::tSptr creator( );
 
       private:
-         Component( base::application::IThread& service, const std::string& );
+         Component( const std::string& );
       public:
          ~Component( ) override;
 

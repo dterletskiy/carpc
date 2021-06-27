@@ -1,10 +1,14 @@
 #pragma once
 
+#include <cstdlib>
+#include <cstdint>
+#include <optional>
+
 
 
 namespace {
 
-   enum class eIndexType : uint8_t { ROW, COLUMN };
+   enum class eIndexType : std::uint8_t { ROW, COLUMN };
 
    #if __cplusplus > 201703L // C++2a
 
@@ -117,6 +121,6 @@ namespace base::math {
    using tColumnOpt = std::optional< TIndex< eIndexType::COLUMN > >;
    using tCoordOpt = std::pair< tRowOpt, tColumnOpt >;
 
-   enum class eCloneType : uint8_t { All, Diag, SideDiag, BothDiag };
+   enum class eCloneType : std::uint8_t { All, Diag, SideDiag, BothDiag };
 
 }

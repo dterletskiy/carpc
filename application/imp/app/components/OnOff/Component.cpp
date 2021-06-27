@@ -13,13 +13,13 @@ using namespace application::components::onoff;
 
 
 
-base::component::IComponent::tSptr Component::creator( base::application::IThread& service )
+base::application::IComponent::tSptr Component::creator( )
 {
-   return std::shared_ptr< Component >( new Component( service, "OnOff" ) );
+   return std::shared_ptr< Component >( new Component( "OnOff" ) );
 }
 
-Component::Component( base::application::IThread& _service, const std::string& _name )
-   : base::component::RootComponent( _service, _name )
+Component::Component( const std::string& _name )
+   : base::application::RootComponent( _name )
    , m_server_onoff( "OnOffService", "OnOffService-Server" )
    , m_timer( this, _name )
    , m_fsm( )

@@ -37,7 +37,7 @@ void Thread::thread_loop( )
 
    // Creating components
    for( auto creator : m_component_creators )
-      m_components.emplace_back( creator( *this ) );
+      m_components.emplace_back( creator( ) );
 
    while( started( ) )
    {

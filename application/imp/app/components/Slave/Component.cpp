@@ -10,13 +10,13 @@ using namespace application::components::slave;
 
 
 
-base::component::IComponent::tSptr Component::creator( base::application::IThread& service )
+base::application::IComponent::tSptr Component::creator( )
 {
-   return std::shared_ptr< Component >( new Component( service, "Slave" ) );
+   return std::shared_ptr< Component >( new Component( "Slave" ) );
 }
 
-Component::Component( base::application::IThread& _service, const std::string& _name )
-   : base::component::Component( _service, _name )
+Component::Component( const std::string& _name )
+   : base::application::Component( _name )
 {
    MSG_DBG( "Created: %s", name( ).c_str( ) );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::BOOT );

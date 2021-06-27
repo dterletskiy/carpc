@@ -1,6 +1,5 @@
 #pragma once
 
-#include "api/sys/component/IComponent.hpp"
 #include "api/sys/application/IThread.hpp"
 
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/sys/component/IComponent.hpp"
+#include "api/sys/application/IComponent.hpp"
 #include "api/sys/application/IThread.hpp"
 
 
@@ -14,8 +14,7 @@ namespace base::application {
          {
             using tVector = std::vector< Configuration >;
             std::string                m_name;
-            component::IComponent::tCreatorVector
-                                       m_component_creators;
+            IComponent::tCreatorVector m_component_creators;
             size_t                     m_wd_timeout;
          };
 
@@ -56,8 +55,8 @@ namespace base::application {
          tConsumerMap                                 m_consumers_map;
 
       private:
-         component::IComponent::tSptrList             m_components;
-         component::IComponent::tCreatorVector        m_component_creators;
+         IComponent::tSptrList                        m_components;
+         IComponent::tCreatorVector                   m_component_creators;
 
       private:
          void dump( ) const override;
