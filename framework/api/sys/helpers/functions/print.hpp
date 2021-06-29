@@ -27,6 +27,11 @@ namespace base {
       ::write( STDOUT_FILENO, p_buffer, size );
    }
 
+   /****************************************************************************************************
+    * 
+    * Print formated message to file without dynamic memory allocation (instead of "printf")
+    * 
+    ***************************************************************************************************/
    template< typename... Args >
    void write( int fd, const char* const format, Args&&... args )
    {
@@ -40,12 +45,10 @@ namespace base {
 
    /****************************************************************************************************
     * 
-    * Print std containers and types
+    * Print byte buffer
     * 
     ***************************************************************************************************/
    void print( const void* p_buffer, const std::size_t size, const bool is_new_line = false );
-
-   void print( const std::string& string, const bool is_new_line = false );
 
    template< typename TYPE >
    void print( const TYPE& value, const bool is_new_line = false )
@@ -64,6 +67,14 @@ namespace base {
    // }
 
 
+
+   /****************************************************************************************************
+    *
+    * This function prints array declared on the stack or heap:
+    *    std::size_t array[ ] = { 4, 5, 55, 4, 457, 45, 68, 1, 87, 41 };
+    *    base::print( array, 10, true );
+    *
+    ***************************************************************************************************/
    template< typename TYPE >
    void print( const TYPE* array, const std::size_t size, const bool is_new_line = false )
    {
@@ -78,6 +89,38 @@ namespace base {
       if( is_new_line ) printf( "\n" );
    }
 
+
+
+   /****************************************************************************************************
+    *
+    * This function prints array declared on the stack:
+    *    std::size_t array[ ] = { 4, 5, 55, 4, 457, 45, 68, 1, 87, 41 };
+    *    base::print( *array, true );
+    *
+    ***************************************************************************************************/
+   template < typename T, std::size_t N >
+   void print( T (&array)[N], const bool is_new_line = false )
+   {
+      printf( "{ " );
+      for ( std::size_t index = 0; index < N; ++index )
+      {
+         base::print( array[ index ] );
+         printf( " " );
+      }
+      printf( "}" );
+
+      if( is_new_line ) printf( "\n" );
+   }
+
+
+
+   /****************************************************************************************************
+    * 
+    * Print std containers and types
+    * 
+    ***************************************************************************************************/
+
+   void print( const std::string& string, const bool is_new_line = false );
 
    template< typename TYPE >
    void print( const std::list< TYPE >& list, const bool is_new_line = false )
