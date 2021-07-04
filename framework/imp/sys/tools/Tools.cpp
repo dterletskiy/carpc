@@ -1,3 +1,6 @@
+#include <fstream>
+#include <algorithm>
+
 #include "api/sys/tools/Tools.hpp"
 
 #include "api/sys/trace/Trace.hpp"

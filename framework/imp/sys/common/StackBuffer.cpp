@@ -1,4 +1,5 @@
-#include "api/sys/helpers/macros/strings.hpp"
+#include <cstring>
+
 #include "api/sys/helpers/functions/pointer.hpp"
 #include "api/sys/common/StackBuffer.hpp"
 
@@ -11,7 +12,7 @@ using namespace base;
 
 
 
-StackBuffer::StackBuffer( const size_t capacity, const bool is_reallocate_allowed )
+StackBuffer::StackBuffer( const std::size_t capacity, const bool is_reallocate_allowed )
    : m_is_reallocate_allowed( is_reallocate_allowed )
 {
    if( true == allocate( capacity ) )
@@ -26,7 +27,7 @@ StackBuffer::~StackBuffer( )
 
 void StackBuffer::dump( ) const
 {
-   for( size_t i = 0; i < m_size; ++i )
+   for( std::size_t i = 0; i < m_size; ++i )
       printf( "%#x ", static_cast< uint8_t* >( mp_buffer )[i] );
    printf( "\n" );
 }
@@ -38,10 +39,10 @@ void StackBuffer::info( ) const
 
 void StackBuffer::fill( const char symbol )
 {
-   memset( mp_buffer, symbol, m_capacity );
+   std::memset( mp_buffer, symbol, m_capacity );
 }
 
-bool StackBuffer::allocate( const size_t capacity )
+bool StackBuffer::allocate( const std::size_t capacity )
 {
    if( 0 == capacity )
       return false;
@@ -57,7 +58,7 @@ bool StackBuffer::allocate( const size_t capacity )
    return true;
 }
 
-bool StackBuffer::reallocate( const size_t capacity, const bool is_store )
+bool StackBuffer::reallocate( const std::size_t capacity, const bool is_store )
 {
    if( 0 == capacity )
       return false;
@@ -74,8 +75,8 @@ bool StackBuffer::reallocate( const size_t capacity, const bool is_store )
    // Copying current data to new buffer => size will be the same
    if( true == is_store )
    {
-      size_t size = std::min( capacity, m_size );
-      memcpy( p_buffer, mp_buffer, size );
+      std::size_t size = std::min( capacity, m_size );
+      std::memcpy( p_buffer, mp_buffer, size );
       m_size = size;
    }
    // Storing data was not requested => size should be 0
@@ -88,7 +89,7 @@ bool StackBuffer::reallocate( const size_t capacity, const bool is_store )
    return true;
 }
 
-bool StackBuffer::push_back( const void* const p_buffer, const size_t size, const std::optional< bool > is_reallocate )
+bool StackBuffer::push_back( const void* const p_buffer, const std::size_t size, const std::optional< bool > is_reallocate )
 {
    if( 0 == size )
       return false;
@@ -108,13 +109,13 @@ bool StackBuffer::push_back( const void* const p_buffer, const size_t size, cons
       else return false;
    }
 
-   memcpy( inc( mp_buffer, m_size ), p_buffer, size );
+   std::memcpy( inc( mp_buffer, m_size ), p_buffer, size );
 
    return true;
 }
 
 
-void StackBuffer::pop_back( const size_t size )
+void StackBuffer::pop_back( const std::size_t size )
 {
    if( size >= m_size )
       return reset( );
@@ -122,7 +123,7 @@ void StackBuffer::pop_back( const size_t size )
    m_size -= size;
 }
 
-bool StackBuffer::back( void* const p_buffer, const size_t size )
+bool StackBuffer::back( void* const p_buffer, const std::size_t size )
 {
    if( size > m_size )
       return false;
@@ -133,12 +134,12 @@ bool StackBuffer::back( void* const p_buffer, const size_t size )
    if( nullptr == mp_buffer )
       return false;
 
-   memcpy( p_buffer, inc( mp_buffer, m_size - size ), size );
+   std::memcpy( p_buffer, inc( mp_buffer, m_size - size ), size );
 
    return true;
 }
 
-bool StackBuffer::front( void* const p_buffer, const size_t size, const size_t offset )
+bool StackBuffer::front( void* const p_buffer, const std::size_t size, const std::size_t offset )
 {
    if( size + offset > m_size )
       return false;
@@ -149,7 +150,7 @@ bool StackBuffer::front( void* const p_buffer, const size_t size, const size_t o
    if( nullptr == mp_buffer )
       return false;
 
-   memcpy( p_buffer, inc( mp_buffer, offset ), size );
+   std::memcpy( p_buffer, inc( mp_buffer, offset ), size );
 
    return true;
 }

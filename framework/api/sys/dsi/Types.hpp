@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdlib>
+#include <memory>
+
 #include "api/sys/oswrappers/linux/socket.hpp"
 #include "api/sys/common/IPC.hpp"
 

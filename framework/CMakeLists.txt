@@ -67,7 +67,6 @@ add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
 target_link_libraries( ${TARGET_NAME} pthread )
-target_link_libraries( ${TARGET_NAME} curl )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )
 install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION . )

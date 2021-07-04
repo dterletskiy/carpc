@@ -11,7 +11,7 @@ using namespace base;
 
 
 
-RawBuffer RawBuffer::create( const size_t size )
+RawBuffer RawBuffer::create( const std::size_t size )
 {
    RawBuffer buffer;
    buffer.alloc( size );
@@ -23,7 +23,7 @@ void RawBuffer::destroy( RawBuffer& buffer )
    buffer.free( );
 }
 
-bool RawBuffer::alloc( size_t _size )
+bool RawBuffer::alloc( std::size_t _size )
 {
    if( nullptr != ptr )
    {
@@ -63,10 +63,10 @@ void RawBuffer::free( )
    ptr = nullptr;
 }
 
-void RawBuffer::fill( const uint8_t symbol, const ssize_t delta ) const
+void RawBuffer::fill( const std::uint8_t symbol, const ssize_t delta ) const
 {
-   uint8_t* p = static_cast< uint8_t* >( ptr );
-   for( size_t i = 0; i < size; ++i )
+   std::uint8_t* p = static_cast< std::uint8_t* >( ptr );
+   for( std::size_t i = 0; i < size; ++i )
       p[ i ] = symbol + delta * i;
 }
 

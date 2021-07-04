@@ -10,6 +10,8 @@
    #define SERVICE_NAMESPACE secure
 #endif
 
+#include <memory>
+
 #include "api/sys/comm/service/Types.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 #include "api/sys/helpers/macros/strings.hpp"

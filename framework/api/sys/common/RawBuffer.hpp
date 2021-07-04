@@ -1,6 +1,7 @@
-#include "api/sys/common/Includes.hpp"
-
 #pragma once
+
+#include <cstdlib>
+#include <cstdint>
 
 
 
@@ -8,16 +9,16 @@ namespace base {
 
    struct RawBuffer
    {
-      static RawBuffer create( const size_t size );
+      static RawBuffer create( const std::size_t size );
       static void destroy( RawBuffer& buffer );
 
-      bool alloc( size_t size = 0 );
+      bool alloc( std::size_t size = 0 );
       void free( );
-      void fill( const uint8_t symbol, const ssize_t delta = 0 ) const;
+      void fill( const std::uint8_t symbol, const ssize_t delta = 0 ) const;
       void dump( ) const;
 
       void* ptr = nullptr;
-      size_t size = 0;
+      std::size_t size = 0;
    };
 
 

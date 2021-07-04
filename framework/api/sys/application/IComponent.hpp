@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "api/sys/application/Types.hpp"
 
 

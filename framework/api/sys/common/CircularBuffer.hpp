@@ -1,6 +1,8 @@
 #pragma once
 
-#include "api/sys/common/Includes.hpp"
+#include <cstring>
+#include <optional>
+
 #include "api/sys/common/RawBuffer.hpp"
 #include "api/sys/helpers/functions/pointer.hpp"
 
@@ -19,7 +21,7 @@ namespace base {
 
    public:
       CircularBuffer(
-                        const size_t capacity = 1024,
+                        const std::size_t capacity = 1024,
                         const bool is_overlap_allowed = true,
                         const bool is_reallocate_allowed = false,
                         const bool auto_free = true
@@ -56,7 +58,7 @@ namespace base {
        *    capacity - new buffer capacity. If capacity < m_size some data will be lost.
        *
        *****************************************************************************/
-      bool reallocate( size_t capacity = 0 );
+      bool reallocate( std::size_t capacity = 0 );
 
       /******************************************************************************
        *
@@ -80,7 +82,7 @@ namespace base {
        *    ePush::Error - operation error.
        *
        *****************************************************************************/
-      ePush push_back( const void* const buffer, const size_t size, const std::optional< bool > is_reallocate = std::nullopt );
+      ePush push_back( const void* const buffer, const std::size_t size, const std::optional< bool > is_reallocate = std::nullopt );
       ePush push_back( const RawBuffer& buffer, const std::optional< bool > is_reallocate = std::nullopt );
       ePush push_back( const CircularBuffer& buffer, const std::optional< bool > is_reallocate = std::nullopt );
 
@@ -91,7 +93,7 @@ namespace base {
        *    size - size of data to be removed. If this parameter more then current data size => all data will be removed.
        *
        *****************************************************************************/
-      void pop_front( const size_t size );
+      void pop_front( const std::size_t size );
 
       /******************************************************************************
        *
@@ -100,7 +102,7 @@ namespace base {
        *    size - size of data to be removed. If this parameter more then current data size => all data will be removed.
        *
        *****************************************************************************/
-      void pop_back( const size_t size );
+      void pop_back( const std::size_t size );
 
       /******************************************************************************
        *
@@ -110,7 +112,7 @@ namespace base {
        *    size - size of data to be read.
        *
        *****************************************************************************/
-      bool get( void* const buffer, const size_t size, const size_t offset = 0 ) const;
+      bool get( void* const buffer, const std::size_t size, const std::size_t offset = 0 ) const;
 
       /******************************************************************************
        *
@@ -120,7 +122,7 @@ namespace base {
        *    size - size of data to be read.
        *
        *****************************************************************************/
-      bool front( void* const buffer, const size_t size ) const;
+      bool front( void* const buffer, const std::size_t size ) const;
       bool front( RawBuffer& buffer ) const;
       bool front( CircularBuffer& buffer ) const;
 
@@ -132,7 +134,7 @@ namespace base {
        *    pop_front( size );
        *
        *****************************************************************************/
-      bool move_front( void* const buffer, const size_t size );
+      bool move_front( void* const buffer, const std::size_t size );
       bool move_front( RawBuffer& buffer );
       bool move_front( CircularBuffer& buffer );
 
@@ -145,8 +147,8 @@ namespace base {
        *    - offset - offset from data beginning in current circular buffer to compare.
        *
        *****************************************************************************/
-      bool cmp( void* const buffer, const size_t size, const size_t offset = 0 ) const;
-      bool cmp( const RawBuffer& buffer, const size_t offset = 0 ) const;
+      bool cmp( void* const buffer, const std::size_t size, const std::size_t offset = 0 ) const;
+      bool cmp( const RawBuffer& buffer, const std::size_t offset = 0 ) const;
 
       /******************************************************************************
        *
@@ -157,8 +159,8 @@ namespace base {
        *    - offset - offset from data beginning in current circular buffer to find.
        *
        *****************************************************************************/
-      ssize_t find( void* const buffer, const size_t size, const size_t offset = 0 ) const;
-      ssize_t find( const RawBuffer& buffer, const size_t offset = 0 ) const;
+      ssize_t find( void* const buffer, const std::size_t size, const std::size_t offset = 0 ) const;
+      ssize_t find( const RawBuffer& buffer, const std::size_t offset = 0 ) const;
 
       /******************************************************************************
        *
@@ -184,13 +186,13 @@ namespace base {
        *    size - size of buffer will be set as a result if result is true, otherwise - 0.
        *
        *****************************************************************************/
-      bool is_linear( const void*& pointer, size_t& size ) const;
+      bool is_linear( const void*& pointer, std::size_t& size ) const;
       bool is_linear( ) const;
 
    public:
-      size_t size( ) const;
-      size_t capacity( ) const;
-      size_t free_space( ) const;
+      std::size_t size( ) const;
+      std::size_t capacity( ) const;
+      std::size_t free_space( ) const;
       const void* const ptr( ) const;
       const RawBuffer buffer( ) const;
 
@@ -199,15 +201,15 @@ namespace base {
       void dump_logic( ) const;
 
    private:
-      void*       mp_head = nullptr;
-      void*       mp_tail = nullptr;
-      void*       mp_begin = nullptr;
-      void*       mp_end = nullptr;
-      size_t      m_capacity = 0;
-      size_t      m_size = 0;
-      const bool  m_is_overlap_allowed = true;
-      const bool  m_is_reallocate_allowed = false;
-      bool        m_auto_free = true;
+      void*          mp_head = nullptr;
+      void*          mp_tail = nullptr;
+      void*          mp_begin = nullptr;
+      void*          mp_end = nullptr;
+      std::size_t    m_capacity = 0;
+      std::size_t    m_size = 0;
+      const bool     m_is_overlap_allowed = true;
+      const bool     m_is_reallocate_allowed = false;
+      bool           m_auto_free = true;
 
    public:
       bool state_save( );
@@ -227,7 +229,7 @@ namespace base {
 
          void*       mp_begin = nullptr;
          void*       mp_end = nullptr;
-         size_t      m_size = 0;
+         std::size_t      m_size = 0;
       };
       std::optional< state > m_state = std::nullopt;
       bool m_is_state_locked = false;
@@ -257,23 +259,23 @@ namespace base {
    inline
    void CircularBuffer::fill( const char symbol ) const
    {
-      memset( mp_head, symbol, m_capacity );
+      std::memset( mp_head, symbol, m_capacity );
    }
 
    inline
-   size_t CircularBuffer::size( ) const
+   std::size_t CircularBuffer::size( ) const
    {
       return m_size;
    }
 
    inline
-   size_t CircularBuffer::capacity( ) const
+   std::size_t CircularBuffer::capacity( ) const
    {
       return m_capacity;
    }
 
    inline
-   size_t CircularBuffer::free_space( ) const
+   std::size_t CircularBuffer::free_space( ) const
    {
       return m_capacity - m_size;
    }
@@ -293,11 +295,11 @@ namespace base {
    inline
    bool CircularBuffer::is_linear( ) const
    {
-      return m_size <= static_cast< size_t >( diff( mp_tail, mp_begin ) );
+      return m_size <= static_cast< std::size_t >( diff( mp_tail, mp_begin ) );
    }
 
    inline
-   bool CircularBuffer::is_linear( const void*& pointer, size_t& size ) const
+   bool CircularBuffer::is_linear( const void*& pointer, std::size_t& size ) const
    {
       if( false == is_linear( ) )
       {

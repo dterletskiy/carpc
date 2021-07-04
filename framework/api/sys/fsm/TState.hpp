@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <memory>
+#include <optional>
 #include "api/sys/fsm/Types.hpp"
 
 #include "api/sys/trace/Trace.hpp"

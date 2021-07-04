@@ -4,6 +4,9 @@
 # ENVIRONMENT_SETUP=/mnt/p4v/Audi_HCP3/NavCtrl/DevDef/packages/sdk/hcp3sim/installed/environment-setup-core2-64-hcp3-linux-musl
 # ENVIRONMENT_SETUP=./.configuration/android-env.sh
 
+# Dump all available features on a particular platform
+# gcc -march=native -dM -E - </dev/null
+
 
 
 declare -A COMMAND=(

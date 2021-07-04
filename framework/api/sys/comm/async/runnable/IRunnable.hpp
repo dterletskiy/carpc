@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "api/sys/application/Context.hpp"
 #include "api/sys/comm/async/Types.hpp"
 #include "api/sys/comm/async/IAsync.hpp"

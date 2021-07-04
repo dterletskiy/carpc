@@ -1,6 +1,15 @@
 #pragma once
 
+#include <cstdint>
+#include <string>
+#include <set>
+#include <map>
+#include <memory>
+#include <optional>
+#include <functional>
+
 #include "api/sys/application/Context.hpp"
+#include "api/sys/comm/async/event/Event.hpp"
 #include "api/sys/fsm/Types.hpp"
 #include "api/sys/fsm/TState.hpp"
 

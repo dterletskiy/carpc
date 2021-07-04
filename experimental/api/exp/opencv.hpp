@@ -8,9 +8,9 @@
 
 namespace experimental::opencv {
 
-   void draw_contours( const cv::Mat& source, const cv::Mat& destination );
+   void draw_contours( const ::cv::Mat& source, const ::cv::Mat& destination );
 
-   void process_image( const cv::Mat& image );
+   void process_image( const ::cv::Mat& image );
 
    void process_image( const std::string& path );
 

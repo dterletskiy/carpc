@@ -90,6 +90,7 @@ endif( )
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
+message( NOTICE "-----------------------------------------------------------------------" )
 message( NOTICE "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
 message( NOTICE "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
 message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
@@ -97,6 +98,7 @@ message( NOTICE "CMAKE_GENERATOR = " ${CMAKE_GENERATOR} )
 message( NOTICE "RPC_SOURCE_DIR = " ${RPC_SOURCE_DIR} )
 message( NOTICE "RPC_BINARY_DIR = " ${RPC_BINARY_DIR} )
 message( NOTICE "CMAKE_INSTALL_PREFIX = " ${CMAKE_INSTALL_PREFIX} )
+message( NOTICE "-----------------------------------------------------------------------" )
 
 
 
@@ -109,6 +111,6 @@ add_subdirectory( application )
 add_subdirectory( controller )
 add_subdirectory( core )
 add_subdirectory( hmi )
-# add_subdirectory( experimental )
+add_subdirectory( experimental )
 
 install( FILES ${PROJECT_SOURCE_DIR}/.configuration/dlt.conf DESTINATION etc )

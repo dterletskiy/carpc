@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include "api/sys/common/ID.hpp"
 #include "api/sys/oswrappers/Thread.hpp"
 #include "api/sys/comm/async/IAsync.hpp"

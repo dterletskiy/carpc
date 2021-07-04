@@ -1,6 +1,5 @@
 #pragma once
 
-#include "api/sys/command/Types.hpp"
 #include "api/sys/command/ICommand.hpp"
 
 #include "api/sys/trace/Trace.hpp"

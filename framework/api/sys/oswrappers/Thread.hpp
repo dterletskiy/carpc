@@ -1,7 +1,9 @@
 #pragma once
 
+#include <memory>
+#include <functional>
+
 #include "api/sys/oswrappers/linux/thread.hpp"
-#include "api/sys/common/Includes.hpp"
 #include "api/sys/common/ID.hpp"
 
 
