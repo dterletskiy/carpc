@@ -1,3 +1,6 @@
+version 3.1.1
+   - Return back previously removed main.cpp file from experimental project.
+
 version 3.1.0
    - Common serialization / deserialization wrappers implemented and used in the code instead of stream.push(...) / stream.pop(...).
      This will allow to used any other serializer / deserializer in the future just introducing new wrappers.
