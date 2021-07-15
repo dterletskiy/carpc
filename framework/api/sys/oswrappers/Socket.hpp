@@ -8,6 +8,7 @@
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
 #include "api/sys/common/ID.hpp"
+#include "api/sys/common/RawBuffer.hpp"
 
 
 
@@ -78,6 +79,7 @@ namespace base::os {
 
       public:
          const void* const buffer( size_t& ) const;
+         RawBuffer buffer( ) const;
       protected:
          void fill_buffer( const char symbol = 0 );
       protected:

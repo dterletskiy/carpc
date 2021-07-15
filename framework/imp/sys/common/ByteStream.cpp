@@ -9,19 +9,34 @@ using namespace base;
 
 
 
-ByteStream::ByteStream( const size_t capacity, const bool is_reallocate_allowed )
+ByteStream::ByteStream( const std::size_t capacity, const bool is_reallocate_allowed )
    : m_buffer( capacity, false, is_reallocate_allowed )
 {
+   SYS_INF( );
 }
 
-ByteStream::ByteStream( const ByteStream& stream )
-   : m_buffer( stream.m_buffer )
+ByteStream::ByteStream( const void* const buffer, const std::size_t size, const std::size_t capacity, const bool is_reallocate_allowed )
+   : m_buffer( ( capacity > size ? capacity : size ), false, is_reallocate_allowed )
 {
+   SYS_INF( );
+   push( buffer, size );
+}
 
+ByteStream::ByteStream( const ByteStream& other )
+   : m_buffer( other.m_buffer )
+{
+   SYS_INF( );
+}
+
+ByteStream::ByteStream( ByteStream&& other )
+   : m_buffer( std::move( other.m_buffer ) )
+{
+   SYS_INF( );
 }
 
 ByteStream::~ByteStream( )
 {
+   SYS_INF( );
 }
 
 
@@ -30,16 +45,14 @@ ByteStream::~ByteStream( )
  * Push methods
  *
  ****************************************/
-bool ByteStream::push( const void* const buffer, const size_t size )
+bool ByteStream::push( const void* const buffer, const std::size_t size )
 {
-   // SYS_VRB( "--------------- PUSH BEGIN ---------------" );
-   // SYS_VRB( "buffer: %p / size: %zu", buffer, size );
-   // for( size_t i = 0; i < size; ++i )
-   //    printf( "%#x ", static_cast< const uint8_t* const >( buffer )[i] );
-   // printf( "\n" );
-   // SYS_VRB( "---------------- PUSH END ----------------" );
-
    return CircularBuffer::ePush::Error != m_buffer.push_back( buffer, size );
+}
+
+bool ByteStream::push( void* const buffer, const std::size_t size )
+{
+   return push( const_cast< const void* const >( buffer ), size );
 }
 
 bool ByteStream::push( const CircularBuffer& buffer )
@@ -48,21 +61,6 @@ bool ByteStream::push( const CircularBuffer& buffer )
       return false;
 
    return CircularBuffer::ePush::Error != m_buffer.push_back( buffer );
-}
-
-bool ByteStream::push( void* const buffer, const size_t size )
-{
-   return push( const_cast< const void* const >( buffer ), size );
-}
-
-bool ByteStream::push( const void* const pointer )
-{
-   return push( (const void* const)&pointer, sizeof( void* ) );
-}
-
-bool ByteStream::push( void* const pointer )
-{
-   return push( (void* const)&pointer, sizeof( void* ) );
 }
 
 bool ByteStream::push( const RawBuffer& buffer )
@@ -78,6 +76,16 @@ bool ByteStream::push( const ByteStream& stream )
    return push( stream.m_buffer );
 }
 
+bool ByteStream::push( const void* const pointer )
+{
+   return push( (const void* const)&pointer, sizeof( void* ) );
+}
+
+bool ByteStream::push( void* const pointer )
+{
+   return push( (void* const)&pointer, sizeof( void* ) );
+}
+
 bool ByteStream::push( const bool value )
 {
    return push( static_cast< tBool >( value ? 1 : 0 ) );
@@ -86,7 +94,7 @@ bool ByteStream::push( const bool value )
 bool ByteStream::push( const std::string& string )
 {
    const void* p_buffer = static_cast< const void* >( string.c_str( ) );
-   const size_t size = string.size( );
+   const std::size_t size = string.size( );
 
    if( false == push( size ) )
       return false;
@@ -101,12 +109,8 @@ bool ByteStream::push( const std::string& string )
  * Pop methods
  *
  ****************************************/
-bool ByteStream::pop( void* const buffer, const size_t size )
+bool ByteStream::pop( void* const buffer, const std::size_t size )
 {
-   // SYS_VRB( "--------------- PUSH BEGIN ---------------" );
-   // SYS_VRB( "buffer: %p / size: %zu", buffer, size );
-   // SYS_VRB( "---------------- PUSH END ----------------" );
-
    if( false == m_buffer.front( buffer, size ) )
       return false;
 
@@ -114,6 +118,11 @@ bool ByteStream::pop( void* const buffer, const size_t size )
    return true;
 
    // return m_buffer.move_front( buffer, size );
+}
+
+bool ByteStream::pop( const void* buffer, const std::size_t size )
+{
+   return pop( const_cast< void* const >( buffer ), size );
 }
 
 bool ByteStream::pop( CircularBuffer& buffer )
@@ -126,21 +135,6 @@ bool ByteStream::pop( CircularBuffer& buffer )
    rb.free( );
 
    return result;
-}
-
-bool ByteStream::pop( const void* buffer, const size_t size )
-{
-   return pop( const_cast< void* const >( buffer ), size );
-}
-
-bool ByteStream::pop( const void*& pointer )
-{
-   return pop( &pointer, sizeof( void* ) );
-}
-
-bool ByteStream::pop( void*& pointer )
-{
-   return pop( &pointer, sizeof( void* ) );
 }
 
 bool ByteStream::pop( RawBuffer& buffer )
@@ -160,6 +154,16 @@ bool ByteStream::pop( ByteStream& stream )
    return pop( stream.m_buffer );
 }
 
+bool ByteStream::pop( const void*& pointer )
+{
+   return pop( &pointer, sizeof( void* ) );
+}
+
+bool ByteStream::pop( void*& pointer )
+{
+   return pop( &pointer, sizeof( void* ) );
+}
+
 bool ByteStream::pop( bool& value )
 {
    tBool bool_value = false;
@@ -172,7 +176,7 @@ bool ByteStream::pop( bool& value )
 
 bool ByteStream::pop( std::string& string )
 {
-   size_t size = 0;
+   std::size_t size = 0;
    if( false == pop( size ) )
       return false;
 

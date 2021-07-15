@@ -28,12 +28,12 @@ Address::Address( const Address& other )
 
 bool Address::to_stream( base::ipc::tStream& stream ) const
 {
-   return stream.push( m_context, m_id );
+   return ipc::serialize( stream, m_context, m_id );
 }
 
 bool Address::from_stream( base::ipc::tStream& stream )
 {
-   return stream.pop( m_context, m_id );
+   return ipc::deserialize( stream, m_context, m_id );
 }
 
 Address& Address::operator=( const Address& other )

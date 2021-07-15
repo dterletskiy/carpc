@@ -63,12 +63,12 @@ namespace base::events::service {
 
    const bool SignatureStatus::to_stream( ipc::tStream& stream ) const
    {
-      return stream.push( m_signature, m_id );
+      return ipc::serialize( stream, m_signature, m_id );
    }
 
    const bool SignatureStatus::from_stream( ipc::tStream& stream )
    {
-      return stream.pop( m_signature, m_id );
+      return ipc::deserialize( stream, m_signature, m_id );
    }
 
    const base::service::Signature& SignatureStatus::signature( ) const

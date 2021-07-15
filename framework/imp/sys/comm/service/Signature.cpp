@@ -21,12 +21,12 @@ Signature::Signature( const Signature& other )
 
 bool Signature::to_stream( base::ipc::tStream& stream ) const
 {
-   return stream.push( m_type_id, m_role );
+   return ipc::serialize( stream, m_type_id, m_role );
 }
 
 bool Signature::from_stream( base::ipc::tStream& stream )
 {
-   return stream.pop( m_type_id, m_role );
+   return ipc::deserialize( stream, m_type_id, m_role );
 }
 
 Signature& Signature::operator=( const Signature& other )

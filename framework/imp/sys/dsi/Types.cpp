@@ -42,12 +42,12 @@ SocketCongiguration::SocketCongiguration( const os::os_linux::socket::configurat
 
 bool SocketCongiguration::to_stream( ipc::tStream& stream ) const
 {
-   return stream.push( domain, type, protocole, address, port );
+   return ipc::serialize( stream, domain, type, protocole, address, port );
 }
 
 bool SocketCongiguration::from_stream( ipc::tStream& stream )
 {
-   return stream.pop( domain, type, protocole, address, port );
+   return ipc::deserialize( stream, domain, type, protocole, address, port );
 }
 
 
@@ -68,12 +68,12 @@ Package::~Package( )
 
 bool Package::to_stream( ipc::tStream& _stream ) const
 {
-   return _stream.push( m_command, m_data );
+   return ipc::serialize( _stream, m_command, m_data );
 }
 
 bool Package::from_stream( ipc::tStream& _stream )
 {
-   return _stream.pop( m_command, m_data );
+   return ipc::deserialize( _stream, m_command, m_data );
 }
 
 
@@ -89,7 +89,7 @@ Packet::~Packet( )
 bool Packet::to_stream( ipc::tStream& _stream ) const
 {
    // here will be calculated CRC
-   return _stream.push( m_begin_sign, m_size, m_packages, m_crc, m_end_sign );
+   return ipc::serialize( _stream, m_begin_sign, m_size, m_packages, m_crc, m_end_sign );
 }
 
 bool Packet::from_stream( ipc::tStream& _stream )
@@ -99,7 +99,7 @@ bool Packet::from_stream( ipc::tStream& _stream )
 
    size_t begin_sign = 0;
    size_t end_sign = 0;
-   return _stream.pop( begin_sign, m_size, m_packages, m_crc, end_sign );
+   return ipc::deserialize( _stream, begin_sign, m_size, m_packages, m_crc, end_sign );
 }
 
 bool Packet::test_stream( ipc::tStream& _stream ) const

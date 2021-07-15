@@ -94,13 +94,13 @@ namespace base::service::fast {
    template< typename _ID >
    const bool TSignature< _ID >::to_stream( ipc::tStream& stream ) const
    {
-      return stream.push( m_role, m_id, m_from, m_to, m_seq_id );
+      return ipc::serialize( stream, m_role, m_id, m_from, m_to, m_seq_id );
    }
 
    template< typename _ID >
    const bool TSignature< _ID >::from_stream( ipc::tStream& stream )
    {
-      return stream.pop( m_role, m_id, m_from, m_to, m_seq_id );
+      return ipc::deserialize( stream, m_role, m_id, m_from, m_to, m_seq_id );
    }
 
    template< typename _ID >

@@ -62,7 +62,7 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               return stream.push( type_id( ), m_user_signature );
+               return ipc::serialize( stream, m_user_signature );
             }
             return false;
          }
@@ -70,17 +70,20 @@ namespace base::async {
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
-               tAsyncTypeID type_id;
-               const bool result = stream.pop( type_id, m_user_signature );
-               // if( type_id( ) != type_id ) { SYS_ERR( "event type_id mismatch" ); }
-               return result;
+               return ipc::deserialize( stream, m_user_signature );
             }
             return false;
          }
 
       public:
-         const tUserSignature& user_signature( ) const { return m_user_signature; }
-         void user_signature( const tUserSignature& signature ) { m_user_signature = signature; }
+         const tUserSignature& user_signature( ) const
+         {
+            return m_user_signature;
+         }
+         void user_signature( const tUserSignature& signature )
+         {
+            m_user_signature = signature;
+         }
       private:
          tUserSignature m_user_signature;
    };
@@ -148,11 +151,11 @@ namespace base::async::id {
          }
          const bool to_stream( ipc::tStream& stream ) const
          {
-            return stream.push( m_id );
+            return ipc::serialize( stream, m_id );
          }
          const bool from_stream( ipc::tStream& stream )
          {
-            return stream.pop( m_id );
+            return ipc::deserialize( stream, m_id );
          }
 
       public:

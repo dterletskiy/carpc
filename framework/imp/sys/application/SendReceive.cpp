@@ -105,6 +105,14 @@ bool SendReceive::send( const RawBuffer& buffer, os::Socket::tSptr p_socket )
    return os::Socket::eResult::OK == p_socket->send( buffer.ptr, buffer.size );
 }
 
+bool SendReceive::send( const ipc::tStream& stream, os::Socket::tSptr p_socket )
+{
+   RawBuffer buffer;
+   if( false == ipc::raw_buffer( stream, buffer ) )
+      return false;
+   return send( buffer, p_socket );
+}
+
 bool SendReceive::send( const RawBuffer& buffer, const application::Context& to_context )
 {
    return send( buffer, socket( to_context ) );
@@ -112,20 +120,14 @@ bool SendReceive::send( const RawBuffer& buffer, const application::Context& to_
 
 bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
 {
-   RawBuffer buffer = ipc::tStream::serialize( packet );
-   bool result = send( buffer, p_socket );
-   buffer.free( );
-
-   return result;
+   ipc::tStream stream;
+   ipc::serialize( stream, packet );
+   return send( stream, p_socket );
 }
 
 bool SendReceive::send( const dsi::Packet& packet, const application::Context& to_context )
 {
-   RawBuffer buffer = ipc::tStream::serialize( packet );
-   bool result = send( buffer, socket( to_context ) );
-   buffer.free( );
-
-   return result;
+   return send( packet, socket( to_context ) );
 }
 
 bool SendReceive::send( const async::IEvent::tSptr p_event, const application::Context& to_context )
@@ -149,7 +151,7 @@ bool SendReceive::Base::process_stream( ipc::tStream& stream )
    while( 0 < stream.size( ) )
    {
       dsi::Packet packet;
-      stream.pop( packet );
+      ipc::deserialize( stream, packet );
       result &= process_packet( packet );
    }
    return result;
@@ -212,7 +214,7 @@ void SendReceive::ServiceBrocker::process_select( os::os_linux::socket::fd& fd_s
       size_t recv_size = 0;
       const void* const p_buffer = mp_socket->buffer( recv_size );
       ipc::tStream stream;
-      stream.push( p_buffer, recv_size );
+      ipc::append( stream, p_buffer, recv_size );
       process_stream( stream );
    }
 }
@@ -397,7 +399,7 @@ void SendReceive::PendingConnections::process_select( os::os_linux::socket::fd& 
          size_t recv_size = 0;
          const void* const p_buffer = p_socket->buffer( recv_size );
          ipc::tStream stream;
-         stream.push( p_buffer, recv_size );
+         ipc::append( stream, p_buffer, recv_size );
          process_stream( stream );
       }
 
@@ -547,7 +549,7 @@ void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set 
          size_t recv_size = 0;
          const void* const p_buffer = p_socket_recv->buffer( recv_size );
          ipc::tStream stream;
-         stream.push( p_buffer, recv_size );
+         ipc::append( stream, p_buffer, recv_size );
          process_stream( stream );
       }
 

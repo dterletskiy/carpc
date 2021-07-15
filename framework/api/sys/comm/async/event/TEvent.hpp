@@ -123,7 +123,7 @@ namespace base::async {
 
       // serialization / deserialization
       public:
-         const bool to_stream( ipc::tStream& stream ) const override final
+         const bool to_stream_t( ipc::tStream& stream ) const override final
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
@@ -133,13 +133,13 @@ namespace base::async {
                   return false;
                }
 
-               if( false == stream.push( *mp_signature, m_context, m_priority ) )
+               if( false == ipc::serialize( stream, *mp_signature, m_context, m_priority ) )
                   return false;
 
-               if( false == stream.push( ( nullptr != mp_data ) ) )
+               if( false == ipc::serialize( stream, ( nullptr != mp_data ) ) )
                   return false;
                if( mp_data )
-                  if( false == stream.push( *mp_data ) )
+                  if( false == ipc::serialize( stream, *mp_data ) )
                      return false;
 
                return true;
@@ -147,21 +147,21 @@ namespace base::async {
 
             return false;
          }
-         const bool from_stream( ipc::tStream& stream ) override final
+         const bool from_stream_t( ipc::tStream& stream ) override final
          {
             if constexpr( false == std::is_same_v< tService, NoServiceType > )
             {
                mp_signature = tSignature::create( );
-               if( false == stream.pop( *mp_signature, m_context, m_priority ) )
+               if( false == ipc::deserialize( stream, *mp_signature, m_context, m_priority ) )
                   return false;
 
                bool is_data = false;
-               if( false == stream.pop( is_data ) )
+               if( false == ipc::deserialize( stream, is_data ) )
                   return false;
                if( false == is_data )
                   return true;
                mp_data = std::make_shared< tData >( );
-               return stream.pop( *mp_data );
+               return ipc::deserialize( stream, *mp_data );
             }
 
             return false;

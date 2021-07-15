@@ -35,14 +35,20 @@ namespace base {
             ByteStream& operator >> ( TYPE& value );
 
       public:
+         // Serializing all arguments and result will be stored in raw_buffer.
+         // In this case RawBuffer will point to allocated memory and this memory MUST be freed by user.
          template< typename ... TYPES >
-         static RawBuffer serialize( const TYPES& ... args )
+         static bool serialize( RawBuffer& buffer, const TYPES& ... args )
          {
             ByteStream stream( 1024, true );
             stream.m_buffer.auto_free( false );
             stream.push( args... );
-            return stream.m_buffer.buffer( );
+            // in this case raw buffer always will be linear and we can just return it
+            buffer = stream.m_buffer.buffer( );
+            return true;
          }
+         // Deserializing raw_buffer to arguments.
+         // raw_buffer will not be changed afterward.
          template< typename ... TYPES >
          static bool deserialize( const RawBuffer& buffer, TYPES& ... args )
          {
@@ -52,8 +58,10 @@ namespace base {
          }
 
       public:
-         ByteStream( const size_t capacity = 4096, const bool is_reallocate_allowed = true );
-         ByteStream( const ByteStream& stream );
+         ByteStream( const std::size_t capacity = 4096, const bool is_reallocate_allowed = true );
+         ByteStream( const void* const buffer, const std::size_t size, const std::size_t capacity = 0, const bool is_reallocate_allowed = true );
+         ByteStream( const ByteStream& other );
+         ByteStream( ByteStream&& other );
          ~ByteStream( );
 
       /*****************************************
@@ -62,13 +70,13 @@ namespace base {
        *
        ****************************************/
       public:
-         // This method for multipl push
+         // This method for multiple push
          template< typename ... TYPES >
             bool push( const TYPES& ... values );
 
       public:
-         bool push( const void* const buffer, const size_t size );
-         bool push( void* const buffer, const size_t size );
+         bool push( const void* const buffer, const std::size_t size );
+         bool push( void* const buffer, const std::size_t size );
          bool push( const RawBuffer& buffer );
          bool push( const CircularBuffer& buffer );
          bool push( const ByteStream& stream );
@@ -76,12 +84,18 @@ namespace base {
          bool push( void* const pointer );
          bool push( const std::string& string );
          bool push( const bool value );
+         template < typename TYPE, std::size_t N >
+            bool push( const TYPE (&array)[ N ] );
          template< typename TYPE >
             bool push( const std::optional< TYPE >& value );
          template< typename TYPE >
             bool push( const std::vector< TYPE >& vector );
          template< typename TYPE >
             bool push( const std::list< TYPE >& list );
+         template< typename TYPE >
+            bool push( const std::queue< TYPE >& queue );
+         template< typename TYPE >
+            bool push( const std::deque< TYPE >& deque );
          template< typename TYPE_FIRST, typename TYPE_SECOND >
             bool push( const std::pair< TYPE_FIRST, TYPE_SECOND >& pair );
          template< typename TYPE >
@@ -113,13 +127,13 @@ namespace base {
        *
        ****************************************/
       public:
-         // This method for multipl push
+         // This method for multiple push
          template< typename ... TYPES >
             bool pop( TYPES& ... values );
 
       public:
-         bool pop( void* const buffer, const size_t size );
-         bool pop( const void* buffer, const size_t size );
+         bool pop( void* const buffer, const std::size_t size );
+         bool pop( const void* buffer, const std::size_t size );
          bool pop( RawBuffer& buffer );
          bool pop( CircularBuffer& buffer );
          bool pop( ByteStream& stream );
@@ -127,12 +141,18 @@ namespace base {
          bool pop( void*& pointer );
          bool pop( std::string& string );
          bool pop( bool& value );
+         template < typename TYPE, std::size_t N >
+            bool pop( TYPE (&array)[ N ] );
          template< typename TYPE >
             bool pop( std::optional< TYPE >& value );
          template< typename TYPE >
             bool pop( std::vector< TYPE >& vactor );
          template< typename TYPE >
             bool pop( std::list< TYPE >& list );
+         template< typename TYPE >
+            bool pop( std::queue< TYPE >& queue );
+         template< typename TYPE >
+            bool pop( std::deque< TYPE >& deque );
          template< typename TYPE_FIRST, typename TYPE_SECOND >
             bool pop( std::pair< TYPE_FIRST, TYPE_SECOND >& pair );
          template< typename TYPE >
@@ -160,28 +180,19 @@ namespace base {
 
       /*****************************************
        *
-       * Get methods
-       *
-       ****************************************/
-      public:
-         // This method for multipl get
-         template< typename ... TYPES >
-            bool get( TYPES& ... values );
-
-      /*****************************************
-       *
        * Erase methods
        *
        ****************************************/
       public:
-         void erase( const size_t size, const size_t offset = 0 );
+         void erase( const std::size_t size, const std::size_t offset = 0 );
 
       public:
-         size_t size( ) const;
-         size_t capacity( ) const;
+         std::size_t size( ) const;
+         std::size_t capacity( ) const;
          void dump( ) const;
          void reset( );
-         bool is_linear( const void*& pointer, size_t& size ) const;
+         bool is_linear( void*& pointer, std::size_t& size ) const;
+         bool is_linear( RawBuffer& buffer ) const;
       private:
          CircularBuffer m_buffer;
    };
@@ -223,6 +234,17 @@ namespace base {
       return result;
    }
 
+   template < typename TYPE, std::size_t N >
+   bool ByteStream::push( const TYPE (&array)[ N ] )
+   {
+      printf( "----- N: %zu -----\n", N );
+      bool result = true;
+      for ( std::size_t index = 0; index < N; ++index )
+         result &= push( array[ index ] );
+
+      return result;
+   }
+
    template< typename TYPE >
    bool ByteStream::push( const std::optional< TYPE >& optional )
    {
@@ -246,6 +268,18 @@ namespace base {
    bool ByteStream::push( const std::list< TYPE >& list )
    {
       return push_stl_container( list );
+   }
+
+   template< typename TYPE >
+   bool ByteStream::push( const std::queue< TYPE >& queue )
+   {
+      return push_stl_container( queue );
+   }
+
+   template< typename TYPE >
+   bool ByteStream::push( const std::deque< TYPE >& deque )
+   {
+      return push_stl_container( deque );
    }
 
    template< typename TYPE_FIRST, typename TYPE_SECOND >
@@ -329,6 +363,16 @@ namespace base {
       return result;
    }
 
+   template < typename TYPE, std::size_t N >
+   bool ByteStream::pop( TYPE (&array)[ N ] )
+   {
+      bool result = true;
+      for ( std::size_t index = 0; index < N; ++index )
+         result &= pop( array[ index ] );
+
+      return result;
+   }
+
    template< typename TYPE >
    bool ByteStream::pop( std::optional< TYPE >& optional )
    {
@@ -358,6 +402,18 @@ namespace base {
    bool ByteStream::pop( std::list< TYPE >& list )
    {
       return pop_stl_container( list );
+   }
+
+   template< typename TYPE >
+   bool ByteStream::pop( std::queue< TYPE >& queue )
+   {
+      return pop_stl_container( queue );
+   }
+
+   template< typename TYPE >
+   bool ByteStream::pop( std::deque< TYPE >& deque )
+   {
+      return pop_stl_container( deque );
    }
 
    template< typename TYPE_FIRST, typename TYPE_SECOND >
@@ -413,11 +469,11 @@ namespace base {
    template< typename TYPE_CONTAINER >
    bool ByteStream::pop_stl_container( TYPE_CONTAINER& container )
    {
-      size_t size = 0;
+      std::size_t size = 0;
       if( false == pop( size ) )
          return false;
 
-      for( size_t index = 0; index < size; ++index )
+      for( std::size_t index = 0; index < size; ++index )
       {
          typename TYPE_CONTAINER::value_type value;
          if( false == pop( value ) )
@@ -431,11 +487,11 @@ namespace base {
    template< typename TYPE_CONTAINER >
    bool ByteStream::pop_stl_associative_container( TYPE_CONTAINER& container )
    {
-      size_t size = 0;
+      std::size_t size = 0;
       if( false == pop( size ) )
          return false;
 
-      for( size_t index = 0; index < size; ++index )
+      for( std::size_t index = 0; index < size; ++index )
       {
          // Here value is a pair in case of map and simple type in case of set
          typename TYPE_CONTAINER::value_type value;
@@ -452,36 +508,17 @@ namespace base {
 
    /*****************************************
     *
-    * Get methods
-    *
-    ****************************************/
-   template< typename ... TYPES >
-   bool ByteStream::get( TYPES& ... values )
-   {
-      // Current implementation has some big issues during serialization/deserialization user classes
-      m_buffer.state_save( );
-      bool result = true;
-      (void)std::initializer_list< int >{ ( result &= pop( values ), 0 )... };
-      m_buffer.state_restore( );
-
-      return result;
-   }
-
-
-
-   /*****************************************
-    *
     * Other methods
     *
     ****************************************/
    inline
-   size_t ByteStream::size( ) const
+   std::size_t ByteStream::size( ) const
    {
       return m_buffer.size( );
    }
 
    inline
-   size_t ByteStream::capacity( ) const
+   std::size_t ByteStream::capacity( ) const
    {
       return m_buffer.capacity( );
    }
@@ -499,13 +536,19 @@ namespace base {
    }
 
    inline
-   bool ByteStream::is_linear( const void*& pointer, size_t& size ) const
+   bool ByteStream::is_linear( void*& pointer, std::size_t& size ) const
    {
       return m_buffer.is_linear( pointer, size );
    }
 
    inline
-   void ByteStream::erase( const size_t size, const size_t offset )
+   bool ByteStream::is_linear( RawBuffer& buffer ) const
+   {
+      return m_buffer.is_linear( buffer );
+   }
+
+   inline
+   void ByteStream::erase( const std::size_t size, const std::size_t offset )
    {
       m_buffer.pop_front( size );
    }

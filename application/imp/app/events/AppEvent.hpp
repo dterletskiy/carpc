@@ -15,8 +15,8 @@ namespace application::events {
       AppEventData( base::ipc::tStream& stream ) { from_stream( stream ); }
       ~AppEventData( ) { }
 
-      bool to_stream( base::ipc::tStream& stream ) const { return stream.push( message ); }
-      bool from_stream( base::ipc::tStream& stream ) { return stream.pop( message ); }
+      bool to_stream( base::ipc::tStream& stream ) const { return base::ipc::serialize( stream, message ); }
+      bool from_stream( base::ipc::tStream& stream ) { return base::ipc::deserialize( stream, message ); }
 
       std::string message = "";
    };

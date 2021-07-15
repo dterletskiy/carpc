@@ -61,10 +61,11 @@ namespace base::async {
          const eAsyncType type( ) const override final;
 
       public:
-         // serialization / deserialization methods should
-         // serialize / deserialize all data exapt of type_id and communication type
-         virtual const bool to_stream( ipc::tStream& ) const = 0;
-         virtual const bool from_stream( ipc::tStream& ) = 0;
+         const bool to_stream( ipc::tStream& ) const;
+         const bool from_stream( ipc::tStream& );
+      private:
+         virtual const bool to_stream_t( ipc::tStream& ) const = 0;
+         virtual const bool from_stream_t( ipc::tStream& ) = 0;
 
       public:
          virtual const bool is_ipc( ) const = 0;

@@ -40,6 +40,7 @@ namespace base::application {
          bool send( const async::IEvent::tSptr, const application::Context& );
       private:
          bool send( const RawBuffer&, os::Socket::tSptr );
+         bool send( const ipc::tStream&, os::Socket::tSptr );
          bool send( const dsi::Packet&, os::Socket::tSptr );
          os::Socket::tSptr socket( const application::Context& );
 

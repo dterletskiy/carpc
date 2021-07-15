@@ -27,7 +27,7 @@ namespace base::onoff::ipc {
    BaseData::tSptr BaseData::create( base::ipc::tStream& stream )
    {
       eOnOff id = eOnOff::Undefined;
-      if( false == stream.pop( id ) )
+      if( false == base::ipc::deserialize( stream, id ) )
          return nullptr;
 
       tSptr ptr = nullptr;
@@ -47,7 +47,7 @@ namespace base::onoff::ipc {
 
    bool BaseData::serrialize( base::ipc::tStream& stream )
    {
-      if( false == stream.push( id( ) ) )
+      if( false == base::ipc::serialize( stream, id( ) ) )
          return false;
 
       return to_stream( stream );
@@ -65,8 +65,8 @@ namespace base::onoff::ipc {
    const eOnOff RequestTriggerStateData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestTriggerStateData::id( ) const { return ID; }
 
-   bool RequestTriggerStateData::to_stream( base::ipc::tStream& stream ) { return stream.push( state, delay ); }
-   bool RequestTriggerStateData::from_stream( base::ipc::tStream& stream ) { return stream.pop( state, delay ); }
+   bool RequestTriggerStateData::to_stream( base::ipc::tStream& stream ) { return base::ipc::serialize( stream, state, delay ); }
+   bool RequestTriggerStateData::from_stream( base::ipc::tStream& stream ) { return base::ipc::deserialize( stream, state, delay ); }
 
 
 
@@ -80,8 +80,8 @@ namespace base::onoff::ipc {
    const eOnOff ResponseTriggerStateData::ID = eOnOff::ResponseTriggerState;
    const eOnOff ResponseTriggerStateData::id( ) const { return ID; }
 
-   bool ResponseTriggerStateData::to_stream( base::ipc::tStream& stream ) { return stream.push( result ); }
-   bool ResponseTriggerStateData::from_stream( base::ipc::tStream& stream ) { return stream.pop( result ); }
+   bool ResponseTriggerStateData::to_stream( base::ipc::tStream& stream ) { return base::ipc::serialize( stream, result ); }
+   bool ResponseTriggerStateData::from_stream( base::ipc::tStream& stream ) { return base::ipc::deserialize( stream, result ); }
 
 
 
@@ -107,8 +107,8 @@ namespace base::onoff::ipc {
    const eOnOff NotificationCurrentStateData::ID = eOnOff::NotificationCurrentState;
    const eOnOff NotificationCurrentStateData::id( ) const { return ID; }
 
-   bool NotificationCurrentStateData::to_stream( base::ipc::tStream& stream ) { return stream.push( state ); }
-   bool NotificationCurrentStateData::from_stream( base::ipc::tStream& stream ) { return stream.pop( state ); }
+   bool NotificationCurrentStateData::to_stream( base::ipc::tStream& stream ) { return base::ipc::serialize( stream, state ); }
+   bool NotificationCurrentStateData::from_stream( base::ipc::tStream& stream ) { return base::ipc::deserialize( stream, state ); }
 
 } // namespace base::onoff::ipc
 

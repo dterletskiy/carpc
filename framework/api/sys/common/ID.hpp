@@ -45,11 +45,11 @@ namespace base {
       public:
          bool to_stream( ipc::tStream& stream ) const
          {
-            return stream.push( m_value );
+            return ipc::serialize( stream, m_value );
          }
          bool from_stream( ipc::tStream& stream )
          {
-            return stream.pop( m_value );
+            return ipc::deserialize( stream, m_value );
          }
 
       public:

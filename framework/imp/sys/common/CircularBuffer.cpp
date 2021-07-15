@@ -10,6 +10,10 @@ using namespace base;
 
 
 
+const double s_reallocation_coefficient = 1.5;
+
+
+
 const char* CircularBuffer::c_str( const ePush result )
 {
    switch( result )
@@ -33,44 +37,66 @@ CircularBuffer::CircularBuffer(
    , m_is_reallocate_allowed( is_reallocate_allowed )
    , m_auto_free( auto_free )
 {
+   SYS_INF( );
+
    mp_head = malloc( m_capacity + 1 );
    mp_tail = inc( mp_head, m_capacity );
    mp_begin = mp_end = mp_head;
 }
 
-CircularBuffer::CircularBuffer( const CircularBuffer& cb )
-   : m_capacity( cb.m_capacity )
-   , m_is_overlap_allowed( cb.m_is_overlap_allowed )
-   , m_is_reallocate_allowed( cb.m_is_reallocate_allowed )
-   , m_auto_free( cb.m_auto_free )
+CircularBuffer::CircularBuffer( const CircularBuffer& other )
+   : m_capacity( other.m_capacity )
+   , m_is_overlap_allowed( other.m_is_overlap_allowed )
+   , m_is_reallocate_allowed( other.m_is_reallocate_allowed )
+   , m_auto_free( other.m_auto_free )
 {
+   SYS_INF( );
+
    mp_head = malloc( m_capacity + 1 );
    mp_tail = inc( mp_head, m_capacity );
    mp_begin = mp_end = mp_head;
 
-   cb.front( mp_head, cb.size( ) );
-   mp_end = inc( mp_begin, cb.size( ) );
+   other.front( mp_head, other.size( ) );
+   mp_end = inc( mp_begin, other.size( ) );
 
-   m_size = cb.m_size;
+   m_size = other.m_size;
+}
+
+CircularBuffer::CircularBuffer( CircularBuffer&& other )
+   : m_capacity( other.m_capacity )
+   , m_size( other.m_size )
+   , m_is_overlap_allowed( other.m_is_overlap_allowed )
+   , m_is_reallocate_allowed( other.m_is_reallocate_allowed )
+   , m_auto_free( other.m_auto_free )
+{
+   SYS_INF( );
+
+   mp_head = other.mp_head;
+   mp_tail = other.mp_tail;
+   mp_begin = other.mp_begin;
+   mp_end = other.mp_end;
+
+   other.mp_head = nullptr;
+   other.mp_tail = nullptr;
+   other.mp_begin = nullptr;
+   other.mp_end = nullptr;
+   other.m_capacity = 0;
+   other.m_size = 0;
+   other.m_auto_free = false;
 }
 
 CircularBuffer::~CircularBuffer( )
 {
+   SYS_INF( );
+
    if( true == m_auto_free )
       free( mp_head );
 }
 
 bool CircularBuffer::reallocate( std::size_t capacity )
 {
-   if( std::nullopt != m_state )
-   {
-      SYS_ERR( "restore saved state" );
-      return false;
-   }
-   state::locker locker( m_is_state_locked );
-
    if( 0 == capacity )
-      capacity = 1.5 * m_capacity;
+      capacity = s_reallocation_coefficient * m_capacity;
 
    void* p_head = malloc( capacity + 1 );
    if( nullptr == p_head )
@@ -85,8 +111,8 @@ bool CircularBuffer::reallocate( std::size_t capacity )
    mp_tail = inc( mp_head, m_capacity );
    mp_begin = mp_head;
    mp_end = inc( mp_begin, m_size );
-   if( mp_tail == mp_end )
-      mp_end = mp_head;
+   // if( mp_tail == mp_end ) // @TDA: perhaps not needed
+   //    mp_end = mp_head;
 
    return true;
 }
@@ -158,13 +184,6 @@ void CircularBuffer::dump_logic( ) const
 
 CircularBuffer::ePush CircularBuffer::push_back( const void* const p_buffer, const std::size_t size, const std::optional< bool > is_reallocate )
 {
-   if( std::nullopt != m_state )
-   {
-      SYS_ERR( "restore saved state" );
-      return ePush::Error;
-   }
-   state::locker locker( m_is_state_locked );
-
    if( nullptr == p_buffer )
    {
       SYS_ERR( "source buffer pointer is nullptr" );
@@ -182,7 +201,7 @@ CircularBuffer::ePush CircularBuffer::push_back( const void* const p_buffer, con
       if( false == is_reallocate.value_or( m_is_reallocate_allowed ) )
          return ePush::Error;
 
-      if( false == reallocate( 1.5 * ( m_size + size ) ) )
+      if( false == reallocate( s_reallocation_coefficient * ( m_size + size ) ) )
          return ePush::Error;
       result = ePush::Realloc;
    }
@@ -200,8 +219,8 @@ CircularBuffer::ePush CircularBuffer::push_back( const void* const p_buffer, con
       mp_end = inc( mp_end, size );
    }
 
-   if( mp_end == mp_tail )
-      mp_end = mp_head;
+   // if( mp_end == mp_tail )
+   //    mp_end = mp_head; // @TDA: perhaps not needed
 
    if( size > free_space( ) )
    {
@@ -246,8 +265,6 @@ CircularBuffer::ePush CircularBuffer::push_back( const CircularBuffer& buffer, c
 
 void CircularBuffer::pop_front( const std::size_t size )
 {
-   state::locker locker( m_is_state_locked );
-
    if( 0 == m_size )
       return;
 
@@ -257,22 +274,16 @@ void CircularBuffer::pop_front( const std::size_t size )
    const std::size_t part_size = static_cast< std::size_t >( diff( mp_tail, mp_begin ) );
    if( size > part_size )
    {
-      // zeroing in case if context was not save => will not be restored in other case modification is not allowed
-      // (should be after updating mp_end)
-      if( std::nullopt == m_state )
-      {
-         std::memset( mp_begin, 0, part_size );
-         std::memset( mp_head, 0, size - part_size );
-      }
+      // zeroing pop data bytes
+      std::memset( mp_begin, 0, part_size );
+      std::memset( mp_head, 0, size - part_size );
 
       mp_begin = inc( mp_head, size - part_size );
    }
    else
    {
-      // zeroing in case if context was not save => will not be restored in other case modification is not allowed
-      // (should be after updating mp_end)
-      if( std::nullopt == m_state )
-         std::memset( mp_begin, 0, size );
+      // zeroing pop data bytes
+      std::memset( mp_begin, 0, size );
 
       mp_begin = inc( mp_begin, size );
    }
@@ -285,39 +296,31 @@ void CircularBuffer::pop_front( const std::size_t size )
 
 void CircularBuffer::pop_back( const std::size_t size )
 {
-   state::locker locker( m_is_state_locked );
-
    if( 0 == m_size )
       return;
 
    if( size >= m_size )
       return reset( );
 
-   const std::size_t part_size = static_cast< std::size_t >( diff( mp_head, mp_end ) );
+   const std::size_t part_size = static_cast< std::size_t >( diff( mp_end, mp_head ) );
    if( size > part_size )
    {
       mp_end = dec( mp_tail, size - part_size );
 
-      // zeroing in case if context was not save => will not be restored in other case modification is not allowed
-      // (should be after updating mp_end)
-      if( std::nullopt == m_state )
-      {
-         std::memset( mp_head, 0, part_size );
-         std::memset( mp_end, 0, size - part_size );
-      }
+      // zeroing pop data bytes
+      std::memset( mp_head, 0, part_size );
+      std::memset( mp_end, 0, size - part_size );
    }
    else
    {
       mp_end = dec( mp_end, size );
 
-      // zeroing in case if context was not save => will not be restored in other case modification is not allowed
-      // (should be after updating mp_end)
-      if( std::nullopt == m_state )
-         std::memset( mp_end, 0, size );
+      // zeroing pop data bytes
+      std::memset( mp_end, 0, size );
    }
 
-   if( mp_end == mp_tail )
-      mp_end = mp_head;
+   // if( mp_end == mp_tail )
+   //    mp_end = mp_head; // @TDA: perhaps not needed
 
    m_size -= size;
 }
@@ -447,41 +450,4 @@ ssize_t CircularBuffer::find( void* const p_buffer, const std::size_t size, cons
 ssize_t CircularBuffer::find( const RawBuffer& buffer, const std::size_t offset ) const
 {
    return find( buffer.ptr, buffer.size, offset );
-}
-
-bool CircularBuffer::state_save( )
-{
-   if( true == m_is_state_locked )
-   {
-      SYS_ERR( "state locked" );
-      return false;
-   }
-   if( std::nullopt != m_state )
-   {
-      SYS_ERR( "state already saved" );
-      return false;
-   }
-
-   m_state = { mp_begin, mp_end, m_size };
-   return true;
-}
-
-bool CircularBuffer::state_restore( )
-{
-   if( true == m_is_state_locked )
-   {
-      SYS_ERR( "state locked" );
-      return false;
-   }
-   if( std::nullopt == m_state )
-   {
-      SYS_ERR( "state was not saved" );
-      return false;
-   }
-
-   mp_begin = m_state.value( ).mp_begin;
-   mp_end = m_state.value( ).mp_end;
-   m_size = m_state.value( ).m_size;
-   m_state = std::nullopt;
-   return true;
 }

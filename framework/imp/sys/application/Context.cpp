@@ -83,12 +83,12 @@ bool Context::is_valid( ) const
 
 bool Context::to_stream( base::ipc::tStream& stream ) const
 {
-   return stream.push( m_pid, m_tid );
+   return ipc::serialize( stream, m_pid, m_tid );
 }
 
 bool Context::from_stream( base::ipc::tStream& stream )
 {
-   return stream.pop( m_pid, m_tid );
+   return ipc::deserialize( stream, m_pid, m_tid );
 }
 
 Context& Context::operator=( const Context& other )

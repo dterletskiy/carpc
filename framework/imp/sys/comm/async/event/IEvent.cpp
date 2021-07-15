@@ -44,7 +44,13 @@ bool IEvent::serialize( ipc::tStream& stream, const IEvent& event )
       return false;
    }
 
-   if( false == event.to_stream( stream ) )
+   if( false == ipc::serialize( stream, event.signature( )->type_id( ) ) )
+   {
+      SYS_ERR( "meta data serialization error" );
+      return false;
+   }
+
+   if( false == event.to_stream_t( stream ) )
    {
       SYS_ERR( "event '%s' serialization error", event.signature( )->name( ).c_str( ) );
       return false;
@@ -55,24 +61,24 @@ bool IEvent::serialize( ipc::tStream& stream, const IEvent& event )
 
 IEvent::tSptr IEvent::deserialize( ipc::tStream& stream )
 {
-   tAsyncTypeID event_type;
-   if( false == stream.get( event_type ) )
+   tAsyncTypeID event_type_id;
+   if( false == ipc::deserialize( stream, event_type_id ) )
    {
       SYS_ERR( "meta data deserialization error" );
       return nullptr;
    }
 
-   auto iterator = s_registry.find( event_type );
+   auto iterator = s_registry.find( event_type_id );
    if( s_registry.end( ) == iterator )
    {
-      SYS_ERR( "event '%s' is not registered", event_type.c_str( ) );
+      SYS_ERR( "event '%s' is not registered", event_type_id.c_str( ) );
       return nullptr;
    }
 
    IEvent::tSptr p_event = iterator->second( );
-   if( false == p_event->from_stream( stream ) )
+   if( false == p_event->from_stream_t( stream ) )
    {
-      SYS_ERR( "event '%s' deserialization error", event_type.c_str( ) );
+      SYS_ERR( "event '%s' deserialization error", event_type_id.c_str( ) );
       return nullptr;
    }
 
@@ -80,6 +86,16 @@ IEvent::tSptr IEvent::deserialize( ipc::tStream& stream )
 }
 
 
+
+const bool IEvent::to_stream( ipc::tStream& stream ) const
+{
+   return serialize( stream, *this );
+}
+
+const bool IEvent::from_stream( ipc::tStream& stream )
+{
+   return false;
+}
 
 const bool IEvent::set_notification( IAsync::IConsumer* p_consumer, const ISignature::tSptr p_signature )
 {

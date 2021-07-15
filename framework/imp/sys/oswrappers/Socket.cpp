@@ -192,6 +192,11 @@ const void* const Socket::buffer( size_t& size ) const
    return mp_buffer;
 }
 
+base::RawBuffer Socket::buffer( ) const
+{
+   return { mp_buffer, m_buffer_size };
+}
+
 void Socket::fill_buffer( const char symbol )
 {
    memset( mp_buffer, symbol, m_buffer_capacity );

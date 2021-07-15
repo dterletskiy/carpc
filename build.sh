@@ -102,7 +102,7 @@ function build( )
    local -n LOCAL_BUILD__PROJECT=${1}
    local LOCAL_TARGETS=${2}
 
-   cmake --build ${LOCAL_BUILD__PROJECT[BUILD_DIR]} --target ${LOCAL_TARGETS}
+   cmake --build ${LOCAL_BUILD__PROJECT[BUILD_DIR]} --target ${LOCAL_TARGETS} -j 4
 }
 
 function install( )

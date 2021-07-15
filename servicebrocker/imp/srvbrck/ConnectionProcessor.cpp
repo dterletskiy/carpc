@@ -13,7 +13,7 @@ namespace local {
    bool send( base::os::Socket::tSptr p_socket, base::ipc::tStream& stream )
    {
       size_t size = 0;
-      const void* buffer = nullptr;
+      void* buffer = nullptr;
       if( false == stream.is_linear( buffer, size ) )
       {
          SYS_WRN( "stream is not linear" );
@@ -58,17 +58,15 @@ bool ConnectionProcessor::shutdown( )
 
 void ConnectionProcessor::read_slave( base::os::Socket::tSptr p_socket )
 {
-   size_t recv_size = 0;
+   std::size_t recv_size = 0;
    const void* const p_buffer = p_socket->buffer( recv_size );
-   // p_socket->send( p_buffer, recv_size );
-
    base::ipc::tStream stream;
-   stream.push( p_buffer, recv_size );
+   base::ipc::append( stream, p_buffer, recv_size );
    while( 0 < stream.size( ) )
    {
       SYS_INF( "stream size = %zu", stream.size( ) );
       base::dsi::Packet packet;
-      stream.pop( packet );
+      base::ipc::deserialize( stream, packet );
       for( base::dsi::Package& package : packet.packages( ) )
       {
          SYS_INF( "processing package: %s", package.c_str( ) );
@@ -158,7 +156,7 @@ void ConnectionProcessor::process_broadcast_event( base::os::Socket::tSptr p_soc
    base::dsi::Packet packet;
    packet.add_package( std::move( package ) );
    base::ipc::tStream stream;
-   stream.push( packet );
+   base::ipc::serialize( stream, packet );
 
    local::send( p_socket, stream );
 }
@@ -207,7 +205,7 @@ void ConnectionProcessor::register_server( base::os::Socket::tSptr p_socket, bas
    base::dsi::Packet packet;
    packet.add_package( base::dsi::eCommand::DetectedServer, service_passport, inet_address );
    base::ipc::tStream stream;
-   stream.push( packet );
+   base::ipc::serialize( stream, packet );
    for( auto connection : service_connection.clients )
       local::send( connection.socket, stream );
 }
@@ -308,7 +306,7 @@ void ConnectionProcessor::register_client( base::os::Socket::tSptr p_socket, bas
       server.inet_address
    );
    base::ipc::tStream stream;
-   stream.push( packet );
+   base::ipc::serialize( stream, packet );
    local::send( p_socket, stream );
 }
 

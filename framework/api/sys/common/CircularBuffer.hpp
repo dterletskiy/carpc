@@ -12,6 +12,84 @@ namespace base {
 
 
 
+   /*********************************************************************************************************************************
+    *
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7   |   8   |   8   |  10   |  11   |  12   |  13   |
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *
+    *
+    *
+    *
+    *
+    *      head                                                                                                     tail
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    |   0   |   1   |   2   |   3   |   4   |   5   |   6   |       |       |       |       |       |       |   X   |
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *        |                                                       |
+    *        |                                                       |
+    *        |                                                       |
+    *      begin                                                    end
+    *
+    *
+    *
+    *      head                                                                                                     tail
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    |       |       |   0   |   1   |   2   |   3   |   4   |   5   |       |       |       |       |       |   X   |
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *                        |                                               |
+    *                        |                                               |
+    *                        |                                               |
+    *                      begin                                            end
+    *
+    *
+    *
+    *      head                                                                                                     tail
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    |   5   |   6   |       |       |       |       |       |       |   0   |   1   |   2   |   3   |   4   |   X   |
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *                        |                                               |                                       
+    *                        |                                               |                                       
+    *                        |                                               |                                       
+    *                       end                                            begin
+    *
+    *
+    *
+    *      head                                                                                                     tail
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *        |                                                                                                       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    |   5   |   6   |   7   |   8   |   9   |  10   |  11   |  12   |   0   |   1   |   2   |   3   |   4   |   X   |
+    *    |       |       |       |       |       |       |       |       |       |       |       |       |       |       |
+    *    +-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+    *                                                                        |                                       
+    *                                                                        |                                       
+    *                                                                        |                                       
+    *                                                                    end / begin
+    *
+    */
+
+
+
    class CircularBuffer
    {
    public:
@@ -26,7 +104,8 @@ namespace base {
                         const bool is_reallocate_allowed = false,
                         const bool auto_free = true
                      );
-      CircularBuffer( const CircularBuffer& buffer );
+      CircularBuffer( const CircularBuffer& other );
+      CircularBuffer( CircularBuffer&& other );
       ~CircularBuffer( );
 
       void auto_free( const bool af );
@@ -186,7 +265,8 @@ namespace base {
        *    size - size of buffer will be set as a result if result is true, otherwise - 0.
        *
        *****************************************************************************/
-      bool is_linear( const void*& pointer, std::size_t& size ) const;
+      bool is_linear( void*& pointer, std::size_t& size ) const;
+      bool is_linear( RawBuffer& buffer ) const;
       bool is_linear( ) const;
 
    public:
@@ -201,38 +281,15 @@ namespace base {
       void dump_logic( ) const;
 
    private:
-      void*          mp_head = nullptr;
-      void*          mp_tail = nullptr;
-      void*          mp_begin = nullptr;
-      void*          mp_end = nullptr;
+      void*          mp_head = nullptr;      // start of allocated buffer
+      void*          mp_tail = nullptr;      // end of allocated buffer
+      void*          mp_begin = nullptr;     // start of data
+      void*          mp_end = nullptr;       // end of data + 1
       std::size_t    m_capacity = 0;
       std::size_t    m_size = 0;
       const bool     m_is_overlap_allowed = true;
       const bool     m_is_reallocate_allowed = false;
       bool           m_auto_free = true;
-
-   public:
-      bool state_save( );
-      bool state_restore( );
-      bool state_lock( );
-      bool state_unlock( );
-   private:
-      struct state
-      {
-         struct locker
-         {
-            locker( bool& _state ) : state( _state ) { state = true; }
-            ~locker( ) { state = false; }
-         private:
-            bool& state;
-         };
-
-         void*       mp_begin = nullptr;
-         void*       mp_end = nullptr;
-         std::size_t      m_size = 0;
-      };
-      std::optional< state > m_state = std::nullopt;
-      bool m_is_state_locked = false;
    };
 
 
@@ -252,7 +309,8 @@ namespace base {
    inline
    void CircularBuffer::reset( )
    {
-      mp_begin = mp_end = mp_head;
+      mp_begin = mp_head;
+      mp_end = mp_head;
       m_size = 0;
    }
 
@@ -299,7 +357,7 @@ namespace base {
    }
 
    inline
-   bool CircularBuffer::is_linear( const void*& pointer, std::size_t& size ) const
+   bool CircularBuffer::is_linear( void*& pointer, std::size_t& size ) const
    {
       if( false == is_linear( ) )
       {
@@ -311,6 +369,12 @@ namespace base {
       pointer = mp_begin;
       size = m_size;
       return true;
+   }
+
+   inline
+   bool CircularBuffer::is_linear( RawBuffer& buffer ) const
+   {
+      return is_linear( buffer.ptr, buffer.size );
    }
 
 } // namespace base

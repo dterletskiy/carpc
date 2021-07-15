@@ -1,3 +1,11 @@
+version 3.1.0
+   - Common serialization / deserialization wrappers implemented and used in the code instead of stream.push(...) / stream.pop(...).
+     This will allow to used any other serializer / deserializer in the future just introducing new wrappers.
+   - Event serializetion / deserialization algorithm changed.
+   - Fix in CircularBuffer for "pop_back".
+   - Removed "lock", "store" and "restore" functionality from CircularBuffer.
+   - ByteStream api and functionality extended.
+
 version 3.0.4
    - Removed DUM from framework project.
    - Optimizations for includes.

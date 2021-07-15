@@ -177,8 +177,14 @@
             return strings[ static_cast< std::string::size_type >( value ) ].c_str( );       \
       };                                                                                     \
                                                                                              \
-      bool to_stream( base::ipc::tStream& stream ) const { return stream.push( value ); }    \
-      bool from_stream( base::ipc::tStream& stream ) { return stream.pop( value ); }         \
+      bool to_stream( base::ipc::tStream& stream ) const                                     \
+      {                                                                                      \
+         return ipc::serialize( stream, value );                                             \
+      }                                                                                      \
+      bool from_stream( base::ipc::tStream& stream )                                         \
+      {                                                                                      \
+         return ipc::deserialize( stream, value );                                           \
+      }                                                                                      \
                                                                                              \
       eValue value = UNDEFINED;                                                              \
    };

@@ -27,10 +27,10 @@ const std::string Passport::name( ) const
 
 bool Passport::to_stream( base::ipc::tStream& stream ) const
 {
-   return stream.push( signature, address );
+   return ipc::serialize( stream, signature, address );
 }
 
 bool Passport::from_stream( base::ipc::tStream& stream )
 {
-   return stream.pop( signature, address );
+   return ipc::deserialize( stream, signature, address );
 }
