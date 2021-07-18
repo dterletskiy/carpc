@@ -15,6 +15,14 @@
 
 
 
+#define DEBUG
+#ifdef DEBUG
+   #define MESSAGE( FORMAT, ... ) base::write( FORMAT, ##__VA_ARGS__ );
+#else
+   #define MESSAGE( FORMAT, ... )
+#endif
+
+
 
 namespace {
 

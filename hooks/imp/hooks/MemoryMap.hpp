@@ -35,6 +35,7 @@ namespace hook::memory {
          using tEntry = struct { void* address; };
 
          tEntry         m_mem_map[ s_memory_map_size ];
+         // tEntry*        m_mem_map = nullptr;
          std::size_t    m_records = 0;
          std::size_t    m_min_track_size = 0;
          int            m_last_errno = 0;

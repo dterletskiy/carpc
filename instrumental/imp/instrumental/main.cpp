@@ -16,6 +16,7 @@ instrumental::Elf64* elf;
 
 int getresuid( uid_t*, uid_t*, uid_t* ) __attribute__(( no_instrument_function ));
 
+bool init( ) __attribute__(( no_instrument_function ));
 bool init( )
 {
    elf = new instrumental::Elf64;

@@ -26,6 +26,11 @@
 
 
 
+extern "C" void* malloc_u( size_t size );
+extern "C" void free_u( void* address );
+
+
+
 const mode_t AccessPerms = (mode_t)0600;
 
 
@@ -81,11 +86,13 @@ MemoryMap::MemoryMap( const char* _path, const std::size_t _size )
    : m_min_track_size( _size )
    , m_path( _path )
 {
+   // m_mem_map = (tEntry*) malloc_u( s_memory_map_size * sizeof( tEntry ) );
    init( );
 }
 
 MemoryMap::~MemoryMap( )
 {
+   // free_u( m_mem_map );
    deinit( );
 }
 

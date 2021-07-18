@@ -24,6 +24,8 @@ declare -A COMMAND=(
 
 declare -A PROJECT
 
+CORES=$( grep -c ^processor /proc/cpuinfo )
+
 
 
 ACTION=${1}
@@ -102,7 +104,7 @@ function build( )
    local -n LOCAL_BUILD__PROJECT=${1}
    local LOCAL_TARGETS=${2}
 
-   cmake --build ${LOCAL_BUILD__PROJECT[BUILD_DIR]} --target ${LOCAL_TARGETS} -j 4
+   cmake --build ${LOCAL_BUILD__PROJECT[BUILD_DIR]} --target ${LOCAL_TARGETS} -j ${CORES}
 }
 
 function install( )
@@ -226,9 +228,13 @@ function start( )
 {
    local -n LOCAL_START__PROJECT=${1}
 
-   LD_PATH=${LD_LIBRARY_PATH}:${LOCAL_START__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
-   echo export LD_LIBRARY_PATH=${LD_PATH}
-   export LD_LIBRARY_PATH=${LD_PATH}
+   _LD_LIBRARY_PATH_=${LD_LIBRARY_PATH}:${LOCAL_START__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
+   echo export LD_LIBRARY_PATH=${_LD_LIBRARY_PATH_}
+   export LD_LIBRARY_PATH=${_LD_LIBRARY_PATH_}
+
+   # _LD_PRELOAD_=${LD_PRELOAD}:${LOCAL_START__PROJECT[DELIVERY_DIR]}/lib/libhooks.so
+   # echo export LD_PRELOAD=${_LD_PRELOAD_}
+   # export LD_PRELOAD=${_LD_PRELOAD_}
 
    # start_delivery LOCAL_START__PROJECT
    start_test LOCAL_START__PROJECT

@@ -11,8 +11,8 @@ namespace instrumental {
 
    struct Elf64
    {
-      Elf64( );
-      ~Elf64( );
+      Elf64( ) __attribute__(( no_instrument_function ));
+      ~Elf64( ) __attribute__(( no_instrument_function ));
 
       bool init( ) __attribute__(( no_instrument_function ));
       int fill_tab( char** result ) __attribute__(( no_instrument_function ));

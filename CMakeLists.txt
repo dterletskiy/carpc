@@ -11,6 +11,8 @@ option( SYS_TRACE                "Enable framework system tracing"              
 option( MSG_TRACE                "Enable application tracing"                                   ON )
 option( COLORED_TRACE            "Enable colored tracing for console"                           ON )
 option( DLT_TRACE                "Enable dlt tracing"                                           ON )
+option( MEMORY_HOOK              "Enable memory allocator hooks"                                OFF )
+option( INSTRUMENTAL             "Enable instrumental functionality"                            OFF )
 
 
 
@@ -50,18 +52,23 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 ###########################################################################################
 add_definitions( -Wall )
 add_definitions( -Wextra )
-add_definitions( -Ofast )
 add_definitions( -Wno-ignored-qualifiers )
 add_definitions( -Wno-unused-but-set-variable )
 add_definitions( -Wno-unused-variable )
 add_definitions( -Wno-unused-parameter )
 add_definitions( -Wno-unused-function )
 add_definitions( -Wno-comment )
+if( INSTRUMENTAL )
+   add_definitions( -O0 )
+   add_definitions( -g )
+   add_definitions( -finstrument-functions )
+else( )
+   add_definitions( -Ofast )
+endif( )
 
 add_compile_definitions( OS_ANDROID=0 )
 add_compile_definitions( OS_LINUX=1 )
 add_compile_definitions( OS=OS_LINUX )
-
 if( SYS_TRACE )
    add_compile_definitions( SYS_TRACE )
 endif( )
@@ -73,6 +80,9 @@ if( COLORED_TRACE )
 endif( )
 if( DLT_TRACE )
    add_compile_definitions( USE_DLT )
+endif( )
+if( MEMORY_HOOK )
+   add_compile_definitions( USE_MEMORY_HOOK )
 endif( )
 
 

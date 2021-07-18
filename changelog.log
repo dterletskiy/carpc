@@ -1,3 +1,7 @@
+version 3.1.2
+   - INSTRUMENTAL and MEMORY_HOOK support were added to build system.
+   - Some minor changes.
+
 version 3.1.1
    - Return back previously removed main.cpp file from experimental project.
 

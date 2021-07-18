@@ -53,7 +53,7 @@ bool test( int argc, char** argv, char** envp );
    void preinit( int argc, char** argv, char** envp )
    {
       base::tools::PCE configuration( argc, argv, envp );
-      configuration.print( );
+      // configuration.print( );
 
       std::string string_trace_strategy = configuration.value( "trace" ).value_or( "CONSOLE" );
       base::trace::eLogStrategy trace_strategy = base::trace::eLogStrategy::CONSOLE;

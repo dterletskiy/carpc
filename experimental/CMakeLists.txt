@@ -75,6 +75,13 @@ add_executable( ${TARGET_NAME} ${SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
 target_link_libraries( ${TARGET_NAME} framework )
+if( MEMORY_HOOK )
+   target_link_libraries( ${TARGET_NAME} hooks )
+endif( )
+if( INSTRUMENTAL )
+   target_link_libraries( ${TARGET_NAME} instrumental )
+endif( )
+
 target_link_libraries( ${TARGET_NAME} ${OpenCV_LIBS} )
 target_link_libraries( ${TARGET_NAME} dlib )
 target_link_libraries( ${TARGET_NAME} gif )
