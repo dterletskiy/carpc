@@ -152,10 +152,40 @@ namespace base::os::os_linux::socket {
                         , const int _flags = 0
    );
 
+   const ssize_t sendto(
+                          const tSocket _socket
+                        , const void* _buffer
+                        , const size_t _size
+                        , const int _flags
+                        , const sockaddr* const _address
+                        , const socklen_t _address_len
+   );
+
+   const ssize_t sendmsg(
+                          const tSocket _socket
+                        , const msghdr* const _message
+                        , const int _flags = 0
+   );
+
    const ssize_t recv(
                           const tSocket _socket
                         , void* const _buffer
                         , const size_t _size
+                        , const int _flags = 0
+   );
+
+   const ssize_t recvfrom(
+                          const tSocket _socket
+                        , void* const _buffer
+                        , const size_t _size
+                        , const int _flags
+                        , sockaddr* const _address
+                        , socklen_t* const _address_len
+   );
+
+   const ssize_t recvmsg(
+                          const tSocket _socket
+                        , msghdr* const message
                         , const int _flags = 0
    );
 

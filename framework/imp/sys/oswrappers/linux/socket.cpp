@@ -431,6 +431,34 @@ namespace base::os::os_linux::socket {
       return size;
    }
 
+   const ssize_t sendto( const tSocket _socket, const void* _buffer, const size_t _size, const int _flags,
+                        const sockaddr* const _address, const socklen_t _address_len )
+   {
+      if( nullptr == _buffer )
+      {
+         SYS_ERR( "sendto(%d): buffer is nullptr", _socket );
+         return 0;
+      }
+
+      ssize_t size = ::sendto( _socket, _buffer, _size, _flags, _address, _address_len );
+      error = errno;
+      if( size != static_cast< ssize_t >( _size ) )
+      {
+         SYS_ERR( "sendto(%d): error %d / bytes %zd", _socket, error, size );
+         return size;
+      }
+      SYS_VRB( "sendto(%d): %zd bytes", _socket, size );
+      return size;
+   }
+
+   const ssize_t sendmsg( const tSocket _socket, const msghdr* const _message, const int _flags )
+   {
+      ssize_t size = ::sendmsg( _socket, _message, _flags );
+      error = errno;
+      SYS_VRB( "sendmsg(%d): %zd bytes", _socket, size );
+      return size;
+   }
+
    const ssize_t recv( const tSocket _socket, void* const _buffer, const size_t _size, const int _flags )
    {
       if( nullptr == _buffer )
@@ -447,6 +475,34 @@ namespace base::os::os_linux::socket {
          return size;
       }
       SYS_VRB( "recv(%d): %zd bytes", _socket, size );
+      return size;
+   }
+
+   const ssize_t recvfrom( const tSocket _socket, void* const _buffer, const size_t _size, const int _flags,
+                        sockaddr* const _address, socklen_t* const _address_len )
+   {
+      if( nullptr == _buffer )
+      {
+         SYS_ERR( "recvfrom(%d): buffer is nullptr", _socket );
+         return 0;
+      }
+
+      ssize_t size = ::recvfrom( _socket, _buffer, _size, _flags, _address, _address_len );
+      error = errno;
+      if( 0 >= size )
+      {
+         SYS_ERR( "recvfrom(%d): error %d", _socket, error );
+         return size;
+      }
+      SYS_VRB( "recvfrom(%d): %zd bytes", _socket, size );
+      return size;
+   }
+
+   const ssize_t recvmsg( const tSocket _socket, msghdr* const _message, const int _flags )
+   {
+      ssize_t size = ::recvmsg( _socket, _message, _flags );
+      error = errno;
+      SYS_VRB( "recvmsg(%d): %zd bytes", _socket, size );
       return size;
    }
 
