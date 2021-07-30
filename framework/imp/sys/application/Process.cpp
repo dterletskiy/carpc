@@ -94,7 +94,7 @@ namespace { base::os::Mutex s_mutex; }
 Process::tSptr Process::instance( int argc, char** argv, char** envp )
 {
    // First call of this function must be done from main function => should not be race condition.
-   // os::MutexAutoLocker locker( s_mutex );
+   // os::Mutex::AutoLocker locker( s_mutex );
    if( nullptr == mp_instance )
    {
       if( argc < 1 || nullptr == argv )

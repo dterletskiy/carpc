@@ -37,7 +37,7 @@ Thread::~Thread( )
    SYS_INF( );
    // Not supported by Android
    // if( true == m_created ) pthread_cancel( m_created );
-   os::MutexAutoLocker locker( s_registry_mutex );
+   os::Mutex::AutoLocker locker( s_registry_mutex );
    s_registry.erase( m_thread_id );
 }
 
@@ -50,7 +50,7 @@ void Thread::init( )
 
 const Thread::ID Thread::current_id( )
 {
-   os::MutexAutoLocker locker( s_registry_mutex );
+   os::Mutex::AutoLocker locker( s_registry_mutex );
    const auto iterator = s_registry.find( pthread_self( ) );
    if( s_registry.end( ) == iterator )
       return ID::invalid;

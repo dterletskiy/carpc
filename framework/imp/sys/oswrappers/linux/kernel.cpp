@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <fcntl.h>
+#include <sys/syscall.h>
 #ifdef EXECINFO
    #include <execinfo.h>
 #endif
@@ -66,6 +67,11 @@ namespace base::os::os_linux {
          free( strings );
       }
    #endif
+   }
+
+   int futex( int* uaddr, int futex_op, int val, const struct timespec* timeout, int* uaddr2, int val3 )
+   {
+      return syscall( SYS_futex, uaddr, futex_op, val, timeout, uaddr, val3 );
    }
 
 } // namespace base::os::os_linux

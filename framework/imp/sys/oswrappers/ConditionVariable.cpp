@@ -20,45 +20,58 @@ using namespace base::os;
 
 
 ConditionVariable::ConditionVariable( )
+   : Mutex( false, false )
 {
+   pthread_condattr_init( &m_cond_attr );
+   pthread_cond_init( &m_cond_var, &m_cond_attr );
+
    MESSAGE( "%s: created(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
 }
 
 ConditionVariable::~ConditionVariable( )
 {
+   pthread_cond_destroy( &m_cond_var );
+   pthread_condattr_destroy( &m_cond_attr );
+
    MESSAGE( "%s: destroyed(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
 }
 
-void ConditionVariable::lock( )
-{
-   MESSAGE( "%s: trying to lock(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-   pthread_mutex_lock( &m_mutex );
-   MESSAGE( "%s: locked(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-}
-
-void ConditionVariable::unlock( )
-{
-   pthread_mutex_unlock( &m_mutex );
-   MESSAGE( "%s: unlocked(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-}
-
-void ConditionVariable::wait( )
+bool ConditionVariable::wait( )
 {
    MESSAGE( "%s: waiting(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-   pthread_cond_wait( &m_cond_var, &m_mutex );
+   const int result = pthread_cond_wait( &m_cond_var, &m_mutex );
+   m_error = errno;
+   if( 0 != result )
+   {
+      MESSAGE( "%s: waiting(%#10lx) error: %d\n", m_id.name( ).c_str( ), pthread_self( ), m_error );
+      return false;
+   }
+
    MESSAGE( "%s: wait finished(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
+   return true;
 }
 
-void ConditionVariable::notify( const bool all )
+bool ConditionVariable::notify( const bool all )
 {
+   int result = 0;
    if( all )
    {
-      MESSAGE( "%s: broadcast(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-      pthread_cond_broadcast( &m_cond_var );
+      MESSAGE( "%s: notify all(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
+      result = pthread_cond_broadcast( &m_cond_var );
+      m_error = errno;
    }
    else
    {
-      MESSAGE( "%s: signal(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-      pthread_cond_signal( &m_cond_var );
+      MESSAGE( "%s: notify one(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
+      result = pthread_cond_signal( &m_cond_var );
+      m_error = errno;
    }
+
+   if( 0 != result )
+   {
+      MESSAGE( "%s: notify(%#10lx) error: %d\n", m_id.name( ).c_str( ), pthread_self( ), m_error );
+      return false;
+   }
+
+   return true;
 }

@@ -13,6 +13,7 @@ option( COLORED_TRACE            "Enable colored tracing for console"           
 option( DLT_TRACE                "Enable dlt tracing"                                           ON )
 option( MEMORY_HOOK              "Enable memory allocator hooks"                                OFF )
 option( INSTRUMENTAL             "Enable instrumental functionality"                            OFF )
+option( USE_DEBUG                "Enable debug information"                                     ON )
 
 
 
@@ -64,6 +65,9 @@ if( INSTRUMENTAL )
    add_definitions( -finstrument-functions )
 else( )
    add_definitions( -Ofast )
+endif( )
+if( USE_DEBUG )
+   add_definitions( -g )
 endif( )
 
 add_compile_definitions( OS_ANDROID=0 )

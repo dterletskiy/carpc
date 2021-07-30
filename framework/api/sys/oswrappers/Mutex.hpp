@@ -10,31 +10,47 @@ namespace base::os {
    class Mutex
    {
       public:
+         class AutoLocker
+         {
+            public:
+               AutoLocker( os::Mutex& mutex )
+                  : m_mutex( mutex )
+               {
+                  m_mutex.lock( );
+               }
+               ~AutoLocker( )
+               {
+                  m_mutex.unlock( );
+               }
+
+            private:
+               os::Mutex& m_mutex;
+         };
+
+      public:
          using ID = base::TID< Mutex >;
 
       public:
-         Mutex( const bool auto_lock = false, const bool recursive = true, const char* name = "mutex_no_name" );
+         Mutex( const bool auto_lock = false, const bool recursive = true );
          Mutex( const Mutex& ) = delete;
-         virtual ~Mutex( );
+         ~Mutex( );
 
       public:
          const ID id( ) const;
-         const char* const name( ) const;
-      private:
-         ID                m_id = ID::generate( );
-         const char* const m_name;
+      protected:
+         ID                   m_id = ID::generate( );
 
       public:
-         void lock( );
-         void unlock( );
-      private:
-         bool        m_locked = false;
+         bool lock( );
+         bool try_lock( );
+         bool unlock( );
+      protected:
+         bool                 m_locked = false;
+         int                  m_error = 0;
 
-      public:
-         pthread_mutex_t& mutex( );
-      private:
+      protected:
          pthread_mutex_t      m_mutex = PTHREAD_MUTEX_INITIALIZER;
-         pthread_mutexattr_t  m_attr;
+         pthread_mutexattr_t  m_mutex_attr;
    };
 
 
@@ -44,29 +60,5 @@ namespace base::os {
    {
       return m_id;
    }
-
-   inline
-   const char* const Mutex::name( ) const
-   {
-      return m_name;
-   }
-
-   inline
-   pthread_mutex_t& Mutex::mutex( )
-   {
-      return m_mutex;
-   }
-
-
-
-   class MutexAutoLocker
-   {
-   public:
-      MutexAutoLocker( Mutex& );
-      ~MutexAutoLocker( );
-
-   private:
-      Mutex& m_mutex;
-   };
 
 } // namespace base::os

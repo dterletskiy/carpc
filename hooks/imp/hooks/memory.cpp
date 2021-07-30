@@ -47,7 +47,7 @@ extern "C" void* malloc( size_t size )
    if( 0 == size )
       return nullptr;
 
-   base::os::MutexAutoLocker locker( s_mutex );
+   base::os::Mutex::AutoLocker locker( s_mutex );
    void* address = __libc_malloc( size + hook::memory::s_header_size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
@@ -65,7 +65,7 @@ extern "C" void* memalign( size_t alignment, size_t size )
    if( 0 == size )
       return nullptr;
 
-   base::os::MutexAutoLocker locker( s_mutex );
+   base::os::Mutex::AutoLocker locker( s_mutex );
    void* address = __libc_memalign( alignment, size );
    s_memory_map.insert( address, __builtin_return_address(0), size );
 
@@ -83,7 +83,7 @@ extern "C" void* realloc( void* address, size_t size )
    if( 0 == size )
       return nullptr;
 
-   base::os::MutexAutoLocker locker( s_mutex );
+   base::os::Mutex::AutoLocker locker( s_mutex );
    void* new_address = __libc_realloc(
         address ? static_cast< void* >(static_cast< char* >( address ) - hook::memory::s_header_size) : address
       , (size + hook::memory::s_header_size)
@@ -105,7 +105,7 @@ extern "C" void* calloc( size_t number, size_t size )
    if( 0 == size || 0 == number )
       return nullptr;
 
-   base::os::MutexAutoLocker locker( s_mutex );
+   base::os::Mutex::AutoLocker locker( s_mutex );
    // void* address = __libc_calloc( number, size );
    void* address = __libc_malloc( number * size + hook::memory::s_header_size );
    memset( address, 0, number * size + hook::memory::s_header_size );
@@ -125,7 +125,7 @@ extern "C" void free( void* address )
    if( nullptr == address )
       return;
 
-   base::os::MutexAutoLocker locker( s_mutex );
+   base::os::Mutex::AutoLocker locker( s_mutex );
    SYS_VRB( "address = %p", address );
    s_memory_map.remove( static_cast< char* >( address ) - hook::memory::s_header_size );
    __libc_free( static_cast< char* >( address ) - hook::memory::s_header_size );

@@ -61,7 +61,7 @@ const Address::tSet& Registry::clients( const Passport& passport ) const
 
 Registry::eResult Registry::register_server( const Signature& signature, const Address& address )
 {
-   os::MutexAutoLocker locker( s_mutex );
+   os::Mutex::AutoLocker locker( s_mutex );
 
    // Add signature to DB if it is not exists
    auto iterator = m_db.find( signature );
@@ -101,7 +101,7 @@ Registry::eResult Registry::register_server( const Signature& signature, const A
 
 Registry::eResult Registry::unregister_server( const Signature& signature, const Address& address )
 {
-   os::MutexAutoLocker locker( s_mutex );
+   os::Mutex::AutoLocker locker( s_mutex );
 
    // Find registered signature in DB
    auto iterator = m_db.find( signature );
@@ -138,7 +138,7 @@ Registry::eResult Registry::unregister_server( const Signature& signature, const
 
 Registry::eResult Registry::register_client( const Signature& signature, const Address& address )
 {
-   os::MutexAutoLocker locker( s_mutex );
+   os::Mutex::AutoLocker locker( s_mutex );
 
    // Add signature to DB if it is not exists
    auto iterator = m_db.find( signature );
@@ -180,7 +180,7 @@ Registry::eResult Registry::register_client( const Signature& signature, const A
 
 Registry::eResult Registry::unregister_client( const Signature& signature, const Address& address )
 {
-   os::MutexAutoLocker locker( s_mutex );
+   os::Mutex::AutoLocker locker( s_mutex );
 
    // Find registered signature in DB
    auto iterator = m_db.find( signature );

@@ -1,3 +1,8 @@
+version 3.1.4
+   - Thread synchronization refactoring.
+   - Spinlock wrapper implemented.
+   - Futex wrapper implemented.
+
 version 3.1.3
    - Wrappers for kernel socket functions added.
 

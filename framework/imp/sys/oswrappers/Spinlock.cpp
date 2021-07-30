@@ -1,5 +1,5 @@
 #include "api/sys/helpers/functions/print.hpp"
-#include "api/sys/oswrappers/Mutex.hpp"
+#include "api/sys/oswrappers/Spinlock.hpp"
 
 
 
@@ -16,34 +16,30 @@ using namespace base::os;
 
 
 
-Mutex::Mutex( const bool auto_lock, const bool recursive )
+Spinlock::Spinlock( const bool auto_lock, const bool shared )
 {
-   pthread_mutexattr_init( &m_mutex_attr );
-   if( true == recursive )
-      pthread_mutexattr_settype( &m_mutex_attr, PTHREAD_MUTEX_RECURSIVE );
-   pthread_mutex_init( &m_mutex, &m_mutex_attr );
-
-   MESSAGE( "%s: created(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
+   pthread_spin_init( &m_spinlock, shared ? PTHREAD_PROCESS_SHARED : PTHREAD_PROCESS_PRIVATE );
 
    if( auto_lock )
       lock( );
+
+   MESSAGE( "%s: created(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
 }
 
-Mutex::~Mutex( )
+Spinlock::~Spinlock( )
 {
-   MESSAGE( "%s: destroyed(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-
    if( m_locked )
       unlock( );
 
-   pthread_mutex_destroy( &m_mutex );
-   pthread_mutexattr_destroy( &m_mutex_attr );
+   pthread_spin_destroy( &m_spinlock );
+
+   MESSAGE( "%s: destroyed(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
 }
 
-bool Mutex::lock( )
+bool Spinlock::lock( )
 {
    MESSAGE( "%s: trying to lock(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-   const int result = pthread_mutex_lock( &m_mutex );
+   const int result = pthread_spin_lock( &m_spinlock );
    m_error = errno;
    if( 0 != result )
    {
@@ -56,10 +52,10 @@ bool Mutex::lock( )
    return true;
 }
 
-bool Mutex::try_lock( )
+bool Spinlock::try_lock( )
 {
    MESSAGE( "%s: trying to lock(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-   const int result = pthread_mutex_trylock( &m_mutex );
+   const int result = pthread_spin_trylock( &m_spinlock );
    m_error = errno;
    if( 0 != result )
    {
@@ -72,10 +68,10 @@ bool Mutex::try_lock( )
    return true;
 }
 
-bool Mutex::unlock( )
+bool Spinlock::unlock( )
 {
    MESSAGE( "%s: trying to unlock(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
-   const int result = pthread_mutex_unlock( &m_mutex );
+   const int result = pthread_spin_unlock( &m_spinlock );
    m_error = errno;
    if( 0 != result )
    {
