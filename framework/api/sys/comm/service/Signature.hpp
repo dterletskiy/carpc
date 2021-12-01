@@ -24,7 +24,6 @@ namespace base::service {
          bool from_stream( base::ipc::tStream& );
 
       public:
-         Signature& operator=( const Signature& );
          bool operator==( const Signature& ) const;
          bool operator!=( const Signature& ) const;
          bool operator<( const Signature& ) const;

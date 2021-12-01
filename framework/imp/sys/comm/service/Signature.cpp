@@ -29,17 +29,6 @@ bool Signature::from_stream( base::ipc::tStream& stream )
    return ipc::deserialize( stream, m_type_id, m_role );
 }
 
-Signature& Signature::operator=( const Signature& other )
-{
-   if( other == *this )
-      return *this;
-
-   m_type_id = other.m_type_id;
-   m_role = other.m_role;
-
-   return *this;
-}
-
 bool Signature::operator==( const Signature& other ) const
 {
    return ( m_type_id == other.m_type_id ) && ( m_role == other.m_role );

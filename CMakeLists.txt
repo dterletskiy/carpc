@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 # set( CMAKE_C_COMPILER "/usr/bin/gcc" )
 # set( CMAKE_CXX_COMPILER "/usr/bin/g++" )
@@ -13,7 +13,7 @@ option( COLORED_TRACE            "Enable colored tracing for console"           
 option( DLT_TRACE                "Enable dlt tracing"                                           ON )
 option( MEMORY_HOOK              "Enable memory allocator hooks"                                OFF )
 option( INSTRUMENTAL             "Enable instrumental functionality"                            OFF )
-option( USE_DEBUG                "Enable debug information"                                     ON )
+option( USE_DEBUG                "Enable debug information"                                     OFF )
 
 
 
@@ -58,6 +58,7 @@ add_definitions( -Wno-unused-but-set-variable )
 add_definitions( -Wno-unused-variable )
 add_definitions( -Wno-unused-parameter )
 add_definitions( -Wno-unused-function )
+add_definitions( -Wno-unused-result )
 add_definitions( -Wno-comment )
 if( INSTRUMENTAL )
    add_definitions( -O0 )
@@ -66,7 +67,7 @@ if( INSTRUMENTAL )
 else( )
    add_definitions( -Ofast )
 endif( )
-if( USE_DEBUG )
+if( USE_DEBUG OR INSTRUMENTAL )
    add_definitions( -g )
 endif( )
 
@@ -125,6 +126,6 @@ add_subdirectory( application )
 add_subdirectory( controller )
 add_subdirectory( core )
 add_subdirectory( hmi )
-add_subdirectory( experimental )
+# add_subdirectory( experimental )
 
 install( FILES ${PROJECT_SOURCE_DIR}/.configuration/dlt.conf DESTINATION etc )
