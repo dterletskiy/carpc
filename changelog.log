@@ -1,3 +1,6 @@
+version 3.1.6
+   - Initial code generator scripts.
+
 version 3.1.5
    - Some minor changes.
    - Changed minimal required cmake version.

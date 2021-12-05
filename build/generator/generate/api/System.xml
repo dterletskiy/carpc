@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" ?>
+
+<namespace name="system::event">
+
+   <class name="Data" type="data">
+      <field name="id" type="std::size_t" value="0"/>
+      <field name="message" type="std::string" value="&quot;no_message&quot;"/>
+   </class>
+
+   <enum name="eID" type="std::uint8_t">
+      <field name="boot" value="0" description="boot"/>
+      <field name="shutdown" value="0" description="shutdown"/>
+      <field name="ping" value="0" description="ping"/>
+   </enum>
+
+   <class name="Signature" type="signature">
+      <field name="id" type="eID" value="{ }"/>
+      <field name="status" type="std::string"/>
+   </class>
+
+   <event name="System" type="IPC" data="Data" signature="Signature">
+      <description>
+         "System event"
+      </description>
+   </event>
+
+   <event name="Service" type="NoIPC" data="Data" signature="Signature">
+      <description>
+         "Service event"
+      </description>
+   </event>
+
+</namespace>
