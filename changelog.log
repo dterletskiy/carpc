@@ -1,3 +1,6 @@
+version 3.1.7a
+   - Some fix for previous commit.
+
 version 3.1.7
    - Implemented read/write mutex wrapper.
    - Improvement for mutex wrapper.
