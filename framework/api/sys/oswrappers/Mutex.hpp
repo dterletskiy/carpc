@@ -43,9 +43,10 @@ namespace base::os {
       public:
          bool lock( );
          bool try_lock( );
+         bool timed_lock( const timespec& abs_timeout );
          bool unlock( );
       protected:
-         bool                 m_locked = false;
+         unsigned int         m_locked = 0;
          int                  m_error = 0;
 
       protected:
@@ -57,6 +58,52 @@ namespace base::os {
 
    inline
    const Mutex::ID Mutex::id( ) const
+   {
+      return m_id;
+   }
+
+} // namespace base::os
+
+
+
+namespace base::os {
+
+   class MutexRW
+   {
+      public:
+         using ID = base::TID< MutexRW >;
+
+      public:
+         MutexRW( );
+         MutexRW( const MutexRW& ) = delete;
+         ~MutexRW( );
+
+      public:
+         const ID id( ) const;
+      protected:
+         ID                   m_id = ID::generate( );
+
+      public:
+         bool read_lock( );
+         bool write_lock( );
+         bool try_read_lock( );
+         bool try_write_lock( );
+         bool read_time_lock( const timespec& abs_timeout );
+         bool write_time_lock( const timespec& abs_timeout );
+         bool unlock( );
+      protected:
+         unsigned int         m_locked = 0;
+         int                  m_error = 0;
+
+      protected:
+         pthread_rwlock_t     m_mutex = PTHREAD_RWLOCK_INITIALIZER;
+         pthread_rwlockattr_t m_mutex_attr;
+   };
+
+
+
+   inline
+   const MutexRW::ID MutexRW::id( ) const
    {
       return m_id;
    }

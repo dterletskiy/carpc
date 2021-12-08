@@ -48,6 +48,7 @@ link_directories( ${TRACING_BINARY_DIR} )
 #                                                                                         #
 ###########################################################################################
 file( GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
+list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
 
 
 
@@ -66,7 +67,9 @@ message( STATUS "SOURCE_FILES = " ${SOURCE_FILES} )
 add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
-target_link_libraries( ${TARGET_NAME} pthread )
+if( ${OS} EQUAL ${OS_LINUX} )
+   target_link_libraries( ${TARGET_NAME} pthread )
+endif( )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )
 install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION . )

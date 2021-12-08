@@ -1,22 +1,35 @@
 #!/bin/sh
 
-NDK=/mnt/sdk/Android/ndk/r20b
-HOST_TAG=linux-x86_64
+# links:
+# https://developer.android.com/ndk/guides/other_build_systems
+
+
+
+NDK=/home/dmytro_terletskyi/Soft/android/ndk/r23b
+
+HOST_ARCH=x86_64
+HOST_OS=linux
+HOST_TAG=${HOST_OS}-${HOST_ARCH}
 
 export TOOLCHAIN=${NDK}/toolchains/llvm/prebuilt/${HOST_TAG}
 export SYSROOT=${TOOLCHAIN}/sysroot
 
-export ARCH=i686
+export ARCH=x86_64
 export OS=linux
-export API=android24
-export SESSION=${ARCH}-${OS}-${API}
+export API=21
+export TARGET=${ARCH}-${OS}-android
+export SESSION=${TARGET}${API}
+
 ADDITIONAL_PARAMETERS="-mstackrealign -fno-addrsig"
 PARAMETERS="--sysroot=${SYSROOT} --target=${SESSION} ${ADDITIONAL_PARAMETERS}"
 
-export AR="${TOOLCHAIN}/bin/aarch64-linux-android-ar ${PARAMETERS}"
-export AS="${TOOLCHAIN}/bin/aarch64-linux-android-as ${PARAMETERS}"
-export CC="${TOOLCHAIN}/bin/aarch64-linux-android21-clang ${PARAMETERS}"
-export CXX="${TOOLCHAIN}/bin/aarch64-linux-android21-clang++ ${PARAMETERS}"
-export LD="${TOOLCHAIN}/bin/aarch64-linux-android-ld ${PARAMETERS}"
-export RANLIB="${TOOLCHAIN}/bin/aarch64-linux-android-ranlib ${PARAMETERS}"
-export STRIP="${TOOLCHAIN}/bin/aarch64-linux-android-strip ${PARAMETERS}"
+
+
+export AR="${TOOLCHAIN}/bin/llvm-ar ${PARAMETERS}"
+export AS="${TOOLCHAIN}/bin/llvm-as ${PARAMETERS}"
+export CC="${TOOLCHAIN}/bin/${TARGET}${API}-clang ${PARAMETERS}"
+export CXX="${TOOLCHAIN}/bin/${TARGET}${API}-clang++ ${PARAMETERS}"
+# export AS="$CC"
+export LD="${TOOLCHAIN}/bin/ld ${PARAMETERS}"
+export RANLIB="${TOOLCHAIN}/bin/llvm-ranlib ${PARAMETERS}"
+export STRIP="${TOOLCHAIN}/bin/llvm-strip ${PARAMETERS}"

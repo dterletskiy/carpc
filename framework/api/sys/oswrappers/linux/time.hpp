@@ -9,15 +9,15 @@
 
 namespace base::os::os_linux {
 
-   enum class eGranularity : size_t
+   enum class eGranularity : std::size_t
    {
       seconds = 1,
-      miliseconds = 1000,
-      microeconds = 1000000,
+      milliseconds = 1000,
+      microseconds = 1000000,
       nanoseconds = 1000000000
    };
 
-   void local_time_of_date( tm*&, size_t& );
+   void local_time_of_date( tm*&, std::size_t& );
 
    uint64_t time( const eGranularity gran, clockid_t clk_id = CLOCK_REALTIME );
    uint64_t milliseconds( clockid_t clk_id = CLOCK_REALTIME );
