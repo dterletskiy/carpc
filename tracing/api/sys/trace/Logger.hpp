@@ -8,7 +8,7 @@
 
 namespace base::trace {
 
-   const std::size_t s_buffer_size = 1024;
+   const std::size_t s_buffer_size = 2 * 1024;
 
 
 
@@ -171,7 +171,7 @@ namespace base::trace {
 
       private:
          const char* mp_application_name = nullptr;
-         std::size_t m_buffer_size = 0;
+         std::size_t m_buffer_size = s_buffer_size;
 
       public:
          const eLogStrategy& log_strategy( ) const;

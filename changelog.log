@@ -1,3 +1,6 @@
+version 3.1.8a
+   - Some fix for previous commit.
+
 version 3.1.8
    - Fix for permanent stuck in SendReceive thread after shutdown what prevents to complete shutdown.
    - Some changes and fixes in oswrappers/linux/time.
