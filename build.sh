@@ -173,17 +173,19 @@ function start_delivery( )
    local -n LOCAL_SD__PROJECT=${1}
 
    start_dlt_daemon LOCAL_SD__PROJECT
-   start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "DLT"
-   start_process LOCAL_SD__PROJECT ${HMI} "DLT"
-   start_process LOCAL_SD__PROJECT ${CONTROLLER} "DLT"
-   start_process LOCAL_SD__PROJECT ${CORE} "DLT"
+   # start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "DLT"
+   # start_process LOCAL_SD__PROJECT ${APPLICATION} "DLT"
+   # start_process LOCAL_SD__PROJECT ${HMI} "DLT"
+   # start_process LOCAL_SD__PROJECT ${CONTROLLER} "DLT"
+   # start_process LOCAL_SD__PROJECT ${CORE} "DLT"
 }
 
 function stop_delivery( )
 {
-   stop_process ${CORE}
-   stop_process ${CONTROLLER}
-   stop_process ${HMI}
+   # stop_process ${CORE}
+   # stop_process ${CONTROLLER}
+   # stop_process ${HMI}
+   stop_process ${APPLICATION}
    stop_process ${SERVICEBROCKER}
    stop_dlt_daemon
 }
@@ -192,14 +194,14 @@ function start_test( )
 {
    local -n LOCAL_SD__PROJECT=${1}
 
-   # start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "CONSOLE"
-   start_process LOCAL_SD__PROJECT ${EXPERIMENTAL} "CONSOLE"
+   start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "CONSOLE"
+   # start_process LOCAL_SD__PROJECT ${EXPERIMENTAL} "CONSOLE"
 }
 
 function stop_test( )
 {
-   stop_process ${EXPERIMENTAL}
-   # stop_process ${SERVICEBROCKER}
+   # stop_process ${EXPERIMENTAL}
+   stop_process ${SERVICEBROCKER}
 }
 
 function start_dlt_daemon( )
@@ -236,8 +238,8 @@ function start( )
    # echo export LD_PRELOAD=${_LD_PRELOAD_}
    # export LD_PRELOAD=${_LD_PRELOAD_}
 
-   # start_delivery LOCAL_START__PROJECT
-   start_test LOCAL_START__PROJECT
+   start_delivery LOCAL_START__PROJECT
+   # start_test LOCAL_START__PROJECT
 }
 
 function stop( )

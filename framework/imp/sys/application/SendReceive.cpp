@@ -68,10 +68,12 @@ void SendReceive::thread_loop( )
       m_connections.prepare_select( max_socket, fd_set );
       m_pending_connections.prepare_select( max_socket, fd_set );
 
-      if( false == os::os_linux::socket::select( max_socket, fd_set ) )
+      timeval timeout{ 1, 0 };
+      if( false == os::os_linux::socket::select( max_socket, fd_set, &timeout ) )
          continue;
 
-      // WARNING!!! This order is important because during processing some sockets could be moved from one collection to another.
+      // WARNING!!!
+      // This order is important because during processing some sockets could be moved from one collection to another.
       m_service_brocker.process_select( fd_set );
       m_connections.process_select( fd_set );
       m_pending_connections.process_select( fd_set );

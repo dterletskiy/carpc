@@ -11,14 +11,14 @@ namespace hook::memory {
 
    struct MemoryHeader
    {
-      void*       caller   = nullptr;
-      std::size_t size     = 0;
-      uint64_t    time     = 0;
-      pthread_t   thread   = 0;
+      void*          caller   = nullptr;
+      std::size_t    size     = 0;
+      std::uint64_t  time     = 0;
+      pthread_t      thread   = 0;
 
       static MemoryHeader* cast( void* );
       static void dump( void*, const int fd = -1, const char* const message = "" );
-      static void write( void* _address, void* _caller, const std::size_t _size, const uint64_t _time, const pthread_t _thread  );
+      static void write( void* _address, void* _caller, const std::size_t _size, const std::uint64_t _time, const pthread_t _thread  );
    };
 
 

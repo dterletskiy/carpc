@@ -19,7 +19,12 @@ void preinit( int argc, char** argv, char** envp )
    if( "CONSOLE" == string_trace_strategy )  trace_strategy = base::trace::eLogStrategy::CONSOLE;
    else if( "DLT" == string_trace_strategy ) trace_strategy = base::trace::eLogStrategy::DLT;
    else                                      trace_strategy = base::trace::eLogStrategy::CONSOLE;
-   base::trace::Logger::init( trace_strategy, "SBR" );
+
+   std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
+         configuration.value( "trace_buffer" ).value_or( "1024" )
+      ) );
+
+   base::trace::Logger::init( trace_strategy, "SBR", trace_buffer );
 
    MSG_INF( "preinit_array" );
 }

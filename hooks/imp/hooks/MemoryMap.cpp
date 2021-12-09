@@ -75,7 +75,7 @@ void MemoryHeader::dump( void* _address, const int fd, const char* const message
    }
 }
 
-void MemoryHeader::write( void* _address, void* _caller, const std::size_t _size, const uint64_t _time, const pthread_t _thread )
+void MemoryHeader::write( void* _address, void* _caller, const std::size_t _size, const std::uint64_t _time, const pthread_t _thread )
 {
    *cast( _address ) = { _caller, _size, _time, _thread };
 }
@@ -149,7 +149,7 @@ bool MemoryMap::insert( void* _address, void* _caller, std::size_t _size )
    if( nullptr == _address )
       return false;
 
-   uint64_t time_stamp = base::os::os_linux::time( base::os::os_linux::eGranularity::miliseconds );
+   std::uint64_t time_stamp = base::os::os_linux::time( base::os::os_linux::eGranularity::milliseconds );
    tHeaderType::write( _address, _caller, _size, time_stamp, pthread_self( ) );
    m_common_size += _size;
 

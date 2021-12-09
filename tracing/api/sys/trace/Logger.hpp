@@ -8,24 +8,28 @@
 
 namespace base::trace {
 
+   const std::size_t s_buffer_size = 1024;
+
+
+
    class Logger
    {
       private:
          Logger( );
-         Logger( const eLogStrategy&, const char* const );
+         Logger( const eLogStrategy&, const char* const app_name, const std::size_t buffer_size = s_buffer_size );
          static Logger* mp_instance;
       public:
          ~Logger( );
          static Logger& instance( );
-         static Logger& instance( const eLogStrategy&, const char* const );
+         static Logger& instance( const eLogStrategy&, const char* const app_name, const std::size_t buffer_size = s_buffer_size );
 
-         static bool init( const eLogStrategy&, const char* const );
+         static bool init( const eLogStrategy&, const char* const app_name, const std::size_t buffer_size = s_buffer_size );
          static bool deinit( );
 
          template< typename... Args >
          void message( const eLogLevel& log_level, const char* const format, Args... args )
          {
-            char p_buffer[1024];
+            char p_buffer[ m_buffer_size ];
             auto size = ::sprintf( p_buffer, format, args... );
 
             switch( m_log_strategy )
@@ -167,6 +171,7 @@ namespace base::trace {
 
       private:
          const char* mp_application_name = nullptr;
+         std::size_t m_buffer_size = 0;
 
       public:
          const eLogStrategy& log_strategy( ) const;

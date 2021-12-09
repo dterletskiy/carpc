@@ -22,8 +22,9 @@ Logger::Logger( )
    log_strategy( eLogStrategy::CONSOLE );
 }
 
-Logger::Logger( const eLogStrategy& _log_strategy, const char* const app_name )
+Logger::Logger( const eLogStrategy& _log_strategy, const char* const app_name, const std::size_t buffer_size )
    : mp_application_name( app_name )
+   , m_buffer_size( buffer_size )
 {
    log_strategy( _log_strategy );
 
@@ -87,17 +88,17 @@ Logger& Logger::instance( )
    return *mp_instance;
 }
 
-Logger& Logger::instance( const eLogStrategy& log_strategy, const char* const app_name )
+Logger& Logger::instance( const eLogStrategy& log_strategy, const char* const app_name, const std::size_t buffer_size )
 {
    if( nullptr == mp_instance )
-      mp_instance = new Logger( log_strategy, app_name );
+      mp_instance = new Logger( log_strategy, app_name, buffer_size );
 
    return *mp_instance;
 }
 
-bool Logger::init( const eLogStrategy& log_strategy, const char* const app_name )
+bool Logger::init( const eLogStrategy& log_strategy, const char* const app_name, const std::size_t buffer_size )
 {
-   instance( log_strategy, app_name );
+   instance( log_strategy, app_name, buffer_size );
 
    return true;
 }
