@@ -1,3 +1,6 @@
+version 3.1.9
+   - Implementation for Android executable build.
+
 version 3.1.8a
    - Some fix for previous commit.
 
