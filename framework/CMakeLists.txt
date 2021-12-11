@@ -48,7 +48,9 @@ link_directories( ${TRACING_BINARY_DIR} )
 #                                                                                         #
 ###########################################################################################
 file( GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
-# list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
+if( ${OS} EQUAL ${OS_ANDROID} )
+   list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
+endif( )
 
 
 

@@ -33,3 +33,5 @@ export CXX="${TOOLCHAIN}/bin/${TARGET}${API}-clang++ ${PARAMETERS}"
 export LD="${TOOLCHAIN}/bin/ld ${PARAMETERS}"
 export RANLIB="${TOOLCHAIN}/bin/llvm-ranlib ${PARAMETERS}"
 export STRIP="${TOOLCHAIN}/bin/llvm-strip ${PARAMETERS}"
+
+export ABD_TOOL=adb

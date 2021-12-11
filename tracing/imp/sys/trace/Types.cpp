@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "api/sys/trace/Types.hpp"
 
 
@@ -49,6 +51,32 @@ namespace base::trace {
       return DLT_LOG_VERBOSE;
    }
    #endif
+
+   const char* const log_strategy_to_string( const eLogStrategy& strategy )
+   {
+      switch( strategy )
+      {
+         case eLogStrategy::CONSOLE:      return "CONSOLE";
+         case eLogStrategy::CONSOLE_EXT:  return "CONSOLE_EXT";
+         case eLogStrategy::DLT:          return "DLT";
+         case eLogStrategy::ANDROID:      return "ANDROID";
+         case eLogStrategy::UNDEFINED:    return "UNDEFINED";
+         default:                         return "CONSOLE";
+      }
+      return "CONSOLE";
+   }
+
+   const eLogStrategy log_strategy_from_string( const char* const strategy )
+   {
+      if     ( 0 == std::strcmp( strategy, "CONSOLE" ) )       return eLogStrategy::CONSOLE;
+      else if( 0 == std::strcmp( strategy, "CONSOLE_EXT" ) )   return eLogStrategy::CONSOLE_EXT;
+      else if( 0 == std::strcmp( strategy, "DLT" ) )           return eLogStrategy::DLT;
+      else if( 0 == std::strcmp( strategy, "ANDROID" ) )       return eLogStrategy::ANDROID;
+      else if( 0 == std::strcmp( strategy, "UNDEFINED" ) )     return eLogStrategy::UNDEFINED;
+      else                                                     return eLogStrategy::CONSOLE;
+
+      return eLogStrategy::CONSOLE;
+   }
 
 } // namespace base::trace
 

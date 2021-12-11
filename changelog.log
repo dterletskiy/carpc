@@ -1,3 +1,6 @@
+version 3.1.10
+   - Improvement for processing configuration and command line parameters.
+
 version 3.1.9
    - Implementation for Android executable build.
 

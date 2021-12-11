@@ -141,13 +141,13 @@ namespace base {
 namespace base::timer {
 
    using tCallback = std::function< void( const base::Timer::ID ) >;
-   const std::size_t Infinite = std::numeric_limits< size_t >::max( );
+   const std::size_t Infinite = std::numeric_limits< std::size_t >::max( );
 
    // This timer creates new thread and sleep it to some milliseconds.
    // When thread is finished "callback" will be executed in context of application thread
    // where this timer have been called.
    // Performance of this timer is worse then base::Timer implementation.
    // This timer can't be stopped.
-   base::Timer::ID start( const size_t milliseconds, const size_t count, tCallback callback, const bool asynchronous = true );
+   base::Timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous = true );
 
 } // namespace base::timer

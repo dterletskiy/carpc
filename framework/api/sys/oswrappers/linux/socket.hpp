@@ -23,6 +23,12 @@ namespace base::os::os_linux::socket {
    const tSocket InvalidSocket = -1;
    extern thread_local int error;
 
+   const char* const socket_domain_to_string( const int domain );
+   int socket_domain_from_string( const char* const domain );
+
+   const char* const socket_type_to_string( const int type );
+   int socket_type_from_string( const char* const type );
+
    struct configuration
    {
       const std::string name( ) const;

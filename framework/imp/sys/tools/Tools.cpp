@@ -25,6 +25,15 @@ namespace base::tools {
       return iterator->second;
    }
 
+   BasePCE::tValue BasePCE::value_or( const tParameter& parameter, const tValue& default_value ) const
+   {
+      const auto iterator = m_map.find( parameter );
+      if( m_map.end( ) == iterator )
+         return default_value;
+
+      return iterator->second;
+   }
+
    void BasePCE::print( ) const
    {
       const char* line = "----------------------------------------------";
@@ -103,9 +112,6 @@ namespace base::tools {
 
    void Configuration::init( const std::string& file, const std::string& delimiter )
    {
-      // std::string file = std::filesystem::path( *argv ).filename( );
-      // file += std::string( ".cfg" );
-
       std::ifstream file_stream;
       file_stream.open( file.c_str( ) );
       // std::cout << file_stream.rdbuf( ) << std::endl;
@@ -137,15 +143,11 @@ namespace base::tools {
 
 
    PCE::PCE( int argc, char** argv, char** envp, const std::string& delimiter )
-      : Parameters( argc, argv, delimiter )
-      , Environment( envp, delimiter )
+      : Parameters( )
+      , Environment( )
       , Configuration( )
    {
-      std::string file_name = std::filesystem::path( *argv ).filename( );
-      file_name += std::string( ".cfg" );
-      file_name = Parameters::value( "config" ).value_or( file_name );
-
-      Configuration::init( file_name, delimiter );
+      PCE::init( argc, argv, envp, delimiter );
    }
 
    void PCE::init( int argc, char** argv, char** envp, const std::string& delimiter )
@@ -155,7 +157,7 @@ namespace base::tools {
 
       std::string file_name = std::filesystem::path( *argv ).filename( );
       file_name += std::string( ".cfg" );
-      file_name = Parameters::value( "config" ).value_or( file_name );
+      file_name = Parameters::value_or( "config", file_name );
 
       Configuration::init( file_name, delimiter );
    }
@@ -209,6 +211,28 @@ namespace base::tools {
 
       value_opt = Configuration::value( parameter );
       return value_opt;
+   }
+
+   PCE::tValue PCE::value_or( const tParameter& parameter, const tValue& default_value, const eType& type ) const
+   {
+      switch( type )
+      {
+         case eType::CMD: return Parameters::value_or( parameter, default_value );
+         case eType::ENV: return Environment::value_or( parameter, default_value );
+         case eType::CFG: return Configuration::value_or( parameter, default_value );
+         default: break;
+      }
+
+      tValueOpt value_opt = Parameters::value( parameter );
+      if( std::nullopt != value_opt )
+         return value_opt.value( );
+
+      value_opt = Environment::value( parameter );
+      if( std::nullopt != value_opt )
+         return value_opt.value( );
+
+      value_opt = Configuration::value( parameter );
+      return value_opt.value_or( default_value );
    }
 
 } // namespace base::tools

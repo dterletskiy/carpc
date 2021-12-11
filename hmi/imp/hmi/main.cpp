@@ -9,7 +9,6 @@ const base::application::Thread::Configuration::tVector services =
    {
         { "OnOff_Service", { hmi::components::onoff::Component::creator }, 5 }
    };
-const char* const application_name{ "HMI" };
 
 
 

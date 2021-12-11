@@ -4,8 +4,9 @@
 # ENVIRONMENT_SETUP=/mnt/p4v/Audi_HCP3/NavCtrl/DevDef/packages/sdk/hcp3sim/installed/environment-setup-core2-64-hcp3-linux-musl
 # ENVIRONMENT_SETUP=./.configuration/android-env.sh
 
-# Dump all available features on a particular platform
-# gcc -march=native -dM -E - </dev/null
+
+
+ANDROID_INSTALL_PATH=/data/local/tmp/tda
 
 
 
@@ -19,8 +20,22 @@ declare -A COMMAND=(
    [ARCHIVE]="--archive"            [ARCHIVE_S]="-a"
    [START]="--start"                [START_S]="-r"
    [STOP]="--stop"                  [STOP_S]="-f"
-   [OLD]="old"
+   [ADB_INSTALL]="--adb_install"    [ADB_INSTALL_S]="-z"
 )
+
+function info( )
+{
+   echo "   ${COMMAND[INFO]}         | ${COMMAND[INFO_S]}         print info"
+   echo "   ${COMMAND[CLEAN]}        | ${COMMAND[CLEAN_S]}        clean product folder"
+   echo "   ${COMMAND[CONFIGURE]}    | ${COMMAND[CONFIGURE_S]}    configure build"
+   echo "   ${COMMAND[BUILD]}        | ${COMMAND[BUILD_S]}        build project"
+   echo "   ${COMMAND[CLEAN_BUILD]}  | ${COMMAND[CLEAN_BUILD_S]}  clean build project"
+   echo "   ${COMMAND[INSTALL]}      | ${COMMAND[INSTALL_S]}      install built project"
+   echo "   ${COMMAND[ARCHIVE]}      | ${COMMAND[ARCHIVE_S]}      archive project"
+   echo "   ${COMMAND[START]}        | ${COMMAND[START_S]}        start installed project"
+   echo "   ${COMMAND[STOP]}         | ${COMMAND[STOP_S]}         stop installed project"
+   echo "   ${COMMAND[ADB_INSTALL]}  | ${COMMAND[ADB_INSTALL_S]}  install to device via adb"
+}
 
 declare -A PROJECT
 
@@ -109,10 +124,10 @@ function build( )
 
 function install( )
 {
-   local -n LOCAL_INSTALL__PROJECT=${1}
+   local -n LOCAL_PROJECT=${1}
 
-   cmake --build ${LOCAL_INSTALL__PROJECT[BUILD_DIR]} --target install
-   # cmake --install ${LOCAL_INSTALL__PROJECT[BUILD_DIR]} --prefix ${LOCAL_INSTALL__PROJECT[DELIVERY_DIR]}
+   cmake --build ${LOCAL_PROJECT[BUILD_DIR]} --target install
+   # cmake --install ${LOCAL_PROJECT[BUILD_DIR]} --prefix ${LOCAL_PROJECT[DELIVERY_DIR]}
 }
 
 function archive( )
@@ -131,6 +146,26 @@ function gpb_generate( )
    local PROTO_FILE=${3}
 
    protoc -I=${SOURCE_DIR} --cpp_out=${DESTINATION_DIR} ${SOURCE_DIR}/${PROTO_FILE}
+}
+
+function adb_install( )
+{
+   if [[ -z ${2+x} ]]; then
+      echo "Set project and installation path"
+      return 255
+   fi
+
+   local -n LOCAL_PROJECT=${1}
+   local LOCAL_INSTALL_PATH=${2}
+
+   echo ${ABD_TOOL} root
+   echo ${ABD_TOOL} shell mkdir -p ${LOCAL_INSTALL_PATH}
+   echo ${ABD_TOOL} push ${LOCAL_PROJECT[DELIVERY_DIR]}/bin/* ${LOCAL_INSTALL_PATH}
+   echo ${ABD_TOOL} shell chmod +x ${LOCAL_INSTALL_PATH}/*
+   echo ${ABD_TOOL} push ${LOCAL_PROJECT[DELIVERY_DIR]}/lib/* ${LOCAL_INSTALL_PATH}
+   echo ${ABD_TOOL} push ${LOCAL_PROJECT[DELIVERY_DIR]}/etc/* ${LOCAL_INSTALL_PATH}
+   echo ${ABD_TOOL} push ${SYSROOT}/usr/lib/${TARGET}/libc++_shared.so ${LOCAL_INSTALL_PATH}
+
 }
 
 
@@ -299,20 +334,12 @@ function main( )
          echo "stop"
          stop PROJECT
       ;;
-      ${COMMAND[OLD]})
-         echo "using old build system"
-         ./_build_/build.py
+      ${COMMAND[ADB_INSTALL]} | ${COMMAND[ADB_INSTALL_S]})
+         echo "adb install"
+         adb_install PROJECT ${ANDROID_INSTALL_PATH}
       ;;
       *)
-         echo "   --info         | -i     print info"
-         echo "   --clean        | -c     clean product folder"
-         echo "   --configure    | -s     configure build"
-         echo "   --build        | -b     build project"
-         echo "   --clean_build  | -x     clean build project"
-         echo "   --install      | -d     install built project"
-         echo "   --archive      | -a     archive project"
-         echo "   --start        | -r     start installed project"
-         echo "   --stop         | -f     stop installed project"
+         info
       ;;
    esac
 

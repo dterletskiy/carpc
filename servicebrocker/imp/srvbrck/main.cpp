@@ -14,17 +14,14 @@ void preinit( int argc, char** argv, char** envp )
    base::tools::PCE configuration( argc, argv, envp );
    configuration.print( );
 
-   std::string string_trace_strategy = configuration.value( "trace" ).value_or( "CONSOLE" );
-   base::trace::eLogStrategy trace_strategy = base::trace::eLogStrategy::CONSOLE;
-   if( "CONSOLE" == string_trace_strategy )  trace_strategy = base::trace::eLogStrategy::CONSOLE;
-   else if( "DLT" == string_trace_strategy ) trace_strategy = base::trace::eLogStrategy::DLT;
-   else                                      trace_strategy = base::trace::eLogStrategy::CONSOLE;
-
-   std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
-         configuration.value( "trace_buffer" ).value_or( "1024" )
+   const base::trace::eLogStrategy trace_strategy = base::trace::log_strategy_from_string(
+         configuration.value_or( "trace_log", "CONSOLE" ).c_str( )
+      );
+   const std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
+         configuration.value_or( "trace_buffer", "4096" )
       ) );
-
-   base::trace::Logger::init( trace_strategy, "SBR", trace_buffer );
+   const char* const trace_app_name = configuration.value_or( "trace_app_name", "SBR" ).c_str( );
+   base::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
 
    MSG_INF( "preinit_array" );
 }
@@ -61,12 +58,21 @@ int main( int argc, char** argv, char** envp )
    base::tools::PCE configuration( argc, argv, envp );
    configuration.print( );
 
-   std::string address = configuration.value( "ipc_servicebrocker_address" ).value( );
-   int port = static_cast< int >( std::stoll( configuration.value( "ipc_servicebrocker_port" ).value( ) ) );
-   int protocole = static_cast< int >( std::stoll( configuration.value( "ipc_servicebrocker_protocole" ).value( ) ) );
-   base::os::os_linux::socket::configuration socket_configuration{ AF_UNIX, SOCK_STREAM, protocole, address, port };
+   base::os::os_linux::socket::configuration socket_configuration{
+      base::os::os_linux::socket::socket_domain_from_string(
+            configuration.value( "ipc_servicebrocker_domain" ).value( ).c_str( )
+         ),
+      base::os::os_linux::socket::socket_type_from_string(
+            configuration.value( "ipc_servicebrocker_type" ).value( ).c_str( )
+         ),
+      static_cast< int >( std::stoll( configuration.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
+      configuration.value( "ipc_servicebrocker_address" ).value( ),
+      static_cast< int >( std::stoll( configuration.value( "ipc_servicebrocker_port" ).value( ) ) )
+   };
 
-   size_t buffer_size = static_cast< size_t >( std::stoll( configuration.value( "ipc_servicebrocker_buffer_size" ).value( ) ) );
+   std::size_t buffer_size = static_cast< std::size_t >( std::stoll(
+         configuration.value( "ipc_servicebrocker_buffer_size" ).value( )
+      ) );
 
    ConnectionProcessor conn( socket_configuration, buffer_size );
    conn.init( );

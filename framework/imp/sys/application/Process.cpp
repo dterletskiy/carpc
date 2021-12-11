@@ -65,22 +65,34 @@ Process::Process( int argc, char** argv, char** envp )
    m_pce.print( );
 
    m_configuration.ipc_sb.socket = os::os_linux::socket::configuration {
-      AF_UNIX,
-      SOCK_STREAM,
+      base::os::os_linux::socket::socket_domain_from_string(
+            m_pce.value( "ipc_servicebrocker_domain" ).value( ).c_str( )
+         ),
+      base::os::os_linux::socket::socket_type_from_string(
+            m_pce.value( "ipc_servicebrocker_type" ).value( ).c_str( )
+         ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
       m_pce.value( "ipc_servicebrocker_address" ).value( ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_port" ).value( ) ) )
    };
-   m_configuration.ipc_sb.buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) ) );
+   m_configuration.ipc_sb.buffer_size = static_cast< size_t >( std::stoll(
+         m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) )
+      );
 
    m_configuration.ipc_app.socket = os::os_linux::socket::configuration {
-      AF_UNIX,
-      SOCK_STREAM,
+      base::os::os_linux::socket::socket_domain_from_string(
+            m_pce.value( "ipc_application_domain" ).value( ).c_str( )
+         ),
+      base::os::os_linux::socket::socket_type_from_string(
+            m_pce.value( "ipc_application_type" ).value( ).c_str( )
+         ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_application_protocole" ).value( ) ) ),
       m_pce.value( "ipc_application_address" ).value( ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_application_port" ).value( ) ) )
    };
-   m_configuration.ipc_app.buffer_size = static_cast< size_t >( std::stoll( m_pce.value( "ipc_application_buffer_size" ).value( ) ) );
+   m_configuration.ipc_app.buffer_size = static_cast< size_t >(
+         std::stoll( m_pce.value( "ipc_application_buffer_size" ).value( ) )
+      );
 
    DUMP_IPC_EVENTS;
 }
@@ -182,7 +194,10 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    // Watchdog timer
    if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
       return false;
-   if( false == os::os_linux::timer::start( m_timer_id, 1000000000, os::os_linux::timer::eTimerType::continious ) )
+   const std::size_t wd_timout = static_cast< std::size_t >( std::stoll(
+         m_pce.value_or( "application_wd_timout", "10" )
+      ) );
+   if( false == os::os_linux::timer::start( m_timer_id, wd_timout * 1000000000, os::os_linux::timer::eTimerType::continious ) )
       return false;
 
    return true;

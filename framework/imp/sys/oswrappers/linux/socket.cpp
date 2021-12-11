@@ -1,5 +1,6 @@
 #include <string.h>
 #include <errno.h>
+#include <cstring>
 
 #include "api/sys/oswrappers/linux/kernel.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
@@ -13,6 +14,98 @@
 namespace base::os::os_linux::socket {
 
    int thread_local error = 0;
+
+
+
+   const char* const socket_domain_to_string( const int domain )
+   {
+      switch( domain )
+      {
+         case AF_UNIX:        return "AF_UNIX";
+         // case AF_LOCAL:       return "AF_LOCAL";
+         case AF_AX25:        return "AF_AX25";
+         case AF_IPX:         return "AF_IPX";
+         case AF_APPLETALK:   return "AF_APPLETALK";
+         case AF_X25:         return "AF_X25";
+         case AF_INET6:       return "AF_INET6";
+         case AF_DECnet:      return "AF_DECnet";
+         case AF_KEY:         return "AF_KEY";
+         case AF_NETLINK:     return "AF_NETLINK";
+         case AF_PACKET:      return "AF_PACKET";
+         case AF_RDS:         return "AF_RDS";
+         case AF_PPPOX:       return "AF_PPPOX";
+         case AF_LLC:         return "AF_LLC";
+         case AF_IB:          return "AF_IB";
+         case AF_MPLS:        return "AF_MPLS";
+         case AF_CAN:         return "AF_CAN";
+         case AF_TIPC:        return "AF_TIPC";
+         case AF_BLUETOOTH:   return "AF_BLUETOOTH";
+         case AF_ALG:         return "AF_ALG";
+         case AF_VSOCK:       return "AF_VSOCK";
+         case AF_KCM:         return "AF_KCM";
+         case AF_XDP:         return "AF_XDP";
+         default:             return "AF_UNDEFINED";
+      }
+      return "AF_UNDEFINED";
+   }
+
+   int socket_domain_from_string( const char* const domain )
+   {
+      if     ( 0 == std::strcmp( domain, "AF_UNIX" )        ) return AF_UNIX;
+      else if( 0 == std::strcmp( domain, "AF_LOCAL" )       ) return AF_LOCAL;
+      else if( 0 == std::strcmp( domain, "AF_AX25" )        ) return AF_AX25;
+      else if( 0 == std::strcmp( domain, "AF_IPX" )         ) return AF_IPX;
+      else if( 0 == std::strcmp( domain, "AF_APPLETALK" )   ) return AF_APPLETALK;
+      else if( 0 == std::strcmp( domain, "AF_X25" )         ) return AF_X25;
+      else if( 0 == std::strcmp( domain, "AF_INET6" )       ) return AF_INET6;
+      else if( 0 == std::strcmp( domain, "AF_DECnet" )      ) return AF_DECnet;
+      else if( 0 == std::strcmp( domain, "AF_KEY" )         ) return AF_KEY;
+      else if( 0 == std::strcmp( domain, "AF_NETLINK" )     ) return AF_NETLINK;
+      else if( 0 == std::strcmp( domain, "AF_PACKET" )      ) return AF_PACKET;
+      else if( 0 == std::strcmp( domain, "AF_RDS" )         ) return AF_RDS;
+      else if( 0 == std::strcmp( domain, "AF_PPPOX" )       ) return AF_PPPOX;
+      else if( 0 == std::strcmp( domain, "AF_LLC" )         ) return AF_LLC;
+      else if( 0 == std::strcmp( domain, "AF_IB" )          ) return AF_IB;
+      else if( 0 == std::strcmp( domain, "AF_MPLS" )        ) return AF_MPLS;
+      else if( 0 == std::strcmp( domain, "AF_CAN" )         ) return AF_CAN;
+      else if( 0 == std::strcmp( domain, "AF_TIPC" )        ) return AF_TIPC;
+      else if( 0 == std::strcmp( domain, "AF_BLUETOOTH" )   ) return AF_BLUETOOTH;
+      else if( 0 == std::strcmp( domain, "AF_ALG" )         ) return AF_ALG;
+      else if( 0 == std::strcmp( domain, "AF_VSOCK" )       ) return AF_VSOCK;
+      else if( 0 == std::strcmp( domain, "AF_KCM" )         ) return AF_KCM;
+      else if( 0 == std::strcmp( domain, "AF_XDP" )         ) return AF_XDP;
+      else                                                    return -1;
+
+      return -1;
+   }
+
+   const char* const socket_type_to_string( const int type )
+   {
+      switch( type )
+      {
+         case SOCK_STREAM:    return "SOCK_STREAM";
+         case SOCK_DGRAM:     return "SOCK_DGRAM";
+         case SOCK_SEQPACKET: return "SOCK_SEQPACKET";
+         case SOCK_RAW:       return "SOCK_RAW";
+         case SOCK_RDM:       return "SOCK_RDM";
+         case SOCK_PACKET:    return "SOCK_PACKET";
+         default:             return "SOCK_UNDEFINED";
+      }
+      return "SOCK_UNDEFINED";
+   }
+
+   int socket_type_from_string( const char* const type )
+   {
+      if     ( 0 == std::strcmp( type, "SOCK_STREAM" )    ) return SOCK_STREAM;
+      else if( 0 == std::strcmp( type, "SOCK_DGRAM" )     ) return SOCK_DGRAM;
+      else if( 0 == std::strcmp( type, "SOCK_SEQPACKET" ) ) return SOCK_SEQPACKET;
+      else if( 0 == std::strcmp( type, "SOCK_RAW" )       ) return SOCK_RAW;
+      else if( 0 == std::strcmp( type, "SOCK_RDM" )       ) return SOCK_RDM;
+      else if( 0 == std::strcmp( type, "SOCK_PACKET" )    ) return SOCK_PACKET;
+      else                                                  return -1;
+
+      return -1;
+   }
 
 
 

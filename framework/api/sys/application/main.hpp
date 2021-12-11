@@ -38,7 +38,6 @@ namespace memory {
 
 
 extern const base::application::Thread::Configuration::tVector services;
-extern const char* const application_name;
 
 bool test( int argc, char** argv, char** envp );
 
@@ -52,18 +51,14 @@ void preinit( int argc, char** argv, char** envp )
    base::tools::PCE configuration( argc, argv, envp );
    // configuration.print( );
 
-   std::string string_trace_strategy = configuration.value( "trace" ).value_or( "CONSOLE" );
-   base::trace::eLogStrategy trace_strategy;
-   if( "CONSOLE" == string_trace_strategy )        trace_strategy = base::trace::eLogStrategy::CONSOLE;
-   else if( "DLT" == string_trace_strategy )       trace_strategy = base::trace::eLogStrategy::DLT;
-   else if( "ANDROID" == string_trace_strategy )   trace_strategy = base::trace::eLogStrategy::ANDROID;
-   else                                            trace_strategy = base::trace::eLogStrategy::CONSOLE;
-
-   std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
-         configuration.value( "trace_buffer" ).value_or( "1024" )
+   const base::trace::eLogStrategy trace_strategy = base::trace::log_strategy_from_string(
+         configuration.value_or( "trace_log", "CONSOLE" ).c_str( )
+      );
+   const std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
+         configuration.value_or( "trace_buffer", "4096" )
       ) );
-
-   base::trace::Logger::init( trace_strategy, application_name, trace_buffer );
+   const char* const trace_app_name = configuration.value_or( "trace_app_name", "APP" ).c_str( );
+   base::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
 
    MSG_INF( "preinit_array" );
 }

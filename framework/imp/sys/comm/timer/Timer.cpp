@@ -45,7 +45,11 @@ namespace {
    void signal_handler( int signal, siginfo_t* si, void* uc )
    {
       SYS_VRB( "signal: %d / si->si_signo: %d", signal, si->si_signo );
-      SYS_VRB( "sival_ptr: %p(%#zx) / sival_int: %d ", si->si_value.sival_ptr, *static_cast< size_t* >( si->si_value.sival_ptr ), si->si_value.sival_int );
+      SYS_VRB( "sival_ptr: %p(%#zx) / sival_int: %d ",
+         si->si_value.sival_ptr,
+         *static_cast< std::size_t* >( si->si_value.sival_ptr ),
+         si->si_value.sival_int
+      );
 
       base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( si->si_value.sival_ptr );
       SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
@@ -104,7 +108,7 @@ Timer::~Timer( )
    TimerEvent::Event::clear_notification( mp_consumer, { m_id.value( ) } );
 
    mutex_consumer_map.lock( );
-   const size_t result = consumer_map.erase( m_timer_id );
+   const std::size_t result = consumer_map.erase( m_timer_id );
    mutex_consumer_map.unlock( );
    if( 0 == result )
    {
@@ -230,7 +234,7 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 
 namespace base::timer {
 
-   base::Timer::ID start( const size_t milliseconds, const size_t count, tCallback callback, const bool asynchronous )
+   base::Timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous )
    {
       application::Context context = application::Process::instance( )->current_context( );
       if( application::Context::invalid == context )
@@ -247,7 +251,7 @@ namespace base::timer {
          std::thread(
             [=]( )
             {
-               for( size_t ticks = 0; ticks < count; ++ticks )
+               for( std::size_t ticks = 0; ticks < count; ++ticks )
                {
                   std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
                   base::async::Runnable::create_send( on_timer, context );
@@ -257,7 +261,7 @@ namespace base::timer {
       }
       else
       {
-         for( size_t ticks = 0; ticks < count; ++ticks )
+         for( std::size_t ticks = 0; ticks < count; ++ticks )
          {
             std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
             base::async::Runnable::create_send( on_timer, context );

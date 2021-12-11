@@ -20,11 +20,12 @@ namespace base::tools {
          using tMap = std::map< tParameter, tValue >;
 
       public:
-         BasePCE( const std::string& );
+         BasePCE( const std::string& dump_message );
          ~BasePCE( ) = default;
 
       public:
-         tValueOpt value( const tParameter& ) const;
+         tValueOpt value( const tParameter& parameter ) const;
+         tValue value_or( const tParameter& parameter, const tValue& default_value ) const;
          void print( ) const;
 
       protected:
@@ -73,7 +74,8 @@ namespace base::tools {
 
          void init( int argc, char** argv, char** envp, const std::string& delimiter = "=" );
 
-         tValueOpt value( const tParameter&, const eType& type = eType::DEFAULT ) const;
+         tValueOpt value( const tParameter& parameter, const eType& type = eType::DEFAULT ) const;
+         tValue value_or( const tParameter& parameter, const tValue& default_value, const eType& type = eType::DEFAULT ) const;
          void print( const eType& type = eType::DEFAULT ) const;
    };
 

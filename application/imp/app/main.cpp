@@ -14,7 +14,6 @@ const base::application::Thread::Configuration::tVector services =
       , { "Driver_Service", { application::components::driver::Component::creator }, 10 }
       , { "Device_Service", { application::components::master::Component::creator, application::components::slave::Component::creator }, 10 }
    };
-const char* const application_name{ "APP" };
 
 
 
