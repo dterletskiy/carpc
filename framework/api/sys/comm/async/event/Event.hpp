@@ -63,7 +63,7 @@
 // In this case static const s_type_id field should be introduced to Signature.
 // Additionally this macro must be called outside of any manespace and eventType parameter must contain
 // namespace where corresponding event is defined. This is because of s_type_id must containe unique value.
-// REGISTER_EVENT macro must use { #eventType } instead of build_type( ).
+// REGISTER_EVENT macro must use { #eventType } instead of build_type_id( ).
 // #define INIT_EVENT( eventType ) \
 //    template< > const base::async::tAsyncTypeID eventType::Signature::s_type_id = { #eventType }; \
 
