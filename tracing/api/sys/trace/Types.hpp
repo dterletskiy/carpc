@@ -27,7 +27,7 @@ namespace base::trace {
       DltLogLevelType to_dlt( const eLogLevel& );
    #endif
 
-   enum class eLogStrategy : std::uint8_t { CONSOLE, CONSOLE_EXT, DLT, ANDROID, UNDEFINED };
+   enum class eLogStrategy : std::uint8_t { CONSOLE, CONSOLE_EXT, DLT, ANDROID_LOGCAT, UNDEFINED };
    const char* const log_strategy_to_string( const eLogStrategy& );
    const eLogStrategy log_strategy_from_string( const char* const );
 

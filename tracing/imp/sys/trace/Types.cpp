@@ -56,12 +56,12 @@ namespace base::trace {
    {
       switch( strategy )
       {
-         case eLogStrategy::CONSOLE:      return "CONSOLE";
-         case eLogStrategy::CONSOLE_EXT:  return "CONSOLE_EXT";
-         case eLogStrategy::DLT:          return "DLT";
-         case eLogStrategy::ANDROID:      return "ANDROID";
-         case eLogStrategy::UNDEFINED:    return "UNDEFINED";
-         default:                         return "CONSOLE";
+         case eLogStrategy::CONSOLE:         return "CONSOLE";
+         case eLogStrategy::CONSOLE_EXT:     return "CONSOLE_EXT";
+         case eLogStrategy::DLT:             return "DLT";
+         case eLogStrategy::ANDROID_LOGCAT:  return "ANDROID";
+         case eLogStrategy::UNDEFINED:       return "UNDEFINED";
+         default:                            return "CONSOLE";
       }
       return "CONSOLE";
    }
@@ -71,7 +71,7 @@ namespace base::trace {
       if     ( 0 == std::strcmp( strategy, "CONSOLE" ) )       return eLogStrategy::CONSOLE;
       else if( 0 == std::strcmp( strategy, "CONSOLE_EXT" ) )   return eLogStrategy::CONSOLE_EXT;
       else if( 0 == std::strcmp( strategy, "DLT" ) )           return eLogStrategy::DLT;
-      else if( 0 == std::strcmp( strategy, "ANDROID" ) )       return eLogStrategy::ANDROID;
+      else if( 0 == std::strcmp( strategy, "ANDROID" ) )       return eLogStrategy::ANDROID_LOGCAT;
       else if( 0 == std::strcmp( strategy, "UNDEFINED" ) )     return eLogStrategy::UNDEFINED;
       else                                                     return eLogStrategy::CONSOLE;
 

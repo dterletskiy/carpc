@@ -47,7 +47,7 @@ namespace base::trace {
                   #endif // OS == USE_DLT
                   break;
                }
-               case eLogStrategy::ANDROID:
+               case eLogStrategy::ANDROID_LOGCAT:
                {
                   #if OS == OS_ANDROID
                      __android_log_print( to_android( log_level ), "TAG", "%s", p_buffer );
@@ -119,7 +119,7 @@ namespace base::trace {
                   message( log_level, full_format, file, function, line, args... );
                   break;
                }
-               case eLogStrategy::ANDROID:
+               case eLogStrategy::ANDROID_LOGCAT:
                {
                   char full_format[ full_format_max_size ] = { 0 };
                   strcat( full_format, "[%s:%s:%d] -> " );
@@ -178,7 +178,7 @@ namespace base::trace {
          void log_strategy( const eLogStrategy& );
       private:
          #if OS == OS_ANDROID
-            eLogStrategy m_log_strategy = eLogStrategy::ANDROID;
+            eLogStrategy m_log_strategy = eLogStrategy::ANDROID_LOGCAT;
          #else
             eLogStrategy m_log_strategy = eLogStrategy::CONSOLE;
          #endif
@@ -208,7 +208,7 @@ namespace base::trace {
          if( eLogStrategy::DLT == m_log_strategy )
          {
             #if OS == OS_ANDROID
-               m_log_strategy = eLogStrategy::ANDROID;
+               m_log_strategy = eLogStrategy::ANDROID_LOGCAT;
             #else
                m_log_strategy = eLogStrategy::CONSOLE;
             #endif
@@ -216,7 +216,7 @@ namespace base::trace {
       #endif
 
       #if OS != OS_ANDROID
-         if( eLogStrategy::ANDROID == m_log_strategy )
+         if( eLogStrategy::ANDROID_LOGCAT == m_log_strategy )
             m_log_strategy = eLogStrategy::CONSOLE;
       #endif
    }
