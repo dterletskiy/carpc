@@ -1,3 +1,6 @@
+version 3.1.12
+   - Change "install" build target for include headers.
+
 version 3.1.11
    - Rename ANDROID log strategy to ANDROID_LOGCAT to avoid naming collision in aosp.
 

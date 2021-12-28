@@ -74,4 +74,4 @@ if( ${OS} EQUAL ${OS_LINUX} )
 endif( )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )
-install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION . )
+install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION include )
