@@ -16,14 +16,14 @@ namespace base::trace {
    {
       private:
          Logger( );
-         Logger( const eLogStrategy&, const char* const app_name, const std::size_t buffer_size = s_buffer_size );
+         Logger( const eLogStrategy&, const std::string& app_name, const std::size_t buffer_size = s_buffer_size );
          static Logger* mp_instance;
       public:
          ~Logger( );
          static Logger& instance( );
-         static Logger& instance( const eLogStrategy&, const char* const app_name, const std::size_t buffer_size = s_buffer_size );
+         static Logger& instance( const eLogStrategy&, const std::string& app_name, const std::size_t buffer_size = s_buffer_size );
 
-         static bool init( const eLogStrategy&, const char* const app_name, const std::size_t buffer_size = s_buffer_size );
+         static bool init( const eLogStrategy&, const std::string& app_name, const std::size_t buffer_size = s_buffer_size );
          static bool deinit( );
 
          template< typename... Args >
@@ -170,7 +170,7 @@ namespace base::trace {
          }
 
       private:
-         const char* mp_application_name = nullptr;
+         std::string mp_application_name = nullptr;
          std::size_t m_buffer_size = s_buffer_size;
 
       public:

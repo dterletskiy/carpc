@@ -75,6 +75,11 @@ namespace base::application {
             SendReceive& m_parent;
          };
 
+         // Structure for Connection to ServiceBrocker.
+         // Contains client socket what should be connected to ServiceBrocket.
+         // Via this socket current application will send information about provided and
+         // required IPC interfaces to ServiceBrocker and will receive information about
+         // other applications what provide required interfaces from ServiceBrocker.
          struct ServiceBrocker : public Base
          {
             ServiceBrocker( SendReceive& );

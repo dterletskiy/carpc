@@ -21,8 +21,8 @@ namespace base::os::os_linux::socket {
    {
       switch( domain )
       {
-         case AF_UNIX:        return "AF_UNIX";
-         // case AF_LOCAL:       return "AF_LOCAL";
+         case AF_UNIX:        return "AF_UNIX"; // "AF_LOCAL" - Synonym for "AF_UNIX"
+         case AF_INET:        return "AF_INET";
          case AF_AX25:        return "AF_AX25";
          case AF_IPX:         return "AF_IPX";
          case AF_APPLETALK:   return "AF_APPLETALK";
@@ -53,6 +53,7 @@ namespace base::os::os_linux::socket {
    {
       if     ( 0 == std::strcmp( domain, "AF_UNIX" )        ) return AF_UNIX;
       else if( 0 == std::strcmp( domain, "AF_LOCAL" )       ) return AF_LOCAL;
+      else if( 0 == std::strcmp( domain, "AF_INET" )        ) return AF_INET;
       else if( 0 == std::strcmp( domain, "AF_AX25" )        ) return AF_AX25;
       else if( 0 == std::strcmp( domain, "AF_IPX" )         ) return AF_IPX;
       else if( 0 == std::strcmp( domain, "AF_APPLETALK" )   ) return AF_APPLETALK;

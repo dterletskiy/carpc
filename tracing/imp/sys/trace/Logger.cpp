@@ -22,7 +22,7 @@ Logger::Logger( )
    log_strategy( eLogStrategy::CONSOLE );
 }
 
-Logger::Logger( const eLogStrategy& _log_strategy, const char* const app_name, const std::size_t buffer_size )
+Logger::Logger( const eLogStrategy& _log_strategy, const std::string& app_name, const std::size_t buffer_size )
    : mp_application_name( app_name )
    , m_buffer_size( buffer_size )
 {
@@ -31,7 +31,7 @@ Logger::Logger( const eLogStrategy& _log_strategy, const char* const app_name, c
    #ifdef USE_DLT
       if( eLogStrategy::DLT == m_log_strategy )
       {
-         const auto registerAppStatus = dlt_register_app( mp_application_name, "Application" );
+         const auto registerAppStatus = dlt_register_app( mp_application_name.c_str( ), "Application" );
          if( DLT_RETURN_OK != registerAppStatus )
             return;
       }
@@ -88,7 +88,7 @@ Logger& Logger::instance( )
    return *mp_instance;
 }
 
-Logger& Logger::instance( const eLogStrategy& log_strategy, const char* const app_name, const std::size_t buffer_size )
+Logger& Logger::instance( const eLogStrategy& log_strategy, const std::string& app_name, const std::size_t buffer_size )
 {
    if( nullptr == mp_instance )
       mp_instance = new Logger( log_strategy, app_name, buffer_size );
@@ -96,7 +96,7 @@ Logger& Logger::instance( const eLogStrategy& log_strategy, const char* const ap
    return *mp_instance;
 }
 
-bool Logger::init( const eLogStrategy& log_strategy, const char* const app_name, const std::size_t buffer_size )
+bool Logger::init( const eLogStrategy& log_strategy, const std::string& app_name, const std::size_t buffer_size )
 {
    instance( log_strategy, app_name, buffer_size );
 

@@ -16,7 +16,7 @@ export SYSROOT=${TOOLCHAIN}/sysroot
 
 export ARCH=x86_64
 export OS=linux
-export API=21
+export API=31
 export TARGET=${ARCH}-${OS}-android
 export SESSION=${TARGET}${API}
 

@@ -1,3 +1,11 @@
+version 3.1.13
+   - Change IPC protocole from UNIX to TCP/IP socket.
+   - Fix missing case for linux socket processing.
+   - Remove try/catch from Priority type.
+   - Add rt library for linking to framework.
+   - Improve start scripts.
+   - Fix obtaining application name for Logger (error: object backing the pointer will be destroyed at the end of the full-expression)
+
 version 3.1.12
    - Change "install" build target for include headers.
 

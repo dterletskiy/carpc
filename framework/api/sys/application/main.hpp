@@ -57,7 +57,7 @@ void preinit( int argc, char** argv, char** envp )
    const std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
          configuration.value_or( "trace_buffer", "4096" )
       ) );
-   const char* const trace_app_name = configuration.value_or( "trace_app_name", "APP" ).c_str( );
+   const std::string trace_app_name = configuration.value_or( "trace_app_name", "APP" );
    base::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
 
    MSG_INF( "preinit_array" );

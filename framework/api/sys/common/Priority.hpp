@@ -188,15 +188,13 @@ namespace base {
    inline
    const tPriority& priority( const ePriority type )
    {
-      try
+      if( g_priority_map.end( ) == g_priority_map.find( type ) )
       {
-         return g_priority_map.at( type );
+         SYS_WRN( "Undefined priority" );
+         static const tPriority& dummy = g_priority_map.at( ePriority::DEFAULT );
+         return dummy;
       }
-      catch( const std::out_of_range& oor )
-      {
-         SYS_WRN( "Obtaining priority error: %s", oor.what( ) );
-         return g_priority_map.at( ePriority::DEFAULT );
-      }
+      return g_priority_map.at( type );
    }
 
 } // namespace base

@@ -71,6 +71,7 @@ add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
 target_link_libraries( ${TARGET_NAME} tracing )
 if( ${OS} EQUAL ${OS_LINUX} )
    target_link_libraries( ${TARGET_NAME} pthread )
+   target_link_libraries( ${TARGET_NAME} rt )
 endif( )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )

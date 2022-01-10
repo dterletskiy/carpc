@@ -72,7 +72,7 @@ void SendReceive::thread_loop( )
       if( false == os::os_linux::socket::select( max_socket, fd_set, &timeout ) )
          continue;
 
-      // WARNING!!!
+      // @TDA: WARNING!!!
       // This order is important because during processing some sockets could be moved from one collection to another.
       m_service_brocker.process_select( fd_set );
       m_connections.process_select( fd_set );
@@ -104,6 +104,8 @@ bool SendReceive::send( const RawBuffer& buffer, os::Socket::tSptr p_socket )
    if( nullptr == p_socket )
       return false;
 
+   // @TDA: here could be a crash in case of servicebrocker socket created but was not connected.
+   // => sending to not connected socket will lead to crash.
    return os::Socket::eResult::OK == p_socket->send( buffer.ptr, buffer.size );
 }
 
