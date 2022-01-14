@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <iostream>
 
-#if OS == OS_ANDROID
+#if OS_TARGET == OS_ANDROID
    #include <android/log.h>
 #endif
 
@@ -20,7 +20,7 @@ namespace base::trace {
 
    enum class eLogLevel : std::uint8_t { VERBOSE, DEBUG, INFO, WARNING, ERROR, FATAL };
    const char* const to_color( const eLogLevel& );
-   #if OS == OS_ANDROID
+   #if OS_TARGET == OS_ANDROID
       int to_android( const eLogLevel& );
    #endif
    #ifdef USE_DLT

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# ENVIRONMENT_SETUP=/mnt/p4v/Audi_MIB3/NavCtrl/DevDef/packages/sdk/mib3h/installed/environment-setup-aarch64-poky-linux
-# ENVIRONMENT_SETUP=/mnt/p4v/Audi_HCP3/NavCtrl/DevDef/packages/sdk/hcp3sim/installed/environment-setup-core2-64-hcp3-linux-musl
-# ENVIRONMENT_SETUP=./.configuration/android-env.sh
+ENVIRONMENT_SETUP_MIB3=/packages/sdk/mib3h/installed/environment-setup-aarch64-poky-linux
+ENVIRONMENT_SETUP_HCP3=/packages/sdk/hcp3sim/installed/environment-setup-core2-64-hcp3-linux-musl
+ENVIRONMENT_SETUP_ANDROID=./.configuration/android-env.sh
 
 
 
@@ -44,7 +44,25 @@ CORES=$( grep -c ^processor /proc/cpuinfo )
 
 
 ACTION=${1}
-TARGET=${2}
+TARGET_OS=${2}
+
+readonly OS_ANDROID="0"
+readonly OS_LINUX="1"
+
+OS_TARGET=${OS_LINUX}
+case ${TARGET_OS} in
+   "linux")
+      OS_TARGET=${OS_LINUX}
+   ;;
+   "android")
+      OS_TARGET=${OS_ANDROID}
+      ENVIRONMENT_SETUP=${ENVIRONMENT_SETUP_ANDROID}
+   ;;
+   *)
+      OS_TARGET=${OS_LINUX}
+   ;;
+esac
+CMAKE_PARAMETERS_OS="-DOS_ANDROID:STRING=${OS_ANDROID} -DOS_LINUX:STRING=${OS_LINUX} -DOS_TARGET:STRING=${OS_TARGET}"
 
 
 
@@ -111,7 +129,8 @@ function configure( )
    cmake -B ${LOCAL_CONFIGURE__PROJECT[BUILD_DIR]} \
       -DCMAKE_INSTALL_PREFIX=${LOCAL_CONFIGURE__PROJECT[DELIVERY_DIR]} \
       -S ${LOCAL_CONFIGURE__PROJECT[SOURCE_DIR]} \
-      --graphviz=${LOCAL_CONFIGURE__PROJECT[DOCUMENTATION_DIR]}/graph
+      --graphviz=${LOCAL_CONFIGURE__PROJECT[DOCUMENTATION_DIR]}/graph \
+      ${CMAKE_PARAMETERS_OS}
 }
 
 function build( )

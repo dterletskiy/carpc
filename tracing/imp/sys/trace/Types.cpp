@@ -20,7 +20,7 @@ namespace base::trace {
       return FG_WHITE;
    }
 
-   #if OS == OS_ANDROID
+   #if OS_TARGET == OS_ANDROID
    int to_android( const eLogLevel& log_level )
    {
       switch( log_level )

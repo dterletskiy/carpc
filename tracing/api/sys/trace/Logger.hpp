@@ -44,14 +44,14 @@ namespace base::trace {
                {
                   #ifdef USE_DLT
                      DLT_LOG( dlt_context( ), to_dlt( log_level ), DLT_SIZED_CSTRING( p_buffer, size ) );
-                  #endif // OS == USE_DLT
+                  #endif // USE_DLT
                   break;
                }
                case eLogStrategy::ANDROID_LOGCAT:
                {
-                  #if OS == OS_ANDROID
+                  #if OS_TARGET == OS_ANDROID
                      __android_log_print( to_android( log_level ), "TAG", "%s", p_buffer );
-                  #endif // OS == OS_ANDROID
+                  #endif // OS_TARGET == OS_ANDROID
                   break;
                }
                default: break;
@@ -177,7 +177,7 @@ namespace base::trace {
          const eLogStrategy& log_strategy( ) const;
          void log_strategy( const eLogStrategy& );
       private:
-         #if OS == OS_ANDROID
+         #if OS_TARGET == OS_ANDROID
             eLogStrategy m_log_strategy = eLogStrategy::ANDROID_LOGCAT;
          #else
             eLogStrategy m_log_strategy = eLogStrategy::CONSOLE;
@@ -207,7 +207,7 @@ namespace base::trace {
          // Prevent DLT logging startegy in case of DLT is not used
          if( eLogStrategy::DLT == m_log_strategy )
          {
-            #if OS == OS_ANDROID
+            #if OS_TARGET == OS_ANDROID
                m_log_strategy = eLogStrategy::ANDROID_LOGCAT;
             #else
                m_log_strategy = eLogStrategy::CONSOLE;
@@ -215,7 +215,7 @@ namespace base::trace {
          }
       #endif
 
-      #if OS != OS_ANDROID
+      #if OS_TARGET != OS_ANDROID
          if( eLogStrategy::ANDROID_LOGCAT == m_log_strategy )
             m_log_strategy = eLogStrategy::CONSOLE;
       #endif

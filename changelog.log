@@ -1,3 +1,10 @@
+version 3.1.14
+   - Change started flag in application thread to atomic.
+   - Move back_trace to separate file.
+   - Rename "OS" definition to "OS_TARGET" definition.
+   - Improve start scripts and build system.
+   - build.sh script processes second parameter for ctarget OS (android or linux).
+
 version 3.1.13
    - Change IPC protocole from UNIX to TCP/IP socket.
    - Fix missing case for linux socket processing.

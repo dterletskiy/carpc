@@ -48,8 +48,9 @@ link_directories( ${TRACING_BINARY_DIR} )
 #                                                                                         #
 ###########################################################################################
 file( GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
-if( ${OS} EQUAL ${OS_ANDROID} )
+if( ${OS_TARGET} EQUAL ${OS_ANDROID} )
    list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
+   list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/linux/backtrace.cpp )
 endif( )
 
 
@@ -69,7 +70,7 @@ message( STATUS "SOURCE_FILES = " ${SOURCE_FILES} )
 add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
-if( ${OS} EQUAL ${OS_LINUX} )
+if( ${OS_TARGET} EQUAL ${OS_LINUX} )
    target_link_libraries( ${TARGET_NAME} pthread )
    target_link_libraries( ${TARGET_NAME} rt )
 endif( )

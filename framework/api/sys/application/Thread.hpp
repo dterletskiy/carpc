@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include "api/sys/application/IComponent.hpp"
 #include "api/sys/application/IThread.hpp"
 
@@ -38,7 +40,7 @@ namespace base::application {
          const base::os::Thread& thread( ) const override;
          void thread_loop( );
          base::os::Thread                             m_thread;
-         bool                                         m_started = false;
+         std::atomic< bool >                          m_started = false;
 
       private:
          bool insert_event( const base::async::IAsync::tSptr ) override;
@@ -73,14 +75,15 @@ namespace base::application {
    inline
    bool Thread::started( ) const
    {
-      return m_started;
+      return m_started.load( );
    }
 
    inline
    bool Thread::wait( )
    {
-      m_started = m_thread.join( );
-      return !m_started;
+   const bool started = m_thread.join( );
+   m_started.store( started );
+      return !m_started.load( );
    }
 
 } // namespace base::application

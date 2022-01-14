@@ -8,7 +8,7 @@
 #include <fcntl.h>
 
 #include "api/sys/helpers/functions/print.hpp"
-#include "api/sys/oswrappers/linux/kernel.hpp"
+#include "api/sys/oswrappers/linux/backtrace.hpp"
 #include "api/sys/oswrappers/linux/time.hpp"
 #include "imp/hooks/MemoryMap.hpp"
 

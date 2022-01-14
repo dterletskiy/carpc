@@ -31,7 +31,7 @@ Thread::~Thread( )
 void Thread::thread_loop( )
 {
    SYS_INF( "'%s': enter", m_name.c_str( ) );
-   m_started = true;
+   m_started.store( true );
 
    SystemEventConsumer system_event_consumer( *this );
 
@@ -67,7 +67,7 @@ bool Thread::start( )
 void Thread::stop( )
 {
    SYS_INF( "'%s': stopping", m_name.c_str( ) );
-   m_started = false;
+   m_started.store( false );
 }
 
 void Thread::boot( const std::string& message )

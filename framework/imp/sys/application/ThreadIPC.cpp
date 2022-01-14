@@ -34,7 +34,7 @@ ThreadIPC::~ThreadIPC( )
 void ThreadIPC::thread_loop( )
 {
    SYS_INF( "'%s': enter", m_name.c_str( ) );
-   m_started = true;
+   m_started.store( true );
 
    SystemEventConsumer system_event_consumer( *this );
    ServiceEventConsumer service_event_consumer( mp_send_receive );
@@ -70,15 +70,16 @@ bool ThreadIPC::start( )
 void ThreadIPC::stop( )
 {
    SYS_INF( "'%s': stopping", m_name.c_str( ) );
-   m_started = false;
+   m_started.store( false );
    mp_send_receive->stop( );
 }
 
 bool ThreadIPC::wait( )
 {
-   m_started = m_thread.join( );
+   const bool started = m_thread.join( );
+   m_started.store( started );
    const bool stopped = mp_send_receive->wait( );
-   return !m_started && !stopped;
+   return !m_started.load( ) && !stopped;
 }
 
 void ThreadIPC::boot( const std::string& message )

@@ -66,7 +66,7 @@ add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
 if( DLT_TRACE )
    target_link_libraries( ${TARGET_NAME} dlt )
 endif( )
-if( ${OS} EQUAL ${OS_ANDROID} )
+if( ${OS_TARGET} EQUAL ${OS_ANDROID} )
    target_link_libraries( ${TARGET_NAME} log )
 endif( )
 

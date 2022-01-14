@@ -115,7 +115,7 @@ int main( int argc, char** argv, char** envp )
 
 
 
-#if OS == OS_ANDROID
+#if OS_TARGET == OS_ANDROID
 
    #include <jni.h>
    #include "api/sys/oswrappers/Thread.hpp"

@@ -1,13 +1,10 @@
 cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-# set( CMAKE_C_COMPILER "/usr/bin/gcc" )
-# set( CMAKE_CXX_COMPILER "/usr/bin/g++" )
-
 project( RPC )
 
-set( OS_ANDROID   0 )
-set( OS_LINUX     1 )
-set( OS           ${OS_LINUX} )
+set( OS_ANDROID   "100" CACHE STRING "Operating System Android" )
+set( OS_LINUX     "101" CACHE STRING "Operating System Linux" )
+set( OS_TARGET    ${OS_LINUX} CACHE STRING "Operating System Target" )
 
 
 
@@ -77,7 +74,7 @@ endif( )
 
 add_compile_definitions( OS_ANDROID=${OS_ANDROID} )
 add_compile_definitions( OS_LINUX=${OS_LINUX} )
-add_compile_definitions( OS=${OS} )
+add_compile_definitions( OS_TARGET=${OS_TARGET} )
 if( SYS_TRACE )
    add_compile_definitions( SYS_TRACE )
 endif( )
@@ -110,6 +107,10 @@ endif( )
 #                                                                                         #
 ###########################################################################################
 message( NOTICE "-----------------------------------------------------------------------" )
+message( NOTICE "OS_ANDROID = " ${OS_ANDROID} )
+message( NOTICE "OS_LINUX = " ${OS_LINUX} )
+message( NOTICE "OS_TARGET = " ${OS_TARGET} )
+message( NOTICE "-----------------------------------------------------------------------" )
 message( NOTICE "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
 message( NOTICE "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
 message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
@@ -118,14 +119,30 @@ message( NOTICE "RPC_SOURCE_DIR = " ${RPC_SOURCE_DIR} )
 message( NOTICE "RPC_BINARY_DIR = " ${RPC_BINARY_DIR} )
 message( NOTICE "CMAKE_INSTALL_PREFIX = " ${CMAKE_INSTALL_PREFIX} )
 message( NOTICE "-----------------------------------------------------------------------" )
+# execute_process( COMMAND "${CMAKE_COMMAND}" "-E" "environment" )
+message( NOTICE "TOOLCHAIN: $ENV{TOOLCHAIN}" )
+message( NOTICE "SYSROOT: $ENV{SYSROOT}" )
+message( NOTICE "ARCH: $ENV{ARCH}" )
+message( NOTICE "OS: $ENV{OS}" )
+message( NOTICE "API: $ENV{API}" )
+message( NOTICE "TARGET: $ENV{TARGET}" )
+message( NOTICE "SESSION: $ENV{SESSION}" )
+message( NOTICE "AR: $ENV{AR}" )
+message( NOTICE "AS: $ENV{AS}" )
+message( NOTICE "CC: $ENV{CC}" )
+message( NOTICE "CXX: $ENV{CXX}" )
+message( NOTICE "LD: $ENV{LD}" )
+message( NOTICE "RANLIB: $ENV{RANLIB}" )
+message( NOTICE "STRIP: $ENV{STRIP}" )
+message( NOTICE "-----------------------------------------------------------------------" )
 
 
 
 add_subdirectory( tracing )
 add_subdirectory( framework )
+add_subdirectory( servicebrocker )
 add_subdirectory( hooks )
 add_subdirectory( instrumental )
-add_subdirectory( servicebrocker )
 add_subdirectory( application )
 add_subdirectory( controller )
 add_subdirectory( core )
