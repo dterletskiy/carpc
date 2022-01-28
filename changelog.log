@@ -1,3 +1,6 @@
+version 3.1.15
+   - Build system improvement.
+
 version 3.1.14
    - Change started flag in application thread to atomic.
    - Move back_trace to separate file.

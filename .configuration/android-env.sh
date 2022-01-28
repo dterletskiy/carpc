@@ -5,7 +5,9 @@
 
 
 
-NDK=/home/dmytro_terletskyi/Soft/android/ndk/r23b
+NDK_ROOT=/home/dmytro_terletskyi/Soft/android/ndk
+NDK_VERSION=r23b
+NDK=${NDK_ROOT}/${NDK_VERSION}
 
 HOST_ARCH=x86_64
 HOST_OS=linux

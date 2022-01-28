@@ -1,7 +1,13 @@
 #!/bin/bash
 
-ENVIRONMENT_SETUP_MIB3=/packages/sdk/mib3h/installed/environment-setup-aarch64-poky-linux
-ENVIRONMENT_SETUP_HCP3=/packages/sdk/hcp3sim/installed/environment-setup-core2-64-hcp3-linux-musl
+SHELL_FW=../shell_fw
+source ${SHELL_FW}/constants/console.sh
+source ${SHELL_FW}/constants/constants.sh
+source ${SHELL_FW}/base.sh
+source ${SHELL_FW}/print.sh
+
+
+
 ENVIRONMENT_SETUP_ANDROID=./.configuration/android-env.sh
 
 
@@ -11,58 +17,49 @@ ANDROID_INSTALL_PATH=/data/local/tmp/tda
 
 
 declare -A COMMAND=(
-   [INFO]="--info"                  [INFO_S]="-i"
-   [CLEAN]="--clean"                [CLEAN_S]="-c"
-   [CONFIGURE]="--configure"        [CONFIGURE_S]="-s"
-   [BUILD]="--build"                [BUILD_S]="-b"
-   [CLEAN_BUILD]="--clean_build"    [CLEAN_BUILD_S]="-x"
-   [INSTALL]="--install"            [INSTALL_S]="-d"
-   [ARCHIVE]="--archive"            [ARCHIVE_S]="-a"
-   [START]="--start"                [START_S]="-r"
-   [STOP]="--stop"                  [STOP_S]="-f"
-   [ADB_INSTALL]="--adb_install"    [ADB_INSTALL_S]="-z"
+   [INFO]="info"
+   [CLEAN]="clean"
+   [CONFIGURE]="configure"
+   [BUILD]="build"
+   [CLEAN_BUILD]="clean_build"
+   [INSTALL]="install"
+   [ARCHIVE]="archive"
+   [START]="start"
+   [STOP]="stop"
+   [ADB_INSTALL]="adb_install"
 )
 
 function info( )
 {
-   echo "   ${COMMAND[INFO]}         | ${COMMAND[INFO_S]}         print info"
-   echo "   ${COMMAND[CLEAN]}        | ${COMMAND[CLEAN_S]}        clean product folder"
-   echo "   ${COMMAND[CONFIGURE]}    | ${COMMAND[CONFIGURE_S]}    configure build"
-   echo "   ${COMMAND[BUILD]}        | ${COMMAND[BUILD_S]}        build project"
-   echo "   ${COMMAND[CLEAN_BUILD]}  | ${COMMAND[CLEAN_BUILD_S]}  clean build project"
-   echo "   ${COMMAND[INSTALL]}      | ${COMMAND[INSTALL_S]}      install built project"
-   echo "   ${COMMAND[ARCHIVE]}      | ${COMMAND[ARCHIVE_S]}      archive project"
-   echo "   ${COMMAND[START]}        | ${COMMAND[START_S]}        start installed project"
-   echo "   ${COMMAND[STOP]}         | ${COMMAND[STOP_S]}         stop installed project"
-   echo "   ${COMMAND[ADB_INSTALL]}  | ${COMMAND[ADB_INSTALL_S]}  install to device via adb"
+   echo "   ${COMMAND[INFO]}         - print project info"
+   echo "   ${COMMAND[CLEAN]}        - clean product folder"
+   echo "   ${COMMAND[CONFIGURE]}    - configure build"
+   echo "   ${COMMAND[BUILD]}        - build project"
+   echo "   ${COMMAND[CLEAN_BUILD]}  - clean build project"
+   echo "   ${COMMAND[INSTALL]}      - install built project"
+   echo "   ${COMMAND[ARCHIVE]}      - archive project"
+   echo "   ${COMMAND[START]}        - start installed project"
+   echo "   ${COMMAND[STOP]}         - stop installed project"
+   echo "   ${COMMAND[ADB_INSTALL]}  - install to device via adb"
 }
 
-declare -A PROJECT
+readonly CORES=$( grep -c ^processor /proc/cpuinfo )
 
-CORES=$( grep -c ^processor /proc/cpuinfo )
+declare -A ARCH_MAP=(
+      [x86]=0
+      [x86_64]=1
+      [arm]=2
+      [aarch64]=3
+   )
 
+declare -A OS_MAP=(
+      [linux]=0
+      [android]=1
+   )
 
-
-ACTION=${1}
-TARGET_OS=${2}
-
-readonly OS_ANDROID="0"
-readonly OS_LINUX="1"
-
-OS_TARGET=${OS_LINUX}
-case ${TARGET_OS} in
-   "linux")
-      OS_TARGET=${OS_LINUX}
-   ;;
-   "android")
-      OS_TARGET=${OS_ANDROID}
-      ENVIRONMENT_SETUP=${ENVIRONMENT_SETUP_ANDROID}
-   ;;
-   *)
-      OS_TARGET=${OS_LINUX}
-   ;;
-esac
-CMAKE_PARAMETERS_OS="-DOS_ANDROID:STRING=${OS_ANDROID} -DOS_LINUX:STRING=${OS_LINUX} -DOS_TARGET:STRING=${OS_TARGET}"
+declare -A PROJECT_CONFIG
+declare -A TARGET_CONFIG
+ACTION="info"
 
 
 
@@ -73,88 +70,93 @@ function setup_sdk( )
    # Check if 'SDK' is set
    # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
    if [ -z ${SDK+x} ]; then
-      echo "SDK is unset";
+      print_info "SDK is unset";
    elif [ -z ${SDK} ]; then
-      echo "SDK is empty";
+      print_info "SDK is empty";
    else
-      echo "SDK is set to '${SDK}'";
+      print_info "SDK is set to '${SDK}'";
       if [ ! -f "${SDK}" ]; then
-         echo "'${SDK}' file does not exist"
+         print_error "'${SDK}' file does not exist"
          exit
       fi
       source ${SDK}
    fi
 }
 
-function print( )
-{
-   local -n LOCAL_PRINT__PROJECT=${1}
-
-   echo "ROOT_DIR:           ${LOCAL_PRINT__PROJECT[ROOT_DIR]}"
-   echo "ROOT_DIR_NAME:      ${LOCAL_PRINT__PROJECT[ROOT_DIR_NAME]}"
-   echo "SOURCE_DIR:         ${LOCAL_PRINT__PROJECT[SOURCE_DIR]}"
-   echo "PRODUCT_DIR:        ${LOCAL_PRINT__PROJECT[PRODUCT_DIR]}"
-   echo "BUILD_DIR:          ${LOCAL_PRINT__PROJECT[BUILD_DIR]}"
-   echo "DELIVERY_DIR:       ${LOCAL_PRINT__PROJECT[DELIVERY_DIR]}"
-   echo "DOCUMENTATION_DIR:  ${LOCAL_PRINT__PROJECT[DOCUMENTATION_DIR]}"
-
-   echo "CXX:" ${CXX}
-   echo "CC:" ${CC}
-}
-
 function setup( )
 {
-   local -n LOCAL_SETUP__PROJECT=${1}
+   PROJECT_CONFIG[ROOT_DIR]=${PWD}
+   PROJECT_CONFIG[ROOT_DIR_NAME]=${PWD##*/}
+   PROJECT_CONFIG[SOURCE_DIR]=${PROJECT_CONFIG[ROOT_DIR]}
+   PROJECT_CONFIG[PRODUCT_DIR]=${PROJECT_CONFIG[ROOT_DIR]}/../${PROJECT_CONFIG[ROOT_DIR_NAME]}"_product"
+   PROJECT_CONFIG[BUILD_DIR]=${PROJECT_CONFIG[PRODUCT_DIR]}/build
+   PROJECT_CONFIG[DELIVERY_DIR]=${PROJECT_CONFIG[PRODUCT_DIR]}/delivery
+   PROJECT_CONFIG[DOCUMENTATION_DIR]=${PROJECT_CONFIG[PRODUCT_DIR]}/documentation
+   PROJECT_CONFIG[CMAKE_PARAMETERS]=" \
+         -DOS_ANDROID:STRING=${OS_MAP[android]} \
+         -DOS_LINUX:STRING=${OS_MAP[linux]} \
+         -DOS_TARGET:STRING=${OS_MAP[${TARGET_CONFIG[OS]}]} \
+      "
+   if [ ${TARGET_CONFIG[OS]} == "android" ]; then
+      PROJECT_CONFIG[ENVIRONMENT_SETUP]=${ENVIRONMENT_SETUP_ANDROID}
+   fi
+}
 
-   LOCAL_SETUP__PROJECT[ROOT_DIR]=${PWD}
-   LOCAL_SETUP__PROJECT[ROOT_DIR_NAME]=${PWD##*/}
-   LOCAL_SETUP__PROJECT[SOURCE_DIR]=${LOCAL_SETUP__PROJECT[ROOT_DIR]}
-   LOCAL_SETUP__PROJECT[PRODUCT_DIR]=${LOCAL_SETUP__PROJECT[ROOT_DIR]}/../${LOCAL_SETUP__PROJECT[ROOT_DIR_NAME]}"_product"
-   LOCAL_SETUP__PROJECT[BUILD_DIR]=${LOCAL_SETUP__PROJECT[PRODUCT_DIR]}/build
-   LOCAL_SETUP__PROJECT[DELIVERY_DIR]=${LOCAL_SETUP__PROJECT[PRODUCT_DIR]}/delivery
-   LOCAL_SETUP__PROJECT[DOCUMENTATION_DIR]=${LOCAL_SETUP__PROJECT[PRODUCT_DIR]}/documentation
+function print_project_info( )
+{
+   echo "ROOT_DIR:            ${PROJECT_CONFIG[ROOT_DIR]}"
+   echo "ROOT_DIR_NAME:       ${PROJECT_CONFIG[ROOT_DIR_NAME]}"
+   echo "SOURCE_DIR:          ${PROJECT_CONFIG[SOURCE_DIR]}"
+   echo "PRODUCT_DIR:         ${PROJECT_CONFIG[PRODUCT_DIR]}"
+   echo "BUILD_DIR:           ${PROJECT_CONFIG[BUILD_DIR]}"
+   echo "DELIVERY_DIR:        ${PROJECT_CONFIG[DELIVERY_DIR]}"
+   echo "DOCUMENTATION_DIR:   ${PROJECT_CONFIG[DOCUMENTATION_DIR]}"
+   echo "CMAKE_PARAMETERS:    ${PROJECT_CONFIG[CMAKE_PARAMETERS]}"
+   echo "ENVIRONMENT_SETUP:   ${PROJECT_CONFIG[ENVIRONMENT_SETUP]}"
+
+   echo "TARGET ARCH:         ${TARGET_CONFIG[ARCH]}"
+   echo "TARGET OS:           ${TARGET_CONFIG[OS]}"
+
+   echo "AR:                  ${AR}"
+   echo "AS:                  ${AS}"
+   echo "CC:                  ${CC}"
+   echo "CXX:                 ${CXX}"
+   echo "LD:                  ${LD}"
+   echo "RANLIB:              ${RANLIB}"
+   echo "STRIP:               ${STRIP}"
 }
 
 function clean( )
 {
-   local DIR=${1}
-
-   rm -R ${DIR}
+   rm -R ${PROJECT_CONFIG[PRODUCT_DIR]}
 }
 
 function configure( )
 {
-   local -n LOCAL_CONFIGURE__PROJECT=${1}
-
-   cmake -B ${LOCAL_CONFIGURE__PROJECT[BUILD_DIR]} \
-      -DCMAKE_INSTALL_PREFIX=${LOCAL_CONFIGURE__PROJECT[DELIVERY_DIR]} \
-      -S ${LOCAL_CONFIGURE__PROJECT[SOURCE_DIR]} \
-      --graphviz=${LOCAL_CONFIGURE__PROJECT[DOCUMENTATION_DIR]}/graph \
-      ${CMAKE_PARAMETERS_OS}
+   cmake -B ${PROJECT_CONFIG[BUILD_DIR]} \
+      -DCMAKE_INSTALL_PREFIX=${PROJECT_CONFIG[DELIVERY_DIR]} \
+      -S ${PROJECT_CONFIG[SOURCE_DIR]} \
+      --graphviz=${PROJECT_CONFIG[DOCUMENTATION_DIR]}/graph \
+      ${PROJECT_CONFIG[CMAKE_PARAMETERS]}
 }
 
 function build( )
 {
-   local -n LOCAL_BUILD__PROJECT=${1}
-   local LOCAL_TARGETS=${2}
+   local LOCAL_TARGETS=${1}
 
-   cmake --build ${LOCAL_BUILD__PROJECT[BUILD_DIR]} --target ${LOCAL_TARGETS} -j ${CORES}
+   cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target ${LOCAL_TARGETS} -j ${CORES}
 }
 
 function install( )
 {
-   local -n LOCAL_PROJECT=${1}
-
-   cmake --build ${LOCAL_PROJECT[BUILD_DIR]} --target install
-   # cmake --install ${LOCAL_PROJECT[BUILD_DIR]} --prefix ${LOCAL_PROJECT[DELIVERY_DIR]}
+   cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target install
+   # cmake --install ${PROJECT_CONFIG[BUILD_DIR]} --prefix ${PROJECT_CONFIG[DELIVERY_DIR]}
 }
 
 function archive( )
 {
-   local -n LOCAL_ARCHIVE__PROJECT=${1}
-
-   ARCHIVE_NAME=${LOCAL_ARCHIVE__PROJECT[ROOT_DIR_NAME]}_$(date +'%Y-%m-%d_%H-%M-%S')
-   zip -r ../${ARCHIVE_NAME} ../${LOCAL_ARCHIVE__PROJECT[ROOT_DIR_NAME]}
+   ARCHIVE_NAME=${PROJECT_CONFIG[ROOT_DIR_NAME]}_$(date +'%Y-%m-%d_%H-%M-%S')
+   zip -r ../${ARCHIVE_NAME} ../${PROJECT_CONFIG[ROOT_DIR_NAME]}
    echo ${ARCHIVE_NAME}
 }
 
@@ -174,15 +176,14 @@ function adb_install( )
       return 255
    fi
 
-   local -n LOCAL_PROJECT=${1}
-   local LOCAL_INSTALL_PATH=${2}
+   local LOCAL_INSTALL_PATH=${1}
 
    echo ${ABD_TOOL} root
    echo ${ABD_TOOL} shell mkdir -p ${LOCAL_INSTALL_PATH}
-   echo ${ABD_TOOL} push ${LOCAL_PROJECT[DELIVERY_DIR]}/bin/* ${LOCAL_INSTALL_PATH}
+   echo ${ABD_TOOL} push ${PROJECT_CONFIG[DELIVERY_DIR]}/bin/* ${LOCAL_INSTALL_PATH}
    echo ${ABD_TOOL} shell chmod +x ${LOCAL_INSTALL_PATH}/*
-   echo ${ABD_TOOL} push ${LOCAL_PROJECT[DELIVERY_DIR]}/lib/* ${LOCAL_INSTALL_PATH}
-   echo ${ABD_TOOL} push ${LOCAL_PROJECT[DELIVERY_DIR]}/etc/* ${LOCAL_INSTALL_PATH}
+   echo ${ABD_TOOL} push ${PROJECT_CONFIG[DELIVERY_DIR]}/lib/* ${LOCAL_INSTALL_PATH}
+   echo ${ABD_TOOL} push ${PROJECT_CONFIG[DELIVERY_DIR]}/etc/* ${LOCAL_INSTALL_PATH}
    echo ${ABD_TOOL} push ${SYSROOT}/usr/lib/${TARGET}/libc++_shared.so ${LOCAL_INSTALL_PATH}
 
 }
@@ -199,15 +200,18 @@ DLT_DAEMON="dlt-daemon"
 
 function start_process( )
 {
-   local -n LOCAL_SDP__PROJECT=${1}
-   local LOCAL_PROCESS_NAME=${2}
-   local LOCAL_TRACE=${3}
+   local LOCAL_PROCESS_NAME=${1}
+   local LOCAL_TRACE=${2}
 
    local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
    if [ -z "${LOCAL_PROCESS_PID}" ]; then
       echo "starting" ${LOCAL_PROCESS_NAME}
-      echo ${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/bin/${LOCAL_PROCESS_NAME} config=${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/etc/${LOCAL_PROCESS_NAME}.cfg trace=${LOCAL_TRACE} &
-      ${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/bin/${LOCAL_PROCESS_NAME} config=${LOCAL_SDP__PROJECT[DELIVERY_DIR]}/etc/${LOCAL_PROCESS_NAME}.cfg trace=${LOCAL_TRACE} &
+      echo ${PROJECT_CONFIG[DELIVERY_DIR]}/bin/${LOCAL_PROCESS_NAME} \
+         config=${PROJECT_CONFIG[DELIVERY_DIR]}/etc/${LOCAL_PROCESS_NAME}.cfg \
+         trace=${LOCAL_TRACE} &
+      ${PROJECT_CONFIG[DELIVERY_DIR]}/bin/${LOCAL_PROCESS_NAME} \
+         config=${PROJECT_CONFIG[DELIVERY_DIR]}/etc/${LOCAL_PROCESS_NAME}.cfg \
+         trace=${LOCAL_TRACE} &
       echo ${LOCAL_PROCESS_NAME} "started successfully with PID" $!
    else
       echo ${LOCAL_PROCESS_NAME} "has been started with PID" ${LOCAL_PROCESS_PID}
@@ -224,14 +228,12 @@ function stop_process( )
 
 function start_delivery( )
 {
-   local -n LOCAL_SD__PROJECT=${1}
-
-   start_dlt_daemon LOCAL_SD__PROJECT
-   # start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "DLT"
-   # start_process LOCAL_SD__PROJECT ${APPLICATION} "DLT"
-   # start_process LOCAL_SD__PROJECT ${HMI} "DLT"
-   # start_process LOCAL_SD__PROJECT ${CONTROLLER} "DLT"
-   # start_process LOCAL_SD__PROJECT ${CORE} "DLT"
+   start_dlt_daemon
+   # start_process ${SERVICEBROCKER} "DLT"
+   # start_process ${APPLICATION} "DLT"
+   # start_process ${HMI} "DLT"
+   # start_process ${CONTROLLER} "DLT"
+   # start_process ${CORE} "DLT"
 }
 
 function stop_delivery( )
@@ -246,10 +248,8 @@ function stop_delivery( )
 
 function start_test( )
 {
-   local -n LOCAL_SD__PROJECT=${1}
-
-   start_process LOCAL_SD__PROJECT ${SERVICEBROCKER} "CONSOLE"
-   # start_process LOCAL_SD__PROJECT ${EXPERIMENTAL} "CONSOLE"
+   start_process ${SERVICEBROCKER} "CONSOLE"
+   # start_process ${EXPERIMENTAL} "CONSOLE"
 }
 
 function stop_test( )
@@ -260,13 +260,12 @@ function stop_test( )
 
 function start_dlt_daemon( )
 {
-   local -n LOCAL_SDLT__PROJECT=${1}
    local LOCAL_PROCESS_NAME=${DLT_DAEMON}
 
    local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
    if [ -z "${LOCAL_PROCESS_PID}" ]; then
       echo "starting" ${LOCAL_PROCESS_NAME}
-      ${LOCAL_PROCESS_NAME} -d -c ${LOCAL_SDLT__PROJECT[DELIVERI_DIR]}/etc/dlt.conf
+      ${LOCAL_PROCESS_NAME} -d -c ${PROJECT_CONFIG[DELIVERI_DIR]}/etc/dlt.conf
       echo ${LOCAL_PROCESS_NAME} "started successfully with PID" $!
    else
       echo ${LOCAL_PROCESS_NAME} "has been started with PID" ${LOCAL_PROCESS_PID}
@@ -282,82 +281,141 @@ function stop_dlt_daemon( )
 
 function start( )
 {
-   local -n LOCAL_START__PROJECT=${1}
-
-   _LD_LIBRARY_PATH_=${LD_LIBRARY_PATH}:${LOCAL_START__PROJECT[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
+   _LD_LIBRARY_PATH_=${LD_LIBRARY_PATH}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/
    echo export LD_LIBRARY_PATH=${_LD_LIBRARY_PATH_}
    export LD_LIBRARY_PATH=${_LD_LIBRARY_PATH_}
 
-   # _LD_PRELOAD_=${LD_PRELOAD}:${LOCAL_START__PROJECT[DELIVERY_DIR]}/lib/libhooks.so
+   # _LD_PRELOAD_=${LD_PRELOAD}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib/libhooks.so
    # echo export LD_PRELOAD=${_LD_PRELOAD_}
    # export LD_PRELOAD=${_LD_PRELOAD_}
 
-   start_delivery LOCAL_START__PROJECT
-   # start_test LOCAL_START__PROJECT
+   start_delivery
+   # start_test
 }
 
 function stop( )
 {
-   local -n LOCAL_STOP__PROJECT=${1}
-
-   # stop_delivery LOCAL_STOP__PROJECT
-   stop_test LOCAL_STOP__PROJECT
+   # stop_delivery
+   stop_test
 }
 
 
 
+
+function pre_main( )
+{
+   print_header "Pre-Main Menu"
+
+   for option in "$@"; do
+      case ${option} in
+         --arch=*)
+            print_info "arch"
+            TARGET_CONFIG[ARCH]="${option#*=}"
+            shift # past argument=value
+            ;;
+         --os=*)
+            print_info "os"
+            TARGET_CONFIG[OS]="${option#*=}"
+            shift # past argument=value
+            ;;
+         --action=*)
+            print_info "action"
+            ACTION="${option#*=}"
+            shift # past argument=value
+            ;;
+      esac
+   done
+
+   if [ -z ${TARGET_CONFIG[ARCH]+x} ]; then
+      print_error "Target ARCH is unset";
+      exit 1
+   elif [ -z ${TARGET_CONFIG[ARCH]} ]; then
+      print_error "Target ARCH is empty";
+      exit 1
+   else
+      print_info "Target ARCH is set to '${TARGET_CONFIG[ARCH]}'";
+      map_find_key ARCH_MAP ${TARGET_CONFIG[ARCH]}
+      if [ $? -eq 0 ]; then
+         print_error "Unknown target ARCH"
+         exit 1
+      fi
+   fi
+
+   if [ -z ${TARGET_CONFIG[OS]+x} ]; then
+      print_error "Target OS is unset";
+      exit 1
+   elif [ -z ${TARGET_CONFIG[OS]} ]; then
+      print_error "Target OS is empty";
+      exit 1
+   else
+      print_info "Target OS is set to '${TARGET_CONFIG[OS]}'";
+      map_find_key OS_MAP ${TARGET_CONFIG[OS]}
+      if [ $? -eq 0 ]; then
+         print_error "Unknown target OS"
+         exit 1
+      fi
+   fi
+}
+
 function main( )
 {
+   print_header "Main Menu"
+
    STARTED=$(($(date +%s%N)/1000000))
 
-   setup PROJECT
-   setup_sdk ${ENVIRONMENT_SETUP}
+   pre_main $@
+
+   setup
+   setup_sdk ${PROJECT_CONFIG[ENVIRONMENT_SETUP]}
+   print_project_info
 
    case ${ACTION} in
-      ${COMMAND[INFO]} | ${COMMAND[INFO_S]})
-         print PROJECT
+      ${COMMAND[INFO]})
+         print_info "info"
+         print_project_info
       ;;
-      ${COMMAND[CLEAN]} | ${COMMAND[CLEAN_S]})
-         echo "clean"
-         clean ${PROJECT[PRODUCT_DIR]}
+      ${COMMAND[CLEAN]})
+         print_info "clean"
+         clean
       ;;
-      ${COMMAND[CONFIGURE]} | ${COMMAND[CONFIGURE_S]})
-         echo "configure"
-         configure PROJECT
+      ${COMMAND[CONFIGURE]})
+         print_info "configure"
+         configure
       ;;
-      ${COMMAND[BUILD]} | ${COMMAND[BUILD_S]})
-         echo "build"
-         build PROJECT
-         install PROJECT
+      ${COMMAND[BUILD]})
+         print_info "build"
+         build
+         install
       ;;
-      ${COMMAND[CLEAN_BUILD]} | ${COMMAND[CLEAN_BUILD_S]})
-         echo "clean build"
-         clean ${PROJECT[PRODUCT_DIR]}
-         configure PROJECT
-         build PROJECT
-         install PROJECT
+      ${COMMAND[CLEAN_BUILD]})
+         print_info "clean build"
+         clean
+         configure
+         build
+         install
       ;;
-      ${COMMAND[INSTALL]} | ${COMMAND[INSTALL_S]})
-         echo "install"
-         install PROJECT
+      ${COMMAND[INSTALL]})
+         print_info "install"
+         install
       ;;
-      ${COMMAND[ARCHIVE]} | ${COMMAND[ARCHIVE_S]})
-         echo "archive"
-         archive PROJECT
+      ${COMMAND[ARCHIVE]})
+         print_info "archive"
+         archive
       ;;
-      ${COMMAND[START]} | ${COMMAND[START_S]})
-         echo "start"
-         start PROJECT
+      ${COMMAND[START]})
+         print_info "start"
+         start
       ;;
-      ${COMMAND[STOP]} | ${COMMAND[STOP_S]})
-         echo "stop"
-         stop PROJECT
+      ${COMMAND[STOP]})
+         print_info "stop"
+         stop
       ;;
-      ${COMMAND[ADB_INSTALL]} | ${COMMAND[ADB_INSTALL_S]})
-         echo "adb install"
-         adb_install PROJECT ${ANDROID_INSTALL_PATH}
+      ${COMMAND[ADB_INSTALL]})
+         print_info "adb install"
+         adb_install ${ANDROID_INSTALL_PATH}
       ;;
       *)
+         print_error "Undefined action:" ${ACTION}
          info
       ;;
    esac
@@ -369,4 +427,4 @@ function main( )
 
 
 reset
-main
+main $@
