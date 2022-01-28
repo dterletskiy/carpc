@@ -72,3 +72,6 @@ endif( )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )
 install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION include )
+if( DLT_TRACE )
+   install( FILES ${PROJECT_SOURCE_DIR}/dlt.conf DESTINATION etc )
+endif( )

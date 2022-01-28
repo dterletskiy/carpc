@@ -2,12 +2,6 @@ cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 project( RPC )
 
-set( OS_ANDROID   "100" CACHE STRING "Operating System Android" )
-set( OS_LINUX     "101" CACHE STRING "Operating System Linux" )
-set( OS_TARGET    ${OS_LINUX} CACHE STRING "Operating System Target" )
-
-
-
 option( SYS_TRACE                "Enable framework system tracing"                              ON )
 option( MSG_TRACE                "Enable application tracing"                                   ON )
 option( COLORED_TRACE            "Enable colored tracing for console"                           ON )
@@ -141,14 +135,10 @@ message( NOTICE "---------------------------------------------------------------
 add_subdirectory( tracing )
 add_subdirectory( framework )
 add_subdirectory( servicebrocker )
-add_subdirectory( hooks )
-add_subdirectory( instrumental )
+# add_subdirectory( hooks )
+# add_subdirectory( instrumental )
 add_subdirectory( application )
 add_subdirectory( controller )
 add_subdirectory( core )
 add_subdirectory( hmi )
 # add_subdirectory( experimental )
-
-if( DLT_TRACE )
-   install( FILES ${PROJECT_SOURCE_DIR}/.configuration/dlt.conf DESTINATION etc )
-endif( )
