@@ -59,7 +59,7 @@ declare -A OS_MAP=(
 
 declare -A PROJECT_CONFIG
 declare -A TARGET_CONFIG
-ACTION="info"
+declare -A ACTION
 
 
 
@@ -88,7 +88,7 @@ function setup( )
    PROJECT_CONFIG[ROOT_DIR]=${PWD}
    PROJECT_CONFIG[ROOT_DIR_NAME]=${PWD##*/}
    PROJECT_CONFIG[SOURCE_DIR]=${PROJECT_CONFIG[ROOT_DIR]}
-   PROJECT_CONFIG[PRODUCT_DIR]=${PROJECT_CONFIG[ROOT_DIR]}/../${PROJECT_CONFIG[ROOT_DIR_NAME]}"_product"
+   PROJECT_CONFIG[PRODUCT_DIR]=${PROJECT_CONFIG[ROOT_DIR]}/../${PROJECT_CONFIG[ROOT_DIR_NAME]}_product/${TARGET_CONFIG[OS]}-${TARGET_CONFIG[ARCH]}
    PROJECT_CONFIG[BUILD_DIR]=${PROJECT_CONFIG[PRODUCT_DIR]}/build
    PROJECT_CONFIG[DELIVERY_DIR]=${PROJECT_CONFIG[PRODUCT_DIR]}/delivery
    PROJECT_CONFIG[DOCUMENTATION_DIR]=${PROJECT_CONFIG[PRODUCT_DIR]}/documentation
@@ -104,6 +104,9 @@ function setup( )
 
 function print_project_info( )
 {
+   echo "TARGET ARCH:         ${TARGET_CONFIG[ARCH]}"
+   echo "TARGET OS:           ${TARGET_CONFIG[OS]}"
+
    echo "ROOT_DIR:            ${PROJECT_CONFIG[ROOT_DIR]}"
    echo "ROOT_DIR_NAME:       ${PROJECT_CONFIG[ROOT_DIR_NAME]}"
    echo "SOURCE_DIR:          ${PROJECT_CONFIG[SOURCE_DIR]}"
@@ -113,9 +116,6 @@ function print_project_info( )
    echo "DOCUMENTATION_DIR:   ${PROJECT_CONFIG[DOCUMENTATION_DIR]}"
    echo "CMAKE_PARAMETERS:    ${PROJECT_CONFIG[CMAKE_PARAMETERS]}"
    echo "ENVIRONMENT_SETUP:   ${PROJECT_CONFIG[ENVIRONMENT_SETUP]}"
-
-   echo "TARGET ARCH:         ${TARGET_CONFIG[ARCH]}"
-   echo "TARGET OS:           ${TARGET_CONFIG[OS]}"
 
    echo "AR:                  ${AR}"
    echo "AS:                  ${AS}"
@@ -229,8 +229,8 @@ function stop_process( )
 function start_delivery( )
 {
    start_dlt_daemon
-   # start_process ${SERVICEBROCKER} "DLT"
-   # start_process ${APPLICATION} "DLT"
+   start_process ${SERVICEBROCKER} "DLT"
+   start_process ${APPLICATION} "DLT"
    # start_process ${HMI} "DLT"
    # start_process ${CONTROLLER} "DLT"
    # start_process ${CORE} "DLT"
@@ -249,12 +249,12 @@ function stop_delivery( )
 function start_test( )
 {
    start_process ${SERVICEBROCKER} "CONSOLE"
-   # start_process ${EXPERIMENTAL} "CONSOLE"
+   start_process ${EXPERIMENTAL} "CONSOLE"
 }
 
 function stop_test( )
 {
-   # stop_process ${EXPERIMENTAL}
+   stop_process ${EXPERIMENTAL}
    stop_process ${SERVICEBROCKER}
 }
 
@@ -265,6 +265,7 @@ function start_dlt_daemon( )
    local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
    if [ -z "${LOCAL_PROCESS_PID}" ]; then
       echo "starting" ${LOCAL_PROCESS_NAME}
+      echo ${LOCAL_PROCESS_NAME} -d -c ${PROJECT_CONFIG[DELIVERI_DIR]}/etc/dlt.conf
       ${LOCAL_PROCESS_NAME} -d -c ${PROJECT_CONFIG[DELIVERI_DIR]}/etc/dlt.conf
       echo ${LOCAL_PROCESS_NAME} "started successfully with PID" $!
    else
@@ -289,14 +290,46 @@ function start( )
    # echo export LD_PRELOAD=${_LD_PRELOAD_}
    # export LD_PRELOAD=${_LD_PRELOAD_}
 
-   start_delivery
-   # start_test
+   case ${ACTION[TARGET]} in
+      delivery)
+         print_info "delivery"
+         start_delivery
+         ;;
+      test)
+         print_info "test"
+         start_test
+         ;;
+      dlt)
+         print_info "dlt"
+         start_dlt_daemon
+         ;;
+      *)
+         print_info "target"
+         start_process ${ACTION[TARGET]}
+         ;;
+   esac
 }
 
 function stop( )
 {
-   # stop_delivery
-   stop_test
+   case ${ACTION[TARGET]} in
+      delivery)
+         print_info "delivery"
+         stop_delivery
+         ;;
+      test)
+         print_info "test"
+         stop_test
+         ;;
+      dlt)
+         print_info "dlt"
+         stop_dlt_daemon
+         ;;
+      *)
+         print_info "target"
+         stop_process ${ACTION[TARGET]}
+         ;;
+   esac
 }
 
 
@@ -320,7 +353,12 @@ function pre_main( )
             ;;
          --action=*)
             print_info "action"
-            ACTION="${option#*=}"
+            ACTION[NAME]="${option#*=}"
+            shift # past argument=value
+            ;;
+         --target=*)
+            print_info "target"
+            ACTION[TARGET]="${option#*=}"
             shift # past argument=value
             ;;
       esac
@@ -369,7 +407,7 @@ function main( )
    setup_sdk ${PROJECT_CONFIG[ENVIRONMENT_SETUP]}
    print_project_info
 
-   case ${ACTION} in
+   case ${ACTION[NAME]} in
       ${COMMAND[INFO]})
          print_info "info"
          print_project_info
@@ -415,7 +453,7 @@ function main( )
          adb_install ${ANDROID_INSTALL_PATH}
       ;;
       *)
-         print_error "Undefined action:" ${ACTION}
+         print_error "Undefined action:" ${ACTION[NAME]}
          info
       ;;
    esac
