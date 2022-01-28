@@ -1,3 +1,7 @@
+version 3.2.1
+   - Fixing bug when pending object with socket socket receives two packages at the same time. During processing one package (for example "RegisterProcessAck") this socket will be moved to channel object. Processing second package will be done by pending object, but
+   its content depends on channel object (for example "RegisterClient").
+
 version 3.1.17
    - Build system improvement.
 

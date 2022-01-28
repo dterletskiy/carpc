@@ -16,7 +16,6 @@ SendReceive::SendReceive( )
    : m_thread( std::bind( &SendReceive::thread_loop, this ) )
    , m_service_brocker( *this )
    , m_master( *this )
-   , m_pending_connections( *this )
    , m_connections( *this )
 {
 }
@@ -30,8 +29,6 @@ bool SendReceive::start( )
    if( false == m_service_brocker.setup_connection( ) )
       return false;
    if( false == m_master.setup_connection( ) )
-      return false;
-   if( false == m_pending_connections.setup_connection( ) )
       return false;
    if( false == m_connections.setup_connection( ) )
       return false;
@@ -66,17 +63,17 @@ void SendReceive::thread_loop( )
       m_service_brocker.prepare_select( max_socket, fd_set );
       m_master.prepare_select( max_socket, fd_set );
       m_connections.prepare_select( max_socket, fd_set );
-      m_pending_connections.prepare_select( max_socket, fd_set );
 
       timeval timeout{ 1, 0 };
       if( false == os::os_linux::socket::select( max_socket, fd_set, &timeout ) )
          continue;
 
       // @TDA: WARNING!!!
-      // This order is important because during processing some sockets could be moved from one collection to another.
+      // This order is important because during processing some sockets could be moved from one collection (master)
+      // to another (connections). In this case connections collection is extended and will be processed in wrong way
+      // if it would be processed after "master".
       m_service_brocker.process_select( fd_set );
       m_connections.process_select( fd_set );
-      m_pending_connections.process_select( fd_set );
       m_master.process_select( fd_set );
    }
 
@@ -339,7 +336,7 @@ void SendReceive::Master::process_select( os::os_linux::socket::fd& fd_set )
 
    if( auto p_socket = mp_socket->accept( ) )
    {
-      m_parent.m_pending_connections.add( p_socket );
+      m_parent.m_connections.add_pending_socket( p_socket );
       p_socket->info( "Client connected" );
       p_socket->unblock( );
    }
@@ -363,143 +360,6 @@ bool SendReceive::Master::process_package( dsi::Package& package )
 
 
 
-SendReceive::PendingConnections::PendingConnections( SendReceive& parent )
-   : Base( parent )
-{
-}
-
-bool SendReceive::PendingConnections::setup_connection( )
-{
-   return true;
-}
-
-void SendReceive::PendingConnections::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
-{
-   for( const auto& p_socket : m_sockets )
-   {
-      fd_set.set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ );
-      if( p_socket->socket( ) > max_socket )
-         max_socket = p_socket->socket( );
-   }
-}
-
-void SendReceive::PendingConnections::process_select( os::os_linux::socket::fd& fd_set )
-{
-   for( m_sockets_iterator = m_sockets.begin( ); m_sockets_iterator != m_sockets.end( ); ++m_sockets_iterator )
-   {
-      auto p_socket = *m_sockets_iterator;
-      if( false == fd_set.is_set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ ) )
-         continue;
-
-      const os::Socket::eResult result = p_socket->recv( );
-      if( os::Socket::eResult::DISCONNECTED == result )
-      {
-         p_socket->info( "Client disconnected" );
-
-         m_sockets_iterator = m_sockets.erase( m_sockets_iterator );
-      }
-      else if( os::Socket::eResult::OK == result )
-      {
-         size_t recv_size = 0;
-         const void* const p_buffer = p_socket->buffer( recv_size );
-         ipc::tStream stream;
-         ipc::append( stream, p_buffer, recv_size );
-         process_stream( stream );
-      }
-
-      if( m_sockets.end( ) == m_sockets_iterator )
-         break;
-   }
-}
-
-bool SendReceive::PendingConnections::process_package( dsi::Package& package )
-{
-   SYS_VRB( "Processing package '%s'", package.c_str( ) );
-
-   switch( package.command( ) )
-   {
-      case dsi::eCommand::RegisterProcess:
-      {
-         application::process::ID pid;
-         dsi::SocketCongiguration inet_address;
-         if( false == package.data( pid, inet_address ) )
-         {
-            SYS_ERR( "parce package error" );
-            return false;
-         }
-         SYS_INF( "register process: %s / %s", pid.name( ).c_str( ), inet_address.name( ).c_str( ) );
-
-         auto& channel = m_parent.m_connections.register_connection( pid );
-
-         if( nullptr == channel.mp_socket_send )
-         {
-            channel.mp_socket_send = os::Socket::create_shared( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
-            if( os::Socket::eResult::ERROR == channel.mp_socket_send->create( ) )
-               return false;
-            if( os::Socket::eResult::ERROR == channel.mp_socket_send->connect( ) )
-               return false;
-            channel.mp_socket_send->unblock( );
-            channel.mp_socket_send->info( "connection to process created" );
-         }
-
-         channel.mp_socket_recv = *m_sockets_iterator;
-         m_sockets_iterator = m_sockets.erase( m_sockets_iterator );
-
-         dsi::Packet packet( dsi::eCommand::RegisterProcessAck, application::Process::instance( )->id( ) );
-         m_parent.send( packet, channel.mp_socket_send );
-
-         break;
-      }
-      case dsi::eCommand::RegisterProcessAck:
-      {
-         application::process::ID pid;
-         if( false == package.data( pid ) )
-         {
-            SYS_ERR( "parce package error" );
-            return false;
-         }
-         SYS_INF( "register process acknowledge: %s", pid.name( ).c_str( ) );
-
-         auto& channel = m_parent.m_connections.find_connection( pid );
-         if( nullptr == channel.mp_socket_send )
-         {
-            SYS_WRN( "process '%s' was not registered or send socket is nullptr for connection to process", pid.name( ).c_str( ) );
-            return false;
-         }
-
-         channel.mp_socket_recv = *m_sockets_iterator;
-         m_sockets_iterator = m_sockets.erase( m_sockets_iterator );
-
-         for( auto& pending_server_service_passport : channel.pending_server_service_list )
-         {
-            auto clients_addresses = application::Process::instance( )->service_registry( ).clients( pending_server_service_passport );
-            for( const auto& client_address : clients_addresses )
-            {
-               dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( pending_server_service_passport.signature, client_address ) );
-               m_parent.send( packet, channel.mp_socket_send );
-            }
-         }
-         channel.pending_server_service_list.clear( );
-
-         break;
-      }
-      default:
-      {
-         SYS_WRN( "Unknown package command" );
-         break;
-      }
-   }
-
-   return true;
-}
-
-void SendReceive::PendingConnections::add( os::Socket::tSptr& p_socket )
-{
-   m_sockets.push_back( p_socket );
-}
-
-
-
 SendReceive::Connections::Connections( SendReceive& parent )
    : Base( parent )
 {
@@ -512,6 +372,13 @@ bool SendReceive::Connections::setup_connection( )
 
 void SendReceive::Connections::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
 {
+   for( const auto& p_socket : m_pending_sockets )
+   {
+      fd_set.set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ );
+      if( p_socket->socket( ) > max_socket )
+         max_socket = p_socket->socket( );
+   }
+
    for( const auto& pair : m_process_channel_map )
    {
       auto p_socket_recv = pair.second.mp_socket_recv;
@@ -526,6 +393,11 @@ void SendReceive::Connections::prepare_select( os::os_linux::socket::tSocket& ma
 
 void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set )
 {
+   // @TDA: WARNING!!!
+   // This loop by channel collection must be processed first because new socket could be added to this collection
+   // from pending sockets and data will be read from this socket.
+   // In case this loop goes after next one we will try to read data from this socket again what leads to
+   // recv( ) error = EAGAIN
    for( m_process_channel_map_iterator = m_process_channel_map.begin( ); m_process_channel_map_iterator != m_process_channel_map.end( ); ++m_process_channel_map_iterator )
    {
       auto p_socket_recv = m_process_channel_map_iterator->second.mp_socket_recv;
@@ -560,6 +432,32 @@ void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set 
       if( m_process_channel_map.end( ) == m_process_channel_map_iterator )
          break;
    }
+
+   for( m_pending_sockets_iterator = m_pending_sockets.begin( ); m_pending_sockets_iterator != m_pending_sockets.end( ); ++m_pending_sockets_iterator )
+   {
+      auto p_socket = *m_pending_sockets_iterator;
+      if( false == fd_set.is_set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ ) )
+         continue;
+
+      const os::Socket::eResult result = p_socket->recv( );
+      if( os::Socket::eResult::DISCONNECTED == result )
+      {
+         p_socket->info( "Client disconnected" );
+
+         m_pending_sockets_iterator = m_pending_sockets.erase( m_pending_sockets_iterator );
+      }
+      else if( os::Socket::eResult::OK == result )
+      {
+         size_t recv_size = 0;
+         const void* const p_buffer = p_socket->buffer( recv_size );
+         ipc::tStream stream;
+         ipc::append( stream, p_buffer, recv_size );
+         process_stream( stream );
+      }
+
+      if( m_pending_sockets.end( ) == m_pending_sockets_iterator )
+         break;
+   }
 }
 
 bool SendReceive::Connections::process_package( dsi::Package& package )
@@ -568,6 +466,77 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
 
    switch( package.command( ) )
    {
+      // @TDA: BUG!!!
+      // There could be a situation when some pending socket receives two packages at the same time:
+      // RegisterProcess and RegisterProcessAck. During processing first one this socket will be moved from
+      // pending to channel using iterator. But during processing second package this iterator (changed previously)
+      // will be used to move socket from pending to channel. This will lead to wrong behaviour or even
+      // to crash in case if iterator will be end after processing first package. 
+      case dsi::eCommand::RegisterProcess:
+      {
+         application::process::ID pid;
+         dsi::SocketCongiguration inet_address;
+         if( false == package.data( pid, inet_address ) )
+         {
+            SYS_ERR( "parce package error" );
+            return false;
+         }
+         SYS_INF( "register process: %s / %s", pid.name( ).c_str( ), inet_address.name( ).c_str( ) );
+
+         auto& channel = register_connection( pid );
+
+         if( nullptr == channel.mp_socket_send )
+         {
+            channel.mp_socket_send = os::Socket::create_shared( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
+            if( os::Socket::eResult::ERROR == channel.mp_socket_send->create( ) )
+               return false;
+            if( os::Socket::eResult::ERROR == channel.mp_socket_send->connect( ) )
+               return false;
+            channel.mp_socket_send->unblock( );
+            channel.mp_socket_send->info( "connection to process created" );
+         }
+
+         channel.mp_socket_recv = *m_pending_sockets_iterator;
+         m_pending_sockets_iterator = m_pending_sockets.erase( m_pending_sockets_iterator );
+
+         dsi::Packet packet( dsi::eCommand::RegisterProcessAck, application::Process::instance( )->id( ) );
+         m_parent.send( packet, channel.mp_socket_send );
+
+         break;
+      }
+      case dsi::eCommand::RegisterProcessAck:
+      {
+         application::process::ID pid;
+         if( false == package.data( pid ) )
+         {
+            SYS_ERR( "parce package error" );
+            return false;
+         }
+         SYS_INF( "register process acknowledge: %s", pid.name( ).c_str( ) );
+
+         auto& channel = find_connection( pid );
+         if( nullptr == channel.mp_socket_send )
+         {
+            SYS_WRN( "process '%s' was not registered or send socket is nullptr for connection to process", pid.name( ).c_str( ) );
+            return false;
+         }
+
+         channel.mp_socket_recv = *m_pending_sockets_iterator;
+         m_pending_sockets_iterator = m_pending_sockets.erase( m_pending_sockets_iterator );
+
+         for( auto& pending_server_service_passport : channel.pending_server_service_list )
+         {
+            auto clients_addresses = application::Process::instance( )->service_registry( ).clients( pending_server_service_passport );
+            for( const auto& client_address : clients_addresses )
+            {
+               dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( pending_server_service_passport.signature, client_address ) );
+               m_parent.send( packet, channel.mp_socket_send );
+            }
+         }
+         channel.pending_server_service_list.clear( );
+
+         break;
+      }
       case dsi::eCommand::IpcEvent:
       {
          async::IEvent::tSptr p_event = async::IEvent::deserialize( package.data( ) );
@@ -653,4 +622,22 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
    }
 
    return true;
+}
+
+SendReceive::Connections::Channel& SendReceive::Connections::register_connection( const application::process::ID& pid )
+{
+   auto [ iterator, success ] = m_process_channel_map.insert( { pid, Channel( ) } );
+   return iterator->second;
+}
+
+SendReceive::Connections::Channel& SendReceive::Connections::find_connection( const application::process::ID& pid )
+{
+   static Channel invalid_channel;
+   auto iterator = m_process_channel_map.find( pid );
+   return m_process_channel_map.end( ) == iterator ? invalid_channel : iterator->second;
+}
+
+void SendReceive::Connections::add_pending_socket( os::Socket::tSptr& p_socket )
+{
+   m_pending_sockets.push_back( p_socket );
 }

@@ -110,24 +110,6 @@ namespace base::application {
          };
          Master m_master;
 
-         struct PendingConnections : public Base
-         {
-            PendingConnections( SendReceive& );
-
-            bool setup_connection( ) override;
-
-            void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
-            void process_select( os::os_linux::socket::fd& ) override;
-
-            bool process_package( dsi::Package& ) override;
-
-            void add( os::Socket::tSptr& );
-
-            os::Socket::tSptrList            m_sockets;
-            os::Socket::tSptrList::iterator  m_sockets_iterator;
-         };
-         PendingConnections m_pending_connections;
-
          struct Connections : public Base
          {
             struct Channel
@@ -161,21 +143,20 @@ namespace base::application {
 
             bool process_package( dsi::Package& ) override;
 
-            Channel& register_connection( const application::process::ID& pid )
-            {
-               auto [ iterator, success ] = m_process_channel_map.insert( { pid, Channel( ) } );
-               return iterator->second;
-            }
 
-            Channel& find_connection( const application::process::ID& pid )
-            {
-               static Channel invalid_channel;
-               auto iterator = m_process_channel_map.find( pid );
-               return m_process_channel_map.end( ) == iterator ? invalid_channel : iterator->second;
-            }
 
-            tProcessChannelMap            m_process_channel_map;
-            tProcessChannelMap::iterator  m_process_channel_map_iterator;
+            Channel& register_connection( const application::process::ID& pid );
+            Channel& find_connection( const application::process::ID& pid );
+
+            tProcessChannelMap               m_process_channel_map;
+            tProcessChannelMap::iterator     m_process_channel_map_iterator;
+
+
+
+            void add_pending_socket( os::Socket::tSptr& );
+
+            os::Socket::tSptrList            m_pending_sockets;
+            os::Socket::tSptrList::iterator  m_pending_sockets_iterator;
          };
          Connections m_connections;
    };
