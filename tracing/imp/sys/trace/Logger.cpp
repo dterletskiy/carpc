@@ -4,7 +4,9 @@
 
 namespace {
 
-   std::size_t NAMELEN = 16;
+   #ifdef USE_DLT
+      std::size_t NAMELEN = 16;
+   #endif
 
 }
 

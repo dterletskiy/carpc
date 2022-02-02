@@ -159,6 +159,7 @@ namespace base::os {
 
          struct IConsumer
          {
+            virtual ~IConsumer( ) = default;
             virtual void connected( Socket::tSptr ) = 0;
             virtual void disconnected( Socket::tSptr ) = 0;
             virtual void read_slave( Socket::tSptr ) = 0;

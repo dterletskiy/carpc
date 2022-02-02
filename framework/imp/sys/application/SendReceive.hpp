@@ -45,19 +45,6 @@ namespace base::application {
          os::Socket::tSptr socket( const application::Context& );
 
       private:
-         struct Channel
-         {
-            os::Socket::tSptr socket_send;
-            os::Socket::tSptr socket_recv;
-
-            service::Passport::tList servers;
-            service::Passport::tList clients;
-         };
-         using tProcessChannelMap = std::map< application::process::ID, Channel >;
-
-         os::Socket::tSptrList   m_incoming_sockets;
-         tProcessChannelMap      m_process_channel_map;
-
          struct Base
          {
             Base( SendReceive& );
