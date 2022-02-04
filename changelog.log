@@ -1,3 +1,6 @@
+version 3.2.3
+   - Build system improvement. Android.bp file updated.
+
 version 3.2.2
    - Fixing some bugs and issues.
    - Android.bp file implemented to have a possibility to build framework directly in aosp soong build system.
