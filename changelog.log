@@ -1,3 +1,6 @@
+version 3.2.5
+   - Implemented new example ("rolename") for testing.
+
 version 3.2.4
    - Moved all examples and test applications to folder "examples"
 
