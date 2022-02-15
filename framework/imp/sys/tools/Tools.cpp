@@ -1,6 +1,7 @@
 #include <fstream>
 #include <algorithm>
 
+#include "api/sys/helpers/functions/format.hpp"
 #include "api/sys/tools/Tools.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -127,10 +128,13 @@ namespace base::tools {
          std::string line;
          std::getline( file_stream, line, '\n' );
 
+         line = base::trim( line );
          if( true == line.empty( ) )
             continue;
+         if( '#' == line[0] )
+            continue;
 
-         size_t position = line.find( delimiter );
+         std::size_t position = line.find( delimiter );
          if( std::string::npos == position )
             m_map.emplace( line, std::string("") );
          else
@@ -277,16 +281,16 @@ namespace base::tools::uuid {
    {
       std::stringstream ss;
       ss << std::hex;
-      for( size_t i = 0; i < 8; i++ ) ss << dis( gen );
+      for( std::size_t i = 0; i < 8; i++ ) ss << dis( gen );
       ss << "-";
-      for( size_t i = 0; i < 4; i++ ) ss << dis( gen );
+      for( std::size_t i = 0; i < 4; i++ ) ss << dis( gen );
       ss << "-4";
-      for( size_t i = 0; i < 3; i++ ) ss << dis( gen );
+      for( std::size_t i = 0; i < 3; i++ ) ss << dis( gen );
       ss << "-";
       ss << dis2( gen );
-      for( size_t i = 0; i < 3; i++ ) ss << dis( gen );
+      for( std::size_t i = 0; i < 3; i++ ) ss << dis( gen );
       ss << "-";
-      for( size_t i = 0; i < 12; i++ ) ss << dis( gen );
+      for( std::size_t i = 0; i < 12; i++ ) ss << dis( gen );
 
       _uuid = ss.str( );
    }

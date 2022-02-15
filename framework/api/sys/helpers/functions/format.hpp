@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <sstream>
+#include <string>
 #include <optional>
 #include <initializer_list>
 
@@ -36,3 +36,16 @@ namespace base {
    }
 
 } // namespace base
+
+namespace base {
+
+   // Trim a string in C++ – Remove leading and trailing spaces
+   // link: https://www.techiedelight.com/trim-string-cpp-remove-leading-trailing-spaces/
+
+   const std::string WHITESPACE = " \n\r\t\f\v";
+
+   std::string ltrim( const std::string& s );
+   std::string rtrim( const std::string& s );
+   std::string trim( const std::string& s );
+
+}

@@ -100,7 +100,9 @@ namespace base::fsm {
    const typename TState< TYPES >::tManager& TState< TYPES >::manager( ) const
    {
       if( nullptr == mp_manager )
+      {
          SYS_ERR( "%s: manager is not registered", m_name.c_str( ) );
+      }
 
       return *mp_manager;
    }

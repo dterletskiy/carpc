@@ -1,3 +1,6 @@
+version 3.3.2
+   - Configuration file processing improvement.
+
 version 3.3.1
    - Minor changes in android build system.
 
