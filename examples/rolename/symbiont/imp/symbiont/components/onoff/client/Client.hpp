@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/sys/services/onoff/Client.hpp"
+#include "api/sys/tools/Performance.hpp"
 
 
 
@@ -25,6 +26,10 @@ namespace symbiont::components::onoff {
       public:
          void request_start( );
          void request_trigger_state( const std::string&, const size_t );
+
+      private:
+         void test( );
+         base::tools::Performance m_performance = { "CARPC" };
    };
 
 } // namespace symbiont::components::onoff

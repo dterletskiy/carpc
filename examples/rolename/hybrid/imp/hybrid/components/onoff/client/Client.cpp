@@ -27,7 +27,6 @@ void Client::connected( )
 {
    MSG_DBG( "connected" );
    // subscribe_current_state( );
-   // request_trigger_state( "UNLOADED", 10000000000 );
 }
 
 void Client::disconnected( )
