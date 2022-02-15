@@ -55,9 +55,9 @@ namespace base::application {
             virtual void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) = 0;
             virtual void process_select( os::os_linux::socket::fd& ) = 0;
 
-            bool process_stream( ipc::tStream& );
-            bool process_packet( dsi::Packet& );
-            virtual bool process_package( dsi::Package& ) = 0;
+            bool process_stream( ipc::tStream&, os::Socket::tSptr );
+            bool process_packet( dsi::Packet&, os::Socket::tSptr );
+            virtual bool process_package( dsi::Package&, os::Socket::tSptr ) = 0;
 
             SendReceive& m_parent;
          };
@@ -76,7 +76,7 @@ namespace base::application {
             void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
             void process_select( os::os_linux::socket::fd& ) override;
 
-            bool process_package( dsi::Package& ) override;
+            bool process_package( dsi::Package&, os::Socket::tSptr ) override;
 
             os::Socket::tSptr mp_socket = nullptr;
          };
@@ -91,7 +91,7 @@ namespace base::application {
             void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
             void process_select( os::os_linux::socket::fd& ) override;
 
-            bool process_package( dsi::Package& ) override;
+            bool process_package( dsi::Package&, os::Socket::tSptr ) override;
 
             os::Socket::tSptr mp_socket = nullptr;
          };
@@ -99,51 +99,173 @@ namespace base::application {
 
          struct Connections : public Base
          {
-            struct Channel
-            {
-               Channel( ) = default;
-               Channel( os::Socket::tSptr p_socket_send, os::Socket::tSptr p_socket_recv )
-                  : mp_socket_send( p_socket_send )
-                  , mp_socket_recv( p_socket_recv )
-               { }
-
-               os::Socket::tSptr mp_socket_send;
-               os::Socket::tSptr mp_socket_recv;
-
-               bool established( ) const
+            #if 0 // perhaps redesign
+               struct Connection
                {
-                  return ( nullptr != mp_socket_send ) && ( nullptr != mp_socket_recv );
-               }
+                  using tProcessConnectionMap = std::map< application::process::ID, Connection >;
 
-               service::Passport::tList pending_server_service_list;
-               service::Passport::tList server_service_list;
-               service::Passport::tList client_service_list;
-            };
-            using tProcessChannelMap = std::map< application::process::ID, Channel >;
+                  using tSocketConnectionMap = std::map< os::Socket::tSptr, Connection >;
+                  using tServiceConnectionMap = std::map< service::Passport::tSet, Connection >;
 
-            Connections( SendReceive& );
+                  tSocketConnectionMap::iterator send_iterator = ms_send.end( );
+                  tSocketConnectionMap::iterator recv_iterator = ms_recv.end( );
+                  tServiceConnectionMap::iterator pending_servers_iterator = ms_pending_servers.end( );
+                  tServiceConnectionMap::iterator servers_iterator = ms_servers.end( );
+                  tServiceConnectionMap::iterator clients_iterator = ms_clients.end( );
+               };
 
-            bool setup_connection( ) override;
+               Connection::tProcessConnectionMap ms_process;
 
-            void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
-            void process_select( os::os_linux::socket::fd& ) override;
+               Connection::tSocketConnectionMap ms_send;
+               Connection::tSocketConnectionMap ms_recv;
 
-            bool process_package( dsi::Package& ) override;
+               Connection::tServiceConnectionMap ms_pending_servers;
+               Connection::tServiceConnectionMap ms_servers;
+               Connection::tServiceConnectionMap ms_clients;
+            #endif
 
+            private:
+               using tSocketProcessMap = std::map< os::Socket::tSptr, application::process::ID >;
+               using tProcessSocketMap = std::map< application::process::ID, os::Socket::tSptr >;
+               using tProcessServiceMap = std::map< application::process::ID, service::Passport::tSet >;
 
+            private:
+               struct data
+               {
+                  static tProcessSocketMap ms_send;
+                  static tSocketProcessMap ms_recv;
 
-            Channel& register_connection( const application::process::ID& pid );
-            Channel& find_connection( const application::process::ID& pid );
+                  static tProcessServiceMap ms_pending_servers;
+                  static tProcessServiceMap ms_servers;
+                  static tProcessServiceMap ms_clients;
+               };
 
-            tProcessChannelMap               m_process_channel_map;
-            tProcessChannelMap::iterator     m_process_channel_map_iterator;
+            public:
+               struct channel // => socket
+               {
+                  struct send
+                  {
+                     static os::Socket::tSptr create( const application::process::ID& pid, const dsi::SocketCongiguration& inet_address );
+                     static bool remove( const application::process::ID& pid );
+                     static os::Socket::tSptr socket( const application::process::ID& pid );
+                     static const application::process::ID& pid( os::Socket::tSptr p_socket );
+                     static tProcessSocketMap& collection( );
+                  };
 
+                  struct recv
+                  {
+                     static bool add( os::Socket::tSptr p_socket );
+                     static bool update( os::Socket::tSptr p_socket, const application::process::ID& pid );
+                     static bool remove( os::Socket::tSptr p_socket );
+                     static const application::process::ID& pid( os::Socket::tSptr p_socket );
+                     static os::Socket::tSptr socket( const application::process::ID& pid );
+                     static tSocketProcessMap& collection( );
+                  };
 
+                  static bool established( const application::process::ID& pid );
+               };
 
-            void add_pending_socket( os::Socket::tSptr& );
+               struct interface // => service
+               {
+                  enum class eType: std::uint8_t { SERVER, CLIENT, PENDING_SERVER, PENDING_CLIENT };
 
-            os::Socket::tSptrList            m_pending_sockets;
-            os::Socket::tSptrList::iterator  m_pending_sockets_iterator;
+                  template< eType type >
+                  struct base
+                  {
+                     static tProcessServiceMap& collection( )
+                     {
+                        switch( type )
+                        {
+                           case eType::SERVER:           return data::ms_servers;
+                           case eType::CLIENT:           return data::ms_clients;
+                           case eType::PENDING_SERVER:   return data::ms_pending_servers;
+                        }
+                        static tProcessServiceMap dummy;
+                        return dummy;
+                     }
+                     static const service::Passport::tSet& passports( const application::process::ID& pid )
+                     {
+                        auto& process_service_map = collection( );
+
+                        auto iterator = process_service_map.find( pid );
+                        if( process_service_map.end( ) == iterator )
+                        {
+                           static const service::Passport::tSet dummy{ };
+                           return dummy;
+                        }
+
+                        return iterator->second;                           
+                     }
+                     static bool add( const application::process::ID& pid, const service::Passport& passport )
+                     {
+                        auto& process_service_map = collection( );
+
+                        auto iterator = process_service_map.find( pid );
+                        if( process_service_map.end( ) == iterator )
+                           return process_service_map.emplace( pid, service::Passport::tSet{ passport } ).second;
+
+                        return iterator->second.emplace( passport ).second;
+                     }
+                     static bool remove( const application::process::ID& pid, const service::Passport& passport )
+                     {
+                        auto& process_service_map = collection( );
+
+                        auto iterator = process_service_map.find( pid );
+                        if( process_service_map.end( ) == iterator )
+                           return false;
+
+                        return 0 != iterator->second.erase( passport );
+                     }
+                     static bool remove( const application::process::ID& pid )
+                     {
+                        auto& process_service_map = collection( );
+
+                        auto iterator = process_service_map.find( pid );
+                        if( process_service_map.end( ) == iterator )
+                           return false;
+
+                        iterator->second.clear( );
+                        return true;
+                     }
+                     static const service::Passport::tSet& find( const application::process::ID& pid )
+                     {
+                        auto& process_service_map = collection( );
+
+                        auto iterator = process_service_map.find( pid );
+                        if( process_service_map.end( ) == iterator )
+                        {
+                           static const service::Passport::tSet dummy;
+                           return dummy;
+                        }
+
+                        return iterator->second;
+                     }
+                     static bool process( const application::process::ID& pid )
+                     {
+                        auto& process_service_map = collection( );
+
+                        return true;
+                     }
+                  };
+                  struct server : public base< eType::SERVER >
+                  {
+                     struct pending : public base< eType::PENDING_SERVER > { };
+                  };
+                  struct client : public base< eType::CLIENT >
+                  {
+                     struct pending : public base< eType::PENDING_CLIENT > { };
+                  };
+               };
+
+            public:
+               Connections( SendReceive& );
+
+               bool setup_connection( ) override;
+
+               void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
+               void process_select( os::os_linux::socket::fd& ) override;
+
+               bool process_package( dsi::Package&, os::Socket::tSptr ) override;
          };
          Connections m_connections;
    };

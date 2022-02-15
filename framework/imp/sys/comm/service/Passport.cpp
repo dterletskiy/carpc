@@ -34,3 +34,20 @@ bool Passport::from_stream( base::ipc::tStream& stream )
 {
    return ipc::deserialize( stream, signature, address );
 }
+
+bool Passport::operator==( const Passport& other ) const
+{
+   return ( other.signature == signature ) && ( other.signature == signature );
+}
+
+bool Passport::operator!=( const Passport& other ) const
+{
+   return !( *this == other );
+}
+
+bool Passport::operator<( const Passport& other ) const
+{
+   if( other.signature != signature )
+      return signature < other.signature;
+   return address < other.address;
+}

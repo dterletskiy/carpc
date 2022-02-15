@@ -85,13 +85,13 @@ base::os::Socket::tSptr SendReceive::socket( const application::Context& context
    if( context.pid( ).is_invalid( ) )
       return m_service_brocker.mp_socket;
 
-   auto& channel = m_connections.find_connection( context.pid( ) );
-   if( nullptr == channel.mp_socket_send )
+   auto p_socket_send = Connections::channel::send::socket( context.pid( ) );
+   if( nullptr == p_socket_send )
    {
       SYS_WRN( "unable to find socket for context '%s'", context.name( ).c_str( ) );
    }
 
-   return channel.mp_socket_send;
+   return p_socket_send;
 }
 
 bool SendReceive::send( const RawBuffer& buffer, os::Socket::tSptr p_socket )
@@ -146,23 +146,23 @@ SendReceive::Base::Base( SendReceive& parent )
 {
 }
 
-bool SendReceive::Base::process_stream( ipc::tStream& stream )
+bool SendReceive::Base::process_stream( ipc::tStream& stream, os::Socket::tSptr p_socket )
 {
    bool result = true;
    while( 0 < stream.size( ) )
    {
       dsi::Packet packet;
       ipc::deserialize( stream, packet );
-      result &= process_packet( packet );
+      result &= process_packet( packet, p_socket );
    }
    return result;
 }
 
-bool SendReceive::Base::process_packet( dsi::Packet& packet )
+bool SendReceive::Base::process_packet( dsi::Packet& packet, os::Socket::tSptr p_socket )
 {
    bool result = true;
    for( dsi::Package& package : packet.packages( ) )
-      result &= process_package( package );
+      result &= process_package( package, p_socket );
 
    return result;
 }
@@ -216,11 +216,11 @@ void SendReceive::ServiceBrocker::process_select( os::os_linux::socket::fd& fd_s
       const void* const p_buffer = mp_socket->buffer( recv_size );
       ipc::tStream stream;
       ipc::append( stream, p_buffer, recv_size );
-      process_stream( stream );
+      process_stream( stream, mp_socket );
    }
 }
 
-bool SendReceive::ServiceBrocker::process_package( dsi::Package& package )
+bool SendReceive::ServiceBrocker::process_package( dsi::Package& package, os::Socket::tSptr p_socket )
 {
    SYS_VRB( "Processing package '%s'", package.c_str( ) );
 
@@ -238,26 +238,22 @@ bool SendReceive::ServiceBrocker::process_package( dsi::Package& package )
          SYS_INF( "detected server: '%s' / %s", service_passport.name( ).c_str( ), inet_address.name( ).c_str( ) );
 
          auto& pid = service_passport.address.context( ).pid( );
-         auto& channel = m_parent.m_connections.register_connection( pid );
+         auto p_socket_send = Connections::channel::send::socket( pid );
 
-         if( nullptr == channel.mp_socket_send )
+         if( nullptr == p_socket_send )
          {
-            channel.mp_socket_send = os::Socket::create_shared( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
-            if( os::Socket::eResult::ERROR == channel.mp_socket_send->create( ) )
+            p_socket_send = Connections::channel::send::create( pid, inet_address );
+            if( nullptr == p_socket_send )
                return false;
-            if( os::Socket::eResult::ERROR == channel.mp_socket_send->connect( ) )
-               return false;
-            channel.mp_socket_send->unblock( );
-            channel.mp_socket_send->info( "connection to process created" );
 
             dsi::Packet packet(
                dsi::eCommand::RegisterProcess,
                application::Process::instance( )->id( ),
                static_cast< dsi::SocketCongiguration >( Process::instance( )->configuration( ).ipc_app.socket )
             );
-            m_parent.send( packet, channel.mp_socket_send );
+            m_parent.send( packet, p_socket_send );
 
-            channel.pending_server_service_list.push_back( service_passport );
+            Connections::interface::server::pending::add( pid, service_passport );
          }
          else
          {
@@ -265,7 +261,7 @@ bool SendReceive::ServiceBrocker::process_package( dsi::Package& package )
             for( const auto& client_address : clients_addresses )
             {
                dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( service_passport.signature, client_address ) );
-               m_parent.send( packet, channel.mp_socket_send );
+               m_parent.send( packet, p_socket_send );
             }
          }
 
@@ -336,13 +332,13 @@ void SendReceive::Master::process_select( os::os_linux::socket::fd& fd_set )
 
    if( auto p_socket = mp_socket->accept( ) )
    {
-      m_parent.m_connections.add_pending_socket( p_socket );
+      Connections::channel::recv::add( p_socket );
       p_socket->info( "Client connected" );
       p_socket->unblock( );
    }
 }
 
-bool SendReceive::Master::process_package( dsi::Package& package )
+bool SendReceive::Master::process_package( dsi::Package& package, os::Socket::tSptr p_socket )
 {
    SYS_VRB( "Processing package '%s'", package.c_str( ) );
 
@@ -372,53 +368,52 @@ bool SendReceive::Connections::setup_connection( )
 
 void SendReceive::Connections::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
 {
-   for( const auto& p_socket : m_pending_sockets )
+   for( const auto& pair : channel::recv::collection( ) )
    {
+      auto p_socket = pair.first;
+      if( nullptr == p_socket )
+         continue;
+
       fd_set.set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ );
       if( p_socket->socket( ) > max_socket )
          max_socket = p_socket->socket( );
-   }
-
-   for( const auto& pair : m_process_channel_map )
-   {
-      auto p_socket_recv = pair.second.mp_socket_recv;
-      if( nullptr == p_socket_recv )
-         continue;
-
-      fd_set.set( p_socket_recv->socket( ), os::os_linux::socket::fd::eType::READ );
-      if( p_socket_recv->socket( ) > max_socket )
-         max_socket = p_socket_recv->socket( );
    }
 }
 
 void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set )
 {
-   // @TDA: WARNING!!!
-   // This loop by channel collection must be processed first because new socket could be added to this collection
-   // from pending sockets and data will be read from this socket.
-   // In case this loop goes after next one we will try to read data from this socket again what leads to
-   // recv( ) error = EAGAIN
-   for( m_process_channel_map_iterator = m_process_channel_map.begin( ); m_process_channel_map_iterator != m_process_channel_map.end( ); ++m_process_channel_map_iterator )
+   auto iterator = channel::recv::collection( ).begin( );
+   while( iterator != channel::recv::collection( ).end( ) )
    {
-      auto p_socket_recv = m_process_channel_map_iterator->second.mp_socket_recv;
+      auto p_socket_recv = iterator->first;
+      auto& pid = iterator->second;
       if( nullptr == p_socket_recv )
+      {
+         ++iterator;
          continue;
+      }
 
       if( false == fd_set.is_set( p_socket_recv->socket( ), os::os_linux::socket::fd::eType::READ ) )
+      {
+         ++iterator;
          continue;
+      }
 
       const os::Socket::eResult result = p_socket_recv->recv( );
       if( os::Socket::eResult::DISCONNECTED == result )
       {
          p_socket_recv->info( "Server disconnected" );
 
-         for( const auto& service_passport : m_process_channel_map_iterator->second.server_service_list )
-            application::Process::instance( )->service_registry( ).unregister_server( service_passport );
+         for( const auto& passport : interface::server::passports( pid ) )
+            application::Process::instance( )->service_registry( ).unregister_server( passport );
 
-         for( const auto& service_passport : m_process_channel_map_iterator->second.client_service_list )
-            application::Process::instance( )->service_registry( ).unregister_client( service_passport );
+         for( const auto& passport : interface::client::passports( pid ) )
+            application::Process::instance( )->service_registry( ).unregister_client( passport );
 
-         m_process_channel_map_iterator = m_process_channel_map.erase( m_process_channel_map_iterator );
+         interface::server::remove( pid );
+         interface::client::remove( pid );
+         channel::send::remove( pid );
+         iterator = channel::recv::collection( ).erase( iterator ); // @TDA: improve
       }
       else if( os::Socket::eResult::OK == result )
       {
@@ -426,52 +421,22 @@ void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set 
          const void* const p_buffer = p_socket_recv->buffer( recv_size );
          ipc::tStream stream;
          ipc::append( stream, p_buffer, recv_size );
-         process_stream( stream );
+         process_stream( stream, p_socket_recv );
+         ++iterator;
       }
-
-      if( m_process_channel_map.end( ) == m_process_channel_map_iterator )
-         break;
-   }
-
-   for( m_pending_sockets_iterator = m_pending_sockets.begin( ); m_pending_sockets_iterator != m_pending_sockets.end( ); ++m_pending_sockets_iterator )
-   {
-      auto p_socket = *m_pending_sockets_iterator;
-      if( false == fd_set.is_set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ ) )
-         continue;
-
-      const os::Socket::eResult result = p_socket->recv( );
-      if( os::Socket::eResult::DISCONNECTED == result )
+      else
       {
-         p_socket->info( "Client disconnected" );
-
-         m_pending_sockets_iterator = m_pending_sockets.erase( m_pending_sockets_iterator );
+         ++iterator;
       }
-      else if( os::Socket::eResult::OK == result )
-      {
-         size_t recv_size = 0;
-         const void* const p_buffer = p_socket->buffer( recv_size );
-         ipc::tStream stream;
-         ipc::append( stream, p_buffer, recv_size );
-         process_stream( stream );
-      }
-
-      if( m_pending_sockets.end( ) == m_pending_sockets_iterator )
-         break;
    }
 }
 
-bool SendReceive::Connections::process_package( dsi::Package& package )
+bool SendReceive::Connections::process_package( dsi::Package& package, os::Socket::tSptr p_socket )
 {
    SYS_VRB( "Processing package '%s'", package.c_str( ) );
 
    switch( package.command( ) )
    {
-      // @TDA: BUG!!!
-      // There could be a situation when some pending socket receives two packages at the same time:
-      // RegisterProcess and RegisterProcessAck. During processing first one this socket will be moved from
-      // pending to channel using iterator. But during processing second package this iterator (changed previously)
-      // will be used to move socket from pending to channel. This will lead to wrong behaviour or even
-      // to crash in case if iterator will be end after processing first package. 
       case dsi::eCommand::RegisterProcess:
       {
          application::process::ID pid;
@@ -483,24 +448,18 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
          }
          SYS_INF( "register process: %s / %s", pid.name( ).c_str( ), inet_address.name( ).c_str( ) );
 
-         auto& channel = register_connection( pid );
-
-         if( nullptr == channel.mp_socket_send )
+         auto p_socket_send = channel::send::socket( pid );
+         if( nullptr == p_socket_send )
          {
-            channel.mp_socket_send = os::Socket::create_shared( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
-            if( os::Socket::eResult::ERROR == channel.mp_socket_send->create( ) )
+            p_socket_send = channel::send::create( pid, inet_address );
+            if( nullptr == p_socket_send )
                return false;
-            if( os::Socket::eResult::ERROR == channel.mp_socket_send->connect( ) )
-               return false;
-            channel.mp_socket_send->unblock( );
-            channel.mp_socket_send->info( "connection to process created" );
          }
 
-         channel.mp_socket_recv = *m_pending_sockets_iterator;
-         m_pending_sockets_iterator = m_pending_sockets.erase( m_pending_sockets_iterator );
+         channel::recv::update( p_socket, pid );
 
          dsi::Packet packet( dsi::eCommand::RegisterProcessAck, application::Process::instance( )->id( ) );
-         m_parent.send( packet, channel.mp_socket_send );
+         m_parent.send( packet, p_socket_send );
 
          break;
       }
@@ -514,26 +473,25 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
          }
          SYS_INF( "register process acknowledge: %s", pid.name( ).c_str( ) );
 
-         auto& channel = find_connection( pid );
-         if( nullptr == channel.mp_socket_send )
+         auto p_socket_send = channel::send::socket( pid );
+         if( nullptr == p_socket_send )
          {
             SYS_WRN( "process '%s' was not registered or send socket is nullptr for connection to process", pid.name( ).c_str( ) );
             return false;
          }
 
-         channel.mp_socket_recv = *m_pending_sockets_iterator;
-         m_pending_sockets_iterator = m_pending_sockets.erase( m_pending_sockets_iterator );
+         channel::recv::update( p_socket, pid );
 
-         for( auto& pending_server_service_passport : channel.pending_server_service_list )
+         for( auto& passport : interface::server::pending::passports( pid ) )
          {
-            auto clients_addresses = application::Process::instance( )->service_registry( ).clients( pending_server_service_passport );
+            auto clients_addresses = application::Process::instance( )->service_registry( ).clients( passport );
             for( const auto& client_address : clients_addresses )
             {
-               dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( pending_server_service_passport.signature, client_address ) );
-               m_parent.send( packet, channel.mp_socket_send );
+               dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( passport.signature, client_address ) );
+               m_parent.send( packet, p_socket_send );
             }
          }
-         channel.pending_server_service_list.clear( );
+         interface::server::pending::remove( pid );
 
          break;
       }
@@ -543,18 +501,18 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
          if( nullptr == p_event )
          {
             SYS_ERR( "lost received event" );
+            return false;
          }
-         else
+
+         application::Context to_context = application::Context::internal_broadcast;
+         if( false == package.data( to_context ) )
          {
-            application::Context to_context = application::Context::internal_broadcast;
-            if( false == package.data( to_context ) )
-            {
-               SYS_ERR( "parce package error" );
-               return false;
-            }
-            SYS_VRB( "received event '%s' to context: %s", p_event->signature( )->name( ).c_str( ), to_context.name( ).c_str( ) );
-            p_event->send( to_context );
+            SYS_ERR( "parce package error" );
+            return false;
          }
+         SYS_VRB( "received event '%s' to context: %s", p_event->signature( )->name( ).c_str( ), to_context.name( ).c_str( ) );
+         p_event->send( to_context );
+
          break;
       }
       case dsi::eCommand::RegisterServer:
@@ -567,15 +525,21 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
          }
          SYS_INF( "register server: %s", server_passport.name( ).c_str( ) );
 
-         auto& channel = m_process_channel_map_iterator->second;
-
-         if( false == channel.established( ) )
+         const auto& pid = channel::recv::pid( p_socket );
+         const auto& pid_test = server_passport.address.context( ).pid( );
+         if( pid != pid_test )
          {
-            SYS_WRN( "connection was not established to process %s", m_process_channel_map_iterator->first.name( ).c_str( ) );
+            SYS_ERR( "PID mismatch %s != %s", pid.name( ).c_str( ), pid_test.name( ).c_str( ) );
             return false;
          }
 
-         channel.server_service_list.push_back( server_passport );
+         if( false == channel::established( pid ) )
+         {
+            SYS_WRN( "connection was not established to process %s", pid.name( ).c_str( ) );
+            return false;
+         }
+
+         interface::server::add( pid, server_passport );
          application::Process::instance( )->service_registry( ).register_server( server_passport );
 
          break;
@@ -590,11 +554,17 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
          }
          SYS_INF( "register client: %s", client_passport.name( ).c_str( ) );
 
-         auto& channel = m_process_channel_map_iterator->second;
-
-         if( false == channel.established( ) )
+         const auto& pid = channel::recv::pid( p_socket );
+         const auto& pid_test = client_passport.address.context( ).pid( );
+         if( pid != pid_test )
          {
-            SYS_WRN( "connection was not established to process %s", m_process_channel_map_iterator->first.name( ).c_str( ) );
+            SYS_ERR( "PID mismatch %s != %s", pid.name( ).c_str( ), pid_test.name( ).c_str( ) );
+            return false;
+         }
+
+         if( false == channel::established( pid ) )
+         {
+            SYS_WRN( "connection was not established to process %s", pid.name( ).c_str( ) );
             return false;
          }
 
@@ -605,11 +575,11 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
             return false;
          }
          service::Passport server_passport( client_passport.signature, server_address );
-
+         auto p_socket_send = channel::send::socket( pid );
          dsi::Packet packet( dsi::eCommand::RegisterServer, server_passport );
-         m_parent.send( packet, channel.mp_socket_send );
+         m_parent.send( packet, p_socket_send );
 
-         channel.client_service_list.push_back( client_passport );
+         interface::client::add( pid, client_passport );
          application::Process::instance( )->service_registry( ).register_client( client_passport );
 
          break;
@@ -624,20 +594,131 @@ bool SendReceive::Connections::process_package( dsi::Package& package )
    return true;
 }
 
-SendReceive::Connections::Channel& SendReceive::Connections::register_connection( const application::process::ID& pid )
+
+
+SendReceive::Connections::tProcessSocketMap SendReceive::Connections::data::ms_send = { };
+SendReceive::Connections::tSocketProcessMap SendReceive::Connections::data::ms_recv = { };
+SendReceive::Connections::tProcessServiceMap SendReceive::Connections::data::ms_pending_servers = { };
+SendReceive::Connections::tProcessServiceMap SendReceive::Connections::data::ms_servers = { };
+SendReceive::Connections::tProcessServiceMap SendReceive::Connections::data::ms_clients = { };
+
+base::os::Socket::tSptr SendReceive::Connections::channel::send::create(
+        const application::process::ID& pid
+      , const dsi::SocketCongiguration& inet_address
+   )
 {
-   auto [ iterator, success ] = m_process_channel_map.insert( { pid, Channel( ) } );
+   auto iterator = data::ms_send.find( pid );
+   if( data::ms_send.end( ) != iterator && nullptr != iterator->second )
+   {
+      SYS_WRN( "send socket already exists for PID %s", pid.name( ).c_str( ) );
+      return iterator->second;
+   }
+
+   os::Socket::tSptr p_socket = os::Socket::create_shared( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
+   if( os::Socket::eResult::ERROR == p_socket->create( ) )
+      return nullptr;
+   if( os::Socket::eResult::ERROR == p_socket->connect( ) )
+      return nullptr;
+   p_socket->unblock( );
+   p_socket->info( "connection to process created" );
+
+   if( data::ms_send.end( ) != iterator )
+   {
+      SYS_WRN( "send socket does not exist for PID %s", pid.name( ).c_str( ) );
+      iterator->second = p_socket;
+   }
+   else
+   {
+      SYS_WRN( "PID %s was registered and socket created", pid.name( ).c_str( ) );
+      data::ms_send.emplace( pid, p_socket );
+   }
+
+   return p_socket;
+}
+
+bool SendReceive::Connections::channel::send::remove( const application::process::ID& pid )
+{
+   return 0 != data::ms_send.erase( pid );
+}
+
+base::os::Socket::tSptr SendReceive::Connections::channel::send::socket( const application::process::ID& pid )
+{
+   auto iterator = data::ms_send.find( pid );
+   if( data::ms_send.end( ) == iterator )
+      return nullptr;
+
    return iterator->second;
 }
 
-SendReceive::Connections::Channel& SendReceive::Connections::find_connection( const application::process::ID& pid )
+const base::application::process::ID& SendReceive::Connections::channel::send::pid( os::Socket::tSptr p_socket )
 {
-   static Channel invalid_channel;
-   auto iterator = m_process_channel_map.find( pid );
-   return m_process_channel_map.end( ) == iterator ? invalid_channel : iterator->second;
+   auto iterator = std::find_if(
+           data::ms_send.begin( )
+         , data::ms_send.end( )
+         , [ p_socket ]( auto pair ){ return pair.second == p_socket; }
+      );
+   if( data::ms_send.end( ) == iterator )
+      return application::process::ID::invalid;
+
+   return iterator->first;
 }
 
-void SendReceive::Connections::add_pending_socket( os::Socket::tSptr& p_socket )
+SendReceive::Connections::tProcessSocketMap& SendReceive::Connections::channel::send::collection( )
 {
-   m_pending_sockets.push_back( p_socket );
+   return data::ms_send;
+}
+
+bool SendReceive::Connections::channel::recv::add( os::Socket::tSptr p_socket )
+{
+   return data::ms_recv.emplace( p_socket, application::process::ID::invalid ).second;
+}
+
+bool SendReceive::Connections::channel::recv::update( os::Socket::tSptr p_socket, const application::process::ID& pid )
+{
+   auto iterator = data::ms_recv.find( p_socket );
+   if( data::ms_recv.end( ) == iterator )
+   {
+      SYS_WRN( "socket was not added before" );
+      return false;
+   }
+
+   iterator->second = pid;
+   return true;
+}
+
+bool SendReceive::Connections::channel::recv::remove( os::Socket::tSptr p_socket )
+{
+   return 0 != data::ms_recv.erase( p_socket );
+}
+
+const base::application::process::ID& SendReceive::Connections::channel::recv::pid( os::Socket::tSptr p_socket )
+{
+   auto iterator = data::ms_recv.find( p_socket );
+   if( data::ms_recv.end( ) == iterator )
+      return application::process::ID::invalid;
+
+   return iterator->second;
+}
+
+base::os::Socket::tSptr SendReceive::Connections::channel::recv::socket( const application::process::ID& pid )
+{
+   auto iterator = std::find_if(
+           data::ms_recv.begin( )
+         , data::ms_recv.end( )
+         , [ pid ]( auto pair ){ return pair.second == pid; }
+      );
+   if( data::ms_recv.end( ) == iterator )
+      return nullptr;
+
+   return iterator->first;
+}
+
+bool SendReceive::Connections::channel::established( const application::process::ID& pid )
+{
+   return nullptr != send::socket( pid ) && nullptr != recv::socket( pid );
+}
+
+SendReceive::Connections::tSocketProcessMap& SendReceive::Connections::channel::recv::collection( )
+{
+   return data::ms_recv;
 }
