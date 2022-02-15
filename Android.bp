@@ -10,29 +10,37 @@ license {
     ],
 }
 
+cc_defaults {
+    name: "tda.base.defaults_copy",
+    vendor: true,
+    shared_libs: [
+        "libbase",
+        "libcutils",
+        "liblog",
+        "libutils",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+    cppflags: [
+        "-std=c++17",
+        "-Wno-unused-parameter",
+        "-Wno-unused-variable",
+        "-Wno-unused-but-set-variable",
+        "-Wno-unused-private-field",
+        "-Wno-unused-function",
+        "-Wno-unused-result",
+    ],
+}
+
 // Configuration is used for building carpc framework and applications based on it.
 cc_defaults {
     name: "tda.carpc.base.defaults",
-    // All stuff below is implemented here
     defaults: [
         "tda.base.defaults"
     ],
-
-    // vendor: true,
-    // shared_libs: [
-    //     "libbase",
-    //     "libcutils",
-    //     "liblog",
-    //     "libutils",
-    // ],
-    // cflags: [
-    //     "-Wall",
-    //     "-Wextra",
-    //     "-Werror",
-    // ],
-    // cppflags: [
-    //     "-std=c++17",
-    // ],
 }
 
 // Configuration is used for building carpc framework.
@@ -43,11 +51,6 @@ cc_defaults {
     ],
     rtti: true,
     cppflags: [
-        "-Wno-unused-parameter",
-        "-Wno-unused-variable",
-        "-Wno-unused-but-set-variable",
-        "-Wno-unused-function",
-        "-Wno-unused-result",
         "-Wno-ignored-qualifiers",
         "-Wno-overloaded-virtual",
         "-DOS_ANDROID=0", "-DOS_LINUX=1", "-DOS=OS_ANDROID",
@@ -67,7 +70,9 @@ cc_defaults {
         "tda.carpc.src.defaults"
     ],
     cppflags: [
-        "-DSYS_TRACE", "-DMSG_TRACE", "-DCOLORED_TRACE"
+        "-DSYS_TRACE",
+        "-DMSG_TRACE",
+        "-DCOLORED_TRACE"
     ],
     shared_libs: [
         "tda.carpc.tracing.shared",
@@ -106,7 +111,9 @@ cc_library_shared {
         "framework/"
     ],
     cppflags: [
-        "-DSYS_TRACE", "-DMSG_TRACE", "-DCOLORED_TRACE"
+        "-DSYS_TRACE",
+        "-DMSG_TRACE",
+        "-DCOLORED_TRACE"
     ],
     shared_libs: [
         "tda.carpc.tracing.shared",
@@ -131,7 +138,7 @@ cc_binary {
         "tda.carpc.defaults",
     ],
     init_rc: [
-        "tda.carpc.servicebrocker.rc"
+        "servicebrocker/servicebrocker.rc"
     ],
     relative_install_path: "tda",
     srcs: [

@@ -11,10 +11,10 @@ using namespace base::application;
 Component::Component( const std::string& name )
    : IComponent( name )
 {
-   MSG_DBG( "Created: %s", m_name.c_str( ) );
+   SYS_DBG( "Created: %s", m_name.c_str( ) );
 }
 
 Component::~Component( )
 {
-   MSG_DBG( "Destroyed: %s", m_name.c_str( ) );
+   SYS_DBG( "Destroyed: %s", m_name.c_str( ) );
 }

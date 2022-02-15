@@ -1,3 +1,6 @@
+version 3.3.1
+   - Minor changes in android build system.
+
 version 3.3.0
    - Redesign SendReceive component for fixinf bugs and crashes. This is just initial implementation of new idea.
 
