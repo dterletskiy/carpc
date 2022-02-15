@@ -11,7 +11,7 @@ license {
 }
 
 cc_defaults {
-    name: "tda.base.defaults_copy",
+    name: "tda.base.defaults",
     vendor: true,
     shared_libs: [
         "libbase",
@@ -51,6 +51,7 @@ cc_defaults {
     ],
     rtti: true,
     cppflags: [
+        "-Ofast",
         "-Wno-ignored-qualifiers",
         "-Wno-overloaded-virtual",
         "-DOS_ANDROID=0", "-DOS_LINUX=1", "-DOS=OS_ANDROID",
