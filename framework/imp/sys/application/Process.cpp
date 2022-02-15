@@ -192,13 +192,19 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout all application threads is started before booting system
 
    // Watchdog timer
-   if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
-      return false;
-   const std::size_t wd_timout = static_cast< std::size_t >( std::stoll(
-         m_pce.value_or( "application_wd_timout", "10" )
-      ) );
-   if( false == os::os_linux::timer::start( m_timer_id, wd_timout * 1000000000, os::os_linux::timer::eTimerType::continious ) )
-      return false;
+   const std::size_t wd_timout =
+      static_cast< std::size_t >( std::stoll( m_pce.value_or( "application_wd_timout", "10" ) ) );
+   if( 0 < wd_timout )
+   {
+      if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
+         return false;
+      if( false == os::os_linux::timer::start( m_timer_id, wd_timout * 1000000000, os::os_linux::timer::eTimerType::continious ) )
+         return false;
+   }
+   else
+   {
+      SYS_WRN( "WatchDog disabled" );
+   }
 
    return true;
 }
