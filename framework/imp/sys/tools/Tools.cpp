@@ -61,6 +61,8 @@ namespace base::tools {
 
    void Parameters::init( int argc, char** argv, const std::string& delimiter )
    {
+      if( nullptr == argv ) return;
+
       for( int count = 0; count < argc; ++count )
       {
          tArgument argument( argv[ count ] );
@@ -87,6 +89,8 @@ namespace base::tools {
 
    void Environment::init( char** envp, const std::string& delimiter )
    {
+      if( nullptr == envp ) return;
+
       for( int count = 0; nullptr != envp[ count ]; ++count )
       {
          tArgument argument( envp[ count ] );

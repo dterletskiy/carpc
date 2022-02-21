@@ -23,6 +23,7 @@ message( NOTICE "TARGET_NAME = " ${TARGET_NAME} )
 include_directories( ${PROJECT_SOURCE_DIR} )
 include_directories( ${TRACING_SOURCE_DIR} )
 include_directories( ${FRAMEWORK_SOURCE_DIR} )
+include_directories( "/home/dmytro_terletskyi/Soft/usr/include" )
 
 
 
@@ -33,6 +34,7 @@ include_directories( ${FRAMEWORK_SOURCE_DIR} )
 ###########################################################################################
 link_directories( ${TRACING_BINARY_DIR} )
 link_directories( ${FRAMEWORK_BINARY_DIR} )
+link_directories( "/home/dmytro_terletskyi/Soft/usr/lib" )
 
 
 
@@ -75,6 +77,8 @@ endif( )
 if( INSTRUMENTAL )
    target_link_libraries( ${TARGET_NAME} instrumental )
 endif( )
+target_link_libraries( ${TARGET_NAME} ${Boost_LIBRARIES} vsomeip3 )
 
 install( TARGETS ${TARGET_NAME} DESTINATION bin )
 install( FILES ${PROJECT_SOURCE_DIR}/${TARGET_NAME}.cfg DESTINATION etc )
+install( FILES ${PROJECT_SOURCE_DIR}/vsomeip-${TARGET_NAME}.json DESTINATION etc )

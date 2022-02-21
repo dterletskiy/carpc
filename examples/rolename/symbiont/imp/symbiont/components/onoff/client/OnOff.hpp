@@ -5,7 +5,7 @@
 
 
 
-namespace symbiont::components::onoff {
+namespace symbiont::interface::onoff {
 
    class Client
       : public base::onoff::Client
@@ -32,4 +32,4 @@ namespace symbiont::components::onoff {
          base::tools::Performance m_performance = { "CARPC" };
    };
 
-} // namespace symbiont::components::onoff
+} // namespace symbiont::interface::onoff

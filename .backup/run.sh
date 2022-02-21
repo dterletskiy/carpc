@@ -14,11 +14,20 @@ NAME=${1}
 
 clear
 
+# echo export LD_PRELOAD=/mnt/p4v/Source/RPC/../RPC_product/delivery/lib/libhooks.so
 # export LD_PRELOAD=/mnt/p4v/Source/RPC/../RPC_product/delivery/lib/libhooks.so
+
+echo export LD_LIBRARY_PATH=:${DELIVERY_LIB_DIR}:/usr/lib/:/usr/local/lib/
 export LD_LIBRARY_PATH=:${DELIVERY_LIB_DIR}:/usr/lib/:/usr/local/lib/
+
+# echo export MALLOC_TRACE=/tmp/experimental_mtrace
 # export MALLOC_TRACE=/tmp/experimental_mtrace
 
+echo ${DELIVERY_BIN_DIR}/${NAME} config=${DELIVERY_ETC_DIR}/${NAME}.cfg trace_log=CONSOLE
 ${DELIVERY_BIN_DIR}/${NAME} config=${DELIVERY_ETC_DIR}/${NAME}.cfg trace_log=CONSOLE
 
+# echo unset LD_PRELOAD
 # unset LD_PRELOAD
+
+# echo mtrace /mnt/p4v/Source/RPC/../RPC_product/delivery/bin/experimental ${MALLOC_TRACE}
 # mtrace /mnt/p4v/Source/RPC/../RPC_product/delivery/bin/experimental ${MALLOC_TRACE}

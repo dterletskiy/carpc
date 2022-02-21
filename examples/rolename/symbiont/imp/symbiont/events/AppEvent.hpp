@@ -5,7 +5,7 @@
 
 
 
-namespace application::events {
+namespace symbiont::events {
 
    struct AppEventData
    {
@@ -24,4 +24,4 @@ namespace application::events {
 
    DEFINE_EVENT( AppEvent, AppEventData, tAppEventSignature );
 
-} // namespace application::events
+} // namespace symbiont::events

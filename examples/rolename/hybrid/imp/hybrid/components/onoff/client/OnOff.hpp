@@ -4,7 +4,7 @@
 
 
 
-namespace hybrid::components::onoff {
+namespace hybrid::interface::onoff {
 
    class Client
       : public base::onoff::Client
@@ -27,4 +27,4 @@ namespace hybrid::components::onoff {
          void request_trigger_state( const std::string&, const size_t );
    };
 
-} // namespace hybrid::components::onoff
+} // namespace hybrid::interface::onoff

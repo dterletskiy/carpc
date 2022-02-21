@@ -41,7 +41,7 @@ namespace base::os {
       public:
          const os_linux::thread::tID& thread_id( ) const;
       private:
-         os_linux::thread::tID         m_thread_id;
+         os_linux::thread::tID      m_thread_id;
 
       public:
          const pthread_attr_t& attr( ) const;

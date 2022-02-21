@@ -1,12 +1,12 @@
 // Application
-#include "Server.hpp"
+#include "OnOff.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "OnOffServer"
+#define CLASS_ABBR "OnOff_Server"
 
 
 
-using namespace symbiont::components::onoff;
+using namespace symbiont::interface::onoff;
 
 
 

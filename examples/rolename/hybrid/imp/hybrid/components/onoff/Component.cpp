@@ -26,7 +26,19 @@ Component::~Component( )
    MSG_DBG( "Destroyed: %s", name( ).c_str( ) );
 }
 
+#include <thread>
 void Component::boot( const std::string& command )
 {
    MSG_DBG( "%s", command.c_str( ) );
+
+   // if( true == m_server_someip.init( ) )
+   //    m_server_someip.start( );
+
+   std::thread thread(
+      [ this ]( )
+      {
+         if( m_server_someip.init( ) ) m_server_someip.start( );
+      }
+   );
+   thread.detach( );
 }

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "api/sys/comm/timer/Timer.hpp"
 #include "api/sys/services/onoff/Server.hpp"
 
 
 
-namespace symbiont::components::onoff {
+namespace symbiont::interface::onoff {
 
    class Server
       : public base::onoff::Server
@@ -23,4 +22,4 @@ namespace symbiont::components::onoff {
          void request_trigger_state( const std::string&, const size_t ) override;
    };
 
-} // namespace symbiont::components::onoff
+} // namespace symbiont::interface::onoff

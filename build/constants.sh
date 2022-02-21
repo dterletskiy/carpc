@@ -49,4 +49,6 @@ readonly SERVICEBROCKER=servicebrocker
 readonly HMI=hmi
 readonly CONTROLLER=controller
 readonly CORE=core
+readonly HYBRID=hybrid
+readonly SYMBIONT=symbiont
 readonly DLT_DAEMON="dlt-daemon"

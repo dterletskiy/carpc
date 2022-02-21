@@ -3,8 +3,9 @@
 // Framework
 #include "api/sys/application/RootComponent.hpp"
 // Application
-#include "imp/hybrid/components/onoff/server/Server.hpp"
-#include "imp/hybrid/components/onoff/client/Client.hpp"
+#include "imp/hybrid/components/onoff/server/OnOff.hpp"
+#include "imp/hybrid/components/onoff/client/OnOff.hpp"
+#include "imp/hybrid/components/onoff/server/SomeIP.hpp"
 
 
 
@@ -25,8 +26,10 @@ namespace hybrid::components::onoff {
          void boot( const std::string& ) override;
 
       private:
-         Server m_server_onoff;
-         Client m_client_onoff;
+         interface::onoff::Server m_server_onoff;
+         interface::onoff::Client m_client_onoff;
+
+         interface::someip::Server m_server_someip;
    };
 
 } // namespace hybrid::components::onoff

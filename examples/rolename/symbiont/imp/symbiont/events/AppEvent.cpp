@@ -3,7 +3,7 @@
 
 
 
-namespace application::events {
+namespace symbiont::events {
 
    const char* c_str( const eAppEventID id )
    {
@@ -17,4 +17,4 @@ namespace application::events {
       }
    }
 
-} // namespace application::events
+} // namespace symbiont::events

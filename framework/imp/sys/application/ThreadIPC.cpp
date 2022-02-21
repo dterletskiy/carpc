@@ -52,13 +52,14 @@ void ThreadIPC::thread_loop( )
 bool ThreadIPC::start( )
 {
    SYS_INF( "'%s': starting", m_name.c_str( ) );
-   if( false == m_thread.run( m_name ) )
+
+   if( false == mp_send_receive->start( ) )
    {
       SYS_ERR( "'%s': can't be started", m_name.c_str( ) );
       return false;
    }
 
-   if( false == mp_send_receive->start( ) )
+   if( false == m_thread.run( m_name ) )
    {
       SYS_ERR( "'%s': can't be started", m_name.c_str( ) );
       return false;

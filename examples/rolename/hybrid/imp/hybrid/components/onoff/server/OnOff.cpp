@@ -1,12 +1,12 @@
 // Application
-#include "Server.hpp"
+#include "OnOff.hpp"
 
 #include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "OnOffServer"
+#define CLASS_ABBR "OnOff_Server"
 
 
 
-using namespace hybrid::components::onoff;
+using namespace hybrid::interface::onoff;
 
 
 

@@ -1,0 +1,17 @@
+{
+    "unicast" : "10.0.2.15",
+    "logging" :
+    {
+        "level" : "debug",
+        "console" : "true",
+        "file" : { "enable" : "false", "path" : "/tmp/vsomeip.log" },
+        "dlt" : "false"
+    },
+    "applications" :
+    [
+        {
+            "name" : "symbiont",
+            "id" : "0x1344"
+        }
+    ]
+}

@@ -3,8 +3,10 @@
 // Framework
 #include "api/sys/application/RootComponent.hpp"
 // Application
-#include "imp/symbiont/components/onoff/server/Server.hpp"
-#include "imp/symbiont/components/onoff/client/Client.hpp"
+#include "imp/symbiont/events/AppEvent.hpp"
+#include "imp/symbiont/components/onoff/server/OnOff.hpp"
+#include "imp/symbiont/components/onoff/client/OnOff.hpp"
+#include "imp/symbiont/components/onoff/client/SomeIP.hpp"
 
 
 
@@ -12,6 +14,7 @@ namespace symbiont::components::onoff {
 
    class Component
       : public base::application::RootComponent
+      , public events::AppEvent::Consumer
    {
       public:
          static base::application::IComponent::tSptr creator( );
@@ -25,8 +28,13 @@ namespace symbiont::components::onoff {
          void boot( const std::string& ) override;
 
       private:
-         Server m_server_onoff;
-         Client m_client_onoff;
+         void process_event( const events::AppEvent::Event& ) override;
+
+      private:
+         interface::onoff::Server m_server_onoff;
+         interface::onoff::Client m_client_onoff;
+
+         interface::someip::Client m_client_someip;
    };
 
 } // namespace symbiont::components::onoff

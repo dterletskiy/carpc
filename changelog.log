@@ -1,3 +1,9 @@
+version 3.3.6
+   - Fix: nullptr in configuration and parameters processing.
+   - Some minor changes and optimisations.
+   - Build system changes for run process.
+   - Introduces some/ip to "rolename" example to compare metrics.
+
 version 3.3.5
    - Minor changes in android build system.
    - thirdparty folder added.
