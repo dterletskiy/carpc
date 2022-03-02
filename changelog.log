@@ -1,3 +1,6 @@
+version 3.3.6a
+   - Added metrix to documentation.
+
 version 3.3.6
    - Fix: nullptr in configuration and parameters processing.
    - Some minor changes and optimisations.

@@ -1,0 +1,85 @@
+--------------------------------- TCP/IP, -O? ---------------------------------
+
+02-15 02:36:30.660  2979  2982 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-15 02:37:44.489  2979  2982 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 1000000
+00:01:13.829 = 73829
+
+02-15 02:37:44.491  2979  2983 E tda_engine_symbiont: TEST STARTED BINDER
+02-15 02:38:22.125  2979  2987 E tda_engine_symbiont: TEST FINISHED BINDER: count = 1000000
+00:00:37.634 = 37634
+
+---------------
+
+02-15 02:51:32.933  2203  2206 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-15 02:58:56.409  2203  2206 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 5000000
+00:07:23.476 = 443476
+
+02-15 02:58:56.410  2203  2207 E tda_engine_symbiont: TEST STARTED BINDER
+02-15 03:02:31.543  2203  2214 E tda_engine_symbiont: TEST FINISHED BINDER: count = 5000000
+00:03:35.136 = 215136
+
+
+
+--------------------------------- TCP/IP, -Ofast ---------------------------------
+
+
+02-15 20:37:58.734  2978  2981 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-15 20:39:03.362  2978  2981 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 1000000
+00:01:04.628
+
+02-15 20:39:03.363  2978  2982 E tda_engine_symbiont: TEST STARTED BINDER
+02-15 20:39:39.690  2978  2991 E tda_engine_symbiont: TEST FINISHED BINDER: count = 1000000
+00:00:36.327
+
+---------------
+
+02-15 20:52:09.047  2214  2217 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-15 20:53:26.642  2214  2217 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 1000000
+00:01:17.595
+
+02-15 20:53:26.643  2214  2218 E tda_engine_symbiont: TEST STARTED BINDER
+02-15 20:54:05.616  2214  2222 E tda_engine_symbiont: TEST FINISHED BINDER: count = 1000000
+00:00:38.973
+
+---------------
+
+02-15 21:44:40.881  2237  2240 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-15 21:46:02.505  2237  2240 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 1000000
+
+
+02-15 21:46:02.507  2237  2241 E tda_engine_symbiont: TEST STARTED BINDER
+02-15 21:46:42.668  2237  2244 E tda_engine_symbiont: TEST FINISHED BINDER: count = 1000000
+
+
+
+--------------------------------- UNIX, -Ofast ---------------------------------
+
+02-15 22:37:41.482  2256  2259 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-15 22:38:28.473  2256  2259 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 1000000
+00:00:46.991 = 46991
+
+02-15 22:38:28.474  2256  2260 E tda_engine_symbiont: TEST STARTED BINDER
+02-15 22:39:07.129  2256  2263 E tda_engine_symbiont: TEST FINISHED BINDER: count = 1000000
+00:00:38.655 = 38655
+
+---------------
+
+02-15 23:01:19.645  2206  2209 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-15 23:02:06.534  2206  2209 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 1000000
+00:00:46.889 = 46889
+
+
+02-15 23:02:06.536  2206  2210 E tda_engine_symbiont: TEST STARTED BINDER
+02-15 23:02:46.198  2206  2225 E tda_engine_symbiont: TEST FINISHED BINDER: count = 1000000
+00:00:39.662 = 39662
+
+---------------
+
+02-16 00:53:52.403  2209  2212 D TAG     : [OnOffClient:test:76] -> TEST STARTED CARPC
+02-16 00:54:41.784  2209  2212 D TAG     : [OnOffClient:test:85] -> TEST FINISHED CARPC: count = 1000000
+00:00:49.381 = 49381
+
+
+02-16 00:54:41.785  2209  2213 E tda_engine_symbiont: TEST STARTED BINDER
+02-16 00:55:21.612  2209  2215 E tda_engine_symbiont: TEST FINISHED BINDER: count = 1000000
+00:00:39.827 = 39827

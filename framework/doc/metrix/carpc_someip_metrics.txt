@@ -1,0 +1,23 @@
+TCP/IP
+    1645462234413648 | 0x1e763 0x7f79f5628700 |   [Performance:info:60] -> CARPC: time delta: 285868052 microseconds
+    1645462234413663 | 0x1e763 0x7f79f5628700 |   [OnOff_Client:test:86] -> TEST FINISHED CARPC: count = 10000000
+
+    1645462512772673 | 0x1e763 0x7f79e6ffd700 |   [Performance:info:60] -> CARPC: time delta: 278358991 microseconds
+    1645462512772689 | 0x1e763 0x7f79e6ffd700 |   [SomeIP_Client:test:131] -> TEST FINISHED SOMEIP: count = 10000000
+
+
+
+    1645463268873990 | 0x1f435 0x7ff5776be700 |   [Performance:info:60] -> CARPC: time delta: 305708126 microseconds
+    1645463268874004 | 0x1f435 0x7ff5776be700 |   [OnOff_Client:test:86] -> TEST FINISHED CARPC: count = 10000000
+
+    1645463553566408 | 0x1f435 0x7ff575612700 |   [Performance:info:60] -> CARPC: time delta: 284692385 microseconds
+    1645463553566425 | 0x1f435 0x7ff575612700 |   [SomeIP_Client:test:131] -> TEST FINISHED SOMEIP: count = 10000000
+
+
+
+UNIX
+    1645464068492722 | 0x20641 0x7f4fa77fe700 |   [Performance:info:60] -> CARPC: time delta: 202951656 microseconds
+    1645464068492737 | 0x20641 0x7f4fa77fe700 |   [OnOff_Client:test:86] -> TEST FINISHED CARPC: count = 10000000
+
+    1645464335255306 | 0x20641 0x7f4fa57fa700 |   [Performance:info:60] -> CARPC: time delta: 266762551 microseconds
+    1645464335255321 | 0x20641 0x7f4fa57fa700 |   [SomeIP_Client:test:131] -> TEST FINISHED SOMEIP: count = 10000000
