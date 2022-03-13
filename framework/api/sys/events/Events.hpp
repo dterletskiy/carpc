@@ -11,7 +11,7 @@ namespace base::events {
 
    namespace system {
 
-      enum class eID : size_t { boot, shutdown, ping, undefined };
+      enum class eID : std::uint8_t { boot, shutdown, ping, undefined };
       const char* c_str( const eID );
 
       struct Data
@@ -26,7 +26,7 @@ namespace base::events {
 
    namespace service {
 
-      enum class eAction : size_t
+      enum class eAction : std::uint8_t
       {
          RegisterServer,
          UnregisterServer,
@@ -40,7 +40,7 @@ namespace base::events {
 
 
 
-      enum class eStatus : size_t
+      enum class eStatus : std::uint8_t
       {
          ServerConnected,
          ServerDisconnected,

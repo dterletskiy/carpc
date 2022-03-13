@@ -21,7 +21,7 @@ namespace base::dsi {
 
 
 
-   enum class eCommand : size_t
+   enum class eCommand : std::uint8_t
    {
       RegisterServer,
       UnregisterServer,
@@ -56,7 +56,7 @@ namespace base::dsi {
          bool from_stream( ipc::tStream& stream );
 
       public:
-         size_t size( ) const;
+         std::size_t size( ) const;
          const char* const c_str( ) const;
 
       public:
@@ -80,9 +80,12 @@ namespace base::dsi {
    }
 
    inline
-   size_t Package::size( ) const
+   std::size_t Package::size( ) const
    {
-      return sizeof( eCommand ) + m_data.size( ) + sizeof( size_t );
+      return
+           sizeof( eCommand ) /* size of eCommand */
+         + m_data.size( ) /* stream data size */
+         + sizeof( std::size_t ); /* size of field what contains data size inside stream */
    }
 
    inline
@@ -138,14 +141,14 @@ namespace base::dsi {
          Package::tVector& packages( );
 
       private:
-         static constexpr size_t    m_begin_sign = 0xAABBCCDD;
-         size_t                     m_size   = sizeof( size_t )   /* m_size */
-                                             + sizeof( size_t )   /* m_packages vector count variable */
+         static constexpr std::size_t     m_begin_sign = 0xAABBCCDD;
+         std::size_t                      m_size   = sizeof( std::size_t )   /* m_size */
+                                             + sizeof( std::size_t )   /* m_packages vector count variable */
                                              + 0                  /* m_packages vector content (will be apdated during adding the package) */
-                                             + sizeof( size_t );  /* m_crc */
-         Package::tVector           m_packages;
-         size_t                     m_crc;
-         static constexpr size_t    m_end_sign = 0xFFEEDDCC;
+                                             + sizeof( std::size_t );  /* m_crc */
+         Package::tVector                 m_packages;
+         std::size_t                      m_crc;
+         static constexpr std::size_t     m_end_sign = 0xFFEEDDCC;
    };
 
 

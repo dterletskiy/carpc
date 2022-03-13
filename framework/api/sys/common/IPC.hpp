@@ -23,13 +23,13 @@ namespace base::ipc {
 
 
    inline
-   bool append( tStream& stream, const void* const buffer, const size_t size )
+   bool append( tStream& stream, const void* const buffer, const std::size_t size )
    {
       return stream.push( buffer, size );
    }
 
    inline
-   bool remove( tStream& stream, void* const buffer, const size_t size )
+   bool remove( tStream& stream, void* const buffer, const std::size_t size )
    {
       return stream.pop( buffer, size );
    }
@@ -93,12 +93,12 @@ namespace base::experimental {
          }
 
       public:
-         bool append( tStream& stream, const void* const buffer, const size_t size )
+         bool append( tStream& stream, const void* const buffer, const std::size_t size )
          {
             return stream.m_stream.push( buffer, size );
          }
 
-         bool remove( tStream& stream, void* const buffer, const size_t size )
+         bool remove( tStream& stream, void* const buffer, const std::size_t size )
          {
             return stream.m_stream.pop( buffer, size );
          }

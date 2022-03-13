@@ -97,14 +97,14 @@ bool Packet::from_stream( ipc::tStream& _stream )
    // if( false == test_stream( _stream ) )
    //    return false;
 
-   size_t begin_sign = 0;
-   size_t end_sign = 0;
+   std::size_t begin_sign = 0;
+   std::size_t end_sign = 0;
    return ipc::deserialize( _stream, begin_sign, m_size, m_packages, m_crc, end_sign );
 }
 
 bool Packet::test_stream( ipc::tStream& _stream ) const
 {
-   // size_t begin_sign = 0;
+   // std::size_t begin_sign = 0;
    // if( false == _stream.get( 0, begin_sign ) )
    // {
    //    SYS_ERR( "begin signature read error" );
@@ -116,14 +116,14 @@ bool Packet::test_stream( ipc::tStream& _stream ) const
    //    return false;
    // }
 
-   // size_t size = 0;
+   // std::size_t size = 0;
    // if( false == _stream.get( sizeof( m_begin_sign ), size ) )
    // {
    //    SYS_ERR( "size read error" );
    //    return false;
    // }
 
-   // size_t end_sign = 0;
+   // std::size_t end_sign = 0;
    // if( false == _stream.get( sizeof( m_begin_sign ) + size, end_sign ) )
    // {
    //    SYS_ERR( "end signature read error" );

@@ -212,7 +212,7 @@ void SendReceive::ServiceBrocker::process_select( os::os_linux::socket::fd& fd_s
    }
    else if( os::Socket::eResult::OK == result )
    {
-      size_t recv_size = 0;
+      std::size_t recv_size = 0;
       const void* const p_buffer = mp_socket->buffer( recv_size );
       ipc::tStream stream;
       ipc::append( stream, p_buffer, recv_size );
@@ -417,7 +417,7 @@ void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set 
       }
       else if( os::Socket::eResult::OK == result )
       {
-         size_t recv_size = 0;
+         std::size_t recv_size = 0;
          const void* const p_buffer = p_socket_recv->buffer( recv_size );
          ipc::tStream stream;
          ipc::append( stream, p_buffer, recv_size );

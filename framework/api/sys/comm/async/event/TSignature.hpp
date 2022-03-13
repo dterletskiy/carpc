@@ -147,7 +147,7 @@ namespace base::async::id {
          const std::string name( ) const
          {
             if constexpr( std::is_enum_v< _ID > || std::is_integral_v< _ID > )
-               return base::format_string( "id: ", size_t(m_id) );
+               return base::format_string( "id: ", std::size_t(m_id) );
             else
                return base::format_string( "id: ", m_id.name( ) );
          }
