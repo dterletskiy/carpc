@@ -20,9 +20,10 @@ namespace base::async {
          using tSptr       = std::shared_ptr< tSignature >;
 
       public:
-         static const tAsyncTypeID build_type_id( )
+         static const tAsyncTypeID& build_type_id( )
          {
-            return tAsyncTypeID::generate< tSignature >( );
+            static const tAsyncTypeID _s_type_id = tAsyncTypeID::generate< tSignature >( );
+            return _s_type_id;
          }
 
       private:
@@ -48,8 +49,8 @@ namespace base::async {
          }
          const tAsyncTypeID& type_id( ) const override
          {
-            static tAsyncTypeID _s_type_id = build_type_id( );
-            return _s_type_id;
+            return build_type_id( );
+            // return ms_type_id;
          }
          bool operator<( const IAsync::ISignature& other ) const override
          {
@@ -85,8 +86,13 @@ namespace base::async {
             m_user_signature = signature;
          }
       private:
+         // static const tAsyncTypeID ms_type_id;
          tUserSignature m_user_signature;
    };
+
+   // template< typename _Generator >
+   // const tAsyncTypeID
+   //    TSignature< _Generator >::ms_type_id = build_type_id( );
 
 } // namespace base::async
 

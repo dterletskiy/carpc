@@ -1,3 +1,7 @@
+version 3.3.7
+   - event::TSignature::build_type_id( ) optimization.
+   - added and commented alternative variant with static member.
+
 version 3.3.6a
    - Added metrix to documentation.
 
