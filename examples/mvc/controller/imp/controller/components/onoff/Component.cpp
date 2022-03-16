@@ -62,7 +62,7 @@ void Component::boot( const std::string& command )
    // controller::event::App::Event::create_send( { controller::event::eID::boot } );
 }
 
-void Component::process_timer( const base::Timer::ID id )
+void Component::process_timer( const base::comm::timer::ID id )
 {
    MSG_DBG( "Timer '%s' expired", id.name( ).c_str( ) );
    if( id == m_timer.id( ) )
@@ -72,7 +72,7 @@ void Component::process_timer( const base::Timer::ID id )
    }
 }
 
-void Component::on_timer( const base::Timer::ID id )
+void Component::on_timer( const base::comm::timer::ID id )
 {
    MSG_DBG( "Timer expired: %s", id.name( ).c_str( ) );
 
@@ -84,6 +84,6 @@ void Component::process_event( const controller::event::App::Event& event )
 {
    MSG_DBG( "%s", event.signature( )->name( ).c_str( ) );
 
-   const base::Timer::ID id = base::timer::start( 100000, 1, [ this ]( const base::Timer::ID id ){ on_timer( id ); } );
+   const base::comm::timer::ID id = base::timer::start( 100000, 1, [ this ]( const base::comm::timer::ID id ){ on_timer( id ); } );
    MSG_DBG( "started timer: %s", id.name( ).c_str( ) );
 }

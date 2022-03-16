@@ -30,7 +30,7 @@ namespace controller::components::onoff {
 
    class Component
       : public base::application::RootComponent
-      , public base::ITimerConsumer
+      , public base::timer::ITimerConsumer
       , public controller::event::App::Consumer
    {
       public:
@@ -45,11 +45,11 @@ namespace controller::components::onoff {
          void boot( const std::string& ) override;
 
       private:
-         void process_timer( const base::Timer::ID ) override;
-         base::Timer m_timer;
+         void process_timer( const base::comm::timer::ID ) override;
+         base::timer::Timer m_timer;
 
       public:
-         void on_timer( const base::Timer::ID );
+         void on_timer( const base::comm::timer::ID );
 
       private:
          void process_event( const controller::event::App::Event& ) override;

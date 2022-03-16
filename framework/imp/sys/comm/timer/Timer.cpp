@@ -8,7 +8,7 @@
 
 
 
-using namespace base;
+using namespace base::timer;
 
 
 
@@ -234,7 +234,7 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 
 namespace base::timer {
 
-   base::Timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous )
+   base::comm::timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous )
    {
       application::Context context = application::Process::instance( )->current_context( );
       if( application::Context::invalid == context )
@@ -243,7 +243,7 @@ namespace base::timer {
          return 0;
       }
 
-      const base::Timer::ID id = base::Timer::ID::generate( );
+      const base::comm::timer::ID id = base::comm::timer::ID::generate( );
       auto on_timer = [=]( ){ callback( id ); };
 
       if( asynchronous )

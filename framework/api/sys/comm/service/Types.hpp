@@ -1,30 +1,11 @@
 #pragma once
 
-#include "api/sys/common/ID.hpp"
+#include "api/sys/comm/Types.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 
 
 
 namespace base::service {
-
-   class Service;
-   using ID = base::TID< Service >;
-
-
-
-   using tServiceName = std::string;
-   const tServiceName InvalidServiceName = "NoName";
-
-
-
-   struct Sequence
-   {
-      using ID = base::TID< Sequence >;
-   };
-   using tSequenceID = Sequence::ID;
-   const tSequenceID InvalidSequenceID = Sequence::ID::invalid;
-
-
 
    class IPC;
    class NO_IPC;

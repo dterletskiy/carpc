@@ -16,8 +16,8 @@ namespace base::service {
 
       public:
          Address( ) = default;
-         Address( const ID& );
-         Address( const application::Context&, const ID& );
+         Address( const comm::service::ID& );
+         Address( const application::Context&, const comm::service::ID& );
          Address( const Address& );
          ~Address( ) = default;
 
@@ -36,11 +36,11 @@ namespace base::service {
 
       public:
          const application::Context& context( ) const;
-         const ID& id( ) const;
+         const comm::service::ID& id( ) const;
          bool is_valid( ) const;
       private:
          application::Context    m_context = application::Context::internal_broadcast;
-         ID                      m_id = ID::invalid;
+         comm::service::ID       m_id = comm::service::ID::invalid;
    };
 
 
@@ -52,7 +52,7 @@ namespace base::service {
    }
 
    inline
-   const ID& Address::id( ) const
+   const comm::service::ID& Address::id( ) const
    {
       return m_id;
    }
@@ -60,7 +60,7 @@ namespace base::service {
    inline
    bool Address::is_valid( ) const
    {
-      return m_id != ID::invalid;
+      return m_id != comm::service::ID::invalid;
    }
 
 } // namespace base::service

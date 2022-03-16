@@ -2,6 +2,7 @@
 
 #include "api/sys/comm/async/event/TEvent.hpp"
 #include "api/sys/comm/async/event/TSignature.hpp"
+#include "api/sys/comm/async/event/TConsumer.hpp"
 
 
 
@@ -17,8 +18,8 @@ namespace base::async {
          {
             using tEvent            = TEvent< _Generator >;
             using tSignature        = TSignature< _Generator >;
+            using tConsumer         = TConsumer< _Generator >;
             using tData             = _DataType;
-            using tConsumer         = IEvent::TConsumer< tEvent >;
             using tService          = _ServiceType;
             using tProcessor        = void ( tConsumer::* )( const tEvent& );
             using tUserSignature    = _SignatureType;

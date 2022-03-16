@@ -20,10 +20,10 @@ namespace base::command {
          enum class eSignal : std::uint8_t { FINISH };
          struct tData
          {
-            command::tID id;
+            command::ID id;
             eSignal signal;
          };
-         DEFINE_EVENT_S( Signal, tData, base::async::id::TSignature< queue::tID > );
+         DEFINE_EVENT_S( Signal, tData, base::async::id::TSignature< queue::ID > );
 
       public:
          using tUptr = std::unique_ptr< ICommand >;
@@ -42,25 +42,25 @@ namespace base::command {
          void finish( );
 
       public:
-         const command::tID& id( ) const;
+         const command::ID& id( ) const;
       private:
-         const command::tID m_id = command::tID::generate( );
+         const command::ID m_id = command::ID::generate( );
 
       private:
-         void parent_id( const queue::tID& );
-         queue::tID m_parent_id = queue::tID::invalid;
+         void parent_id( const queue::ID& );
+         queue::ID m_parent_id = queue::ID::invalid;
    };
 
 
 
    inline
-   const command::tID& ICommand::id( ) const
+   const command::ID& ICommand::id( ) const
    {
       return m_id;
    }
 
    inline
-   void ICommand::parent_id( const queue::tID& parent_id )
+   void ICommand::parent_id( const queue::ID& parent_id )
    {
       m_parent_id = parent_id;
    }

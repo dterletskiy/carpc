@@ -9,7 +9,7 @@ namespace controller::components::onoff {
 
    class Server
       : public base::onoff::Server
-      , public base::ITimerConsumer
+      , public base::timer::ITimerConsumer
    {
       public:
          Server( );
@@ -25,12 +25,12 @@ namespace controller::components::onoff {
 
       // Timer
       private:
-         void process_timer( const base::Timer::ID ) override;
+         void process_timer( const base::comm::timer::ID ) override;
          struct TimerSeqID
          {
             std::string current_state;
-            std::shared_ptr< base::Timer > timer;
-            base::service::tSequenceID seq_id;
+            std::shared_ptr< base::timer::Timer > timer;
+            base::comm::sequence::ID seq_id;
          };
          std::list< TimerSeqID > m_timers;
    };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/sys/common/ID.hpp"
+#include "api/sys/common/Name.hpp"
 #include "api/sys/common/Priority.hpp"
 #include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/socket.hpp"
@@ -47,10 +48,10 @@ namespace base::application {
 
       public:
          const process::ID& id( ) const;
-         const std::string& name( ) const;
+         const process::Name& name( ) const;
       private:
          process::ID    m_id;
-         std::string    m_name = "NoName";
+         process::Name  m_name{ "NoName" };
 
       public:
          IThread::tSptr thread_ipc( ) const;
@@ -100,15 +101,15 @@ namespace base::application {
 
 
    inline
-   const std::string& Process::name( ) const
-   {
-      return m_name;
-   }
-
-   inline
    const process::ID& Process::id( ) const
    {
       return m_id;
+   }
+
+   inline
+   const process::Name& Process::name( ) const
+   {
+      return m_name;
    }
 
    inline

@@ -3,8 +3,8 @@
 #include <memory>
 #include <functional>
 
+#include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/thread.hpp"
-#include "api/sys/common/ID.hpp"
 
 
 
@@ -13,7 +13,6 @@ namespace base::os {
    class Thread
    {
       public:
-         using ID = base::TID< Thread >;
          using tSptr = std::shared_ptr< Thread >;
          using FunctionThread = std::function< void( ) >;
 
@@ -30,13 +29,13 @@ namespace base::os {
          bool run( const std::string& name = "NoName" );
          bool join( );
 
-         static const ID current_id( );
+         static const thread::ID current_id( );
          static const os_linux::thread::tID current_thread_id( );
 
       public:
-         const ID& id( ) const;
+         const thread::ID& id( ) const;
       private:
-         ID                         m_id = ID::generate( );
+         thread::ID                 m_id = thread::ID::generate( );
 
       public:
          const os_linux::thread::tID& thread_id( ) const;
@@ -70,7 +69,7 @@ namespace base::os {
    }
 
    inline
-   const Thread::ID& Thread::id( ) const
+   const thread::ID& Thread::id( ) const
    {
       return m_id;
    }

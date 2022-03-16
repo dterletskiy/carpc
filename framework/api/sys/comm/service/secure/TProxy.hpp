@@ -29,8 +29,8 @@ namespace base::service::secure::__private {
    {
       using tClient = TClient< TYPES >;
 
-      std::size_t                         m_count = 0;
-      std::map< tSequenceID, tClient* >   m_client_map;
+      std::size_t                               m_count = 0;
+      std::map< comm::sequence::ID, tClient* >  m_client_map;
    };
 
 
@@ -48,11 +48,11 @@ namespace base::service::secure::__private {
 
       public:
          template< typename tRequestData, typename... Args >
-            const tSequenceID request( tClient* p_client, const Args&... args );
+            const comm::sequence::ID request( tClient* p_client, const Args&... args );
          const bool response( const typename TYPES::tEvent& );
 
       private:
-         tSequenceID                                        m_seq_id = tSequenceID::zero;
+         comm::sequence::ID                                 m_seq_id = comm::sequence::ID::zero;
          std::map< typename TYPES::tEventID, tRequestDB >   m_map;
          tProxy*                                            mp_proxy = nullptr;
    };
@@ -78,13 +78,13 @@ namespace base::service::secure::__private {
 
    template< typename TYPES >
    template< typename tRequestData, typename... Args >
-   const tSequenceID RequestProcessor< TYPES >::request( tClient* p_client, const Args&... args )
+   const comm::sequence::ID RequestProcessor< TYPES >::request( tClient* p_client, const Args&... args )
    {
       auto event_id_iterator = m_map.find( tRequestData::REQUEST );
       if( m_map.end( ) == event_id_iterator )
       {
          SYS_WRN( "request id does not exist: %s", tRequestData::REQUEST.c_str( ) );
-         return InvalidSequenceID;
+         return comm::sequence::ID::invalid;
       }
 
       // If response exists for current request
@@ -123,7 +123,7 @@ namespace base::service::secure::__private {
          if( false == result.second )
          {
             SYS_WRN( "can not insert: %s -> %p", m_seq_id.name( ).c_str( ), p_client );
-            return InvalidSequenceID;
+            return comm::sequence::ID::invalid;
          }
       }
 
@@ -144,7 +144,7 @@ namespace base::service::secure::__private {
    const bool RequestProcessor< TYPES >::response( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const tSequenceID seq_id = event.info( ).seq_id( );
+      const comm::sequence::ID seq_id = event.info( ).seq_id( );
 
       for( auto& item : TYPES::RR )
       {
@@ -413,7 +413,7 @@ namespace base::service::secure::__private {
 
       public:
          template< typename tRequestData, typename... Args >
-            const tSequenceID request( tClient*, const Args&... args );
+            const comm::sequence::ID request( tClient*, const Args&... args );
          template< typename tNotificationData >
             const bool subscribe( tClient* );
          template< typename tNotificationData >
@@ -490,9 +490,9 @@ namespace base::service::secure::__private {
    void TProxy< TYPES >::process_event( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const service::ID from_id = event.info( ).from( );
-      const service::ID to_id = event.info( ).to( );
-      const tSequenceID seq_id = event.info( ).seq_id( );
+      const comm::service::ID from_id = event.info( ).from( );
+      const comm::service::ID to_id = event.info( ).to( );
+      const comm::sequence::ID seq_id = event.info( ).seq_id( );
       const auto from_context = event.context( );
 
       SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
@@ -507,12 +507,12 @@ namespace base::service::secure::__private {
 
    template< typename TYPES >
    template< typename tRequestData, typename... Args >
-   const tSequenceID TProxy< TYPES >::request( tClient* p_client, const Args&... args )
+   const comm::sequence::ID TProxy< TYPES >::request( tClient* p_client, const Args&... args )
    {
       if( !is_connected( ) )
       {
          SYS_WRN( "proxy is not connected" );
-         return InvalidSequenceID;
+         return comm::sequence::ID::invalid;
       }
 
       return m_request_processor.template request< tRequestData >( p_client, args... );

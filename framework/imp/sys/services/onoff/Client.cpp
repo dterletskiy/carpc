@@ -34,7 +34,7 @@ void Client::request_start( )
    request< data::RequestStartData >( this );
 }
 
-const base::service::tSequenceID Client::request_trigger_state( const std::string& state, const std::size_t delay )
+const base::comm::sequence::ID Client::request_trigger_state( const std::string& state, const std::size_t delay )
 {
    SYS_VRB( "state: %s / delay: %zu", state.c_str( ), delay );
    return request< data::RequestTriggerStateData >( this, state, delay );

@@ -59,7 +59,7 @@ bool ThreadIPC::start( )
       return false;
    }
 
-   if( false == m_thread.run( m_name ) )
+   if( false == m_thread.run( m_name.c_str( ) ) )
    {
       SYS_ERR( "'%s': can't be started", m_name.c_str( ) );
       return false;

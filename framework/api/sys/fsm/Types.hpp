@@ -9,18 +9,16 @@ namespace base::fsm {
    enum class eSignal : std::uint8_t { SYSTEM, STATE };
    const char* c_str( const eSignal& );
 
-   namespace manager {
-
-      class Manager;
-      using tID = base::TID< Manager >;
-
+   namespace manager
+   {
+      class ManagerID;
+      using ID = base::TID< ManagerID >;
    }
 
-   namespace state {
-
-      class State;
-      using tID = base::TID< State >;
-
+   namespace state
+   {
+      class StateID;
+      using ID = base::TID< StateID >;
    }
 
 } // namespace base::events

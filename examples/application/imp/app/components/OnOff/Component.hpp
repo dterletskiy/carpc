@@ -14,7 +14,7 @@ namespace application::components::onoff {
 
    class Component
       : public base::application::RootComponent
-      , public base::ITimerConsumer
+      , public base::timer::ITimerConsumer
    {
       public:
          static base::application::IComponent::tSptr creator( );
@@ -32,11 +32,11 @@ namespace application::components::onoff {
 
       // Timer
       private:
-         void process_timer( const base::Timer::ID ) override;
-         base::Timer m_timer;
+         void process_timer( const base::comm::timer::ID ) override;
+         base::timer::Timer m_timer;
 
       public:
-         void on_timer( const base::Timer::ID );
+         void on_timer( const base::comm::timer::ID );
 
       private:
          Manager m_fsm;

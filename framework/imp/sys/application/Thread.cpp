@@ -55,7 +55,7 @@ void Thread::thread_loop( )
 bool Thread::start( )
 {
    SYS_INF( "'%s': starting", m_name.c_str( ) );
-   bool result = m_thread.run( m_name );
+   bool result = m_thread.run( m_name.c_str( ) );
    if( false == result )
    {
       SYS_ERR( "'%s': can't be started", m_name.c_str( ) );

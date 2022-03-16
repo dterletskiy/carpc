@@ -32,7 +32,7 @@ void Client::connected( )
 
    base::timer::start(
       10000, 1,
-      [ this ]( const base::Timer::ID id )
+      [ this ]( const base::comm::timer::ID id )
       {
          MSG_DBG( "Timer expired" );
          subscribe_current_state( );

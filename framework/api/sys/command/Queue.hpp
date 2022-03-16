@@ -32,18 +32,18 @@ namespace base::command {
          void process_event( const typename ICommand::Signal::Event& ) override;
 
       public:
-         const queue::tID& id( ) const;
+         const queue::ID& id( ) const;
       private:
-         const queue::tID m_id = queue::tID::generate( );
+         const queue::ID m_id = queue::ID::generate( );
 
       public:
-         const std::string& name( ) const;
+         const queue::Name& name( ) const;
       private:
-         std::string m_name;
+         queue::Name m_name;
 
       public:
          template< typename T, typename... Args >
-            const command::tID& create_command( const Args&... );
+            const command::ID& create_command( const Args&... );
       private:
          bool execute_next( );
       private:
@@ -53,19 +53,19 @@ namespace base::command {
 
 
    inline
-   const queue::tID& Queue::id( ) const
+   const queue::ID& Queue::id( ) const
    {
       return m_id;
    }
 
    inline
-   const std::string& Queue::name( ) const
+   const queue::Name& Queue::name( ) const
    {
       return m_name;
    }
 
    template< typename T, typename... Args >
-   const command::tID& Queue::create_command( const Args&... args )
+   const command::ID& Queue::create_command( const Args&... args )
    {
       ICommand::tUptr p_command = std::make_unique< T >( args... );
       p_command->parent_id( m_id );

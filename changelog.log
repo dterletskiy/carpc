@@ -1,3 +1,8 @@
+version 3.4.0
+   - Big workaroung with namespaces.
+   - base::TName type implemented for naming objects instead of std::string.
+   - Refactoring event TGenerator and TConsumer.
+
 version 3.3.8
    - Minor changes with types adaptations.
 

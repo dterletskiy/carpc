@@ -27,7 +27,7 @@ namespace base::service::fast::__private {
 
       protected:
          template< typename tRequestData, typename... Args >
-            const tSequenceID request( tClient*, const Args&... );
+            const comm::sequence::ID request( tClient*, const Args&... );
          template< typename tNotificationData >
             const bool subscribe( tClient* p_client );
          template< typename tNotificationData >
@@ -74,7 +74,7 @@ namespace base::service::fast::__private {
 
    template< typename TYPES >
    template< typename tRequestData, typename... Args >
-   const tSequenceID TClient< TYPES >::request( tClient* p_client, const Args&... args )
+   const comm::sequence::ID TClient< TYPES >::request( tClient* p_client, const Args&... args )
    {
       return mp_proxy->template request< tRequestData >( this, args... );
    }

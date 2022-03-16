@@ -9,13 +9,13 @@
 
 namespace base {
 
-   template< typename T >
+   template< typename T, typename V = std::uint64_t >
    class TID
    {
       public:
-         using tID = TID< T >;
-         using VALUE_TYPE = std::uint64_t;
+         using tID = TID< T, V >;
          using OBJECT_TYPE = T;
+         using VALUE_TYPE = V;
 
          static constexpr VALUE_TYPE min_value     = std::numeric_limits< VALUE_TYPE >::min( );
          static constexpr VALUE_TYPE max_value     = std::numeric_limits< VALUE_TYPE >::max( );
@@ -135,19 +135,14 @@ namespace base {
 
 
 
-   template< typename T >
-      const TID< T > TID< T >::min{ min_value };
-   template< typename T >
-      const TID< T > TID< T >::max{ max_value };
-   template< typename T >
-      const TID< T > TID< T >::invalid{ invalid_value };
-   template< typename T >
-      const TID< T > TID< T >::zero{ zero_value };
-
-
-   struct Object { using ID = TID< Object >; };
-   using tID = Object::ID;
-
+   template< typename T, typename V >
+      const TID< T, V > TID< T, V >::min{ min_value };
+   template< typename T, typename V >
+      const TID< T, V > TID< T, V >::max{ max_value };
+   template< typename T, typename V >
+      const TID< T, V > TID< T, V >::invalid{ invalid_value };
+   template< typename T, typename V >
+      const TID< T, V > TID< T, V >::zero{ zero_value };
 
 } // namespace base
 

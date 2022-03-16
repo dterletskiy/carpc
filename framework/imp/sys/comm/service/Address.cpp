@@ -9,12 +9,12 @@ using namespace base::service;
 
 
 
-Address::Address( const ID& id )
+Address::Address( const comm::service::ID& id )
    : m_id( id )
 {
 }
 
-Address::Address( const application::Context& context, const ID& id )
+Address::Address( const application::Context& context, const comm::service::ID& id )
    : m_context( context )
    , m_id( id )
 {

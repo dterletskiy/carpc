@@ -32,13 +32,13 @@ void Server::request_trigger_state( const std::string& state, const size_t delay
 {
    MSG_DBG( "%s: state: %s / delay: %zu", m_name.c_str( ), state.c_str( ), delay );
 
-   std::shared_ptr< base::Timer > timer = std::make_shared< base::Timer >( this, state );
+   std::shared_ptr< base::timer::Timer > timer = std::make_shared< base::timer::Timer >( this, state );
    timer->start( delay, 1 );
    m_timers.emplace_back( TimerSeqID{ state, timer, unblock_request( ) } );
    // m_timers.emplace_back( TimerSeqID{ state, timer, 0 } );
 }
 
-void Server::process_timer( const base::Timer::ID id )
+void Server::process_timer( const base::comm::timer::ID id )
 {
    MSG_DBG( "%s: Timer '%s' expired", m_name.c_str( ), id.name( ).c_str( ) );
 

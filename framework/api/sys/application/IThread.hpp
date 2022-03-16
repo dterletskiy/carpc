@@ -52,10 +52,10 @@ namespace base::application {
 
       public:
          const thread::ID& id( ) const;
-         const std::string& name( ) const;
+         const thread::Name& name( ) const;
       protected:
          thread::ID     m_id = thread::ID::generate( );
-         std::string    m_name = "NoName";
+         thread::Name   m_name{ "NoName_Thread" };
 
       public:
          const size_t wd_timeout( ) const;
@@ -71,7 +71,7 @@ namespace base::application {
 
 
    inline
-   const std::string& IThread::name( ) const
+   const thread::Name& IThread::name( ) const
    {
       return m_name;
    }

@@ -29,7 +29,7 @@ namespace hmi::components::onoff {
 
    class Component
       : public base::application::RootComponent
-      , public base::ITimerConsumer
+      , public base::timer::ITimerConsumer
       , public hmi::event::App::Consumer
    {
       public:
@@ -44,11 +44,11 @@ namespace hmi::components::onoff {
          void boot( const std::string& ) override;
 
       private:
-         void process_timer( const base::Timer::ID ) override;
-         base::Timer m_timer;
+         void process_timer( const base::comm::timer::ID ) override;
+         base::timer::Timer m_timer;
 
       public:
-         void on_timer( const base::Timer::ID );
+         void on_timer( const base::comm::timer::ID );
 
       private:
          void process_event( const hmi::event::App::Event& ) override;

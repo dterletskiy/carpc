@@ -35,6 +35,9 @@ namespace base::service {
          void process_event( const events::service::Status::Event& ) override final;
 
       public:
+         const Passport passport( ) const;
+
+      public:
          const Signature& signature( ) const;
       private:
          Signature               m_signature;
@@ -45,9 +48,9 @@ namespace base::service {
          application::Context    m_context = application::Context::current( );
 
       public:
-         const ID& id( ) const;
+         const comm::service::ID& id( ) const;
       protected:
-         ID                      m_id = ID::generate( );
+         comm::service::ID       m_id = comm::service::ID::generate( );
 
       public:
          bool is_external( ) const;
@@ -56,6 +59,12 @@ namespace base::service {
    };
 
 
+
+   inline
+   const Passport IConnection::passport( ) const
+   {
+      return Passport( m_signature, Address( m_context, m_id ) );
+   }
 
    inline
    const Signature& IConnection::signature( ) const
@@ -70,7 +79,7 @@ namespace base::service {
    }
 
    inline
-   const ID& IConnection::id( ) const
+   const comm::service::ID& IConnection::id( ) const
    {
       return m_id;
    }

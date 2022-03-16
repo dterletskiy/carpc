@@ -3,7 +3,7 @@
 #include <string>
 #include <type_traits>
 
-#include "api/sys/common/IPC.hpp"
+#include "api/sys/comm/Types.hpp"
 #include "api/sys/helpers/functions/format.hpp"
 
 #include "api/sys/trace/Trace.hpp"

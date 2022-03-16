@@ -1,7 +1,7 @@
 #pragma once
 
+#include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/thread.hpp"
-#include "api/sys/common/ID.hpp"
 
 
 
@@ -28,17 +28,14 @@ namespace base::os {
          };
 
       public:
-         using ID = base::TID< Spinlock >;
-
-      public:
          Spinlock( const bool auto_lock = false, const bool shared = false );
          Spinlock( const Spinlock& ) = delete;
          ~Spinlock( );
 
       public:
-         const ID id( ) const;
+         const spinlock::ID& id( ) const;
       protected:
-         ID                      m_id = ID::generate( );
+         spinlock::ID            m_id = spinlock::ID::generate( );
 
       public:
          bool lock( );
@@ -55,7 +52,7 @@ namespace base::os {
 
 
    inline
-   const Spinlock::ID Spinlock::id( ) const
+   const spinlock::ID& Spinlock::id( ) const
    {
       return m_id;
    }

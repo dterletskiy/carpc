@@ -24,7 +24,7 @@ namespace base::fsm {
    class TStateManagerBase
    {
       public:
-         DEFINE_EVENT_S( Signal, typename TYPES::tData, base::async::id::TSignature< manager::tID > );
+         DEFINE_EVENT_S( Signal, typename TYPES::tData, base::async::id::TSignature< manager::ID > );
    };
 
 
@@ -56,9 +56,9 @@ namespace base::fsm {
             bool register_state( Args& ... args );
 
       public:
-         const manager::tID& id( ) const;
+         const manager::ID& id( ) const;
       private:
-         manager::tID m_id = manager::tID::generate( );
+         manager::ID m_id = manager::ID::generate( );
 
       public:
          const std::string& name( ) const;
@@ -88,7 +88,7 @@ namespace base::fsm {
       public:
          struct Subscriber
          {
-            using tCallback = std::function< void( const typename state::tID& ) >;
+            using tCallback = std::function< void( const typename state::ID& ) >;
             using tSptr = std::shared_ptr< Subscriber >;
             using tWptr = std::weak_ptr< Subscriber >;
 
@@ -141,7 +141,7 @@ namespace base::fsm {
    }
 
    template< typename TYPES >
-   const typename manager::tID& TStateManager< TYPES >::id( ) const
+   const typename manager::ID& TStateManager< TYPES >::id( ) const
    {
       return m_id;
    }

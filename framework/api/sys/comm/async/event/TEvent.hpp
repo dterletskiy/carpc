@@ -9,8 +9,6 @@
 
 namespace base::async {
 
-
-
    template< typename _Generator >
    class TEvent : public IEvent
    {
@@ -185,18 +183,18 @@ namespace base::async {
       private:
          tDataPtr mp_data = nullptr;
 
+      // context
       public:
          const application::Context& context( ) const override { return m_context; }
       private:
          application::Context m_context = application::Context::current( );
 
+      // priority
       public:
          const tPriority priority( ) const override { return m_priority; }
       protected:
          tPriority m_priority = base::priority( ePriority::DEFAULT );
    };
-
-
 
 } // namespace base::async
 

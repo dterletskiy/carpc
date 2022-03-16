@@ -15,7 +15,7 @@ using namespace base::os;
 
 namespace {
 
-   using tRegistry = std::map< pthread_t, Thread::ID >;
+   using tRegistry = std::map< os_linux::thread::tID, thread::ID >;
    tRegistry s_registry;
 
    base::os::Mutex s_registry_mutex;
@@ -48,12 +48,12 @@ void Thread::init( )
    pthread_attr_setscope( &m_attr, PTHREAD_SCOPE_PROCESS );
 }
 
-const Thread::ID Thread::current_id( )
+const thread::ID Thread::current_id( )
 {
    os::Mutex::AutoLocker locker( s_registry_mutex );
    const auto iterator = s_registry.find( pthread_self( ) );
    if( s_registry.end( ) == iterator )
-      return ID::invalid;
+      return thread::ID::invalid;
 
    return iterator->second;
 }
@@ -78,7 +78,7 @@ void* Thread::thread_loop( void* parameters )
    thread_loop_mutex.lock( );
    Thread* p_thread = (Thread*)parameters;
 
-   pthread_t id = pthread_self( );
+   os_linux::thread::tID id = pthread_self( );
    SYS_INF( "Thread: %#lx. Enter", id );
    if( id != p_thread->m_thread_id )
    {

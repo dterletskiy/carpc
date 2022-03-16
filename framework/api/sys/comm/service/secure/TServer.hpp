@@ -27,25 +27,25 @@ namespace base::service::secure::__private {
 
    struct RequestInfo
    {
-      RequestInfo( const tSequenceID _server_seq_id )
+      RequestInfo( const comm::sequence::ID _server_seq_id )
          : server_seq_id( _server_seq_id )
       { }
-      RequestInfo( const tSequenceID _server_seq_id, const tSequenceID _client_seq_id, const Address _client_addr )
+      RequestInfo( const comm::sequence::ID _server_seq_id, const comm::sequence::ID _client_seq_id, const Address _client_addr )
          : server_seq_id( _server_seq_id )
          , client_seq_id( _client_seq_id )
          , client_addr( _client_addr )
       { }
       const bool operator<( const RequestInfo& other ) const { return server_seq_id < other.server_seq_id; }
 
-      tSequenceID server_seq_id = InvalidSequenceID;
-      tSequenceID client_seq_id = InvalidSequenceID;
+      comm::sequence::ID server_seq_id = comm::sequence::ID::invalid;
+      comm::sequence::ID client_seq_id = comm::sequence::ID::invalid;
       const Address client_addr;
    };
 
    struct RequestStatus
    {
       eRequestStatus status = eRequestStatus::READY;
-      tSequenceID processing_server_seq_id = InvalidSequenceID;
+      comm::sequence::ID processing_server_seq_id = comm::sequence::ID::invalid;
       std::set< RequestInfo > info_set;
    };
 
@@ -70,13 +70,13 @@ namespace base::service::secure::__private {
          }
 
          application::thread::ID    tid;
-         service::ID                sid;
+         comm::service::ID          sid;
       };
 
       public:
          bool is_subscribed( ) const;
-         void add_subscriber( const application::Context&, const service::ID& );
-         void remove_subscriber( const application::Context&, const service::ID& );
+         void add_subscriber( const application::Context&, const comm::service::ID& );
+         void remove_subscriber( const application::Context&, const comm::service::ID& );
          template< typename tNotificationData, typename... Args >
             void notify_subscribers( const TServer< TYPES >&, const Args& ... args );
 
@@ -100,7 +100,7 @@ namespace base::service::secure::__private {
    }
 
    template< typename TYPES >
-   void NotificationStatus< TYPES >::add_subscriber( const application::Context& context, const service::ID& service_id )
+   void NotificationStatus< TYPES >::add_subscriber( const application::Context& context, const comm::service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
       // It is current process ID and appliocation::process::local
@@ -117,7 +117,7 @@ namespace base::service::secure::__private {
    }
 
    template< typename TYPES >
-   void NotificationStatus< TYPES >::remove_subscriber( const application::Context& context, const service::ID& service_id )
+   void NotificationStatus< TYPES >::remove_subscriber( const application::Context& context, const comm::service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
       // It is current process ID and appliocation::process::local
@@ -210,14 +210,14 @@ namespace base::service::secure::__private {
             std::optional< RequestInfo > prepare_response( );
          bool process_subscription( const typename TYPES::tEvent& );
       public:
-         const tSequenceID unblock_request( );
-         void prepare_response( const tSequenceID );
+         const comm::sequence::ID unblock_request( );
+         void prepare_response( const comm::sequence::ID );
 
       private:
          tRequestStatusMap                         m_request_status_map;
-         tSequenceID                               m_seq_id = tSequenceID::zero;
+         comm::sequence::ID                        m_seq_id = comm::sequence::ID::zero;
          std::optional< typename TYPES::tEventID > m_processing_event_id = std::nullopt;
-         std::optional< tSequenceID >              m_processing_seq_id = std::nullopt;
+         std::optional< comm::sequence::ID >       m_processing_seq_id = std::nullopt;
          tAttributeStatusMap                       m_attribute_status_map;
    };
 
@@ -327,9 +327,9 @@ namespace base::service::secure::__private {
    bool TServer< TYPES >::prepare_request( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const service::ID from_id = event.info( ).from( );
-      const service::ID to_id = event.info( ).to( );
-      const tSequenceID seq_id = event.info( ).seq_id( );
+      const comm::service::ID from_id = event.info( ).from( );
+      const comm::service::ID to_id = event.info( ).to( );
+      const comm::sequence::ID seq_id = event.info( ).seq_id( );
       const auto from_context = event.context( );
 
       // Find request event_id in request status map
@@ -381,7 +381,7 @@ namespace base::service::secure::__private {
       auto& request_status = iterator_status_map->second;
       auto& request_info_set = request_status.info_set;
 
-      tSequenceID serching_seq_id = m_processing_seq_id.value_or( request_status.processing_server_seq_id );
+      comm::sequence::ID serching_seq_id = m_processing_seq_id.value_or( request_status.processing_server_seq_id );
       // Search for RequestInfo structure in request infor set for current request ID
       auto iterator_info_set = request_info_set.find( RequestInfo{ serching_seq_id } );
       if( request_info_set.end( ) == iterator_info_set )
@@ -400,12 +400,12 @@ namespace base::service::secure::__private {
    }
 
    template< typename TYPES >
-   const tSequenceID TServer< TYPES >::unblock_request( )
+   const comm::sequence::ID TServer< TYPES >::unblock_request( )
    {
       if( std::nullopt == m_processing_event_id )
       {
          SYS_WRN( "unable unblock request" );
-         return InvalidSequenceID;
+         return comm::sequence::ID::invalid;
       }
 
       // Find request id in request status map
@@ -413,7 +413,7 @@ namespace base::service::secure::__private {
       if( m_request_status_map.end( ) == iterator_status_map )
       {
          SYS_WRN( "not a request ID: %s", m_processing_event_id.value( ).c_str( ) );
-         return InvalidSequenceID;
+         return comm::sequence::ID::invalid;
       }
       auto& request_status = iterator_status_map->second;
 
@@ -422,7 +422,7 @@ namespace base::service::secure::__private {
    }
 
    template< typename TYPES >
-   void TServer< TYPES >::prepare_response( const tSequenceID seq_id )
+   void TServer< TYPES >::prepare_response( const comm::sequence::ID seq_id )
    {
       m_processing_seq_id = seq_id;
    }
@@ -448,7 +448,7 @@ namespace base::service::secure::__private {
    bool TServer< TYPES >::process_subscription( const typename TYPES::tEvent& event )
    {
       const typename TYPES::tEventID event_id = event.info( ).id( );
-      const service::ID from_id = event.info( ).from( );
+      const comm::service::ID from_id = event.info( ).from( );
       const auto from_context = event.context( );
 
       for( auto& item : TYPES::N )

@@ -27,13 +27,8 @@ namespace base::async {
          {
          };
 
-         template< typename _EventType >
          struct TConsumer : public IAsync::IConsumer
          {
-            TConsumer( ) = default;
-            ~TConsumer( ) override { _EventType::clear_all_notifications( this ); }
-
-            virtual void process_event( const _EventType& ) = 0;
          };
 
       public:

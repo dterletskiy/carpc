@@ -14,7 +14,7 @@ namespace base::service::fast {
 
       public:
          TSignature( ) = default;
-         TSignature( const tServiceName&, const _ID&, const service::ID& from = { }, const service::ID to = { }, const tSequenceID seq_id = { } );
+         TSignature( const comm::service::Name&, const _ID&, const comm::service::ID& from = { }, const comm::service::ID to = { }, const comm::sequence::ID seq_id = { } );
          TSignature( const TSignature& other );
          ~TSignature( ) = default;
 
@@ -25,27 +25,27 @@ namespace base::service::fast {
          const bool from_stream( ipc::tStream& );
 
       public:
-         const tServiceName& role( ) const;
+         const comm::service::Name& role( ) const;
          const _ID& id( ) const;
-         const service::ID& from( ) const;
-         const service::ID& to( ) const;
-         const tSequenceID& seq_id( ) const;
+         const comm::service::ID& from( ) const;
+         const comm::service::ID& to( ) const;
+         const comm::sequence::ID& seq_id( ) const;
 
       private:
-         tServiceName m_role = InvalidServiceName;
+         comm::service::Name m_role = comm::service::Name::invalid;
          _ID m_id = { };
-         service::ID m_from;
-         service::ID m_to;
-         tSequenceID m_seq_id = tSequenceID::invalid;
+         comm::service::ID m_from;
+         comm::service::ID m_to;
+         comm::sequence::ID m_seq_id = comm::sequence::ID::invalid;
    };
 
 
 
    template< typename _ID >
    TSignature< _ID >::TSignature(
-               const tServiceName& role, const _ID& id,
-               const service::ID& from, const service::ID to,
-               const tSequenceID seq_id
+               const comm::service::Name& role, const _ID& id,
+               const comm::service::ID& from, const comm::service::ID to,
+               const comm::sequence::ID seq_id
    )
       : m_role( role )
       , m_id( id )
@@ -69,7 +69,7 @@ namespace base::service::fast {
    const std::string TSignature< _ID >::name( ) const
    {
       return base::format_string(
-         "role: ", m_role,
+         "role: ", m_role.value( ),
          ", id: ", m_id.c_str( ),
          ", from: ", m_from.name( ),
          ", to: ", m_to.name( ),
@@ -104,7 +104,7 @@ namespace base::service::fast {
    }
 
    template< typename _ID >
-   const tServiceName& TSignature< _ID >::role( ) const
+   const comm::service::Name& TSignature< _ID >::role( ) const
    {
       return m_role;
    }
@@ -116,19 +116,19 @@ namespace base::service::fast {
    }
 
    template< typename _ID >
-   const service::ID& TSignature< _ID >::from( ) const
+   const comm::service::ID& TSignature< _ID >::from( ) const
    {
       return m_from;
    }
 
    template< typename _ID >
-   const service::ID& TSignature< _ID >::to( ) const
+   const comm::service::ID& TSignature< _ID >::to( ) const
    {
       return m_to;
    }
 
    template< typename _ID >
-   const tSequenceID& TSignature< _ID >::seq_id( ) const
+   const comm::sequence::ID& TSignature< _ID >::seq_id( ) const
    {
       return m_seq_id;
    }

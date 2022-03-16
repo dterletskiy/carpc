@@ -1,7 +1,7 @@
 #pragma once
 
+#include "api/sys/oswrappers/Types.hpp"
 #include "api/sys/oswrappers/linux/kernel.hpp"
-#include "api/sys/common/ID.hpp"
 
 
 
@@ -28,7 +28,6 @@ namespace base::os {
          };
 
       public:
-         using ID = base::TID< Futex >;
          using tFutex = int;
          const tFutex LOCKED = 0;
          const tFutex UNLOCKED = 1;
@@ -39,9 +38,9 @@ namespace base::os {
          ~Futex( );
 
       public:
-         const ID id( ) const;
+         const futex::ID& id( ) const;
       protected:
-         ID          m_id = ID::generate( );
+         futex::ID   m_id = futex::ID::generate( );
 
       public:
          bool lock( );
@@ -54,7 +53,7 @@ namespace base::os {
 
 
    inline
-   const Futex::ID Futex::id( ) const
+   const futex::ID& Futex::id( ) const
    {
       return m_id;
    }

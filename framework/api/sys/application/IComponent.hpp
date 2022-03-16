@@ -25,10 +25,10 @@ namespace base::application {
 
       public:
          const component::ID& id( ) const;
-         const std::string& name( ) const;
+         const component::Name& name( ) const;
       protected:
-         component::ID  m_id = component::ID::generate( );
-         std::string    m_name;
+         component::ID     m_id = component::ID::generate( );
+         component::Name   m_name{ "NoName_Component" };
 
       public:
          virtual void boot( const std::string& message = "boot" ) = 0;
@@ -38,7 +38,7 @@ namespace base::application {
 
 
    inline
-   const std::string& IComponent::name( ) const
+   const component::Name& IComponent::name( ) const
    {
       return m_name;
    }

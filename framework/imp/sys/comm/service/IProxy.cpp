@@ -23,11 +23,11 @@ IProxy::IProxy( const base::async::tAsyncTypeID& interface_type_id, const std::s
    // Send IPC notification information about registered client to ServiceBrocker
    // in case of there is no registered server with current service name and
    // client could export interface
-   if( service::Registry::eResult::OK_NotPaired == result )
+   if( Registry::eResult::OK_NotPaired == result )
    {
       if( true == is_external( ) )
          ev_i::Action::Event::create_send( { ev_i::eAction::RegisterClient }, { signature( ), Address( context( ), id( ) ) } );
-   } 
+   }
 }
 
 IProxy::~IProxy( )
@@ -37,7 +37,7 @@ IProxy::~IProxy( )
    );
    // Send IPC notification information about registered client to ServiceBrocker
    // in case of there client could exports interface
-   if( service::Registry::eResult::OK_NotPaired == result )
+   if( Registry::eResult::OK_NotPaired == result )
    {
       ev_i::Action::Event::create_send( { ev_i::eAction::UnregisterClient }, { signature( ), Address( context( ), id( ) ) } );
    }

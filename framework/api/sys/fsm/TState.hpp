@@ -42,9 +42,9 @@ namespace base::fsm {
          virtual const std::optional< typename TYPES::tID > process( const typename TYPES::tData& ) = 0;
 
       public:
-         const typename state::tID& id( ) const;
+         const typename state::ID& id( ) const;
       private:
-         typename state::tID m_id = state::tID::generate( );
+         typename state::ID m_id = state::ID::generate( );
 
       public:
          const std::string& name( ) const;
@@ -73,7 +73,7 @@ namespace base::fsm {
    }
 
    template< typename TYPES >
-   const typename state::tID& TState< TYPES >::id( ) const
+   const typename state::ID& TState< TYPES >::id( ) const
    {
       return m_id;
    }

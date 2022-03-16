@@ -6,11 +6,11 @@
 
 #include "api/sys/oswrappers/linux/timer.hpp"
 #include "api/sys/comm/async/event/Event.hpp"
-#include "api/sys/common/ID.hpp"
+#include "api/sys/comm/timer/Types.hpp"
 
 
 
-namespace base {
+namespace base::timer {
 
    class ITimerConsumer;
 
@@ -24,7 +24,6 @@ namespace base {
    class Timer
    {
       public:
-         using ID = base::TID< Timer >;
          static const std::size_t CONTINIOUS = std::numeric_limits< std::size_t >::max( );
 
       public:
@@ -40,12 +39,12 @@ namespace base {
       public:
          const std::string& name( ) const;
       private:
-         std::string             m_name = "NoName_Timer";
+         comm::timer::Name       m_name{ "NoName_Timer" };
 
       public:
-         const ID id( ) const;
+         const comm::timer::ID id( ) const;
       private:
-         ID                      m_id = ID::generate( );
+         comm::timer::ID         m_id = comm::timer::ID::generate( );
 
       public:
          bool is_running( ) const;
@@ -80,7 +79,7 @@ namespace base {
    }
 
    inline
-   const Timer::ID Timer::id( ) const
+   const comm::timer::ID Timer::id( ) const
    {
       return m_id;
    }
@@ -113,9 +112,9 @@ namespace base {
 
    struct TimerEventData
    {
-      Timer::ID id;
+      comm::timer::ID id;
    };
-   DEFINE_EVENT( TimerEvent, TimerEventData, base::async::id::TSignature< Timer::ID::VALUE_TYPE > );
+   DEFINE_EVENT( TimerEvent, TimerEventData, base::async::id::TSignature< comm::timer::ID::VALUE_TYPE > );
 
 
 
@@ -126,7 +125,7 @@ namespace base {
          ITimerConsumer( );
          virtual ~ITimerConsumer( );
 
-         virtual void process_timer( const Timer::ID ) = 0;
+         virtual void process_timer( const comm::timer::ID ) = 0;
 
       private:
          void process_event( const TimerEvent::Event& ) override;
@@ -140,14 +139,14 @@ namespace base {
 
 namespace base::timer {
 
-   using tCallback = std::function< void( const base::Timer::ID ) >;
+   using tCallback = std::function< void( const base::comm::timer::ID ) >;
    const std::size_t Infinite = std::numeric_limits< std::size_t >::max( );
 
    // This timer creates new thread and sleep it to some milliseconds.
    // When thread is finished "callback" will be executed in context of application thread
    // where this timer have been called.
-   // Performance of this timer is worse then base::Timer implementation.
+   // Performance of this timer is worse then base::timer::Timer implementation.
    // This timer can't be stopped.
-   base::Timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous = true );
+   base::comm::timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous = true );
 
 } // namespace base::timer
