@@ -8,6 +8,9 @@
 #include <set>
 #include <map>
 #include <optional>
+#ifdef USE_GPB
+   #include <google/protobuf/message.h>
+#endif
 
 #include "api/sys/common/CircularBuffer.hpp"
 
@@ -17,10 +20,20 @@ namespace base {
 
 
 
+   struct Dummy final { };
+
    #define __INTEGRAL_TYPE__( TYPE )         std::is_integral_v< TYPE >
    #define __FLOATING_POINT_TYPE__( TYPE )   std::is_floating_point_v< TYPE >
    #define __ENUM_TYPE__( TYPE )             std::is_enum_v< TYPE >
-   #define __REST_TYPES__( TYPE )            !std::is_integral_v< TYPE > && !std::is_floating_point_v< TYPE > && !std::is_enum_v< TYPE >
+   #ifdef USE_GPB
+      #define __GPB_TYPE__( TYPE )           std::is_base_of_v< ::google::protobuf::Message, TYPE >
+   #else
+      #define __GPB_TYPE__( TYPE )           std::is_base_of_v< TYPE, Dummy >
+   #endif
+   #define __REST_TYPES__( TYPE )            !__INTEGRAL_TYPE__( TYPE ) \
+                                                && !__FLOATING_POINT_TYPE__( TYPE ) \
+                                                && !__ENUM_TYPE__( TYPE ) \
+                                                && !__GPB_TYPE__( TYPE )
 
    using tBool = char;
 
@@ -114,6 +127,10 @@ namespace base {
          template< typename TYPE >
             typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
                push( const TYPE& value );
+         // This method is for GPB types
+         template< typename TYPE >
+            typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
+               push( const TYPE& value );
 
       private:
          template< typename TYPE_CONTAINER >
@@ -170,6 +187,10 @@ namespace base {
          // This method is for user defined types. It calles "from_stream" method of this type, so it should be implemented in it.
          template< typename TYPE >
             typename std::enable_if_t< __REST_TYPES__( TYPE ), bool >
+               pop( TYPE& value );
+         // This method is for GPB types
+         template< typename TYPE >
+            typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
                pop( TYPE& value );
 
       private:
@@ -327,6 +348,15 @@ namespace base {
       return value.to_stream( *this );
    }
 
+   template< typename TYPE >
+   typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
+   ByteStream::push( const TYPE& value )
+   {
+      std::string ss;
+      value.SerializeToString( &ss );
+      return push( ss );
+   }
+
    template< typename TYPE_CONTAINER >
    bool ByteStream::push_stl_container( const TYPE_CONTAINER& container )
    {
@@ -464,6 +494,15 @@ namespace base {
    ByteStream::pop( TYPE& value )
    {
       return value.from_stream( *this );
+   }
+
+   template< typename TYPE >
+   typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
+   ByteStream::pop( TYPE& value )
+   {
+      std::string ss;
+      pop( ss );
+      return value.ParseFromString( ss );
    }
 
    template< typename TYPE_CONTAINER >

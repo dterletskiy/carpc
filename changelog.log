@@ -1,3 +1,9 @@
+version 3.4.1
+   - Extended ByteStream to push and pop google protobuf objects using its serialize/deserialize methods.
+   - Extended build system to compile projects with or without google protobuf.
+   - Added generate folder for generated source files (google protobuf files).
+   - Implemented example "stream" for serialize/deserialize objects.
+
 version 3.4.0
    - Big workaroung with namespaces.
    - base::TName type implemented for naming objects instead of std::string.

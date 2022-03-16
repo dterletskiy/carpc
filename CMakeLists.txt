@@ -9,6 +9,7 @@ option( DLT_TRACE                "Enable dlt tracing"                           
 option( MEMORY_HOOK              "Enable memory allocator hooks"                                OFF )
 option( INSTRUMENTAL             "Enable instrumental functionality"                            OFF )
 option( USE_DEBUG                "Enable debug information"                                     OFF )
+option( USE_GPB                  "Enable goolgle protobuf"                                      ON )
 
 
 
@@ -84,14 +85,10 @@ endif( )
 if( MEMORY_HOOK )
    add_compile_definitions( USE_MEMORY_HOOK )
 endif( )
-
-
-
-###########################################################################################
-#                                                                                         #
-#                                   Build source file list                                #
-#                                                                                         #
-###########################################################################################
+if( USE_GPB )
+   find_package( Protobuf REQUIRED )
+   add_compile_definitions( USE_GPB )
+endif( )
 
 
 
@@ -105,6 +102,7 @@ message( NOTICE "OS_ANDROID = " ${OS_ANDROID} )
 message( NOTICE "OS_LINUX = " ${OS_LINUX} )
 message( NOTICE "OS_TARGET = " ${OS_TARGET} )
 message( NOTICE "-----------------------------------------------------------------------" )
+message( NOTICE "CMAKE_HOME_DIRECTORY = " ${CMAKE_HOME_DIRECTORY} )
 message( NOTICE "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
 message( NOTICE "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
 message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
@@ -112,8 +110,8 @@ message( NOTICE "CMAKE_GENERATOR = " ${CMAKE_GENERATOR} )
 message( NOTICE "RPC_SOURCE_DIR = " ${RPC_SOURCE_DIR} )
 message( NOTICE "RPC_BINARY_DIR = " ${RPC_BINARY_DIR} )
 message( NOTICE "CMAKE_INSTALL_PREFIX = " ${CMAKE_INSTALL_PREFIX} )
+message( NOTICE "ROOT_GEN_DIR = " ${ROOT_GEN_DIR} )
 message( NOTICE "-----------------------------------------------------------------------" )
-# execute_process( COMMAND "${CMAKE_COMMAND}" "-E" "environment" )
 message( NOTICE "TOOLCHAIN: $ENV{TOOLCHAIN}" )
 message( NOTICE "SYSROOT: $ENV{SYSROOT}" )
 message( NOTICE "ARCH: $ENV{ARCH}" )
@@ -128,6 +126,15 @@ message( NOTICE "CXX: $ENV{CXX}" )
 message( NOTICE "LD: $ENV{LD}" )
 message( NOTICE "RANLIB: $ENV{RANLIB}" )
 message( NOTICE "STRIP: $ENV{STRIP}" )
+message( NOTICE "-----------------------------------------------------------------------" )
+message( NOTICE "ALL VARIABLES:" )
+# execute_process( COMMAND "${CMAKE_COMMAND}" "-E" "environment" )
+
+# get_cmake_property(_variableNames VARIABLES)
+# list (SORT _variableNames)
+# foreach (_variableName ${_variableNames})
+#     message(STATUS "${_variableName}=${${_variableName}}")
+# endforeach()
 message( NOTICE "-----------------------------------------------------------------------" )
 
 

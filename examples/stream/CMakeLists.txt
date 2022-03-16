@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-project( FRAMEWORK )
+project( STREAM )
 
 
 
@@ -14,6 +14,10 @@ string( REPLACE " " "_" TARGET_NAME ${TARGET_NAME} )
 message( NOTICE "TARGET_NAME = " ${TARGET_NAME} )
 
 
+string( REGEX REPLACE "${CMAKE_HOME_DIRECTORY}" "${ROOT_GEN_DIR}" PROJECT_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+file( MAKE_DIRECTORY ${PROJECT_GEN_DIR} )
+
+
 
 ###########################################################################################
 #                                                                                         #
@@ -22,6 +26,8 @@ message( NOTICE "TARGET_NAME = " ${TARGET_NAME} )
 ###########################################################################################
 include_directories( ${PROJECT_SOURCE_DIR} )
 include_directories( ${TRACING_SOURCE_DIR} )
+include_directories( ${FRAMEWORK_SOURCE_DIR} )
+include_directories( ${PROJECT_GEN_DIR} )
 
 
 
@@ -31,6 +37,7 @@ include_directories( ${TRACING_SOURCE_DIR} )
 #                                                                                         #
 ###########################################################################################
 link_directories( ${TRACING_BINARY_DIR} )
+link_directories( ${FRAMEWORK_BINARY_DIR} )
 
 
 
@@ -44,14 +51,29 @@ link_directories( ${TRACING_BINARY_DIR} )
 
 ###########################################################################################
 #                                                                                         #
+#                                      Code generation                                    #
+#                                                                                         #
+###########################################################################################
+file( GLOB_RECURSE PROTO_FILES ${PROJECT_SOURCE_DIR}/*.proto )
+# protobuf_generate_cpp( PROTO_SRCS PROTO_HDRS ${PROTO_FILES} )
+
+list( APPEND PROTO_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR} )
+foreach( PROTO_FILE ${PROTO_FILES} )
+   execute_process(
+         COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_FLAGS} --cpp_out=${PROJECT_GEN_DIR} ${PROTO_FILE}
+      )
+endforeach( )
+
+
+
+
+###########################################################################################
+#                                                                                         #
 #                                   Build source file list                                #
 #                                                                                         #
 ###########################################################################################
 file( GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
-if( ${OS_TARGET} EQUAL ${OS_ANDROID} )
-   list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
-   list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/linux/backtrace.cpp )
-endif( )
+file( GLOB_RECURSE GEN_FILES ${PROJECT_GEN_DIR}/*.cc )
 
 
 
@@ -62,21 +84,26 @@ endif( )
 ###########################################################################################
 message( NOTICE "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
 message( NOTICE "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
+message( NOTICE "PROJECT_GEN_DIR = " ${PROJECT_GEN_DIR} )
 message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
 message( STATUS "SOURCE_FILES = " ${SOURCE_FILES} )
+message( STATUS "GEN_FILES = " ${GEN_FILES} )
+message( STATUS "PROTO_FILES = " ${PROTO_FILES} )
+message( STATUS "PROTO_HDRS = " ${PROTO_HDRS} )
+message( STATUS "PROTO_SRCS = " ${PROTO_SRCS} )
 
 
 
-add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
+add_executable( ${TARGET_NAME} ${SOURCE_FILES} ${GEN_FILES} ${PROTO_SRCS} ${PROTO_HDRS} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
-if( ${OS_TARGET} EQUAL ${OS_LINUX} )
-   target_link_libraries( ${TARGET_NAME} pthread )
-   target_link_libraries( ${TARGET_NAME} rt )
+target_link_libraries( ${TARGET_NAME} framework )
+if( MEMORY_HOOK )
+   target_link_libraries( ${TARGET_NAME} hooks )
 endif( )
-if( USE_GPB )
-   target_link_libraries( ${TARGET_NAME} ${Protobuf_LIBRARIES} )
+if( INSTRUMENTAL )
+   target_link_libraries( ${TARGET_NAME} instrumental )
 endif( )
 
-install( TARGETS ${TARGET_NAME} DESTINATION lib )
-install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION include )
+install( TARGETS ${TARGET_NAME} DESTINATION bin )
+install( FILES ${PROJECT_SOURCE_DIR}/${TARGET_NAME}.cfg DESTINATION etc )
