@@ -49,6 +49,8 @@ namespace base {
     * 
     ***************************************************************************************************/
    void print( const void* p_buffer, const std::size_t size, const bool is_new_line = false );
+   void print_hex( const void* p_buffer, const std::size_t size, const bool is_new_line = false );
+   void print_bin( const void* p_buffer, const std::size_t size, const bool is_new_line = false );
 
    template< typename TYPE >
    void print( const TYPE& value, const bool is_new_line = false )

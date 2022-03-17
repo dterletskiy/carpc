@@ -1,3 +1,8 @@
+version 3.4.2
+   - Fix: clear containers before deserialization from stream in ByteStream.
+   - Extended example "stream" for serialize/deserialize objects.
+   - Implemented helper method for printing buffer in hex and bin representation.
+
 version 3.4.1
    - Extended ByteStream to push and pop google protobuf objects using its serialize/deserialize methods.
    - Extended build system to compile projects with or without google protobuf.

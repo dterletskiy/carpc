@@ -1,6 +1,8 @@
+#include <bitset>
 // Framework
 #include "api/sys/application/main.hpp"
 #include "api/sys/common/IPC.hpp"
+#include "api/sys/helpers/functions/print.hpp"
 
 #include "api/stream/sensor.pb.h"
 
@@ -38,36 +40,139 @@ struct Data
    std::string m_name = "NoName";
 };
 
+bool operator==( const Data& data_1, const Data data_2 )
+{
+   return data_1.id( ) == data_2.id( ) && data_1.name( ) == data_2.name( );
+}
+
+
+
+bool operator==( const sensor::Data& data_1, const sensor::Data data_2 )
+{
+   return data_1.id( ) == data_2.id( ) && data_1.name( ) == data_2.name( );
+}
+
+
+
+#define TEST( A, B ) \
+   if( A == B ) \
+   { \
+      MSG_DBG( "%s == %s", #A, #B ); \
+   } \
+   else \
+   { \
+      MSG_ERR( "%s != %s", #A, #B ); \
+   } \
+
+
+
 bool test( int argc, char** argv, char** envp )
 {
    MSG_MARKER( "TEST" );
 
    base::ipc::tStream stream;
 
+
+
    {
-      std::uint8_t value_uint8_t = 0xAB;
-      std::uint16_t value_uint16_t = 12345;
-      Data value_data{ 0xABCDEF, "DATA" };
-      sensor::Data value_sensor_data;
+      bool                       value_bool = true,                        test_value_bool = false;
+      std::uint8_t               value_uint8_t = 0xAB,                     test_value_uint8_t = 0;
+      std::int16_t               value_int16_t = -12345,                   test_value_int16_t = 0;
+      float                      value_float = 123.456,                    test_value_float = 0.0;
+      double                     value_double = -654.321,                  test_value_double = -0.0;
+      std::vector< int >         value_vector_int = { 11, 22, 33 },        test_value_vector_int = { 0 };
+      std::set< int >            value_set_int = { 44, 55, 66 },           test_value_set_int = { 0 };
+      std::optional< double >    value_optional_double = 987.654,          test_value_optional_double = std::nullopt;
+      std::optional< long >      value_optional_long = std::nullopt,       test_value_optional_long = 123456789;
+      std::string                value_string = "Hello CARPC",             test_value_string = { };
+      Data                       value_data{ 0xABCDEF, "DATA" },           test_value_data{ 0, "" };
+      sensor::Data               value_sensor_data,                        test_value_sensor_data;
       value_sensor_data.set_id( 0xAABBCCDD );
       value_sensor_data.set_name( "GPB_DATA" );
 
-      base::ipc::serialize( stream, value_uint8_t, value_uint16_t, value_data, value_sensor_data );
+      std::map<
+            std::size_t,
+            std::map<
+               std::size_t,
+               std::vector< std::optional< std::set< double > > >
+            >
+      > value =
+      {
+         {
+            100,
+            {
+               { 11111, std::vector< std::optional< std::set< double > > >{ std::set< double >{ 1.1, 2.2, 3.3 } } },
+               { 22222, std::vector< std::optional< std::set< double > > >{ std::set< double >{ 4.4, 5.5, 6.6 } } },
+               { 33333, std::vector< std::optional< std::set< double > > >{ std::nullopt } }
+            }
+         },
+         {
+            200,
+            {
+               { 44444, std::vector< std::optional< std::set< double > > >{ std::nullopt } },
+               { 55555, std::vector< std::optional< std::set< double > > >{ std::set< double >{ 7.7, 8.8, 9.9 } } },
+               { 66666, std::vector< std::optional< std::set< double > > >
+                  {
+                     std::set< double >{ 1.0, 2.0, 3.0 }, std::nullopt, std::nullopt
+                  }
+               },
+            }
+         },
+      }, test_value;
+
+      base::ipc::serialize(
+              stream
+            , value_bool
+            , value_uint8_t
+            , value_int16_t
+            , value_float
+            , value_double
+            , value_vector_int
+            , value_set_int
+            , value_optional_double
+            , value_optional_long
+            , value_string
+            , value_data
+            , value_sensor_data
+            , value
+         );
+
+      base::ipc::deserialize(
+              stream
+            , test_value_bool
+            , test_value_uint8_t
+            , test_value_int16_t
+            , test_value_float
+            , test_value_double
+            , test_value_vector_int
+            , test_value_set_int
+            , test_value_optional_double
+            , test_value_optional_long
+            , test_value_string
+            , test_value_data
+            , test_value_sensor_data
+            , test_value
+         );
+
+      TEST( value_bool, test_value_bool );
+      TEST( value_uint8_t, test_value_uint8_t );
+      TEST( value_int16_t, test_value_int16_t );
+      TEST( value_float, test_value_float );
+      TEST( value_double, test_value_double );
+      TEST( value_vector_int, test_value_vector_int );
+      TEST( value_set_int, test_value_set_int );
+      TEST( value_optional_double, test_value_optional_double );
+      TEST( value_optional_long, test_value_optional_long );
+      TEST( value_string, test_value_string );
+      TEST( value_data, test_value_data );
+      TEST( value_sensor_data, test_value_sensor_data );
+      TEST( value, test_value );
    }
 
-   {
-      std::uint8_t value_uint8_t = 0;
-      std::uint16_t value_uint16_t = 0;
-      Data value_data;
-      sensor::Data value_sensor_data;
 
-      base::ipc::deserialize( stream, value_uint8_t, value_uint16_t, value_data, value_sensor_data );
 
-      MSG_DBG( "value_uint8_t: 0x%X", value_uint8_t );
-      MSG_DBG( "value_uint8_t: %d", value_uint16_t );
-      MSG_DBG( "value_data.id: 0x%X / value_data.name: %s", value_data.id( ), value_data.name( ).c_str( ) );
-      MSG_DBG( "value_sensor_data.id: 0x%X / value_sensor_data.name: %s", value_sensor_data.id( ), value_sensor_data.name( ).c_str( ) );
-   }
+
+
 
    MSG_MARKER( "TEST" );
 

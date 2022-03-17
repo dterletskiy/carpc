@@ -258,7 +258,7 @@ namespace base {
    template < typename TYPE, std::size_t N >
    bool ByteStream::push( const TYPE (&array)[ N ] )
    {
-      printf( "----- N: %zu -----\n", N );
+      // printf( "----- N: %zu -----\n", N );
       bool result = true;
       for ( std::size_t index = 0; index < N; ++index )
          result &= push( array[ index ] );
@@ -512,6 +512,7 @@ namespace base {
       if( false == pop( size ) )
          return false;
 
+      container = TYPE_CONTAINER{ };
       for( std::size_t index = 0; index < size; ++index )
       {
          typename TYPE_CONTAINER::value_type value;
@@ -530,6 +531,7 @@ namespace base {
       if( false == pop( size ) )
          return false;
 
+      container = TYPE_CONTAINER{ };
       for( std::size_t index = 0; index < size; ++index )
       {
          // Here value is a pair in case of map and simple type in case of set
