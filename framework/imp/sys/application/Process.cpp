@@ -170,6 +170,23 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    mp_thread_ipc = std::make_shared< ThreadIPC >( );
    if( nullptr == mp_thread_ipc )
       return false;
+
+   // Starting IPC brocker thread
+   if( true == mp_thread_ipc->start( ) )
+   {
+      SYS_INF( "starting IPC thread started" );
+      while( false == mp_thread_ipc->started( ) )
+      {
+         std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+         SYS_WRN( "waiting to strat IPC thread" );
+      }
+      SYS_INF( "IPC thread started" );
+   }
+   else
+   {
+      SYS_WRN( "starting without IPC thread" );
+   }
+
    // Creating application threads
    for( const auto& thread_config : thread_configs )
    {
@@ -179,17 +196,32 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
       m_thread_list.emplace_back( p_thread );
    }
 
-   // Starting IPC brocker thread
-   if( false == mp_thread_ipc->start( ) )
-   {
-      // return false;
-   }
-   std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout IPC thread is started before other application threads
    // Starting application threads
    for( const auto& p_thread : m_thread_list )
+   {
+      SYS_INF( "starting '%s' thread", p_thread->name( ).c_str( ) );
       if( false == p_thread->start( ) )
          return false;
-   std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) ); // timeout all application threads is started before booting system
+   }
+
+   while( true )
+   {
+      bool threads_started = true;
+      std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+      for( const auto& p_thread : m_thread_list )
+      {
+         bool thread_started = p_thread->started( );
+         threads_started &= thread_started;
+         if( false == thread_started )
+         {
+            SYS_WRN( "waiting to strat '%s' thread", p_thread->name( ).c_str( ) );
+         }
+      }
+
+      if( true == threads_started )
+         break;
+   }
+   SYS_INF( "all application threads started" );
 
    // Watchdog timer
    const std::size_t wd_timout =
@@ -229,10 +261,10 @@ void Process::boot( )
 
    for( auto& p_thread : m_thread_list )
       p_thread->wait( );
-   SYS_DBG( "All application threads are stopped" );
+   SYS_INF( "All application threads are stopped" );
 
    mp_thread_ipc->wait( );
-   SYS_DBG( "IPC thread is stopped" );
+   SYS_INF( "IPC thread is stopped" );
 
    os::os_linux::timer::remove( m_timer_id );
 

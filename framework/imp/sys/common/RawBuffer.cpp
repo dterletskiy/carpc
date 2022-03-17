@@ -72,5 +72,5 @@ void RawBuffer::fill( const std::uint8_t symbol, const ssize_t delta ) const
 
 void RawBuffer::dump( ) const
 {
-   print( ptr, size, true );
+   print_hex( ptr, size, true );
 }

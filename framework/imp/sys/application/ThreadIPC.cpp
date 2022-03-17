@@ -39,7 +39,7 @@ void ThreadIPC::thread_loop( )
    SystemEventConsumer system_event_consumer( *this );
    ServiceEventConsumer service_event_consumer( mp_send_receive );
 
-   while( started( ) )
+   while( m_started.load( ) )
    {
       base::async::IAsync::tSptr p_event = get_event( );
       SYS_VRB( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
@@ -75,6 +75,11 @@ void ThreadIPC::stop( )
    mp_send_receive->stop( );
 }
 
+bool ThreadIPC::started( ) const
+{
+   return m_started.load( ) && mp_send_receive->started( );
+}
+
 bool ThreadIPC::wait( )
 {
    const bool started = m_thread.join( );
@@ -96,7 +101,7 @@ void ThreadIPC::shutdown( const std::string& message )
 
 bool ThreadIPC::insert_event( const base::async::IAsync::tSptr p_event )
 {
-   if( false == started( ) )
+   if( false == m_started.load( ) )
    {
       SYS_WRN( "'%s': is not started", m_name.c_str( ) );
       return false;

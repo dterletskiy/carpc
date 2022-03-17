@@ -39,7 +39,7 @@ void Thread::thread_loop( )
    for( auto creator : m_component_creators )
       m_components.emplace_back( creator( ) );
 
-   while( started( ) )
+   while( m_started.load( ) )
    {
       base::async::IAsync::tSptr p_event = get_event( );
       SYS_VRB( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
@@ -86,7 +86,7 @@ void Thread::shutdown( const std::string& message )
 
 bool Thread::insert_event( const base::async::IAsync::tSptr p_event )
 {
-   if( false == started( ) )
+   if( false == m_started.load( ) )
    {
       SYS_WRN( "'%s': is not started", m_name.c_str( ) );
       return false;

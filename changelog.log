@@ -1,3 +1,6 @@
+version 3.4.3
+   - Improve starting and initializing application sequence to avoid chaotic starting application threads and registering services before starting IPC thread.
+
 version 3.4.2
    - Fix: clear containers before deserialization from stream in ByteStream.
    - Extended example "stream" for serialize/deserialize objects.

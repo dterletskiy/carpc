@@ -45,18 +45,18 @@ bool SendReceive::start( )
 void SendReceive::stop( )
 {
    SYS_INF( "stopping" );
-   m_started = false;
+   m_started.store( false );
 }
 
 void SendReceive::thread_loop( )
 {
    SYS_INF( "enter" );
-   m_started = true;
+   m_started.store( true );
 
    os::os_linux::socket::fd fd_set;
    os::os_linux::socket::tSocket max_socket = os::os_linux::socket::InvalidSocket;
 
-   while( started( ) )
+   while( m_started.load( ) )
    {
       fd_set.reset( );
       max_socket = os::os_linux::socket::InvalidSocket;

@@ -81,8 +81,8 @@ namespace base::application {
    inline
    bool Thread::wait( )
    {
-   const bool started = m_thread.join( );
-   m_started.store( started );
+      const bool started = m_thread.join( );
+      m_started.store( started );
       return !m_started.load( );
    }
 

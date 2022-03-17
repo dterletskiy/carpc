@@ -32,7 +32,7 @@ namespace base::application {
          void thread_loop( );
          const os::Thread& thread( ) const;
          os::Thread                 m_thread;
-         bool                       m_started = false;
+         std::atomic< bool >        m_started = false;
 
       public:
          bool send( const RawBuffer&, const application::Context& );
@@ -275,14 +275,15 @@ namespace base::application {
    inline
    bool SendReceive::started( ) const
    {
-      return m_started;
+      return m_started.load( );
    }
 
    inline
    bool SendReceive::wait( )
    {
-      m_started = m_thread.join( );
-      return !m_started;
+      const bool started = m_thread.join( );
+      m_started.store( started );
+      return !m_started.load( );
    }
 
 } // namespace base::application

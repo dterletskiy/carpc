@@ -67,10 +67,4 @@ namespace base::application {
       return m_thread;
    }
 
-   inline
-   bool ThreadIPC::started( ) const
-   {
-      return m_started.load( );
-   }
-
 } // namespace base::application
