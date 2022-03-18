@@ -1,3 +1,6 @@
+version 3.5.2
+   - Implemented functionality to detect system byte order.
+
 version 3.5.1
    - Implementation serialization/deserialization for "shared_ptr" and "unique_ptr" in ByteStream.
    - Applying "shared_ptr" serialization/deserialization in TEvent.

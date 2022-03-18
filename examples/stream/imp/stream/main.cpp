@@ -82,7 +82,7 @@ bool test( int argc, char** argv, char** envp )
 
 
 
-   if( true )
+   if( false )
    {
       bool                       value_bool = true,                        test_value_bool = false;
       std::uint8_t               value_uint8_t = 0xAB,                     test_value_uint8_t = 0;
@@ -284,7 +284,6 @@ bool test( int argc, char** argv, char** envp )
          MSG_DBG( "p_value_data_test = nullptr" );
       }
    }
-
 
 
 
