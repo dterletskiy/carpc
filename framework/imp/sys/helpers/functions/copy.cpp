@@ -2,7 +2,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    /****************************************************************************************************
     * 
@@ -24,4 +24,4 @@ namespace base {
       while( char_iterations-- ) *p_destination_char++ = *p_source_char++;
    }
 
-} // namespace base
+} // namespace carpc

@@ -11,7 +11,7 @@
 
 
 
-namespace base::os::os_linux::socket {
+namespace carpc::os::os_linux::socket {
 
    int thread_local error = 0;
 
@@ -112,7 +112,7 @@ namespace base::os::os_linux::socket {
 
    const std::string configuration::name( ) const
    {
-      return base::format_string( domain, ".", type, ".", protocole, "-", address, ":", port );
+      return carpc::format_string( domain, ".", type, ".", protocole, "-", address, ":", port );
    }
 
    void configuration::print( const std::string& _message ) const
@@ -307,11 +307,11 @@ namespace base::os::os_linux::socket {
       return mp_except;
    }
 
-} // namespace base::os::os_linux::socket
+} // namespace carpc::os::os_linux::socket
 
 
 
-namespace base::os::os_linux::socket {
+namespace carpc::os::os_linux::socket {
 
    void print( const sockaddr* sa )
    {
@@ -392,25 +392,25 @@ namespace base::os::os_linux::socket {
 
    const tSocket create_server( const configuration& _config )
    {
-      tSocket _socket = base::os::os_linux::socket::socket( _config );
+      tSocket _socket = carpc::os::os_linux::socket::socket( _config );
       if( InvalidSocket == _socket )
          return InvalidSocket;
-      if( false == base::os::os_linux::socket::bind( _socket, _config ) )
+      if( false == carpc::os::os_linux::socket::bind( _socket, _config ) )
          return InvalidSocket;
-      base::os::os_linux::set_nonblock( _socket );
-      if( false == base::os::os_linux::socket::listen( _socket ) )
+      carpc::os::os_linux::set_nonblock( _socket );
+      if( false == carpc::os::os_linux::socket::listen( _socket ) )
          return InvalidSocket;
       return _socket;
    }
 
    const tSocket create_clint( const configuration& _config )
    {
-      tSocket _socket = base::os::os_linux::socket::socket( _config );
+      tSocket _socket = carpc::os::os_linux::socket::socket( _config );
       if( InvalidSocket == _socket )
          return InvalidSocket;
-      if( false == base::os::os_linux::socket::connect( _socket, _config ) )
+      if( false == carpc::os::os_linux::socket::connect( _socket, _config ) )
          return InvalidSocket;
-      base::os::os_linux::set_nonblock( _socket );
+      carpc::os::os_linux::set_nonblock( _socket );
       return _socket;
    }
 
@@ -455,12 +455,12 @@ namespace base::os::os_linux::socket {
    const bool bind( const tSocket _socket, const int _domain, const char* const _address, const int _port )
    {
       socket_addr sa( _domain, _address, _port );
-      return base::os::os_linux::socket::bind( _socket, sa.addr( ), sa.len( ) );
+      return carpc::os::os_linux::socket::bind( _socket, sa.addr( ), sa.len( ) );
    }
 
    const bool bind( const tSocket _socket, const configuration _config )
    {
-      return base::os::os_linux::socket::bind( _socket, _config.domain, _config.address.c_str( ), _config.port );
+      return carpc::os::os_linux::socket::bind( _socket, _config.domain, _config.address.c_str( ), _config.port );
    }
 
    const bool connect( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
@@ -485,12 +485,12 @@ namespace base::os::os_linux::socket {
    const bool connect( const tSocket _socket, const int _domain, const char* const _address, const int _port )
    {
       socket_addr sa( _domain, _address, _port );
-      return base::os::os_linux::socket::connect( _socket, sa.addr( ), sa.len( ) );
+      return carpc::os::os_linux::socket::connect( _socket, sa.addr( ), sa.len( ) );
    }
 
    const bool connect( const tSocket _socket, const configuration _config )
    {
-      return base::os::os_linux::socket::connect( _socket, _config.domain, _config.address.c_str( ), _config.port );
+      return carpc::os::os_linux::socket::connect( _socket, _config.domain, _config.address.c_str( ), _config.port );
    }
 
    const bool listen( const tSocket _socket, const int _backlog )
@@ -628,7 +628,7 @@ namespace base::os::os_linux::socket {
 
    const bool select( const tSocket _max_socket, fd& _fd, timeval* const _timeout )
    {
-      return base::os::os_linux::socket::select( _max_socket, _fd.read( ), _fd.write( ), _fd.except( ), _timeout );
+      return carpc::os::os_linux::socket::select( _max_socket, _fd.read( ), _fd.write( ), _fd.except( ), _timeout );
    }
 
    void close( tSocket _socket )
@@ -638,11 +638,11 @@ namespace base::os::os_linux::socket {
       ::close( _socket );
    }
 
-} // namespace base::os::os_linux::socket
+} // namespace carpc::os::os_linux::socket
 
 
 
-namespace base::os::os_linux {
+namespace carpc::os::os_linux {
 
    bool get_mac( const std::string& connection_name, std::string& connection_mac )
    {
@@ -673,5 +673,5 @@ namespace base::os::os_linux {
       return true;
    }
 
-} // namespace base::os::os_linux
+} // namespace carpc::os::os_linux
 

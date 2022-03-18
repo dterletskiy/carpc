@@ -6,7 +6,7 @@
 
 
 
-namespace base::async {
+namespace carpc::async {
 
    template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
    class TGenerator
@@ -26,4 +26,4 @@ namespace base::async {
          };
    };
 
-} // namespace base::async
+} // namespace carpc::async

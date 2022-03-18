@@ -19,7 +19,7 @@ namespace {
 
    void process_watchdog( )
    {
-      for( const auto& p_thread : base::application::Process::instance( )->thread_list( ) )
+      for( const auto& p_thread : carpc::application::Process::instance( )->thread_list( ) )
       {
          time_t time_stamp = p_thread->process_started( );
          if( 0 == time_stamp )
@@ -34,14 +34,14 @@ namespace {
 
    void timer_handler( union sigval sv )
    {
-      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( sv.sival_ptr );
+      carpc::os::os_linux::timer::tID* timer_id = static_cast< carpc::os::os_linux::timer::tID* >( sv.sival_ptr );
       SYS_INF( "WatchDog timer: %#lx", (long) *timer_id );
       process_watchdog( );
    }
 
    void signal_handler( int signal, siginfo_t* si, void* uc )
    {
-      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( si->si_value.sival_ptr );
+      carpc::os::os_linux::timer::tID* timer_id = static_cast< carpc::os::os_linux::timer::tID* >( si->si_value.sival_ptr );
       SYS_INF( "WatchDog timer: %#lx", (long) *timer_id );
       process_watchdog( );
    }
@@ -50,7 +50,7 @@ namespace {
 
 
 
-using namespace base::application;
+using namespace carpc::application;
 
 
 
@@ -65,10 +65,10 @@ Process::Process( int argc, char** argv, char** envp )
    m_pce.print( );
 
    m_configuration.ipc_sb.socket = os::os_linux::socket::configuration {
-      base::os::os_linux::socket::socket_domain_from_string(
+      carpc::os::os_linux::socket::socket_domain_from_string(
             m_pce.value( "ipc_servicebrocker_domain" ).value( ).c_str( )
          ),
-      base::os::os_linux::socket::socket_type_from_string(
+      carpc::os::os_linux::socket::socket_type_from_string(
             m_pce.value( "ipc_servicebrocker_type" ).value( ).c_str( )
          ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
@@ -80,10 +80,10 @@ Process::Process( int argc, char** argv, char** envp )
       );
 
    m_configuration.ipc_app.socket = os::os_linux::socket::configuration {
-      base::os::os_linux::socket::socket_domain_from_string(
+      carpc::os::os_linux::socket::socket_domain_from_string(
             m_pce.value( "ipc_application_domain" ).value( ).c_str( )
          ),
-      base::os::os_linux::socket::socket_type_from_string(
+      carpc::os::os_linux::socket::socket_type_from_string(
             m_pce.value( "ipc_application_type" ).value( ).c_str( )
          ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_application_protocole" ).value( ) ) ),
@@ -102,7 +102,7 @@ Process::~Process( )
    SYS_VRB( "destroyed" );
 }
 
-namespace { base::os::Mutex s_mutex; }
+namespace { carpc::os::Mutex s_mutex; }
 Process::tSptr Process::instance( int argc, char** argv, char** envp )
 {
    // First call of this function must be done from main function => should not be race condition.

@@ -4,7 +4,7 @@
 
 
 
-namespace base::service::fast {
+namespace carpc::service::fast {
 
    template< typename _ID >
    class TSignature
@@ -68,7 +68,7 @@ namespace base::service::fast {
    template< typename _ID >
    const std::string TSignature< _ID >::name( ) const
    {
-      return base::format_string(
+      return carpc::format_string(
          "role: ", m_role.value( ),
          ", id: ", m_id.c_str( ),
          ", from: ", m_from.name( ),
@@ -133,4 +133,4 @@ namespace base::service::fast {
       return m_seq_id;
    }
 
-} // namespace base::service::fast
+} // namespace carpc::service::fast

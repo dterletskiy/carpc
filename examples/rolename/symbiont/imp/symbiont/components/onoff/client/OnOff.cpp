@@ -13,7 +13,7 @@ using namespace symbiont::interface::onoff;
 
 
 Client::Client( )
-   : base::onoff::Client( "hybrid" )
+   : carpc::onoff::Client( "hybrid" )
 {
    MSG_VRB( "created" );
 }
@@ -40,7 +40,7 @@ void Client::disconnected( )
 void Client::request_start( )
 {
    MSG_DBG( );
-   base::onoff::Client::request_start( );
+   carpc::onoff::Client::request_start( );
 }
 
 
@@ -53,10 +53,10 @@ void Client::response_trigger_state( const bool result )
 void Client::request_trigger_state( const std::string& state, const size_t delay )
 {
    // MSG_DBG( "state: %s / delay: %zu", state.c_str( ), delay );
-   base::onoff::Client::request_trigger_state( state, delay );
+   carpc::onoff::Client::request_trigger_state( state, delay );
 }
 
-void Client::request_trigger_state_failed( const base::service::eError& error )
+void Client::request_trigger_state_failed( const carpc::service::eError& error )
 {
    MSG_ERR( "request error: %s", error.c_str( ) );
 }

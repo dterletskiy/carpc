@@ -11,7 +11,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    /****************************************************************************************************
     * 
@@ -74,7 +74,7 @@ namespace base {
     *
     * This function prints array declared on the stack or heap:
     *    std::size_t array[ ] = { 4, 5, 55, 4, 457, 45, 68, 1, 87, 41 };
-    *    base::print( array, 10, true );
+    *    carpc::print( array, 10, true );
     *
     ***************************************************************************************************/
    template< typename TYPE >
@@ -97,7 +97,7 @@ namespace base {
     *
     * This function prints array declared on the stack:
     *    std::size_t array[ ] = { 4, 5, 55, 4, 457, 45, 68, 1, 87, 41 };
-    *    base::print( *array, true );
+    *    carpc::print( *array, true );
     *
     ***************************************************************************************************/
    template < typename T, std::size_t N >
@@ -106,7 +106,7 @@ namespace base {
       printf( "{ " );
       for ( std::size_t index = 0; index < N; ++index )
       {
-         base::print( array[ index ] );
+         carpc::print( array[ index ] );
          printf( " " );
       }
       printf( "}" );
@@ -206,4 +206,4 @@ namespace base {
       print_pack( std::forward< Ts >( rest )... );
    }
 
-} // namespace base
+} // namespace carpc

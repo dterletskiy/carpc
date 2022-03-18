@@ -7,7 +7,7 @@
 
 
 
-namespace base::events {
+namespace carpc::events {
 
    namespace system {
 
@@ -18,7 +18,7 @@ namespace base::events {
       {
          std::string message;
       };
-      DEFINE_EVENT( System, Data, base::async::id::TSignature< eID > );
+      DEFINE_EVENT( System, Data, carpc::async::id::TSignature< eID > );
 
    }
 
@@ -36,7 +36,7 @@ namespace base::events {
       };
       const char* c_str( const eAction );
 
-      DEFINE_IPC_EVENT( Action, base::service::Passport, base::async::id::TSignature< eAction > );
+      DEFINE_IPC_EVENT( Action, carpc::service::Passport, carpc::async::id::TSignature< eAction > );
 
 
 
@@ -54,7 +54,7 @@ namespace base::events {
       {
          public:
             SignatureStatus( ) = default;
-            SignatureStatus( const base::service::Signature&, const eStatus );
+            SignatureStatus( const carpc::service::Signature&, const eStatus );
             SignatureStatus( const SignatureStatus& );
             ~SignatureStatus( ) = default;
 
@@ -65,15 +65,15 @@ namespace base::events {
             const bool from_stream( ipc::tStream& );
 
          public:
-            const base::service::Signature& signature( ) const;
+            const carpc::service::Signature& signature( ) const;
             const eStatus id( ) const;
 
          private:
-            base::service::Signature      m_signature;
+            carpc::service::Signature      m_signature;
             eStatus                       m_id = eStatus::Undefined;
       };
-      DEFINE_IPC_EVENT( Status, base::service::Address, SignatureStatus );
+      DEFINE_IPC_EVENT( Status, carpc::service::Address, SignatureStatus );
 
    }
 
-} // namespace base::events
+} // namespace carpc::events

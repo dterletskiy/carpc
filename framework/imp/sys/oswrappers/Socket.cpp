@@ -6,7 +6,7 @@
 
 
 
-using namespace base::os;
+using namespace carpc::os;
 
 
 
@@ -192,7 +192,7 @@ const void* const Socket::buffer( size_t& size ) const
    return mp_buffer;
 }
 
-base::RawBuffer Socket::buffer( ) const
+carpc::RawBuffer Socket::buffer( ) const
 {
    return { mp_buffer, m_buffer_size };
 }

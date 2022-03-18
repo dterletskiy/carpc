@@ -12,7 +12,7 @@ using namespace application::components::onoff;
 
 
 Unloaded::Unloaded( Manager& manager )
-   : base::fsm::TState< Types >( eID::Unloaded, "Unloaded" )
+   : carpc::fsm::TState< Types >( eID::Unloaded, "Unloaded" )
    , m_manager( manager )
 {
 }

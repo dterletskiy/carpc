@@ -8,8 +8,8 @@
 
 
 
-namespace ev_i = base::events::service;
-using namespace base::application;
+namespace ev_i = carpc::events::service;
+using namespace carpc::application;
 
 
 
@@ -30,7 +30,7 @@ ServiceEventConsumer::~ServiceEventConsumer( )
 void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
 {
    const auto& id = event.info( ).id( );
-   const base::service::Passport& service_passport = *(event.data( ));
+   const carpc::service::Passport& service_passport = *(event.data( ));
    SYS_INF( "id: %s / passport: %s", ev_i::c_str( id ), service_passport.name( ).c_str( ) );
 
    dsi::eCommand command = dsi::eCommand::Undefined;

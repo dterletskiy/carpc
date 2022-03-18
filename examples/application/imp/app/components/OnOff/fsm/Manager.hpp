@@ -7,10 +7,10 @@
 
 namespace application::components::onoff {
 
-   class Manager : public base::fsm::TStateManager< Types >
+   class Manager : public carpc::fsm::TStateManager< Types >
    {
       public:
-         using tBase = base::fsm::TStateManager< Types >;
+         using tBase = carpc::fsm::TStateManager< Types >;
 
       public:
          Manager( );
@@ -20,4 +20,4 @@ namespace application::components::onoff {
          Subscriber::tSptr mp_subscriber = nullptr;
    };
 
-} // namespace base::events
+} // namespace carpc::events

@@ -11,7 +11,7 @@
 
 
 
-using namespace base::application;
+using namespace carpc::application;
 
 
 
@@ -41,7 +41,7 @@ void ThreadIPC::thread_loop( )
 
    while( m_started.load( ) )
    {
-      base::async::IAsync::tSptr p_event = get_event( );
+      carpc::async::IAsync::tSptr p_event = get_event( );
       SYS_VRB( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
       notify( p_event );
    }
@@ -99,7 +99,7 @@ void ThreadIPC::shutdown( const std::string& message )
    stop( );
 }
 
-bool ThreadIPC::insert_event( const base::async::IAsync::tSptr p_event )
+bool ThreadIPC::insert_event( const carpc::async::IAsync::tSptr p_event )
 {
    if( false == m_started.load( ) )
    {
@@ -116,12 +116,12 @@ bool ThreadIPC::insert_event( const base::async::IAsync::tSptr p_event )
    return m_event_queue.insert( p_event );
 }
 
-base::async::IAsync::tSptr ThreadIPC::get_event( )
+carpc::async::IAsync::tSptr ThreadIPC::get_event( )
 {
    return m_event_queue.get( );
 }
 
-void ThreadIPC::notify( const base::async::IAsync::tSptr p_event )
+void ThreadIPC::notify( const carpc::async::IAsync::tSptr p_event )
 {
    switch( p_event->type( ) )
    {
@@ -148,7 +148,7 @@ void ThreadIPC::notify( const base::async::IAsync::tSptr p_event )
       {
          auto& consumers_set = m_consumers_map.start_process( p_event->signature( ) );
          SYS_VRB( "'%s': %zu consumers will be processed", m_name.c_str( ), consumers_set.size( ) );
-         for( base::async::IAsync::IConsumer* p_consumer : consumers_set )
+         for( carpc::async::IAsync::IConsumer* p_consumer : consumers_set )
          {
             process_start( );
             SYS_VRB( "'%s': start processing event at %ld (%s)",
@@ -173,27 +173,27 @@ void ThreadIPC::notify( const base::async::IAsync::tSptr p_event )
 }
 
 void ThreadIPC::set_notification(
-            const base::async::IAsync::ISignature::tSptr p_signature, base::async::IAsync::IConsumer* p_consumer
+            const carpc::async::IAsync::ISignature::tSptr p_signature, carpc::async::IAsync::IConsumer* p_consumer
          )
 {
    m_consumers_map.set_notification( p_signature, p_consumer );
 }
 
 void ThreadIPC::clear_notification(
-            const base::async::IAsync::ISignature::tSptr p_signature, base::async::IAsync::IConsumer* p_consumer
+            const carpc::async::IAsync::ISignature::tSptr p_signature, carpc::async::IAsync::IConsumer* p_consumer
          )
 {
    m_consumers_map.clear_notification( p_signature, p_consumer );
 }
 
 void ThreadIPC::clear_all_notifications(
-            const base::async::IAsync::ISignature::tSptr p_signature, base::async::IAsync::IConsumer* p_consumer
+            const carpc::async::IAsync::ISignature::tSptr p_signature, carpc::async::IAsync::IConsumer* p_consumer
          )
 {
    m_consumers_map.clear_all_notifications( p_signature, p_consumer );
 }
 
-bool ThreadIPC::is_subscribed( const base::async::IAsync::tSptr p_event )
+bool ThreadIPC::is_subscribed( const carpc::async::IAsync::tSptr p_event )
 {
    switch( p_event->type( ) )
    {
@@ -213,7 +213,7 @@ void ThreadIPC::dump( ) const
    SYS_DUMP_END( );
 }
 
-bool ThreadIPC::send( const base::async::IAsync::tSptr p_event, const application::Context& to_context )
+bool ThreadIPC::send( const carpc::async::IAsync::tSptr p_event, const application::Context& to_context )
 {
    return mp_send_receive->send( std::static_pointer_cast< async::IEvent >( p_event ), to_context );
 }

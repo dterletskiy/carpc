@@ -8,7 +8,7 @@
 
 
 
-namespace base::dsi {
+namespace carpc::dsi {
 
    struct SocketCongiguration : public os::os_linux::socket::configuration
    {
@@ -116,7 +116,7 @@ namespace base::dsi {
 
 
 
-namespace base::dsi {
+namespace carpc::dsi {
 
    class Packet
    {

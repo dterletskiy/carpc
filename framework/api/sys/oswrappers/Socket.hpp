@@ -12,7 +12,7 @@
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class Socket
    {
@@ -20,7 +20,7 @@ namespace base::os {
          enum class eResult { OK, ERROR, DISCONNECTED };
          const char* c_str( const eResult );
 
-         using ID = base::TID< Socket >;
+         using ID = carpc::TID< Socket >;
          using tList = std::list< Socket >;
          using tSptr = std::shared_ptr< Socket >;
          using tWptr = std::weak_ptr< Socket >;
@@ -131,7 +131,7 @@ namespace base::os {
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class SocketClient: public Socket
    {
@@ -150,7 +150,7 @@ namespace base::os {
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class SocketServer: public Socket
    {

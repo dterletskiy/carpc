@@ -8,7 +8,7 @@
 
 
 
-using namespace base::application;
+using namespace carpc::application;
 
 
 
@@ -80,7 +80,7 @@ void SendReceive::thread_loop( )
    SYS_INF( "exit" );
 }
 
-base::os::Socket::tSptr SendReceive::socket( const application::Context& context )
+carpc::os::Socket::tSptr SendReceive::socket( const application::Context& context )
 {
    if( context.pid( ).is_invalid( ) )
       return m_service_brocker.mp_socket;
@@ -177,7 +177,7 @@ SendReceive::ServiceBrocker::ServiceBrocker( SendReceive& parent )
 bool SendReceive::ServiceBrocker::setup_connection( )
 {
    mp_socket = os::Socket::create_shared(
-      process::configuration::current( ).ipc_sb.socket, process::configuration::current( ).ipc_sb.buffer_size
+      configuration::current( ).ipc_sb.socket, configuration::current( ).ipc_sb.buffer_size
    );
 
    if( nullptr == mp_socket )
@@ -249,7 +249,7 @@ bool SendReceive::ServiceBrocker::process_package( dsi::Package& package, os::So
             dsi::Packet packet(
                dsi::eCommand::RegisterProcess,
                application::process::current_id( ),
-               static_cast< dsi::SocketCongiguration >( process::configuration::current( ).ipc_app.socket )
+               static_cast< dsi::SocketCongiguration >( configuration::current( ).ipc_app.socket )
             );
             m_parent.send( packet, p_socket_send );
 
@@ -300,7 +300,7 @@ SendReceive::Master::Master( SendReceive& parent )
 bool SendReceive::Master::setup_connection( )
 {
    mp_socket = os::Socket::create_shared(
-      process::configuration::current( ).ipc_app.socket, process::configuration::current( ).ipc_app.buffer_size
+      configuration::current( ).ipc_app.socket, configuration::current( ).ipc_app.buffer_size
    );
 
    if( nullptr == mp_socket )
@@ -602,7 +602,7 @@ SendReceive::Connections::tProcessServiceMap SendReceive::Connections::data::ms_
 SendReceive::Connections::tProcessServiceMap SendReceive::Connections::data::ms_servers = { };
 SendReceive::Connections::tProcessServiceMap SendReceive::Connections::data::ms_clients = { };
 
-base::os::Socket::tSptr SendReceive::Connections::channel::send::create(
+carpc::os::Socket::tSptr SendReceive::Connections::channel::send::create(
         const application::process::ID& pid
       , const dsi::SocketCongiguration& inet_address
    )
@@ -614,7 +614,7 @@ base::os::Socket::tSptr SendReceive::Connections::channel::send::create(
       return iterator->second;
    }
 
-   os::Socket::tSptr p_socket = os::Socket::create_shared( inet_address, process::configuration::current( ).ipc_app.buffer_size );
+   os::Socket::tSptr p_socket = os::Socket::create_shared( inet_address, configuration::current( ).ipc_app.buffer_size );
    if( os::Socket::eResult::ERROR == p_socket->create( ) )
       return nullptr;
    if( os::Socket::eResult::ERROR == p_socket->connect( ) )
@@ -641,7 +641,7 @@ bool SendReceive::Connections::channel::send::remove( const application::process
    return 0 != data::ms_send.erase( pid );
 }
 
-base::os::Socket::tSptr SendReceive::Connections::channel::send::socket( const application::process::ID& pid )
+carpc::os::Socket::tSptr SendReceive::Connections::channel::send::socket( const application::process::ID& pid )
 {
    auto iterator = data::ms_send.find( pid );
    if( data::ms_send.end( ) == iterator )
@@ -650,7 +650,7 @@ base::os::Socket::tSptr SendReceive::Connections::channel::send::socket( const a
    return iterator->second;
 }
 
-const base::application::process::ID& SendReceive::Connections::channel::send::pid( os::Socket::tSptr p_socket )
+const carpc::application::process::ID& SendReceive::Connections::channel::send::pid( os::Socket::tSptr p_socket )
 {
    auto iterator = std::find_if(
            data::ms_send.begin( )
@@ -691,7 +691,7 @@ bool SendReceive::Connections::channel::recv::remove( os::Socket::tSptr p_socket
    return 0 != data::ms_recv.erase( p_socket );
 }
 
-const base::application::process::ID& SendReceive::Connections::channel::recv::pid( os::Socket::tSptr p_socket )
+const carpc::application::process::ID& SendReceive::Connections::channel::recv::pid( os::Socket::tSptr p_socket )
 {
    auto iterator = data::ms_recv.find( p_socket );
    if( data::ms_recv.end( ) == iterator )
@@ -700,7 +700,7 @@ const base::application::process::ID& SendReceive::Connections::channel::recv::p
    return iterator->second;
 }
 
-base::os::Socket::tSptr SendReceive::Connections::channel::recv::socket( const application::process::ID& pid )
+carpc::os::Socket::tSptr SendReceive::Connections::channel::recv::socket( const application::process::ID& pid )
 {
    auto iterator = std::find_if(
            data::ms_recv.begin( )

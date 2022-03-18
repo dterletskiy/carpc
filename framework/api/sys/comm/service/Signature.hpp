@@ -5,7 +5,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class Signature
    {
@@ -15,13 +15,13 @@ namespace base::service {
 
       public:
          Signature( ) = default;
-         Signature( const base::async::tAsyncTypeID&, const std::string& );
+         Signature( const carpc::async::tAsyncTypeID&, const std::string& );
          Signature( const Signature& );
          ~Signature( ) = default;
 
       public:
-         bool to_stream( base::ipc::tStream& ) const;
-         bool from_stream( base::ipc::tStream& );
+         bool to_stream( carpc::ipc::tStream& ) const;
+         bool from_stream( carpc::ipc::tStream& );
 
       public:
          bool operator==( const Signature& ) const;
@@ -32,17 +32,17 @@ namespace base::service {
          const std::string name( ) const;
 
       public:
-         const base::async::tAsyncTypeID& type_id( ) const;
+         const carpc::async::tAsyncTypeID& type_id( ) const;
          const std::string role( ) const;
       private:
-         base::async::tAsyncTypeID  m_type_id;
+         carpc::async::tAsyncTypeID  m_type_id;
          std::string                m_role;
    };
 
 
 
    inline
-   const base::async::tAsyncTypeID& Signature::type_id( ) const
+   const carpc::async::tAsyncTypeID& Signature::type_id( ) const
    {
       return m_type_id;
    }
@@ -53,4 +53,4 @@ namespace base::service {
       return m_role;
    }
 
-} // namespace base::service
+} // namespace carpc::service

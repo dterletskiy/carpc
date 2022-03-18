@@ -4,7 +4,7 @@
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class ConditionVariable : public Mutex
    {
@@ -22,4 +22,4 @@ namespace base::os {
          pthread_condattr_t   m_cond_attr;
    };
 
-} // namespace base::os
+} // namespace carpc::os

@@ -5,7 +5,7 @@
 
 
 
-using namespace base::service;
+using namespace carpc::service;
 
 
 
@@ -26,12 +26,12 @@ Address::Address( const Address& other )
 {
 }
 
-bool Address::to_stream( base::ipc::tStream& stream ) const
+bool Address::to_stream( carpc::ipc::tStream& stream ) const
 {
    return ipc::serialize( stream, m_context, m_id );
 }
 
-bool Address::from_stream( base::ipc::tStream& stream )
+bool Address::from_stream( carpc::ipc::tStream& stream )
 {
    return ipc::deserialize( stream, m_context, m_id );
 }

@@ -4,7 +4,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    /****************************************************************************************************
     * 
@@ -18,9 +18,9 @@ namespace base {
     *    class D { };
     *    int main( )
     *    {
-    *       printf( "A is %s base for B", base::is_base_of< A, B >::value ? "" : "not" );
-    *       printf( "A is %s base for C", base::is_base_of< A, C >::value ? "" : "not" );
-    *       printf( "A is %s base for D", base::is_base_of< A, D >::value ? "" : "not" );
+    *       printf( "A is %s base for B", carpc::is_base_of< A, B >::value ? "" : "not" );
+    *       printf( "A is %s base for C", carpc::is_base_of< A, C >::value ? "" : "not" );
+    *       printf( "A is %s base for D", carpc::is_base_of< A, D >::value ? "" : "not" );
     *    
     *       return 0;
     *    }
@@ -42,4 +42,4 @@ namespace base {
       static bool const value = false;
    };
 
-} // namespace base
+} // namespace carpc

@@ -11,7 +11,7 @@ using namespace hybrid::interface::onoff;
 
 
 Server::Server( )
-   : base::onoff::Server( "hybrid" )
+   : carpc::onoff::Server( "hybrid" )
 {
    MSG_DBG( "created" );
    current_state( "UNLOADED" );

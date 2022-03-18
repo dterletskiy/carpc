@@ -5,7 +5,7 @@
 
 
 
-using namespace base::application;
+using namespace carpc::application;
 
 
 
@@ -92,12 +92,12 @@ bool Context::is_valid( ) const
    return m_pid.is_valid( ) && m_tid.is_valid( );
 }
 
-bool Context::to_stream( base::ipc::tStream& stream ) const
+bool Context::to_stream( carpc::ipc::tStream& stream ) const
 {
    return ipc::serialize( stream, m_pid, m_tid );
 }
 
-bool Context::from_stream( base::ipc::tStream& stream )
+bool Context::from_stream( carpc::ipc::tStream& stream )
 {
    return ipc::deserialize( stream, m_pid, m_tid );
 }
@@ -129,5 +129,5 @@ bool Context::operator<( const Context& other ) const
 
 const std::string Context::name( ) const
 {
-   return base::format_string( m_pid.name( ), ".", m_tid.name( ) );
+   return carpc::format_string( m_pid.name( ), ".", m_tid.name( ) );
 }

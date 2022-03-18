@@ -8,7 +8,7 @@
 
 
 
-namespace base::tools {
+namespace carpc::tools {
 
    class BasePCE
    {
@@ -79,22 +79,22 @@ namespace base::tools {
          void print( const eType& type = eType::DEFAULT ) const;
    };
 
-} // namespace base::tools
+} // namespace carpc::tools
 
 
 
-namespace base::tools::cmd {
+namespace carpc::tools::cmd {
 
    char* get_option( int, char**, const std::string& );
    bool is_option_exists( int , char**, const std::string&  );
 
-} // namespace base::tools::cmd
+} // namespace carpc::tools::cmd
 
 
 
 // link: https://stackoverflow.com/a/60198074/12978480
-namespace base::tools::uuid {
+namespace carpc::tools::uuid {
 
    void generate_random( std::string& );
 
-} //namespace base::tools::uuid
+} //namespace carpc::tools::uuid

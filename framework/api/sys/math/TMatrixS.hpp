@@ -9,7 +9,7 @@
 #if __cplusplus > 201703L // C++2a
 
 
-namespace base::math {
+namespace carpc::math {
 
    template< typename T, tRow ROWS, tColumn COLUMNS >
    class TMatrixS
@@ -113,7 +113,7 @@ namespace base::math {
             print( "------------------------------ TMatrixS dump begin ------------------------------\n" );
             print( "name: %s / dimention: %zu\n", m_name.c_str( ), ROWS * COLUMNS )
             for( tRow row{ 0 }; row < ROWS; ++row )
-               base::print( m_elements[ row.value( ) ], COLUMNS, true );
+               carpc::print( m_elements[ row.value( ) ], COLUMNS, true );
             print( "------------------------------- TMatrixS dump end -------------------------------\n" );
          }
 
@@ -152,7 +152,7 @@ namespace base::math {
 
 
 
-namespace base::math {
+namespace carpc::math {
 
    template< typename T, tRow ROWS_1, tColumn COLUMNS_1, tRow ROWS_2, tColumn COLUMNS_2 >
    TMatrixS< T, ROWS_1, COLUMNS_2 > multiply( const TMatrixS< T, ROWS_1, COLUMNS_1 >& matrix_1, const TMatrixS< T, ROWS_2, COLUMNS_2 >& matrix_2 )
@@ -176,7 +176,7 @@ namespace base::math {
 
 
 
-namespace base::math {
+namespace carpc::math {
 
    template< typename T, std::size_t ROWS, std::size_t COLUMNS >
    class TMatrixS
@@ -267,7 +267,7 @@ namespace base::math {
             print( "------------------------------ TMatrixS dump begin ------------------------------\n" );
             print( "name: %s / dimention: %zu\n", m_name.c_str( ), ROWS * COLUMNS );
             for( tRow row{ 0 }; row < ROWS; ++row )
-               base::print( m_elements[ row.value( ) ], COLUMNS, true );
+               carpc::print( m_elements[ row.value( ) ], COLUMNS, true );
             print( "------------------------------- TMatrixS dump end -------------------------------\n" );
          }
 
@@ -311,7 +311,7 @@ namespace base::math {
 
 
 
-namespace base::math {
+namespace carpc::math {
 
    template< typename T, std::size_t ROWS, std::size_t COLUMNS, std::size_t tCommon >
    TMatrixS< T, ROWS, COLUMNS > multiply( const TMatrixS< T, ROWS, tCommon >& matrix_1, const TMatrixS< T, tCommon, COLUMNS >& matrix_2 )

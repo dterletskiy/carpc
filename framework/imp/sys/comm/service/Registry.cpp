@@ -7,14 +7,14 @@
 
 
 
-namespace ev_i = base::events::service;
-using namespace base::service;
+namespace ev_i = carpc::events::service;
+using namespace carpc::service;
 
 
 
 namespace {
 
-   base::os::Mutex s_mutex;
+   carpc::os::Mutex s_mutex;
 
    struct Connection
    {

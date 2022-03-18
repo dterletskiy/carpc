@@ -11,11 +11,11 @@
 namespace application::components::driver {
 
    class Component
-      : public base::application::Component
+      : public carpc::application::Component
       , public events::AppEvent::Consumer
    {
       public:
-         static base::application::IComponent::tSptr creator( );
+         static carpc::application::IComponent::tSptr creator( );
 
       private:
          Component( const std::string& );

@@ -16,7 +16,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
 
 
@@ -594,4 +594,4 @@ namespace base {
       m_buffer.pop_front( size );
    }
 
-} // namespace base
+} // namespace carpc

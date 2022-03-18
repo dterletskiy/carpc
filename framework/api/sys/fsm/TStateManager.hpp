@@ -18,13 +18,13 @@
 
 
 
-namespace base::fsm {
+namespace carpc::fsm {
 
    template< typename TYPES >
    class TStateManagerBase
    {
       public:
-         DEFINE_EVENT_S( Signal, typename TYPES::tData, base::async::id::TSignature< manager::ID > );
+         DEFINE_EVENT_S( Signal, typename TYPES::tData, carpc::async::id::TSignature< manager::ID > );
    };
 
 
@@ -361,7 +361,7 @@ namespace base::fsm {
       }
    }
 
-} // namespace base::events
+} // namespace carpc::events
 
 
 

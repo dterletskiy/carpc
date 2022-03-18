@@ -30,13 +30,13 @@ using namespace hmi::components::onoff;
 
 
 
-base::application::IComponent::tSptr Component::creator( )
+carpc::application::IComponent::tSptr Component::creator( )
 {
    return std::shared_ptr< Component >( new Component( "OnOff" ) );
 }
 
 Component::Component( const std::string& _name )
-   : base::application::RootComponent( _name )
+   : carpc::application::RootComponent( _name )
    , m_timer( this )
    , m_client_onoff( )
 {
@@ -55,12 +55,12 @@ void Component::boot( const std::string& command )
 
    REGISTER_EVENT( hmi::event::App );
    // hmi::event::App::Event::create_send( { hmi::event::eID::boot },
-   //    base::application::Context( base::application::process::ID::generate( ), base::application::thread::ID::generate( ) )
+   //    carpc::application::Context( carpc::application::process::ID::generate( ), carpc::application::thread::ID::generate( ) )
    // );
    // hmi::event::App::Event::create_send( { hmi::event::eID::boot } );
 }
 
-void Component::process_timer( const base::comm::timer::ID id )
+void Component::process_timer( const carpc::comm::timer::ID id )
 {
    MSG_DBG( "Timer '%s' expired", id.name( ).c_str( ) );
    if( id == m_timer.id( ) )
@@ -70,7 +70,7 @@ void Component::process_timer( const base::comm::timer::ID id )
    }
 }
 
-void Component::on_timer( const base::comm::timer::ID id )
+void Component::on_timer( const carpc::comm::timer::ID id )
 {
    MSG_DBG( "Timer expired: %s", id.name( ).c_str( ) );
 
@@ -82,6 +82,6 @@ void Component::process_event( const hmi::event::App::Event& event )
 {
    MSG_DBG( "%s", event.signature( )->name( ).c_str( ) );
 
-   const base::comm::timer::ID id = base::timer::start( 100000, 1, [ this ]( const base::comm::timer::ID id ){ on_timer( id ); } );
+   const carpc::comm::timer::ID id = carpc::timer::start( 100000, 1, [ this ]( const carpc::comm::timer::ID id ){ on_timer( id ); } );
    MSG_DBG( "started timer: %s", id.name( ).c_str( ) );
 }

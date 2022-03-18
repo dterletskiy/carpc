@@ -13,7 +13,7 @@
  * and call it in case if it exusts.
  * 
  ***************************************************************************************************/
-namespace base::is_defined::__private__ {
+namespace carpc::is_defined::__private__ {
 
    template< typename RV >
    struct Result
@@ -28,12 +28,12 @@ namespace base::is_defined::__private__ {
       bool is_defined = false;
    };
 
-} // namespace base::is_defined::__private__
+} // namespace carpc::is_defined::__private__
 
 
 
 #define DEFINE_CALL_IF_EXISTS( METHOD_NAME )                                                                                           \
-   namespace base::is_defined {                                                                                                        \
+   namespace carpc::is_defined {                                                                                                        \
                                                                                                                                        \
       template< typename RV, typename... Args >                                                                                        \
       struct METHOD_NAME {                                                                                                             \
@@ -50,12 +50,12 @@ namespace base::is_defined::__private__ {
                struct wrapper { };                                                                                                     \
                                                                                                                                        \
                template< typename C >                                                                                                  \
-               static base::YES check( wrapper< C >* );                                                                                \
+               static carpc::YES check( wrapper< C >* );                                                                                \
                                                                                                                                        \
                template< typename C >                                                                                                  \
-               static base::NO check( ... );                                                                                           \
+               static carpc::NO check( ... );                                                                                           \
                                                                                                                                        \
-               static bool const value = sizeof( base::YES ) == sizeof( check< T >( 0 ) );                                             \
+               static bool const value = sizeof( carpc::YES ) == sizeof( check< T >( 0 ) );                                             \
                                                                                                                                        \
                static void debug( )                                                                                                    \
                {                                                                                                                       \
@@ -65,7 +65,7 @@ namespace base::is_defined::__private__ {
                                                                                                                                        \
          private:                                                                                                                      \
             template< typename T >                                                                                                     \
-            static tResult caller( base::YES, T& object, Args... args )                                                                \
+            static tResult caller( carpc::YES, T& object, Args... args )                                                                \
             {                                                                                                                          \
                if constexpr( true == std::is_same_v< void, RV > )                                                                      \
                {                                                                                                                       \
@@ -80,7 +80,7 @@ namespace base::is_defined::__private__ {
             }                                                                                                                          \
                                                                                                                                        \
             template< typename T >                                                                                                     \
-            static tResult caller( base::NO, T& object, Args... args )                                                                 \
+            static tResult caller( carpc::NO, T& object, Args... args )                                                                 \
             {                                                                                                                          \
                return { };                                                                                                             \
             }                                                                                                                          \
@@ -90,7 +90,7 @@ namespace base::is_defined::__private__ {
             static tResult call( T& object, Args... args )                                                                             \
             {                                                                                                                          \
                if( 0 ) Helper< T >::debug( );                                                                                          \
-               using DEFINED = typename base::Bool2Type< Helper< T >::value >::type;                                                   \
+               using DEFINED = typename carpc::Bool2Type< Helper< T >::value >::type;                                                   \
                return caller( DEFINED( ), object, args... );                                                                           \
             }                                                                                                                          \
                                                                                                                                        \
@@ -102,10 +102,10 @@ namespace base::is_defined::__private__ {
             }                                                                                                                          \
       };                                                                                                                               \
                                                                                                                                        \
-   } // namespace base::is_defined
+   } // namespace carpc::is_defined
 
 #define DEFINE_CALL_IF_EXISTS_ALIAS( METHOD_NAME, ALIAS, RETURN_TYPE, ... )                                                            \
-   namespace base::is_defined { using ALIAS = METHOD_NAME< RETURN_TYPE, ##__VA_ARGS__ >; }
+   namespace carpc::is_defined { using ALIAS = METHOD_NAME< RETURN_TYPE, ##__VA_ARGS__ >; }
 
 
 
@@ -167,19 +167,19 @@ namespace base::is_defined::__private__ {
       HasNoFoo hnf;
 
       {
-         base::is_defined::foo_alias_0::call( hf );
-         base::is_defined::foo_alias_0::call( hnf );
+         carpc::is_defined::foo_alias_0::call( hf );
+         carpc::is_defined::foo_alias_0::call( hnf );
       }
 
       {
          std::size_t value = 123;
-         base::is_defined::foo< void, std::size_t >::call( hf, value );
+         carpc::is_defined::foo< void, std::size_t >::call( hf, value );
       }
 
       {
          std::size_t value = 123;
-         auto result_hf = base::is_defined::foo< int, std::size_t&, std::size_t >::call( hf, value, value );
-         auto result_hnf = base::is_defined::foo< int, std::size_t&, std::size_t >::call( hnf, value, value );
+         auto result_hf = carpc::is_defined::foo< int, std::size_t&, std::size_t >::call( hf, value, value );
+         auto result_hnf = carpc::is_defined::foo< int, std::size_t&, std::size_t >::call( hnf, value, value );
 
          MSG_WRN( "is_defined = %d / returned value = %d", result_hf.is_defined, result_hf.value.value_or( 1234567890 ) );
          MSG_WRN( "is_defined = %d / returned value = %d", result_hnf.is_defined, result_hnf.value.value_or( 1234567890 ) );
@@ -187,7 +187,7 @@ namespace base::is_defined::__private__ {
 
       {
          double value = 123.456;
-         base::is_defined::foo< void, double& >::call( hf, value );
+         carpc::is_defined::foo< void, double& >::call( hf, value );
          MSG_WRN( "value = %f", value );
       }
 
@@ -204,7 +204,7 @@ namespace base::is_defined::__private__ {
 #if 0 // Example and depricated implementation
 
    #define DEFINE_CALL_IF_EXISTS( METHOD_NAME )                                                                                           \
-      namespace base::is_defined {                                                                                                        \
+      namespace carpc::is_defined {                                                                                                        \
                                                                                                                                           \
          struct METHOD_NAME {                                                                                                             \
             private:                                                                                                                      \
@@ -217,12 +217,12 @@ namespace base::is_defined::__private__ {
                   struct wrapper { };                                                                                                     \
                                                                                                                                           \
                   template< typename C >                                                                                                  \
-                  static base::YES check( wrapper< C >* );                                                                                \
+                  static carpc::YES check( wrapper< C >* );                                                                                \
                                                                                                                                           \
                   template< typename C >                                                                                                  \
-                  static base::NO check( ... );                                                                                           \
+                  static carpc::NO check( ... );                                                                                           \
                                                                                                                                           \
-                  static bool const value = sizeof( base::YES ) == sizeof( check< T >( 0 ) );                                             \
+                  static bool const value = sizeof( carpc::YES ) == sizeof( check< T >( 0 ) );                                             \
                                                                                                                                           \
                   static void debug( )                                                                                                    \
                   {                                                                                                                       \
@@ -232,27 +232,27 @@ namespace base::is_defined::__private__ {
                                                                                                                                           \
             private:                                                                                                                      \
                template< typename T, typename... Args >                                                                                   \
-               static bool caller( T& object, base::YES, Args&&... args )                                                                 \
+               static bool caller( T& object, carpc::YES, Args&&... args )                                                                 \
                {                                                                                                                          \
                   object.METHOD_NAME( std::forward< Args >( args )... );                                                                  \
                   return true;                                                                                                            \
                }                                                                                                                          \
                                                                                                                                           \
                template< typename T, typename... Args >                                                                                   \
-               static bool caller( T& object, base::NO, Args&&... args )                                                                  \
+               static bool caller( T& object, carpc::NO, Args&&... args )                                                                  \
                {                                                                                                                          \
                   return false;                                                                                                           \
                }                                                                                                                          \
                                                                                                                                           \
             private:                                                                                                                      \
                template< typename T, typename... Args >                                                                                   \
-               static bool checker( T& object, base::YES, Args&&... args )                                                                \
+               static bool checker( T& object, carpc::YES, Args&&... args )                                                                \
                {                                                                                                                          \
                   return true;                                                                                                            \
                }                                                                                                                          \
                                                                                                                                           \
                template< typename T, typename... Args >                                                                                   \
-               static bool checker( T& object, base::NO, Args&&... args )                                                                 \
+               static bool checker( T& object, carpc::NO, Args&&... args )                                                                 \
                {                                                                                                                          \
                   return false;                                                                                                           \
                }                                                                                                                          \
@@ -268,7 +268,7 @@ namespace base::is_defined::__private__ {
                   constexpr bool has_4 = Helper< T, typename std::add_lvalue_reference< Args&& >::type... >::value;                       \
                   constexpr bool has_5 = Helper< T, typename std::add_rvalue_reference< Args& >::type... >::value;                        \
                   constexpr bool has_6 = Helper< T, typename std::add_rvalue_reference< Args&& >::type... >::value;                       \
-                  using DEFINED = typename base::Bool2Type< has_0 || has_1 || has_2 || has_3 || has_4 || has_5 || has_6 >::type;          \
+                  using DEFINED = typename carpc::Bool2Type< has_0 || has_1 || has_2 || has_3 || has_4 || has_5 || has_6 >::type;          \
                                                                                                                                           \
                   if( 0 ) Helper< T, Args... >::debug( );                                                                                 \
                                                                                                                                           \
@@ -295,7 +295,7 @@ namespace base::is_defined::__private__ {
                }                                                                                                                          \
          };                                                                                                                               \
                                                                                                                                           \
-      } // namespace base::is_defined
+      } // namespace carpc::is_defined
 
 
 
@@ -345,8 +345,8 @@ namespace base::is_defined::__private__ {
 
       {
          MSG_MARKER( "BEGIN" );
-         base::is_defined::foo::call( hf );
-         base::is_defined::foo::call( hnf );
+         carpc::is_defined::foo::call( hf );
+         carpc::is_defined::foo::call( hnf );
          MSG_MARKER( "END" );
       }
       printf("\n");
@@ -354,16 +354,16 @@ namespace base::is_defined::__private__ {
       {
          MSG_MARKER( "BEGIN" );
          std::size_t value = 123;
-         base::is_defined::foo::call( hf, value );
-         base::is_defined::foo::call( hnf, value );
+         carpc::is_defined::foo::call( hf, value );
+         carpc::is_defined::foo::call( hnf, value );
          MSG_MARKER( "END" );
       }
       printf("\n");
 
       {
          MSG_MARKER( "BEGIN" );
-         base::is_defined::foo::call( hf, (std::size_t)123 );
-         base::is_defined::foo::call( hnf, (std::size_t)123 );
+         carpc::is_defined::foo::call( hf, (std::size_t)123 );
+         carpc::is_defined::foo::call( hnf, (std::size_t)123 );
          MSG_MARKER( "END" );
       }
       printf("\n");
@@ -372,8 +372,8 @@ namespace base::is_defined::__private__ {
          MSG_MARKER( "BEGIN" );
          double value = 123.456;
          MSG_WRN( "value = %f", value );
-         base::is_defined::foo::call( hf, value );
-         base::is_defined::foo::call( hnf, value );
+         carpc::is_defined::foo::call( hf, value );
+         carpc::is_defined::foo::call( hnf, value );
          MSG_WRN( "value = %f", value );
          MSG_MARKER( "END" );
       }
@@ -381,8 +381,8 @@ namespace base::is_defined::__private__ {
 
       {
          MSG_MARKER( "BEGIN" );
-         base::is_defined::foo::call( hf, (int)123 );
-         base::is_defined::foo::call( hnf, (int)123 );
+         carpc::is_defined::foo::call( hf, (int)123 );
+         carpc::is_defined::foo::call( hnf, (int)123 );
          MSG_MARKER( "END" );
       }
       printf("\n");
@@ -390,16 +390,16 @@ namespace base::is_defined::__private__ {
       {
          MSG_MARKER( "BEGIN" );
          std::string value( "string" );
-         base::is_defined::foo::call( hf, value );
-         base::is_defined::foo::call( hnf, value );
+         carpc::is_defined::foo::call( hf, value );
+         carpc::is_defined::foo::call( hnf, value );
          MSG_MARKER( "END" );
       }
       printf("\n");
 
       {
          MSG_MARKER( "BEGIN" );
-         // base::is_defined::foo::call( hf, std::string( "string" ) );
-         // base::is_defined::foo::call( hnf, std::string( "string" ) );
+         // carpc::is_defined::foo::call( hf, std::string( "string" ) );
+         // carpc::is_defined::foo::call( hnf, std::string( "string" ) );
          MSG_MARKER( "END" );
       }
       printf("\n");

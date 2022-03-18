@@ -4,7 +4,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class IClient;
 
@@ -13,7 +13,7 @@ namespace base::service {
    class IProxy : public IConnection
    {
       public:
-         IProxy( const base::async::tAsyncTypeID&, const std::string&, const bool );
+         IProxy( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
          ~IProxy( ) override;
 
       private:
@@ -42,4 +42,4 @@ namespace base::service {
       return m_server;
    }
 
-} // namespace base::service
+} // namespace carpc::service

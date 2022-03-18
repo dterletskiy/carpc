@@ -2,7 +2,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    using YES = char;
    struct NO { YES m[2]; };
@@ -20,4 +20,4 @@ namespace base {
    };
 
 
-} // namespace base
+} // namespace carpc

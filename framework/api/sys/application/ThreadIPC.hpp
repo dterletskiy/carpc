@@ -6,7 +6,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class Context;
    class SendReceive;
@@ -32,29 +32,29 @@ namespace base::application {
          bool wait( ) override;
 
       private:
-         const base::os::Thread& thread( ) const override;
+         const carpc::os::Thread& thread( ) const override;
          void thread_loop( );
-         base::os::Thread                             m_thread;
+         carpc::os::Thread                             m_thread;
          std::atomic< bool >                          m_started = false;
 
       private:
-         bool insert_event( const base::async::IAsync::tSptr ) override;
-         base::async::IAsync::tSptr get_event( );
+         bool insert_event( const carpc::async::IAsync::tSptr ) override;
+         carpc::async::IAsync::tSptr get_event( );
          tEventCollection                             m_event_queue;
 
       private:
-         void set_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) override;
-         void clear_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) override;
-         void clear_all_notifications( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) override;
-         bool is_subscribed( const base::async::IAsync::tSptr );
-         void notify( const base::async::IAsync::tSptr );
+         void set_notification( const carpc::async::IAsync::ISignature::tSptr, carpc::async::IAsync::IConsumer* ) override;
+         void clear_notification( const carpc::async::IAsync::ISignature::tSptr, carpc::async::IAsync::IConsumer* ) override;
+         void clear_all_notifications( const carpc::async::IAsync::ISignature::tSptr, carpc::async::IAsync::IConsumer* ) override;
+         bool is_subscribed( const carpc::async::IAsync::tSptr );
+         void notify( const carpc::async::IAsync::tSptr );
          tConsumerMap                                 m_consumers_map;
 
       private:
          void dump( ) const override;
 
       public:
-         bool send( const base::async::IAsync::tSptr, const application::Context& ) override;
+         bool send( const carpc::async::IAsync::tSptr, const application::Context& ) override;
       private:
          SendReceive*                                 mp_send_receive;
    };
@@ -62,9 +62,9 @@ namespace base::application {
 
 
    inline
-   const base::os::Thread& ThreadIPC::thread( ) const
+   const carpc::os::Thread& ThreadIPC::thread( ) const
    {
       return m_thread;
    }
 
-} // namespace base::application
+} // namespace carpc::application

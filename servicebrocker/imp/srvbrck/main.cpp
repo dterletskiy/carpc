@@ -11,17 +11,17 @@ using tExit = void (*)( void );
 
 void preinit( int argc, char** argv, char** envp )
 {
-   base::tools::PCE configuration( argc, argv, envp );
+   carpc::tools::PCE configuration( argc, argv, envp );
    configuration.print( );
 
-   const base::trace::eLogStrategy trace_strategy = base::trace::log_strategy_from_string(
+   const carpc::trace::eLogStrategy trace_strategy = carpc::trace::log_strategy_from_string(
          configuration.value_or( "trace_log", "CONSOLE" ).c_str( )
       );
    const std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
          configuration.value_or( "trace_buffer", "4096" )
       ) );
    const std::string trace_app_name = configuration.value_or( "trace_app_name", "SBR" );
-   base::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
+   carpc::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
 
    MSG_INF( "preinit_array" );
 }
@@ -55,14 +55,14 @@ void __destructor__( )
 
 int main( int argc, char** argv, char** envp )
 {
-   base::tools::PCE configuration( argc, argv, envp );
+   carpc::tools::PCE configuration( argc, argv, envp );
    configuration.print( );
 
-   base::os::os_linux::socket::configuration socket_configuration{
-      base::os::os_linux::socket::socket_domain_from_string(
+   carpc::os::os_linux::socket::configuration socket_configuration{
+      carpc::os::os_linux::socket::socket_domain_from_string(
             configuration.value( "ipc_servicebrocker_domain" ).value( ).c_str( )
          ),
-      base::os::os_linux::socket::socket_type_from_string(
+      carpc::os::os_linux::socket::socket_type_from_string(
             configuration.value( "ipc_servicebrocker_type" ).value( ).c_str( )
          ),
       static_cast< int >( std::stoll( configuration.value( "ipc_servicebrocker_protocole" ).value( ) ) ),

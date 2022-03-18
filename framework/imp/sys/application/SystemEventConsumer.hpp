@@ -4,7 +4,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class IThread;
 
@@ -26,4 +26,4 @@ namespace base::application {
          void process_event( const events::system::System::Event& ) override;
    };
 
-} // namespace base::application
+} // namespace carpc::application

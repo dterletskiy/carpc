@@ -8,16 +8,16 @@
 
 
 
-using namespace base::timer;
+using namespace carpc::timer;
 
 
 
-static base::os::Mutex mutex_consumer_map;
-static std::map< base::os::os_linux::timer::tID, Timer* > consumer_map;
+static carpc::os::Mutex mutex_consumer_map;
+static std::map< carpc::os::os_linux::timer::tID, Timer* > consumer_map;
 
 namespace {
 
-   void timer_processor( const base::os::os_linux::timer::tID timer_id )
+   void timer_processor( const carpc::os::os_linux::timer::tID timer_id )
    {
       SYS_VRB( "processing timer: %#lx", (long)timer_id );
 
@@ -37,7 +37,7 @@ namespace {
 
    void timer_handler( union sigval sv )
    {
-      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( sv.sival_ptr );
+      carpc::os::os_linux::timer::tID* timer_id = static_cast< carpc::os::os_linux::timer::tID* >( sv.sival_ptr );
       SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
       timer_processor( *timer_id );
    }
@@ -51,7 +51,7 @@ namespace {
          si->si_value.sival_int
       );
 
-      base::os::os_linux::timer::tID* timer_id = static_cast< base::os::os_linux::timer::tID* >( si->si_value.sival_ptr );
+      carpc::os::os_linux::timer::tID* timer_id = static_cast< carpc::os::os_linux::timer::tID* >( si->si_value.sival_ptr );
       SYS_VRB( "timer id: %#lx", (long)(*timer_id) );
       timer_processor( *timer_id );
    }
@@ -187,7 +187,7 @@ bool Timer::stop( )
    return true;  
 }
 
-void Timer::process( const base::os::os_linux::timer::tID id )
+void Timer::process( const carpc::os::os_linux::timer::tID id )
 {
    if( id != m_timer_id )
    {
@@ -201,7 +201,7 @@ void Timer::process( const base::os::os_linux::timer::tID id )
    else if( m_ticks > m_count )
       return;
 
-   TimerEvent::Event::create_send( { m_id.value( ) }, { m_id }, base::priority( ePriority::TIMER ), m_context );
+   TimerEvent::Event::create_send( { m_id.value( ) }, { m_id }, carpc::priority( ePriority::TIMER ), m_context );
 }
 
 
@@ -232,9 +232,9 @@ void ITimerConsumer::process_event( const TimerEvent::Event& event )
 #include "api/sys/comm/async/runnable/Runnable.hpp"
 #include "api/sys/application/Process.hpp"
 
-namespace base::timer {
+namespace carpc::timer {
 
-   base::comm::timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous )
+   carpc::comm::timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous )
    {
       application::Context context = application::Context::current( );
       if( application::Context::invalid == context )
@@ -243,7 +243,7 @@ namespace base::timer {
          return 0;
       }
 
-      const base::comm::timer::ID id = base::comm::timer::ID::generate( );
+      const carpc::comm::timer::ID id = carpc::comm::timer::ID::generate( );
       auto on_timer = [=]( ){ callback( id ); };
 
       if( asynchronous )
@@ -254,7 +254,7 @@ namespace base::timer {
                for( std::size_t ticks = 0; ticks < count; ++ticks )
                {
                   std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-                  base::async::Runnable::create_send( on_timer, context );
+                  carpc::async::Runnable::create_send( on_timer, context );
                }
             }
          ).detach( );
@@ -264,11 +264,11 @@ namespace base::timer {
          for( std::size_t ticks = 0; ticks < count; ++ticks )
          {
             std::this_thread::sleep_for( std::chrono::milliseconds( milliseconds ) );
-            base::async::Runnable::create_send( on_timer, context );
+            carpc::async::Runnable::create_send( on_timer, context );
          }
       }
 
       return id;
    }
 
-} // namespace base::timer
+} // namespace carpc::timer

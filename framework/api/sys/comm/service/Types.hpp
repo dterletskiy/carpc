@@ -5,7 +5,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class IPC;
    class NO_IPC;
@@ -56,4 +56,4 @@ namespace base::service {
       _ID notification = _ID::Undefined;
    };
 
-} // namespace base::service
+} // namespace carpc::service

@@ -4,7 +4,7 @@
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class DUM
    {
@@ -51,12 +51,12 @@ namespace base::os {
          const size_t m_port = 0;
    };
 
-} // namespace base::os
+} // namespace carpc::os
 
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    template< typename T >
    bool DUM::setopt( const CURLoption option, T value )
@@ -131,7 +131,7 @@ int main( int argc, char** argv )
    FILE* file_header = fopen( pHeaderFile, "wb" );
    FILE* file_data = fopen( pDataFile, "wb" );
 
-   base::os::DUM dumm( url, port );
+   carpc::os::DUM dumm( url, port );
    dumm.init( );
    // dumm.header_processor( write_callback, (void*)&chunk_header );
    dumm.header_processor( file_header );

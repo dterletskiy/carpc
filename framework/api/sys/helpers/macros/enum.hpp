@@ -177,11 +177,11 @@
             return strings[ static_cast< std::string::size_type >( value ) ].c_str( );       \
       };                                                                                     \
                                                                                              \
-      bool to_stream( base::ipc::tStream& stream ) const                                     \
+      bool to_stream( carpc::ipc::tStream& stream ) const                                     \
       {                                                                                      \
          return ipc::serialize( stream, value );                                             \
       }                                                                                      \
-      bool from_stream( base::ipc::tStream& stream )                                         \
+      bool from_stream( carpc::ipc::tStream& stream )                                         \
       {                                                                                      \
          return ipc::deserialize( stream, value );                                           \
       }                                                                                      \

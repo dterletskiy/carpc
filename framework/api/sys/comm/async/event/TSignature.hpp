@@ -7,7 +7,7 @@
 
 
 
-namespace base::async {
+namespace carpc::async {
 
    template< typename _Generator >
    class TSignature : public IEvent::ISignature
@@ -94,7 +94,7 @@ namespace base::async {
    // const tAsyncTypeID
    //    TSignature< _Generator >::ms_type_id = build_type_id( );
 
-} // namespace base::async
+} // namespace carpc::async
 
 
 
@@ -102,7 +102,7 @@ namespace base::async {
 
 
 
-namespace base::async::simple {
+namespace carpc::async::simple {
 
    class Signature
    {
@@ -130,9 +130,9 @@ namespace base::async::simple {
          }
    };
 
-} // namespace base::async::simple
+} // namespace carpc::async::simple
 
-namespace base::async::id {
+namespace carpc::async::id {
 
    template< typename _ID >
    class TSignature
@@ -147,9 +147,9 @@ namespace base::async::id {
          const std::string name( ) const
          {
             if constexpr( std::is_enum_v< _ID > || std::is_integral_v< _ID > )
-               return base::format_string( "id: ", std::size_t(m_id) );
+               return carpc::format_string( "id: ", std::size_t(m_id) );
             else
-               return base::format_string( "id: ", m_id.name( ) );
+               return carpc::format_string( "id: ", m_id.name( ) );
          }
          bool operator<( const TSignature& other ) const
          {
@@ -171,4 +171,4 @@ namespace base::async::id {
          _ID m_id = { };
    };
 
-} // namespace base::async::id
+} // namespace carpc::async::id

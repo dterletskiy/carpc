@@ -8,7 +8,7 @@
 namespace symbiont::interface::onoff {
 
    class Client
-      : public base::onoff::Client
+      : public carpc::onoff::Client
    {
       public:
          Client( );
@@ -20,7 +20,7 @@ namespace symbiont::interface::onoff {
 
       private:
          void response_trigger_state( const bool ) override;
-         void request_trigger_state_failed( const base::service::eError& ) override;
+         void request_trigger_state_failed( const carpc::service::eError& ) override;
          void on_current_state( const std::string& ) override;
 
       public:
@@ -29,7 +29,7 @@ namespace symbiont::interface::onoff {
 
       private:
          void test( );
-         base::tools::Performance m_performance = { "CARPC" };
+         carpc::tools::Performance m_performance = { "CARPC" };
    };
 
 } // namespace symbiont::interface::onoff

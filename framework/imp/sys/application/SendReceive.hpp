@@ -8,7 +8,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class Context;
 
@@ -286,4 +286,4 @@ namespace base::application {
       return !m_started.load( );
    }
 
-} // namespace base::application
+} // namespace carpc::application

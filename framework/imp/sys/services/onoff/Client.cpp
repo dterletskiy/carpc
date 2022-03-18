@@ -5,12 +5,12 @@
 
 
 
-using namespace base::onoff;
+using namespace carpc::onoff;
 
 
 
 Client::Client( const std::string& role_name )
-   : base::service::SERVICE_NAMESPACE::TClient< data::Types >( role_name, true )
+   : carpc::service::SERVICE_NAMESPACE::TClient< data::Types >( role_name, true )
 {
 }
 
@@ -34,7 +34,7 @@ void Client::request_start( )
    request< data::RequestStartData >( this );
 }
 
-const base::comm::sequence::ID Client::request_trigger_state( const std::string& state, const std::size_t delay )
+const carpc::comm::sequence::ID Client::request_trigger_state( const std::string& state, const std::size_t delay )
 {
    SYS_VRB( "state: %s / delay: %zu", state.c_str( ), delay );
    return request< data::RequestTriggerStateData >( this, state, delay );
@@ -64,13 +64,13 @@ void Client::process_response_event( const tService::Event& event )
          }
          else
          {
-            request_trigger_state_failed( base::service::eError::EmptyData );
+            request_trigger_state_failed( carpc::service::eError::EmptyData );
          }
          break;
       }
       case eOnOff::RequestTriggerStateBusy:
       {
-         request_trigger_state_failed( base::service::eError::RequestBusy );
+         request_trigger_state_failed( carpc::service::eError::RequestBusy );
          break;
       }
       default: break;

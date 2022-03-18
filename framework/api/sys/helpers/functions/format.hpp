@@ -7,7 +7,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    /****************************************************************************************************
     * 
@@ -35,9 +35,9 @@ namespace base {
       return format_string( optional.value( ) );
    }
 
-} // namespace base
+} // namespace carpc
 
-namespace base {
+namespace carpc {
 
    // Trim a string in C++ – Remove leading and trailing spaces
    // link: https://www.techiedelight.com/trim-string-cpp-remove-leading-trailing-spaces/

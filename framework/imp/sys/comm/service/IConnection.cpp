@@ -7,12 +7,12 @@
 
 
 
-namespace ev_i = base::events::service;
-using namespace base::service;
+namespace ev_i = carpc::events::service;
+using namespace carpc::service;
 
 
 
-IConnection::IConnection( const base::async::tAsyncTypeID& interface_type_id, const std::string& role, const bool is_external )
+IConnection::IConnection( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role, const bool is_external )
    : m_signature( interface_type_id, role )
    , m_is_external( is_external )
 {

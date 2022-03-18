@@ -5,7 +5,7 @@
 
 
 
-namespace base::async {
+namespace carpc::async {
 
    class AsyncPriorityQueue
    {
@@ -19,7 +19,7 @@ namespace base::async {
           * max_priority - max number of priorities.
           *    Container with prioritised object will containe indexes [0; max_priority),
           *    but real iteration will be performed from (0; max_priority).
-          *    This is because of method base::Tpriority::check( )
+          *    This is because of method carpc::Tpriority::check( )
           *
           **************/
          AsyncPriorityQueue( const tPriority& max_priority = tPriority::max, const std::string& name = "NoName" );
@@ -42,4 +42,4 @@ namespace base::async {
          void dump( ) const;
    };
 
-} // namespace base::async
+} // namespace carpc::async

@@ -8,17 +8,17 @@
 
 
 
-const base::application::Thread::Configuration::tVector services = { };
+const carpc::application::Thread::Configuration::tVector services = { };
 
 struct Data
 {
-   bool to_stream( base::ipc::tStream& stream ) const
+   bool to_stream( carpc::ipc::tStream& stream ) const
    {
-      return base::ipc::serialize( stream, m_id, m_name );
+      return carpc::ipc::serialize( stream, m_id, m_name );
    }
-   bool from_stream( base::ipc::tStream& stream )
+   bool from_stream( carpc::ipc::tStream& stream )
    {
-      return base::ipc::deserialize( stream, m_id, m_name );
+      return carpc::ipc::deserialize( stream, m_id, m_name );
    }
 
    void print( ) const
@@ -70,7 +70,7 @@ bool test( int argc, char** argv, char** envp )
 {
    MSG_MARKER( "TEST" );
 
-   base::ipc::tStream stream;
+   carpc::ipc::tStream stream;
 
 
 
@@ -120,7 +120,7 @@ bool test( int argc, char** argv, char** envp )
          },
       }, test_value;
 
-      base::ipc::serialize(
+      carpc::ipc::serialize(
               stream
             , value_bool
             , value_uint8_t
@@ -137,7 +137,7 @@ bool test( int argc, char** argv, char** envp )
             , value
          );
 
-      base::ipc::deserialize(
+      carpc::ipc::deserialize(
               stream
             , test_value_bool
             , test_value_uint8_t

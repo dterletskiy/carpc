@@ -16,7 +16,7 @@
 
 
 
-namespace base::trace {
+namespace carpc::trace {
 
    enum class eLogLevel : std::uint8_t { VERBOSE, DEBUG, INFO, WARNING, ERROR, FATAL };
    const char* const to_color( const eLogLevel& );
@@ -40,7 +40,7 @@ namespace base::trace {
 
 
 
-namespace base::trace {
+namespace carpc::trace {
 
    enum class eGranularity : std::size_t
    {

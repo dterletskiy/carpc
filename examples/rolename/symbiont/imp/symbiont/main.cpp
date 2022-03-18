@@ -5,7 +5,7 @@
 
 
 
-const base::application::Thread::Configuration::tVector services =
+const carpc::application::Thread::Configuration::tVector services =
    {
         { "OnOff_Service", { symbiont::components::onoff::Component::creator }, 5 }
    };

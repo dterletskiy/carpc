@@ -12,7 +12,7 @@ using namespace application::components::onoff;
 
 
 Loaded::Loaded( Manager& manager )
-   : base::fsm::TState< Types >( eID::Loaded, "Loaded" )
+   : carpc::fsm::TState< Types >( eID::Loaded, "Loaded" )
    , m_manager( manager )
 {
 }

@@ -4,7 +4,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
 
 
@@ -78,4 +78,4 @@ namespace base {
       return reallocate( m_size, true );
    }
 
-} // namespace base
+} // namespace carpc

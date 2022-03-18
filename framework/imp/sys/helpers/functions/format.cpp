@@ -3,7 +3,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    std::string ltrim( const std::string& s )
    {
@@ -22,4 +22,4 @@ namespace base {
       return rtrim( ltrim( s ) );
    }
 
-} // namespace base
+} // namespace carpc

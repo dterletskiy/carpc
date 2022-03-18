@@ -9,7 +9,7 @@
 
 
 
-namespace base::os::os_linux::filesystem {
+namespace carpc::os::os_linux::filesystem {
 
    extern thread_local int error;
 
@@ -43,9 +43,9 @@ namespace base::os::os_linux::filesystem {
    int fputs( char* const s, FILE* const stream );
    off_t lseek( const int fd, const off_t offset, const int whence );
 
-} // namespace base::os::os_linux::filesystem
+} // namespace carpc::os::os_linux::filesystem
 
-namespace base::os::os_linux::filesystem {
+namespace carpc::os::os_linux::filesystem {
 
    DIR* opendir( const char* const path );
    bool closedir( DIR* const dir );
@@ -61,9 +61,9 @@ namespace base::os::os_linux::filesystem {
    int ferror( FILE* const stream );
    int fileno( FILE* const stream );
 
-} // namespace base::os::os_linux::filesystem
+} // namespace carpc::os::os_linux::filesystem
 
-namespace base::os::os_linux::filesystem {
+namespace carpc::os::os_linux::filesystem {
 
    std::string& canonify( std::string& path );
    std::string get_path_leaf( const std::string& path );
@@ -86,7 +86,7 @@ namespace base::os::os_linux::filesystem {
    bool remove( const std::string& path );
    bool rename( const std::string& source, const std::string& destination );
 
-} // namespace base::os::os_linux::filesystem
+} // namespace carpc::os::os_linux::filesystem
 
 
 
@@ -102,27 +102,27 @@ namespace base::os::os_linux::filesystem {
    int main( int argc, char** argv, char** envp )
    {
       {
-         base::tools::Performance performance( "system sendfile" );
+         carpc::tools::Performance performance( "system sendfile" );
          performance.start( );
-         base::os::os_linux::filesystem::copy_file( FILE_SOURCE, FILE_DESTINATION, 0, true );
+         carpc::os::os_linux::filesystem::copy_file( FILE_SOURCE, FILE_DESTINATION, 0, true );
          performance.stop( );
-         base::os::os_linux::filesystem::remove( FILE_DESTINATION );
+         carpc::os::os_linux::filesystem::remove( FILE_DESTINATION );
       }
 
       {
-         base::tools::Performance performance( "system copy" );
+         carpc::tools::Performance performance( "system copy" );
          performance.start( );
-         base::os::os_linux::filesystem::copy_file( FILE_SOURCE, FILE_DESTINATION, 0, false );
+         carpc::os::os_linux::filesystem::copy_file( FILE_SOURCE, FILE_DESTINATION, 0, false );
          performance.stop( );
-         base::os::os_linux::filesystem::remove( FILE_DESTINATION );
+         carpc::os::os_linux::filesystem::remove( FILE_DESTINATION );
       }
 
       {
-         base::tools::Performance performance( "library fcopy" );
+         carpc::tools::Performance performance( "library fcopy" );
          performance.start( );
-         base::os::os_linux::filesystem::fcopy_file( FILE_SOURCE, FILE_DESTINATION );
+         carpc::os::os_linux::filesystem::fcopy_file( FILE_SOURCE, FILE_DESTINATION );
          performance.stop( );
-         base::os::os_linux::filesystem::remove( FILE_DESTINATION );
+         carpc::os::os_linux::filesystem::remove( FILE_DESTINATION );
       }
 
       return 0;

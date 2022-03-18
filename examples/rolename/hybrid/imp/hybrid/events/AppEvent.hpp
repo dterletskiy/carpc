@@ -20,7 +20,7 @@ namespace hybrid::events {
    enum class eAppEventID { BOOT, SHUTDOWN, PING, UNDEFINED };
    const char* c_str( const eAppEventID );
 
-   using tAppEventSignature = base::async::id::TSignature< eAppEventID >;
+   using tAppEventSignature = carpc::async::id::TSignature< eAppEventID >;
 
    DEFINE_EVENT( AppEvent, AppEventData, tAppEventSignature );
 

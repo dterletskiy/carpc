@@ -16,19 +16,19 @@
    #define MSG_TYPE( ... )
 #endif
 
-#define SYS_VRB( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
-#define SYS_DBG( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
-#define SYS_INF( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::INFO,      USER_FORMAT, ##__VA_ARGS__ )
-#define SYS_WRN( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::WARNING,   USER_FORMAT, ##__VA_ARGS__ )
-#define SYS_ERR( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::ERROR,     USER_FORMAT, ##__VA_ARGS__ )
-#define SYS_FTL( USER_FORMAT, ... )          SYS_TYPE( base::trace::eLogLevel::FATAL,     USER_FORMAT, ##__VA_ARGS__ )
+#define SYS_VRB( USER_FORMAT, ... )          SYS_TYPE( carpc::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
+#define SYS_DBG( USER_FORMAT, ... )          SYS_TYPE( carpc::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
+#define SYS_INF( USER_FORMAT, ... )          SYS_TYPE( carpc::trace::eLogLevel::INFO,      USER_FORMAT, ##__VA_ARGS__ )
+#define SYS_WRN( USER_FORMAT, ... )          SYS_TYPE( carpc::trace::eLogLevel::WARNING,   USER_FORMAT, ##__VA_ARGS__ )
+#define SYS_ERR( USER_FORMAT, ... )          SYS_TYPE( carpc::trace::eLogLevel::ERROR,     USER_FORMAT, ##__VA_ARGS__ )
+#define SYS_FTL( USER_FORMAT, ... )          SYS_TYPE( carpc::trace::eLogLevel::FATAL,     USER_FORMAT, ##__VA_ARGS__ )
 
-#define MSG_VRB( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
-#define MSG_DBG( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
-#define MSG_INF( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::INFO,      USER_FORMAT, ##__VA_ARGS__ )
-#define MSG_WRN( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::WARNING,   USER_FORMAT, ##__VA_ARGS__ )
-#define MSG_ERR( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::ERROR,     USER_FORMAT, ##__VA_ARGS__ )
-#define MSG_FTL( USER_FORMAT, ... )          MSG_TYPE( base::trace::eLogLevel::FATAL,     USER_FORMAT, ##__VA_ARGS__ )
+#define MSG_VRB( USER_FORMAT, ... )          MSG_TYPE( carpc::trace::eLogLevel::VERBOSE,   USER_FORMAT, ##__VA_ARGS__ )
+#define MSG_DBG( USER_FORMAT, ... )          MSG_TYPE( carpc::trace::eLogLevel::DEBUG,     USER_FORMAT, ##__VA_ARGS__ )
+#define MSG_INF( USER_FORMAT, ... )          MSG_TYPE( carpc::trace::eLogLevel::INFO,      USER_FORMAT, ##__VA_ARGS__ )
+#define MSG_WRN( USER_FORMAT, ... )          MSG_TYPE( carpc::trace::eLogLevel::WARNING,   USER_FORMAT, ##__VA_ARGS__ )
+#define MSG_ERR( USER_FORMAT, ... )          MSG_TYPE( carpc::trace::eLogLevel::ERROR,     USER_FORMAT, ##__VA_ARGS__ )
+#define MSG_FTL( USER_FORMAT, ... )          MSG_TYPE( carpc::trace::eLogLevel::FATAL,     USER_FORMAT, ##__VA_ARGS__ )
 
 
 

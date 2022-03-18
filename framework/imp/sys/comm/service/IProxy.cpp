@@ -7,12 +7,12 @@
 
 
 
-namespace ev_i = base::events::service;
-using namespace base::service;
+namespace ev_i = carpc::events::service;
+using namespace carpc::service;
 
 
 
-IProxy::IProxy( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+IProxy::IProxy( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    : IConnection( interface_type_id, role_name, is_import )
 {
    ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ServerConnected } );

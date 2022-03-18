@@ -19,7 +19,7 @@
 
 // #define DEBUG
 #ifdef DEBUG
-   #define MESSAGE( FORMAT, ... ) base::write( FORMAT, ##__VA_ARGS__ );
+   #define MESSAGE( FORMAT, ... ) carpc::write( FORMAT, ##__VA_ARGS__ );
 #else
    #define MESSAGE( FORMAT, ... )
 #endif
@@ -50,7 +50,7 @@ void MemoryHeader::dump( void* _address, const int fd, const char* const message
 
    if( 0 < fd )
    {
-      base::write(
+      carpc::write(
            fd
          , "%s: address (user address) = %p (%p) / caller = %p / size = %zu / time = %lu / thread = %#lx\n"
          , message
@@ -149,14 +149,14 @@ bool MemoryMap::insert( void* _address, void* _caller, std::size_t _size )
    if( nullptr == _address )
       return false;
 
-   std::uint64_t time_stamp = base::os::os_linux::time( base::os::os_linux::eGranularity::milliseconds );
+   std::uint64_t time_stamp = carpc::os::os_linux::time( carpc::os::os_linux::eGranularity::milliseconds );
    tHeaderType::write( _address, _caller, _size, time_stamp, pthread_self( ) );
    m_common_size += _size;
 
    if( 0 != m_min_track_size && m_min_track_size < _size )
    {
       tHeaderType::dump( _address, m_fd, "\n" );
-      base::os::os_linux::back_trace( m_fd );
+      carpc::os::os_linux::back_trace( m_fd );
    }
 
    std::size_t index = find_free( );

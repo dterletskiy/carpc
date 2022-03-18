@@ -4,9 +4,9 @@
 
 
 
-namespace base::ipc {
+namespace carpc::ipc {
 
-   using tStream = base::ByteStream;
+   using tStream = carpc::ByteStream;
 
    template< typename ... TYPES >
    bool serialize( tStream& stream, const TYPES& ... args )
@@ -62,18 +62,18 @@ namespace base::ipc {
    //    return tStream::deserialize( raw_buffer, args... );
    // }
 
-} // namespace base
+} // namespace carpc
 
 
 
-namespace base::experimental {
+namespace carpc::experimental {
 
    class ipc
    {
       public:
          using tStream = ipc;
       private:
-         using _tStream_ = base::ByteStream;
+         using _tStream_ = carpc::ByteStream;
 
       public:
          ipc( ) = default;
@@ -118,5 +118,5 @@ namespace base::experimental {
          _tStream_ m_stream;
    };
 
-} // namespace base
+} // namespace carpc
 

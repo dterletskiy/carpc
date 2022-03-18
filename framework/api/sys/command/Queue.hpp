@@ -7,7 +7,7 @@
 
 
 
-namespace base::command {
+namespace carpc::command {
 
    class Queue
       : public ICommand::Signal::Consumer
@@ -76,7 +76,7 @@ namespace base::command {
       return p_command->id( );
    }
 
-} // namespace base::events
+} // namespace carpc::events
 
 
 

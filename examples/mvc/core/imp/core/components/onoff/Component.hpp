@@ -15,11 +15,11 @@ namespace core::event {
 
    struct Data
    {
-      bool to_stream( base::ipc::tStream& _stream ) const { return true; }
-      bool from_stream( base::ipc::tStream& _stream ) { return true; }
+      bool to_stream( carpc::ipc::tStream& _stream ) const { return true; }
+      bool from_stream( carpc::ipc::tStream& _stream ) { return true; }
    };
 
-   DEFINE_IPC_EVENT( App, Data, base::async::id::TSignature< eID > );
+   DEFINE_IPC_EVENT( App, Data, carpc::async::id::TSignature< eID > );
 
 }
 
@@ -28,12 +28,12 @@ namespace core::event {
 namespace core::components::onoff {
 
    class Component
-      : public base::application::RootComponent
-      , public base::timer::ITimerConsumer
+      : public carpc::application::RootComponent
+      , public carpc::timer::ITimerConsumer
       , public core::event::App::Consumer
    {
       public:
-         static base::application::IComponent::tSptr creator( );
+         static carpc::application::IComponent::tSptr creator( );
 
       private:
          Component( const std::string& );
@@ -44,11 +44,11 @@ namespace core::components::onoff {
          void boot( const std::string& ) override;
 
       private:
-         void process_timer( const base::comm::timer::ID ) override;
-         base::timer::Timer m_timer;
+         void process_timer( const carpc::comm::timer::ID ) override;
+         carpc::timer::Timer m_timer;
 
       public:
-         void on_timer( const base::comm::timer::ID );
+         void on_timer( const carpc::comm::timer::ID );
 
       private:
          void process_event( const core::event::App::Event& ) override;

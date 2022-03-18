@@ -5,7 +5,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    struct RawBuffer
    {
@@ -22,4 +22,4 @@ namespace base {
    };
 
 
-} // namespace base
+} // namespace carpc

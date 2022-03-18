@@ -23,7 +23,7 @@ struct Callback : public Manager::Subscriber
 
 
 Manager::Manager( )
-   : base::fsm::TStateManager< Types >( "OnOff" )
+   : carpc::fsm::TStateManager< Types >( "OnOff" )
 {
    register_state< Unloaded >( *this );
    register_state< Loading >( *this );

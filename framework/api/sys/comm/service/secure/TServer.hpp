@@ -9,7 +9,7 @@
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    template< typename TYPES >
       class TProxy;
@@ -17,11 +17,11 @@ namespace base::service::secure::__private {
    template< typename TYPES >
       class TServer;
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    enum class eRequestStatus : std::uint8_t { BUSY, READY };
 
@@ -49,11 +49,11 @@ namespace base::service::secure::__private {
       std::set< RequestInfo > info_set;
    };
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    template< typename TYPES >
    struct NotificationStatus
@@ -164,11 +164,11 @@ namespace base::service::secure::__private {
       }
    }
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    template< typename TYPES >
    class TServer
@@ -182,7 +182,7 @@ namespace base::service::secure::__private {
       using tAttributeStatusMap = std::map< typename TYPES::tEventID, tNotificationStatus >;
 
       public:
-         TServer( const base::async::tAsyncTypeID&, const std::string&, const bool );
+         TServer( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
          ~TServer( ) override;
 
       private:
@@ -225,7 +225,7 @@ namespace base::service::secure::__private {
 
 
    template< typename TYPES >
-   TServer< TYPES >::TServer( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
+   TServer< TYPES >::TServer( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
       : IServer( interface_type_id, role_name, is_export )
       , TYPES::tEventConsumer( )
    {
@@ -528,14 +528,14 @@ namespace base::service::secure::__private {
       return nullptr;
    }
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 
-namespace base::service::secure {
+namespace carpc::service::secure {
 
    template< typename TYPES >
-   class TServer : public __private::TServer< TGenerator< TYPES > >
+   class TServer : public __private__::TServer< TGenerator< TYPES > >
    {
       public:
          TServer( const std::string&, const bool );
@@ -545,12 +545,12 @@ namespace base::service::secure {
 
    template< typename TYPES >
    TServer< TYPES >::TServer( const std::string& role_name, const bool is_export )
-      : __private::TServer< TGenerator< TYPES > >( TGenerator< TYPES >::interface_type_id, role_name, is_export )
+      : __private__::TServer< TGenerator< TYPES > >( TGenerator< TYPES >::interface_type_id, role_name, is_export )
    {
       REGISTER_EVENT( tService );
    }
 
-} // namespace base::service::secure
+} // namespace carpc::service::secure
 
 
 

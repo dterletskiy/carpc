@@ -5,11 +5,11 @@
 
 
 
-using namespace base::service;
+using namespace carpc::service;
 
 
 
-Signature::Signature( const base::async::tAsyncTypeID& type_id, const std::string& role )
+Signature::Signature( const carpc::async::tAsyncTypeID& type_id, const std::string& role )
    : m_type_id( type_id )
    , m_role( role )
 { }
@@ -19,12 +19,12 @@ Signature::Signature( const Signature& other )
    , m_role( other.m_role )
 { }
 
-bool Signature::to_stream( base::ipc::tStream& stream ) const
+bool Signature::to_stream( carpc::ipc::tStream& stream ) const
 {
    return ipc::serialize( stream, m_type_id, m_role );
 }
 
-bool Signature::from_stream( base::ipc::tStream& stream )
+bool Signature::from_stream( carpc::ipc::tStream& stream )
 {
    return ipc::deserialize( stream, m_type_id, m_role );
 }

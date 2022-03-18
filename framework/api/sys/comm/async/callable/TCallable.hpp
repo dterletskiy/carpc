@@ -16,7 +16,7 @@
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
 
-namespace base::async {
+namespace carpc::async {
 
    template < typename ...Args >
    struct TCallable : public ICallable
@@ -100,7 +100,7 @@ namespace base::async {
          const tParameters       m_params;
    };
 
-} // namespace base::async
+} // namespace carpc::async
 
 #pragma GCC pop_options
 
@@ -132,7 +132,7 @@ namespace base::async {
 
    int main( int argc, char* argv[ ] )
    {
-      namespace base_v = base::async;
+      namespace carpc_v = carpc::async;
 
       // Example 1
       {

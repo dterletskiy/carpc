@@ -4,7 +4,7 @@
 
 
 
-namespace base::trace {
+namespace carpc::trace {
 
    const char* const to_color( const eLogLevel& log_level )
    {
@@ -78,11 +78,11 @@ namespace base::trace {
       return eLogStrategy::CONSOLE;
    }
 
-} // namespace base::trace
+} // namespace carpc::trace
 
 
 
-namespace base::trace {
+namespace carpc::trace {
 
    void local_time_of_date( tm*& _time_tm, size_t& _milliseconds )
    {
@@ -99,4 +99,4 @@ namespace base::trace {
       return time_timespec.tv_sec * static_cast< size_t >( gran ) + time_timespec.tv_nsec / ( 1000000000 / static_cast< size_t >( gran ) );
    }
 
-} // namespace base::trace
+} // namespace carpc::trace

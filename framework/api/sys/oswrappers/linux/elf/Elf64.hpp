@@ -8,7 +8,7 @@
 
 
 
-namespace base::os::os_linux {
+namespace carpc::os::os_linux {
 
    struct Elf64
    {
@@ -28,4 +28,4 @@ namespace base::os::os_linux {
       Application app;
    };
 
-} // namespace base::os::os_linux
+} // namespace carpc::os::os_linux

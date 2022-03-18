@@ -7,7 +7,7 @@
 
 
 
-namespace base::async {
+namespace carpc::async {
 
    template< typename _Generator >
    struct TConsumer : public IEvent::IConsumer
@@ -20,7 +20,7 @@ namespace base::async {
       virtual void process_event( const tEvent& ) = 0;
    };
 
-} // namespace base::async
+} // namespace carpc::async
 
 
 

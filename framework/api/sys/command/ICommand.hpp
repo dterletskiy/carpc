@@ -5,7 +5,7 @@
 
 
 
-namespace base::command {
+namespace carpc::command {
 
    class Queue;
 
@@ -23,7 +23,7 @@ namespace base::command {
             command::ID id;
             eSignal signal;
          };
-         DEFINE_EVENT_S( Signal, tData, base::async::id::TSignature< queue::ID > );
+         DEFINE_EVENT_S( Signal, tData, carpc::async::id::TSignature< queue::ID > );
 
       public:
          using tUptr = std::unique_ptr< ICommand >;
@@ -65,4 +65,4 @@ namespace base::command {
       m_parent_id = parent_id;
    }
 
-} // namespace base::command
+} // namespace carpc::command

@@ -8,7 +8,7 @@
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class Thread
    {
@@ -92,6 +92,6 @@ namespace base::os {
       return m_name;
    }
 
-} // namespace base::os
+} // namespace carpc::os
 
 

@@ -8,7 +8,7 @@
 
 
 
-const base::application::Thread::Configuration::tVector services =
+const carpc::application::Thread::Configuration::tVector services =
    {
         { "OnOff_Service", { application::components::onoff::Component::creator }, 5 }
       , { "Driver_Service", { application::components::driver::Component::creator }, 10 }

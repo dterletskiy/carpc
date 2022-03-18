@@ -6,7 +6,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class Registry
    {
@@ -39,4 +39,4 @@ namespace base::service {
          const Address::tSet& clients( const Passport& ) const;
    };
 
-} // namespace base::service
+} // namespace carpc::service

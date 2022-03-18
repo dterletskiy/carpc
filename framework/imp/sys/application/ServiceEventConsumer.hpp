@@ -4,7 +4,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class SendReceive;
 
@@ -26,4 +26,4 @@ namespace base::application {
          SendReceive* mp_send_receive;
    };
 
-} // namespace base::application
+} // namespace carpc::application

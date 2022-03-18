@@ -11,7 +11,7 @@ namespace application::components::onoff {
 
 
 
-   class Loaded : public base::fsm::TState< Types >
+   class Loaded : public carpc::fsm::TState< Types >
    {
       public:
          Loaded( Manager& );
@@ -28,4 +28,4 @@ namespace application::components::onoff {
          Manager& m_manager;
    };
 
-} // namespace base::events
+} // namespace carpc::events

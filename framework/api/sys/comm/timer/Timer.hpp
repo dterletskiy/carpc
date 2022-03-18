@@ -10,7 +10,7 @@
 
 
 
-namespace base::timer {
+namespace carpc::timer {
 
    class ITimerConsumer;
 
@@ -34,7 +34,7 @@ namespace base::timer {
 
          bool start( const std::size_t nanoseconds, const std::size_t count = CONTINIOUS );
          bool stop( );
-         void process( const base::os::os_linux::timer::tID );
+         void process( const carpc::os::os_linux::timer::tID );
 
       public:
          const std::string& name( ) const;
@@ -52,9 +52,9 @@ namespace base::timer {
          bool                    m_is_running = false;
 
       public:
-         const base::os::os_linux::timer::tID timer_id( ) const;
+         const carpc::os::os_linux::timer::tID timer_id( ) const;
       private:
-         base::os::os_linux::timer::tID   m_timer_id = nullptr;
+         carpc::os::os_linux::timer::tID   m_timer_id = nullptr;
 
       public:
          std::size_t nanoseconds( ) const;
@@ -85,7 +85,7 @@ namespace base::timer {
    }
 
    inline
-   const base::os::os_linux::timer::tID Timer::timer_id( ) const
+   const carpc::os::os_linux::timer::tID Timer::timer_id( ) const
    {
       return m_timer_id;
    }
@@ -114,7 +114,7 @@ namespace base::timer {
    {
       comm::timer::ID id;
    };
-   DEFINE_EVENT( TimerEvent, TimerEventData, base::async::id::TSignature< comm::timer::ID::VALUE_TYPE > );
+   DEFINE_EVENT( TimerEvent, TimerEventData, carpc::async::id::TSignature< comm::timer::ID::VALUE_TYPE > );
 
 
 
@@ -133,20 +133,20 @@ namespace base::timer {
 
 
 
-} // namespace base
+} // namespace carpc
 
 
 
-namespace base::timer {
+namespace carpc::timer {
 
-   using tCallback = std::function< void( const base::comm::timer::ID ) >;
+   using tCallback = std::function< void( const carpc::comm::timer::ID ) >;
    const std::size_t Infinite = std::numeric_limits< std::size_t >::max( );
 
    // This timer creates new thread and sleep it to some milliseconds.
    // When thread is finished "callback" will be executed in context of application thread
    // where this timer have been called.
-   // Performance of this timer is worse then base::timer::Timer implementation.
+   // Performance of this timer is worse then carpc::timer::Timer implementation.
    // This timer can't be stopped.
-   base::comm::timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous = true );
+   carpc::comm::timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous = true );
 
-} // namespace base::timer
+} // namespace carpc::timer

@@ -1,16 +1,16 @@
 #include "api/sys/comm/async/Types.hpp"
 
 
-namespace base::async {
+namespace carpc::async {
 
    const char* c_str( const eAsyncType async_type )
    {
       switch( async_type )
       {
-         case eAsyncType::EVENT:       return "base::eAsyncType::EVENT";
-         case eAsyncType::RUNNABLE:    return "base::eAsyncType::RUNNABLE";
-         case eAsyncType::CALLABLE:    return "base::eAsyncType::CALLABLE";
-         default:                      return "base::eAsyncType::UNEFINED";
+         case eAsyncType::EVENT:       return "carpc::eAsyncType::EVENT";
+         case eAsyncType::RUNNABLE:    return "carpc::eAsyncType::RUNNABLE";
+         case eAsyncType::CALLABLE:    return "carpc::eAsyncType::CALLABLE";
+         default:                      return "carpc::eAsyncType::UNEFINED";
       }
    }
 

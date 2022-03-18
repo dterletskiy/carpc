@@ -2,17 +2,17 @@
 
 
 
-namespace base::events::system {
+namespace carpc::events::system {
 
    const char* c_str( const eID id )
    {
       switch( id )
       {
-         case eID::boot:         return "base::events::system::eID::boot";
-         case eID::shutdown:     return "base::events::system::eID::shutdown";
-         case eID::ping:         return "base::events::system::eID::ping";
+         case eID::boot:         return "carpc::events::system::eID::boot";
+         case eID::shutdown:     return "carpc::events::system::eID::shutdown";
+         case eID::ping:         return "carpc::events::system::eID::ping";
          case eID::undefined:
-         default:                return "base::events::system::eID::undefined";
+         default:                return "carpc::events::system::eID::undefined";
       }
    }
 
@@ -20,23 +20,23 @@ namespace base::events::system {
 
 
 
-namespace base::events::service {
+namespace carpc::events::service {
 
    const char* c_str( const eStatus id )
    {
       switch( id )
       {
-         case eStatus::ServerConnected:      return "base::events::service::eStatus::ServerConnected";
-         case eStatus::ServerDisconnected:   return "base::events::service::eStatus::ServerDisconnected";
-         case eStatus::ClientConnected:      return "base::events::service::eStatus::ClientConnected";
-         case eStatus::ClientDisconnected:   return "base::events::service::eStatus::ClientDisconnected";
+         case eStatus::ServerConnected:      return "carpc::events::service::eStatus::ServerConnected";
+         case eStatus::ServerDisconnected:   return "carpc::events::service::eStatus::ServerDisconnected";
+         case eStatus::ClientConnected:      return "carpc::events::service::eStatus::ClientConnected";
+         case eStatus::ClientDisconnected:   return "carpc::events::service::eStatus::ClientDisconnected";
          case eStatus::Undefined:
-         default:                            return "base::events::service::eStatus::Undefined";
+         default:                            return "carpc::events::service::eStatus::Undefined";
       }
    }
 
 
-   SignatureStatus::SignatureStatus( const base::service::Signature& signature, const eStatus id )
+   SignatureStatus::SignatureStatus( const carpc::service::Signature& signature, const eStatus id )
       : m_signature( signature )
       , m_id( id )
    {
@@ -50,7 +50,7 @@ namespace base::events::service {
 
    const std::string SignatureStatus::name( ) const
    {
-      return base::format_string( "signature: ", m_signature.name( ), ", id: ", size_t(m_id) );
+      return carpc::format_string( "signature: ", m_signature.name( ), ", id: ", size_t(m_id) );
    }
 
    bool SignatureStatus::operator<( const SignatureStatus& other ) const
@@ -71,7 +71,7 @@ namespace base::events::service {
       return ipc::deserialize( stream, m_signature, m_id );
    }
 
-   const base::service::Signature& SignatureStatus::signature( ) const
+   const carpc::service::Signature& SignatureStatus::signature( ) const
    {
       return m_signature;
    }
@@ -85,18 +85,18 @@ namespace base::events::service {
 
 
 
-namespace base::events::service {
+namespace carpc::events::service {
 
    const char* c_str( const eAction id )
    {
       switch( id )
       {
-         case eAction::RegisterServer:       return "base::events::interface::eAction::RegisterServer";
-         case eAction::UnregisterServer:     return "base::events::interface::eAction::UnregisterServer";
-         case eAction::RegisterClient:       return "base::events::interface::eAction::RegisterClient";
-         case eAction::UnregisterClient:     return "base::events::interface::eAction::UnregisterClient";
+         case eAction::RegisterServer:       return "carpc::events::interface::eAction::RegisterServer";
+         case eAction::UnregisterServer:     return "carpc::events::interface::eAction::UnregisterServer";
+         case eAction::RegisterClient:       return "carpc::events::interface::eAction::RegisterClient";
+         case eAction::UnregisterClient:     return "carpc::events::interface::eAction::UnregisterClient";
          case eAction::Undefined:
-         default:                            return "base::events::interface::eAction::Undefined";
+         default:                            return "carpc::events::interface::eAction::Undefined";
       }
    }
 

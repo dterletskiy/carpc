@@ -6,7 +6,7 @@
 
 
 
-namespace base::dsi {
+namespace carpc::dsi {
 
    const char* c_str( const eCommand comm_type )
    {
@@ -31,7 +31,7 @@ namespace base::dsi {
 }
 
 
-using namespace base::dsi;
+using namespace carpc::dsi;
 
 
 

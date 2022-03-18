@@ -10,13 +10,13 @@ using namespace application::components::driver;
 
 
 
-base::application::IComponent::tSptr Component::creator( )
+carpc::application::IComponent::tSptr Component::creator( )
 {
    return std::shared_ptr< Component >( new Component( "Driver" ) );
 }
 
 Component::Component( const std::string& _name )
-   : base::application::Component( _name )
+   : carpc::application::Component( _name )
 {
    MSG_DBG( "Created: %s", name( ).c_str( ) );
    events::AppEvent::Event::set_notification( this, events::eAppEventID::BOOT );

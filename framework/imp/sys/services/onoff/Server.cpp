@@ -5,12 +5,12 @@
 
 
 
-using namespace base::onoff;
+using namespace carpc::onoff;
 
 
 
 Server::Server( const std::string& role_name )
-   : base::service::SERVICE_NAMESPACE::TServer< data::Types >( role_name, true )
+   : carpc::service::SERVICE_NAMESPACE::TServer< data::Types >( role_name, true )
 {
 }
 

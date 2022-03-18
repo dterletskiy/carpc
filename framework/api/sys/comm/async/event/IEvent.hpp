@@ -6,13 +6,13 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class Context;
 
 }
 
-namespace base::async {
+namespace carpc::async {
 
    class IEvent
       : public IAsync
@@ -74,4 +74,4 @@ namespace base::async {
       return eAsyncType::EVENT;
    }
 
-} // namespace base::async
+} // namespace carpc::async

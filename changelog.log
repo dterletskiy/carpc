@@ -1,3 +1,7 @@
+version 3.5.0
+   - Renaming main namespace "base" to "carpc"
+   - Build fix after previous commit by renaming "process::configuration::current" to "configuration::current".
+
 version 3.4.4
    - Minor chages in application part.
 

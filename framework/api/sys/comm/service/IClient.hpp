@@ -2,7 +2,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class IClient
    {
@@ -16,4 +16,4 @@ namespace base::service {
    };
 
 
-} // namespace base::service
+} // namespace carpc::service

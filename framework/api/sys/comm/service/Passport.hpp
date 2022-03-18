@@ -5,7 +5,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    struct Passport
    {
@@ -18,8 +18,8 @@ namespace base::service {
 
       const std::string name( ) const;
 
-      bool to_stream( base::ipc::tStream& ) const;
-      bool from_stream( base::ipc::tStream& );
+      bool to_stream( carpc::ipc::tStream& ) const;
+      bool from_stream( carpc::ipc::tStream& );
 
       bool operator==( const Passport& ) const;
       bool operator!=( const Passport& ) const;
@@ -29,4 +29,4 @@ namespace base::service {
       Address     address;
    };
 
-} // namespace base::service
+} // namespace carpc::service

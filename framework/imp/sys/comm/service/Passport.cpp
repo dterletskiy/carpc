@@ -5,7 +5,7 @@
 
 
 
-using namespace base::service;
+using namespace carpc::service;
 
 
 
@@ -25,12 +25,12 @@ const std::string Passport::name( ) const
 }
 
 
-bool Passport::to_stream( base::ipc::tStream& stream ) const
+bool Passport::to_stream( carpc::ipc::tStream& stream ) const
 {
    return ipc::serialize( stream, signature, address );
 }
 
-bool Passport::from_stream( base::ipc::tStream& stream )
+bool Passport::from_stream( carpc::ipc::tStream& stream )
 {
    return ipc::deserialize( stream, signature, address );
 }

@@ -10,7 +10,7 @@
 
 
 
-namespace base::fsm {
+namespace carpc::fsm {
 
    template< typename TYPES >
    class TStateManager;
@@ -122,7 +122,7 @@ namespace base::fsm {
       leave( );
    }
 
-} // namespace base::events
+} // namespace carpc::events
 
 
 

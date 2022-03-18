@@ -5,7 +5,7 @@
 
 
 
-namespace base::os::os_linux::signals {
+namespace carpc::os::os_linux::signals {
 
    extern thread_local int error;
    using tSignal = int;
@@ -30,7 +30,7 @@ namespace base::os::os_linux::signals {
 
 
 
-namespace base::os::os_linux::signals {
+namespace carpc::os::os_linux::signals {
 
    void info( );
 
@@ -106,4 +106,4 @@ namespace base::os::os_linux::signals {
     ***************************************************************************/
    bool wait( const std::vector< tSignal >& signals, tSignal* p_signal = nullptr );
 
-} // namespace base::os::os_linux::signals
+} // namespace carpc::os::os_linux::signals

@@ -2,32 +2,32 @@
 
 
 
-namespace base::onoff {
+namespace carpc::onoff {
 
-   const base::service::RequestResponseIDs< eOnOff >::tVector s_rr = {
+   const carpc::service::RequestResponseIDs< eOnOff >::tVector s_rr = {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState },
       { eOnOff::RequestStart, eOnOff::RequestStartBusy, eOnOff::Undefined }
    };
 
-   const base::service::NotificationIDs< eOnOff >::tVector s_n = {
+   const carpc::service::NotificationIDs< eOnOff >::tVector s_n = {
       { eOnOff::SubscribeCurrentState, eOnOff::UnsubscribeCurrentState, eOnOff::NotificationCurrentState }
    };
 
-} // namespace base::onoff
+} // namespace carpc::onoff
 
 
 
-namespace base::onoff::ipc {
+namespace carpc::onoff::ipc {
 
-   const base::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
-   const base::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
+   const carpc::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
+   const carpc::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
 
 
 
-   BaseData::tSptr BaseData::create( base::ipc::tStream& stream )
+   BaseData::tSptr BaseData::create( carpc::ipc::tStream& stream )
    {
       eOnOff id = eOnOff::Undefined;
-      if( false == base::ipc::deserialize( stream, id ) )
+      if( false == carpc::ipc::deserialize( stream, id ) )
          return nullptr;
 
       tSptr ptr = nullptr;
@@ -45,9 +45,9 @@ namespace base::onoff::ipc {
       return  ptr;
    }
 
-   bool BaseData::serrialize( base::ipc::tStream& stream )
+   bool BaseData::serrialize( carpc::ipc::tStream& stream )
    {
-      if( false == base::ipc::serialize( stream, id( ) ) )
+      if( false == carpc::ipc::serialize( stream, id( ) ) )
          return false;
 
       return to_stream( stream );
@@ -65,8 +65,8 @@ namespace base::onoff::ipc {
    const eOnOff RequestTriggerStateData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestTriggerStateData::id( ) const { return ID; }
 
-   bool RequestTriggerStateData::to_stream( base::ipc::tStream& stream ) { return base::ipc::serialize( stream, state, delay ); }
-   bool RequestTriggerStateData::from_stream( base::ipc::tStream& stream ) { return base::ipc::deserialize( stream, state, delay ); }
+   bool RequestTriggerStateData::to_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::serialize( stream, state, delay ); }
+   bool RequestTriggerStateData::from_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::deserialize( stream, state, delay ); }
 
 
 
@@ -80,8 +80,8 @@ namespace base::onoff::ipc {
    const eOnOff ResponseTriggerStateData::ID = eOnOff::ResponseTriggerState;
    const eOnOff ResponseTriggerStateData::id( ) const { return ID; }
 
-   bool ResponseTriggerStateData::to_stream( base::ipc::tStream& stream ) { return base::ipc::serialize( stream, result ); }
-   bool ResponseTriggerStateData::from_stream( base::ipc::tStream& stream ) { return base::ipc::deserialize( stream, result ); }
+   bool ResponseTriggerStateData::to_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::serialize( stream, result ); }
+   bool ResponseTriggerStateData::from_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::deserialize( stream, result ); }
 
 
 
@@ -92,8 +92,8 @@ namespace base::onoff::ipc {
    const eOnOff RequestStartData::ID = eOnOff::RequestTriggerState;
    const eOnOff RequestStartData::id( ) const { return ID; }
 
-   bool RequestStartData::to_stream( base::ipc::tStream& stream ) { return true; }
-   bool RequestStartData::from_stream( base::ipc::tStream& stream ) { return true; }
+   bool RequestStartData::to_stream( carpc::ipc::tStream& stream ) { return true; }
+   bool RequestStartData::from_stream( carpc::ipc::tStream& stream ) { return true; }
 
 
 
@@ -107,17 +107,17 @@ namespace base::onoff::ipc {
    const eOnOff NotificationCurrentStateData::ID = eOnOff::NotificationCurrentState;
    const eOnOff NotificationCurrentStateData::id( ) const { return ID; }
 
-   bool NotificationCurrentStateData::to_stream( base::ipc::tStream& stream ) { return base::ipc::serialize( stream, state ); }
-   bool NotificationCurrentStateData::from_stream( base::ipc::tStream& stream ) { return base::ipc::deserialize( stream, state ); }
+   bool NotificationCurrentStateData::to_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::serialize( stream, state ); }
+   bool NotificationCurrentStateData::from_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::deserialize( stream, state ); }
 
-} // namespace base::onoff::ipc
+} // namespace carpc::onoff::ipc
 
 
 
-namespace base::onoff::no_ipc {
+namespace carpc::onoff::no_ipc {
 
-   const base::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
-   const base::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
+   const carpc::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
+   const carpc::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
 
 
 
@@ -152,4 +152,4 @@ namespace base::onoff::no_ipc {
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
       : BaseData( ), state( _state ) { }
 
-} // namespace base::onoff::no_ipc
+} // namespace carpc::onoff::no_ipc

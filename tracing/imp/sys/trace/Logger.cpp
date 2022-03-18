@@ -12,7 +12,7 @@ namespace {
 
 
 
-using namespace base::trace;
+using namespace carpc::trace;
 
 
 

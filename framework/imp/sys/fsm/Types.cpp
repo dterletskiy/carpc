@@ -2,7 +2,7 @@
 
 
 
-namespace base::fsm {
+namespace carpc::fsm {
 
    const char* c_str( const eSignal& signal )
    {

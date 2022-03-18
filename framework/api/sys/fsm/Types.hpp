@@ -4,7 +4,7 @@
 
 
 
-namespace base::fsm {
+namespace carpc::fsm {
 
    enum class eSignal : std::uint8_t { SYSTEM, STATE };
    const char* c_str( const eSignal& );
@@ -12,13 +12,13 @@ namespace base::fsm {
    namespace manager
    {
       class ManagerID;
-      using ID = base::TID< ManagerID >;
+      using ID = carpc::TID< ManagerID >;
    }
 
    namespace state
    {
       class StateID;
-      using ID = base::TID< StateID >;
+      using ID = carpc::TID< StateID >;
    }
 
-} // namespace base::events
+} // namespace carpc::events

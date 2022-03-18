@@ -5,7 +5,7 @@
 
 
 
-namespace base::tools {
+namespace carpc::tools {
 
 
 Performance::Performance( const std::string& name )
@@ -63,4 +63,4 @@ long int Performance::info( ) const
 
 
 
-} // namespace base::tools
+} // namespace carpc::tools

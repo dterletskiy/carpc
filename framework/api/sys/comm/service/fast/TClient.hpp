@@ -9,7 +9,7 @@
 
 
 
-namespace base::service::fast::__private {
+namespace carpc::service::fast::__private__ {
 
    template< typename TYPES >
    class TClient : public IClient
@@ -18,7 +18,7 @@ namespace base::service::fast::__private {
       using tClient = TClient< TYPES >;
 
       public:
-         TClient( const base::async::tAsyncTypeID&, const std::string&, const bool );
+         TClient( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
          ~TClient( ) override;
 
       public:
@@ -43,7 +43,7 @@ namespace base::service::fast::__private {
 
 
    template< typename TYPES >
-   TClient< TYPES >::TClient( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+   TClient< TYPES >::TClient( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    {
       mp_proxy = tProxy::create( interface_type_id, role_name, is_import );
       mp_proxy->register_client( this );
@@ -110,14 +110,14 @@ namespace base::service::fast::__private {
       return mp_proxy;
    }
 
-} // namespace base::service::fast::__private
+} // namespace carpc::service::fast::__private__
 
 
 
-namespace base::service::fast {
+namespace carpc::service::fast {
 
    template< typename TYPES >
-   class TClient : public __private::TClient< TGenerator< TYPES > >
+   class TClient : public __private__::TClient< TGenerator< TYPES > >
    {
       public:
          TClient( const std::string&, const bool );
@@ -127,12 +127,12 @@ namespace base::service::fast {
 
    template< typename TYPES >
    TClient< TYPES >::TClient( const std::string& role_name, const bool is_export )
-      : __private::TClient< TGenerator< TYPES > >( TGenerator< TYPES >::interface_type_id, role_name, is_export )
+      : __private__::TClient< TGenerator< TYPES > >( TGenerator< TYPES >::interface_type_id, role_name, is_export )
    {
       REGISTER_EVENT( tService );
    }
 
-} // namespace base::service::fast
+} // namespace carpc::service::fast
 
 
 

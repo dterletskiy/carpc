@@ -8,7 +8,7 @@
 #define DEFINE_EVENT_N( eventType, dataType, signatureType ) \
    namespace eventType { \
       class eventType; \
-      using Generator      = base::async::TGenerator< base::async::NoServiceType, eventType, dataType, signatureType >; \
+      using Generator      = carpc::async::TGenerator< carpc::async::NoServiceType, eventType, dataType, signatureType >; \
       using Event          = Generator::Config::tEvent; \
       using Signature      = Generator::Config::tSignature; \
       using UserSignature  = Generator::Config::tUserSignature; \
@@ -20,7 +20,7 @@
    namespace eventType { \
       class ServiceType; \
       class eventType; \
-      using Generator      = base::async::TGenerator< ServiceType, eventType, dataType, signatureType >; \
+      using Generator      = carpc::async::TGenerator< ServiceType, eventType, dataType, signatureType >; \
       using Event          = Generator::Config::tEvent; \
       using Signature      = Generator::Config::tSignature; \
       using UserSignature  = Generator::Config::tUserSignature; \
@@ -33,7 +33,7 @@
 #define DEFINE_EVENT_S( eventType, dataType, signatureType ) \
    struct eventType { \
       class eventType##_TYPE; \
-      using Generator      = base::async::TGenerator< base::async::NoServiceType, eventType##_TYPE, dataType, signatureType >; \
+      using Generator      = carpc::async::TGenerator< carpc::async::NoServiceType, eventType##_TYPE, dataType, signatureType >; \
       using Event          = typename Generator::Config::tEvent; \
       using Signature      = typename Generator::Config::tSignature; \
       using UserSignature  = typename Generator::Config::tUserSignature; \
@@ -45,7 +45,7 @@
    struct eventType { \
       class ServiceType; \
       class eventType##_TYPE; \
-      using Generator      = base::async::TGenerator< ServiceType, eventType##_TYPE, dataType, signatureType >; \
+      using Generator      = carpc::async::TGenerator< ServiceType, eventType##_TYPE, dataType, signatureType >; \
       using Event          = typename Generator::Config::tEvent; \
       using Signature      = typename Generator::Config::tSignature; \
       using UserSignature  = typename Generator::Config::tUserSignature; \
@@ -65,12 +65,12 @@
 // namespace where corresponding event is defined. This is because of s_type_id must containe unique value.
 // REGISTER_EVENT macro must use { #eventType } instead of build_type_id( ).
 // #define INIT_EVENT( eventType ) \
-//    template< > const base::async::tAsyncTypeID eventType::Signature::s_type_id = { #eventType };
+//    template< > const carpc::async::tAsyncTypeID eventType::Signature::s_type_id = { #eventType };
 
 
 
 #define REGISTER_EVENT( eventType ) \
-   base::async::IEvent::check_in( eventType::Signature::build_type_id( ), eventType::Event::create );
+   carpc::async::IEvent::check_in( eventType::Signature::build_type_id( ), eventType::Event::create );
 
 #define DUMP_IPC_EVENTS \
-   base::async::IEvent::dump( );
+   carpc::async::IEvent::dump( );

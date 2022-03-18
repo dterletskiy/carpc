@@ -15,7 +15,7 @@
 
 
 
-namespace base::os::os_linux::socket {
+namespace carpc::os::os_linux::socket {
 
    using tSocket = int;
    using tSocketSet = std::set< tSocket >;
@@ -94,11 +94,11 @@ namespace base::os::os_linux::socket {
          fd_set* mp_except = nullptr;
    };
 
-} // namespace base::os::os_linux::socket
+} // namespace carpc::os::os_linux::socket
 
 
 
-namespace base::os::os_linux::socket {
+namespace carpc::os::os_linux::socket {
 
    void print( const sockaddr* _sa );
 
@@ -217,15 +217,15 @@ namespace base::os::os_linux::socket {
 
    void close( tSocket _socket );
 
-} // namespace base::os::os_linux::socket
+} // namespace carpc::os::os_linux::socket
 
 
 
-namespace base::os::os_linux {
+namespace carpc::os::os_linux {
 
    bool get_mac( const std::string& connection_name, std::string& connection_mac );
 
-} // namespace base::os::os_linux
+} // namespace carpc::os::os_linux
 
 
 

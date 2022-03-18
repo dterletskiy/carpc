@@ -5,7 +5,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class Context
    {
@@ -31,7 +31,7 @@ namespace base::application {
 
       public:
          bool to_stream( ipc::tStream& ) const;
-         bool from_stream( base::ipc::tStream& );
+         bool from_stream( carpc::ipc::tStream& );
 
       public:
          Context& operator=( const Context& );
@@ -71,4 +71,4 @@ namespace base::application {
       return m_tid;
    }
 
-} // namespace base::application
+} // namespace carpc::application

@@ -8,7 +8,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class Address;
 
@@ -17,7 +17,7 @@ namespace base::service {
    class IConnection : public events::service::Status::Consumer
    {
       public:
-         IConnection( const base::async::tAsyncTypeID&, const std::string&, const bool );
+         IConnection( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
          virtual ~IConnection( );
 
       protected:
@@ -91,4 +91,4 @@ namespace base::service {
       return m_is_external;
    }
 
-} // namespace base::service
+} // namespace carpc::service

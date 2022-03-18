@@ -6,7 +6,7 @@
 
 
 
-namespace base::tools {
+namespace carpc::tools {
 
 
 
@@ -29,4 +29,4 @@ namespace base::tools {
 
 
 
-} // namespace base::tools
+} // namespace carpc::tools

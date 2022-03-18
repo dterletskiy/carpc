@@ -4,12 +4,12 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class IServer : public IConnection
    {
       public:
-         IServer( const base::async::tAsyncTypeID&, const std::string&, const bool );
+         IServer( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
          ~IServer( ) override;
 
       private:
@@ -24,4 +24,4 @@ namespace base::service {
 
    };
 
-} // namespace base::service
+} // namespace carpc::service

@@ -6,10 +6,10 @@
 
 
 
-namespace base::onoff {
+namespace carpc::onoff {
 
    class Client
-      : public base::service::SERVICE_NAMESPACE::TClient< data::Types >
+      : public carpc::service::SERVICE_NAMESPACE::TClient< data::Types >
    {
       public:
          using tSptr = std::shared_ptr< Client >;
@@ -27,9 +27,9 @@ namespace base::onoff {
          void process_notification_event( const tService::Event& ) override;
 
       public:
-         const base::comm::sequence::ID request_trigger_state( const std::string&, const std::size_t );
+         const carpc::comm::sequence::ID request_trigger_state( const std::string&, const std::size_t );
       private:
-         virtual void request_trigger_state_failed( const base::service::eError& ) = 0;
+         virtual void request_trigger_state_failed( const carpc::service::eError& ) = 0;
          virtual void response_trigger_state( const bool ) = 0;
 
       public:
@@ -42,4 +42,4 @@ namespace base::onoff {
          virtual void on_current_state( const std::string& ) = 0;
    };
 
-} // namespace base::onoff
+} // namespace carpc::onoff

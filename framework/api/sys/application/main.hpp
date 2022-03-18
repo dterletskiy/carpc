@@ -37,7 +37,7 @@ namespace memory {
 
 
 
-extern const base::application::Thread::Configuration::tVector services;
+extern const carpc::application::Thread::Configuration::tVector services;
 
 bool test( int argc, char** argv, char** envp );
 
@@ -48,17 +48,17 @@ using tExit = void (*)( void );
 
 void preinit( int argc, char** argv, char** envp )
 {
-   base::tools::PCE configuration( argc, argv, envp );
+   carpc::tools::PCE configuration( argc, argv, envp );
    // configuration.print( );
 
-   const base::trace::eLogStrategy trace_strategy = base::trace::log_strategy_from_string(
+   const carpc::trace::eLogStrategy trace_strategy = carpc::trace::log_strategy_from_string(
          configuration.value_or( "trace_log", "CONSOLE" ).c_str( )
       );
    const std::size_t trace_buffer = static_cast< std::size_t >( std::stoll(
          configuration.value_or( "trace_buffer", "4096" )
       ) );
    const std::string trace_app_name = configuration.value_or( "trace_app_name", "APP" );
-   base::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
+   carpc::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
 
    MSG_INF( "preinit_array" );
 }
@@ -95,7 +95,7 @@ void boot( int argc, char** argv, char** envp )
    SYS_TRACE_INFORMATION;
    MSG_TRACE_INFORMATION;
 
-   base::application::Process::tSptr p_process = base::application::Process::instance( argc, argv, envp );
+   carpc::application::Process::tSptr p_process = carpc::application::Process::instance( argc, argv, envp );
    if( p_process->start( services ) )
    {
       MSG_DBG( "Booting..." );
@@ -120,7 +120,7 @@ int main( int argc, char** argv, char** envp )
    #include <jni.h>
    #include "api/sys/oswrappers/Thread.hpp"
 
-   base::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (102) )) = { boot, 1, nullptr, nullptr };
+   carpc::os::Thread boot_thread __attribute__ (( section ("THREAD"), init_priority (102) )) = { boot, 1, nullptr, nullptr };
 
    extern "C"
    JNIEXPORT jstring JNICALL Java_com_tda_carpc_start( JNIEnv* env, jobject obj, jint id )

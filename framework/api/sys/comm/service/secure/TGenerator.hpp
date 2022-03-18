@@ -5,7 +5,7 @@
 
 
 
-namespace base::service::secure {
+namespace carpc::service::secure {
 
    template< typename TYPES, typename Enable = void >
    struct TGenerator;
@@ -28,12 +28,12 @@ namespace base::service::secure {
 
          tBaseDataPtr ptr = nullptr;
 
-         bool to_stream( base::ipc::tStream& stream ) const
+         bool to_stream( carpc::ipc::tStream& stream ) const
          {
             if( nullptr == ptr ) return true;
             return ptr->serrialize( stream );
          }
-         bool from_stream( base::ipc::tStream& stream )
+         bool from_stream( carpc::ipc::tStream& stream )
          {
             ptr = tBaseData::create( stream );
             return nullptr != ptr;
@@ -113,4 +113,4 @@ namespace base::service::secure {
       TGenerator< TYPES, ENABVLE_IF_NO_IPC_SERVICE >::N =
          TYPES::N;
 
-} // namespace base::service::secure
+} // namespace carpc::service::secure

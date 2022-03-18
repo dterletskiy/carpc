@@ -18,9 +18,9 @@ struct Connection
 
    bool operator<( const Connection& other ) const { return socket < other.socket; }
 
-   base::os::Socket::tSptr socket = nullptr;
-   base::service::Address  service_address;
-   base::dsi::SocketCongiguration inet_address;
+   carpc::os::Socket::tSptr socket = nullptr;
+   carpc::service::Address  service_address;
+   carpc::dsi::SocketCongiguration inet_address;
 };
 
 struct ServiceConnection
@@ -29,10 +29,10 @@ struct ServiceConnection
    Connection::tSet clients;
 };
 
-class ConnectionProcessor : public base::os::SocketServer::IConsumer
+class ConnectionProcessor : public carpc::os::SocketServer::IConsumer
 {
    public:
-      ConnectionProcessor( const base::os::os_linux::socket::configuration& configuration, const size_t buffer_size );
+      ConnectionProcessor( const carpc::os::os_linux::socket::configuration& configuration, const size_t buffer_size );
       ~ConnectionProcessor( );
 
       bool init( );
@@ -40,18 +40,18 @@ class ConnectionProcessor : public base::os::SocketServer::IConsumer
       void connection_loop( );
 
    private:
-      void read_slave( base::os::Socket::tSptr ) override;
-      void connected( base::os::Socket::tSptr ) override;
-      void disconnected( base::os::Socket::tSptr ) override;
+      void read_slave( carpc::os::Socket::tSptr ) override;
+      void connected( carpc::os::Socket::tSptr ) override;
+      void disconnected( carpc::os::Socket::tSptr ) override;
 
    private:
-      void process_broadcast_event( base::os::Socket::tSptr p_socket, base::dsi::Package& package );
-      void register_server( base::os::Socket::tSptr p_socket, base::dsi::Package& package );
-      void unregister_server( base::os::Socket::tSptr p_socket, base::dsi::Package& package );
-      void register_client( base::os::Socket::tSptr p_socket, base::dsi::Package& package );
-      void unregister_client( base::os::Socket::tSptr p_socket, base::dsi::Package& package );
+      void process_broadcast_event( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
+      void register_server( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
+      void unregister_server( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
+      void register_client( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
+      void unregister_client( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
 
    private:
-      base::os::SocketServer::tSptr                            mp_socket;
-      std::map< base::service::Signature, ServiceConnection >  m_service_map;
+      carpc::os::SocketServer::tSptr                            mp_socket;
+      std::map< carpc::service::Signature, ServiceConnection >  m_service_map;
 };

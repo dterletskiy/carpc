@@ -111,7 +111,7 @@ namespace {
 
 }
 
-namespace base::math {
+namespace carpc::math {
 
    using tRow = TIndex< eIndexType::ROW >;
    using tColumn = TIndex< eIndexType::COLUMN >;

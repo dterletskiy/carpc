@@ -8,7 +8,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
 
 
@@ -377,4 +377,4 @@ namespace base {
       return is_linear( buffer.ptr, buffer.size );
    }
 
-} // namespace base
+} // namespace carpc

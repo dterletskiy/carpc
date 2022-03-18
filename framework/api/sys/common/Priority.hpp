@@ -10,7 +10,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    template< typename T >
    class TPriority
@@ -133,7 +133,7 @@ namespace base {
          }
          const std::string name( ) const
          {
-            return base::format_string( "0x", std::hex, static_cast< std::size_t >( m_value ) );
+            return carpc::format_string( "0x", std::hex, static_cast< std::size_t >( m_value ) );
          }
       private:
          T m_value = invalid_value;
@@ -197,7 +197,7 @@ namespace base {
       return g_priority_map.at( type );
    }
 
-} // namespace base
+} // namespace carpc
 
 
 

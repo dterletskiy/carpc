@@ -3,7 +3,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    // void print( const void* const p_buffer, const std::size_t size, const bool is_new_line )
    // {
@@ -39,4 +39,4 @@ namespace base {
       if( is_new_line ) printf( "\n" );
    }
 
-} // namespace base
+} // namespace carpc

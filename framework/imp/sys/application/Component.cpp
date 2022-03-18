@@ -4,7 +4,7 @@
 #define CLASS_ABBR "Component"
 
 
-using namespace base::application;
+using namespace carpc::application;
 
 
 

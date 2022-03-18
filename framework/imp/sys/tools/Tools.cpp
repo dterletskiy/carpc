@@ -10,7 +10,7 @@
 
 
 #include <filesystem>
-namespace base::tools {
+namespace carpc::tools {
 
    BasePCE::BasePCE( const std::string& dump_message )
       : m_dump_message( dump_message )
@@ -132,7 +132,7 @@ namespace base::tools {
          std::string line;
          std::getline( file_stream, line, '\n' );
 
-         line = base::trim( line );
+         line = carpc::trim( line );
          if( true == line.empty( ) )
             continue;
          if( '#' == line[0] )
@@ -243,11 +243,11 @@ namespace base::tools {
       return value_opt.value_or( default_value );
    }
 
-} // namespace base::tools
+} // namespace carpc::tools
 
 
 
-namespace base::tools::cmd {
+namespace carpc::tools::cmd {
 
    char* get_option( int argc, char** begin, const std::string & option )
    {
@@ -265,7 +265,7 @@ namespace base::tools::cmd {
       return std::find( begin, end, option ) != end;
    }
 
-} // namespace base::tools::cmd
+} // namespace carpc::tools::cmd
 
 
 
@@ -274,7 +274,7 @@ namespace base::tools::cmd {
 // #include "uuid/uuid.h"
 
 // link: https://stackoverflow.com/a/60198074/12978480
-namespace base::tools::uuid {
+namespace carpc::tools::uuid {
 
    static std::random_device                 rd;
    static std::mt19937                       gen( rd( ) );
@@ -299,4 +299,4 @@ namespace base::tools::uuid {
       _uuid = ss.str( );
    }
 
-} // base::tools::uuid
+} // carpc::tools::uuid

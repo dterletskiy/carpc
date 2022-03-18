@@ -25,7 +25,7 @@ namespace experimental::dlib {
 
    void dnn_mmod_face_detection_ex( const char* const image_file, const char* const model_file )
    {
-      base::tools::Performance performance( "dnn_mmod_face_detection_ex" );
+      carpc::tools::Performance performance( "dnn_mmod_face_detection_ex" );
       performance.start( );
 
       net_type net;
@@ -53,7 +53,7 @@ namespace experimental::dlib {
 
    void face_detection_ex( const char* const image_file )
    {
-      base::tools::Performance performance( "face_detection_ex" );
+      carpc::tools::Performance performance( "face_detection_ex" );
       performance.start( );
 
       ::dlib::array2d< ::dlib::bgr_pixel > image;

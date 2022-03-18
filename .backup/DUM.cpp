@@ -3,7 +3,7 @@
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "DUM"
 
-using namespace base::os;
+using namespace carpc::os;
 
 
 

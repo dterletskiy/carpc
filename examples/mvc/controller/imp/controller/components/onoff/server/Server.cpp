@@ -11,7 +11,7 @@ using namespace controller::components::onoff;
 
 
 Server::Server( )
-   : base::onoff::Server( "OnOff_Controller" )
+   : carpc::onoff::Server( "OnOff_Controller" )
 {
    MSG_DBG( "created" );
    current_state( "UNLOADED" );
@@ -41,13 +41,13 @@ void Server::request_trigger_state( const std::string& state, const size_t delay
 {
    MSG_DBG( "state: %s / delay: %zu", state.c_str( ), delay );
 
-   std::shared_ptr< base::timer::Timer > timer = std::make_shared< base::timer::Timer >( this );
+   std::shared_ptr< carpc::timer::Timer > timer = std::make_shared< carpc::timer::Timer >( this );
    timer->start( delay, 1 );
    m_timers.emplace_back( TimerSeqID{ state, timer, unblock_request( ) } );
    // m_timers.emplace_back( TimerSeqID{ state, timer, 0 } );
 }
 
-void Server::process_timer( const base::comm::timer::ID id )
+void Server::process_timer( const carpc::comm::timer::ID id )
 {
    MSG_DBG( "timer '%s' expired", id.name( ).c_str( ) );
 

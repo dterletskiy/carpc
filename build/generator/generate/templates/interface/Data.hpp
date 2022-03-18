@@ -18,7 +18,7 @@
 
 
 
-namespace base::onoff {
+namespace carpc::onoff {
 
    DEFINE_ENUMERATION( eOnOff, std::size_t
       , RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState
@@ -31,7 +31,7 @@ namespace base::onoff {
 
 
 
-namespace base::onoff::ipc {
+namespace carpc::onoff::ipc {
 
    class BaseData
    {
@@ -42,12 +42,12 @@ namespace base::onoff::ipc {
          virtual ~BaseData( ) = default;
 
       public:
-         static tSptr create( base::ipc::tStream& );
-         bool serrialize( base::ipc::tStream& );
+         static tSptr create( carpc::ipc::tStream& );
+         bool serrialize( carpc::ipc::tStream& );
 
       private:
-         virtual bool to_stream( base::ipc::tStream& ) = 0;
-         virtual bool from_stream( base::ipc::tStream& ) = 0;
+         virtual bool to_stream( carpc::ipc::tStream& ) = 0;
+         virtual bool from_stream( carpc::ipc::tStream& ) = 0;
          virtual const eOnOff id( ) const = 0;
    };
 
@@ -69,8 +69,8 @@ namespace base::onoff::ipc {
          std::size_t delay = 0;
 
       private:
-         bool to_stream( base::ipc::tStream& ) override;
-         bool from_stream( base::ipc::tStream& ) override;
+         bool to_stream( carpc::ipc::tStream& ) override;
+         bool from_stream( carpc::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };
@@ -92,8 +92,8 @@ namespace base::onoff::ipc {
          bool result = false;
 
       private:
-         bool to_stream( base::ipc::tStream& ) override;
-         bool from_stream( base::ipc::tStream& ) override;
+         bool to_stream( carpc::ipc::tStream& ) override;
+         bool from_stream( carpc::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };
@@ -112,8 +112,8 @@ namespace base::onoff::ipc {
          ~RequestStartData( ) override = default;
 
       private:
-         bool to_stream( base::ipc::tStream& ) override;
-         bool from_stream( base::ipc::tStream& ) override;
+         bool to_stream( carpc::ipc::tStream& ) override;
+         bool from_stream( carpc::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };
@@ -135,8 +135,8 @@ namespace base::onoff::ipc {
          std::string state = "";
 
       private:
-         bool to_stream( base::ipc::tStream& ) override;
-         bool from_stream( base::ipc::tStream& ) override;
+         bool to_stream( carpc::ipc::tStream& ) override;
+         bool from_stream( carpc::ipc::tStream& ) override;
          const eOnOff id( ) const override;
          static const eOnOff ID;
    };
@@ -145,19 +145,19 @@ namespace base::onoff::ipc {
 
    struct Types
    {
-      using tIPC           = base::service::IPC;
+      using tIPC           = carpc::service::IPC;
       using tID            = eOnOff;
       using tBaseData      = BaseData;
 
-      static const base::service::RequestResponseIDs< tID >::tVector& RR;
-      static const base::service::NotificationIDs< tID >::tVector& N;
+      static const carpc::service::RequestResponseIDs< tID >::tVector& RR;
+      static const carpc::service::NotificationIDs< tID >::tVector& N;
    };
 
-} // namespace base::onoff::ipc
+} // namespace carpc::onoff::ipc
 
 
 
-namespace base::onoff::no_ipc {
+namespace carpc::onoff::no_ipc {
 
    class BaseData
    {
@@ -241,20 +241,20 @@ namespace base::onoff::no_ipc {
 
    struct Types
    {
-      using tIPC           = base::service::NO_IPC;
+      using tIPC           = carpc::service::NO_IPC;
       using tID            = eOnOff;
       using tBaseData      = BaseData;
 
-      static const base::service::RequestResponseIDs< tID >::tVector& RR;
-      static const base::service::NotificationIDs< tID >::tVector& N;
+      static const carpc::service::RequestResponseIDs< tID >::tVector& RR;
+      static const carpc::service::NotificationIDs< tID >::tVector& N;
    };
 
-} // namespace base::onoff::no_ipc
+} // namespace carpc::onoff::no_ipc
 
 
 
-namespace base::onoff {
+namespace carpc::onoff {
 
-   namespace data = base::onoff::ipc;
+   namespace data = carpc::onoff::ipc;
 
-} // namespace base::onoff
+} // namespace carpc::onoff

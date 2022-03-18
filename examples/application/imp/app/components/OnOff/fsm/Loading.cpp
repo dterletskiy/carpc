@@ -12,7 +12,7 @@ using namespace application::components::onoff;
 
 
 Loading::Loading( Manager& manager )
-   : base::fsm::TState< Types >( eID::Loading, "Loading" )
+   : carpc::fsm::TState< Types >( eID::Loading, "Loading" )
    , m_manager( manager )
 {
 }

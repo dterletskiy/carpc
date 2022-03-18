@@ -7,7 +7,7 @@
 namespace hybrid::interface::onoff {
 
    class Server
-      : public base::onoff::Server
+      : public carpc::onoff::Server
    {
       public:
          Server( );

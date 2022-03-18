@@ -6,10 +6,10 @@
 
 
 
-namespace base::onoff {
+namespace carpc::onoff {
 
    class Server
-      : public base::service::SERVICE_NAMESPACE::TServer< data::Types >
+      : public carpc::service::SERVICE_NAMESPACE::TServer< data::Types >
    {
       public:
          using tSptr = std::shared_ptr< Server >;
@@ -35,4 +35,4 @@ namespace base::onoff {
          const std::string& current_state( ) const;
    };
 
-} // namespace base::onoff
+} // namespace carpc::onoff

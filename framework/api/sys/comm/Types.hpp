@@ -6,7 +6,7 @@
 
 
 
-namespace base::comm {
+namespace carpc::comm {
 
    namespace async
    {
@@ -16,21 +16,21 @@ namespace base::comm {
    namespace service
    {
       class ServiceID;
-      using ID = base::TID< ServiceID >;
-      using Name = base::TName< ServiceID >;
+      using ID = carpc::TID< ServiceID >;
+      using Name = carpc::TName< ServiceID >;
    }
 
    namespace sequence
    {
       class SequenceID;
-      using ID = base::TID< SequenceID >;
+      using ID = carpc::TID< SequenceID >;
    }
 
    namespace timer
    {
       class TimerID;
-      using ID = base::TID< TimerID >;
-      using Name = base::TName< TimerID >;
+      using ID = carpc::TID< TimerID >;
+      using Name = carpc::TName< TimerID >;
    }
 
-} // namespace base::service
+} // namespace carpc::service

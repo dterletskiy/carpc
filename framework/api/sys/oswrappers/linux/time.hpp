@@ -7,7 +7,7 @@
 
 
 
-namespace base::os::os_linux {
+namespace carpc::os::os_linux {
 
    enum class eGranularity : std::size_t
    {
@@ -27,4 +27,4 @@ namespace base::os::os_linux {
    timespec timeval_to_timespec( const timeval& tv, timespec* const ts = nullptr );
    timeval timespec_to_timeval( const timespec& ts, timeval* const tv = nullptr );
 
-} // namespace base::os::os_linux
+} // namespace carpc::os::os_linux

@@ -6,7 +6,7 @@
 
 
 
-namespace base::service {
+namespace carpc::service {
 
    class Address
    {
@@ -22,8 +22,8 @@ namespace base::service {
          ~Address( ) = default;
 
       public:
-         bool to_stream( base::ipc::tStream& ) const;
-         bool from_stream( base::ipc::tStream& );
+         bool to_stream( carpc::ipc::tStream& ) const;
+         bool from_stream( carpc::ipc::tStream& );
 
       public:
          Address& operator=( const Address& );
@@ -63,4 +63,4 @@ namespace base::service {
       return m_id != comm::service::ID::invalid;
    }
 
-} // namespace base::service
+} // namespace carpc::service

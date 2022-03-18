@@ -13,11 +13,11 @@
 namespace application::components::onoff {
 
    class Component
-      : public base::application::RootComponent
-      , public base::timer::ITimerConsumer
+      : public carpc::application::RootComponent
+      , public carpc::timer::ITimerConsumer
    {
       public:
-         static base::application::IComponent::tSptr creator( );
+         static carpc::application::IComponent::tSptr creator( );
 
       private:
          Component( const std::string& );
@@ -32,11 +32,11 @@ namespace application::components::onoff {
 
       // Timer
       private:
-         void process_timer( const base::comm::timer::ID ) override;
-         base::timer::Timer m_timer;
+         void process_timer( const carpc::comm::timer::ID ) override;
+         carpc::timer::Timer m_timer;
 
       public:
-         void on_timer( const base::comm::timer::ID );
+         void on_timer( const carpc::comm::timer::ID );
 
       private:
          Manager m_fsm;

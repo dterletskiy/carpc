@@ -5,7 +5,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
 
 
@@ -70,4 +70,4 @@ using BlockerRoot = SharedCallback< void >;
 
 
 
-} // namespace base
+} // namespace carpc

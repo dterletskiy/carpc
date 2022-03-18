@@ -12,7 +12,7 @@
 
 
 
-namespace base::math {
+namespace carpc::math {
 
    #define __INTEGRAL_TYPE__( TYPE )         std::is_integral_v< TYPE >
    #define __FLOATING_POINT_TYPE__( TYPE )   std::is_floating_point_v< TYPE >
@@ -372,7 +372,7 @@ namespace base::math {
 
       print( "dimention: %zu x %zu\n", m_rows.value( ), m_columns.value( ) );
       for( tRow row{ 0 }; row < m_rows; ++row )
-         base::print( m_elements[ row.value( ) ], m_columns, true );
+         carpc::print( m_elements[ row.value( ) ], m_columns, true );
    }
 
    template< typename TYPE >
@@ -628,7 +628,7 @@ namespace base::math {
    {
       if( columns( ) != matrix.rows( ) )
       {
-         std::string error = base::format_string(
+         std::string error = carpc::format_string(
             "matrix multiplication with invalid shapes (", rows( ), ",", columns( ), ") (", matrix.rows( ), ",", matrix.columns( ), ")"
          );
          throw std::invalid_argument( error.c_str( ) );
@@ -647,7 +647,7 @@ namespace base::math {
    {
       if( columns( ) != matrix.rows( ) )
       {
-         std::string error = base::format_string(
+         std::string error = carpc::format_string(
             "matrix multiplication with invalid shapes (", rows( ), ",", columns( ), ") (", matrix.rows( ), ",", matrix.columns( ), ")"
          );
          throw std::invalid_argument( error.c_str( ) );
@@ -863,7 +863,7 @@ namespace base::math {
    {
       if( row != m_rows || column != m_columns )
       {
-         std::string error = base::format_string(
+         std::string error = carpc::format_string(
             "invalid shapes: current = (", rows( ), ",", columns( ), ") check = (", row, ",", column, ")"
          );
          throw std::invalid_argument( error.c_str( ) );
@@ -875,7 +875,7 @@ namespace base::math {
    {
       if( row >= m_rows || column >= m_columns )
       {
-         std::string error = base::format_string(
+         std::string error = carpc::format_string(
             "row or column is out of range: current = (", rows( ), ",", columns( ), ") check = (", row, ",", column, ")"
          );
          throw std::invalid_argument( error.c_str( ) );
@@ -893,7 +893,7 @@ namespace base::math {
 
 
 
-namespace base::math {
+namespace carpc::math {
 
    template< typename TYPE >
    TMatrix< TYPE > multiply( const TMatrix< TYPE >& matrix_1, const TMatrix< TYPE >& matrix_2 )

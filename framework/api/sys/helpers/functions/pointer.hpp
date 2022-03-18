@@ -6,7 +6,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    void* const inc( void* const ptr, const std::size_t value );
    const void* const inc( const void* const ptr, const std::size_t value );
@@ -16,4 +16,4 @@ namespace base {
 
    std::ptrdiff_t diff( const void* const ptr1, const void* const ptr2 );
 
-} // namespace base
+} // namespace carpc

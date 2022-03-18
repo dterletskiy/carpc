@@ -6,7 +6,7 @@
 
 
 
-namespace base::os::os_linux::signals {
+namespace carpc::os::os_linux::signals {
 
    thread_local int error = 0;
 
@@ -186,7 +186,7 @@ namespace base::os::os_linux::signals {
 
 
 
-namespace base::os::os_linux::signals {
+namespace carpc::os::os_linux::signals {
 
    void info( )
    {
@@ -359,4 +359,4 @@ namespace base::os::os_linux::signals {
    }
 
 
-} // namespace base::os::os_linux::signals
+} // namespace carpc::os::os_linux::signals

@@ -13,11 +13,11 @@
 namespace symbiont::components::onoff {
 
    class Component
-      : public base::application::RootComponent
+      : public carpc::application::RootComponent
       , public events::AppEvent::Consumer
    {
       public:
-         static base::application::IComponent::tSptr creator( );
+         static carpc::application::IComponent::tSptr creator( );
 
       private:
          Component( const std::string& );

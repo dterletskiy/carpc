@@ -6,7 +6,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class IComponent
    {
@@ -49,4 +49,4 @@ namespace base::application {
       return m_id;
    }
 
-} // namespace base::application
+} // namespace carpc::application

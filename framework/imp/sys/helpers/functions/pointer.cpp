@@ -2,7 +2,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    void* const inc( void* const ptr, const std::size_t value )
    {
@@ -29,4 +29,4 @@ namespace base {
       return static_cast< const std::uint8_t* const >( ptr1 ) - static_cast< const std::uint8_t* const >( ptr2 );
    }
 
-} // namespace base
+} // namespace carpc

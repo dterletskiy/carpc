@@ -6,7 +6,7 @@
 
 
 
-namespace base::trace {
+namespace carpc::trace {
 
    const std::size_t s_buffer_size = 2 * 1024;
 
@@ -221,7 +221,7 @@ namespace base::trace {
       #endif
    }
 
-} // namespace base::trace
+} // namespace carpc::trace
 
 
 
@@ -229,7 +229,7 @@ namespace base::trace {
 
 #define TRACE_LOG( LOG_LEVEL, USER_FORMAT, ... ) \
    do { \
-      ::base::trace::Logger::instance( ).message_format( \
+      ::carpc::trace::Logger::instance( ).message_format( \
          LOG_LEVEL, \
          CLASS_ABBR, __FUNCTION__, __LINE__, \
          "" USER_FORMAT, ##__VA_ARGS__ \

@@ -5,7 +5,7 @@
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class Mutex
    {
@@ -59,11 +59,11 @@ namespace base::os {
       return m_id;
    }
 
-} // namespace base::os
+} // namespace carpc::os
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class MutexRW
    {
@@ -102,4 +102,4 @@ namespace base::os {
       return m_id;
    }
 
-} // namespace base::os
+} // namespace carpc::os

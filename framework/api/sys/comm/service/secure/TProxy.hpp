@@ -9,7 +9,7 @@
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    template< typename TYPES >
       class TServer;
@@ -18,11 +18,11 @@ namespace base::service::secure::__private {
    template< typename TYPES >
       class TClient;
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    template< typename TYPES >
    struct RequestDB
@@ -203,11 +203,11 @@ namespace base::service::secure::__private {
       return false;
    }
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    template< typename TYPES >
    struct NotificationDB
@@ -311,7 +311,7 @@ namespace base::service::secure::__private {
             );
          p_event->data( event_id_iterator->second.mp_event_data );
          auto operation = [ p_client, p_event ]( ){ p_client->process_notification_event( *p_event ); };
-         base::async::Runnable::create_send( operation );
+         carpc::async::Runnable::create_send( operation );
       }
 
       return true;
@@ -378,11 +378,11 @@ namespace base::service::secure::__private {
       return true;
    }
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 
-namespace base::service::secure::__private {
+namespace carpc::service::secure::__private__ {
 
    template< typename TYPES >
    class TProxy
@@ -396,11 +396,11 @@ namespace base::service::secure::__private {
       using tAttributeMap = std::map< typename TYPES::tEventID, typename TYPES::tEvent >;
 
       private:
-         TProxy( const base::async::tAsyncTypeID&, const std::string&, const bool );
+         TProxy( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
          static thread_local tProxy* sp_proxy;
       public:
          ~TProxy( ) override;
-         static tProxy* create( const base::async::tAsyncTypeID&, const std::string&, const bool );
+         static tProxy* create( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
 
       private:
          void connected( const Address& ) override final;
@@ -429,7 +429,7 @@ namespace base::service::secure::__private {
 
 
    template< typename TYPES >
-   TProxy< TYPES >::TProxy( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+   TProxy< TYPES >::TProxy( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
       : IProxy( interface_type_id, role_name, is_import )
       , TYPES::tEventConsumer( )
       , m_request_processor( this )
@@ -447,7 +447,7 @@ namespace base::service::secure::__private {
    thread_local TProxy< TYPES >* TProxy< TYPES >::sp_proxy = nullptr;
 
    template< typename TYPES >
-   TProxy< TYPES >* TProxy< TYPES >::create( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
+   TProxy< TYPES >* TProxy< TYPES >::create( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
    {
       if( nullptr != sp_proxy )
       {
@@ -549,7 +549,7 @@ namespace base::service::secure::__private {
       return nullptr;
    }
 
-} // namespace base::service::secure::__private
+} // namespace carpc::service::secure::__private__
 
 
 

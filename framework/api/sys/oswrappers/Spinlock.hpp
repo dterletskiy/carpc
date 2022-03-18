@@ -5,7 +5,7 @@
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class Spinlock
    {
@@ -57,4 +57,4 @@ namespace base::os {
       return m_id;
    }
 
-} // namespace base::os
+} // namespace carpc::os

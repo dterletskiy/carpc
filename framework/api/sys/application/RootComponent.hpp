@@ -4,7 +4,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class RootComponent : public IComponent
    {
@@ -18,4 +18,4 @@ namespace base::application {
          void shutdown( const std::string& info = "shutdown" ) override final;
    };
 
-} // namespace base::application
+} // namespace carpc::application

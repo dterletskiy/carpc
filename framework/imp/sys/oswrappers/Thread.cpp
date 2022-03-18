@@ -9,7 +9,7 @@
 
 
 
-using namespace base::os;
+using namespace carpc::os;
 
 
 
@@ -18,8 +18,8 @@ namespace {
    using tRegistry = std::map< os_linux::thread::tID, thread::ID >;
    tRegistry s_registry;
 
-   base::os::Mutex s_registry_mutex;
-   base::os::Mutex thread_loop_mutex;
+   carpc::os::Mutex s_registry_mutex;
+   carpc::os::Mutex thread_loop_mutex;
 
 }
 

@@ -12,7 +12,7 @@
 
 
 
-namespace base::os::os_linux::filesystem {
+namespace carpc::os::os_linux::filesystem {
 
    thread_local int error = 0;
 
@@ -292,9 +292,9 @@ namespace base::os::os_linux::filesystem {
       return offset_result;
    }
 
-} // namespace base::os::os_linux::filesystem
+} // namespace carpc::os::os_linux::filesystem
 
-namespace base::os::os_linux::filesystem {
+namespace carpc::os::os_linux::filesystem {
 
    DIR* opendir( const char* const path )
    {
@@ -536,9 +536,9 @@ namespace base::os::os_linux::filesystem {
       return result;
    }
 
-} // namespace base::os::os_linux::filesystem
+} // namespace carpc::os::os_linux::filesystem
 
-namespace base::os::os_linux::filesystem {
+namespace carpc::os::os_linux::filesystem {
 
    std::string& canonify( std::string& path )
    {
@@ -889,4 +889,4 @@ namespace base::os::os_linux::filesystem {
       return filesystem::rename( source.c_str( ), destination.c_str( ) );
    }
 
-} // namespace base::os::os_linux::filesystem
+} // namespace carpc::os::os_linux::filesystem

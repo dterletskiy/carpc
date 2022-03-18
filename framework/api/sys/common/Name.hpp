@@ -5,7 +5,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    template< typename T, typename V = std::string >
    class TName
@@ -96,4 +96,4 @@ namespace base {
    template< typename T, typename V >
       const TName< T, V > TName< T, V >::invalid{ invalid_value };
 
-} // namespace base
+} // namespace carpc

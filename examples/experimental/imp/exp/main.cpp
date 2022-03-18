@@ -3,7 +3,7 @@
 
 
 
-const base::application::Thread::Configuration::tVector services = { };
+const carpc::application::Thread::Configuration::tVector services = { };
 
 
 

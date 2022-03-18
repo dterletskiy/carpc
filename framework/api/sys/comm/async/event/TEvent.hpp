@@ -7,7 +7,7 @@
 
 
 
-namespace base::async {
+namespace carpc::async {
 
    template< typename _Generator >
    class TEvent : public IEvent
@@ -65,7 +65,7 @@ namespace base::async {
 
          static std::shared_ptr< tEvent > create(
                const tUserSignature& signature,
-               const tPriority& priority = base::priority( ePriority::DEFAULT )
+               const tPriority& priority = carpc::priority( ePriority::DEFAULT )
             )
          {
             return std::shared_ptr< tEvent >( new tEvent( signature, priority ) );
@@ -73,7 +73,7 @@ namespace base::async {
          static std::shared_ptr< tEvent > create(
                const tUserSignature& signature,
                const tData& data,
-               const tPriority& priority = base::priority( ePriority::DEFAULT )
+               const tPriority& priority = carpc::priority( ePriority::DEFAULT )
             )
          {
             return std::shared_ptr< tEvent >( new tEvent( signature, data, priority ) );
@@ -193,10 +193,10 @@ namespace base::async {
       public:
          const tPriority priority( ) const override { return m_priority; }
       protected:
-         tPriority m_priority = base::priority( ePriority::DEFAULT );
+         tPriority m_priority = carpc::priority( ePriority::DEFAULT );
    };
 
-} // namespace base::async
+} // namespace carpc::async
 
 
 

@@ -6,12 +6,12 @@
 
 
 
-namespace ev_i = base::events::service;
-using namespace base::service;
+namespace ev_i = carpc::events::service;
+using namespace carpc::service;
 
 
 
-IServer::IServer( const base::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
+IServer::IServer( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
    : IConnection( interface_type_id, role_name, is_export )
 {
    ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ClientConnected } );

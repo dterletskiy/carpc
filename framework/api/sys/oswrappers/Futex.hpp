@@ -5,7 +5,7 @@
 
 
 
-namespace base::os {
+namespace carpc::os {
 
    class Futex
    {
@@ -58,7 +58,7 @@ namespace base::os {
       return m_id;
    }
 
-} // namespace base::os
+} // namespace carpc::os
 
 
 
@@ -71,7 +71,7 @@ namespace base::os {
 
 
 
-   base::os::Futex futex;
+   carpc::os::Futex futex;
 
    void thread_loop( const std::size_t index )
    {
@@ -102,10 +102,10 @@ namespace base::os {
 
    int main( int argc, char** argv, char** envp )
    {
-      std::vector< std::shared_ptr< base::os::Thread > > threads;
+      std::vector< std::shared_ptr< carpc::os::Thread > > threads;
       for( std::size_t index = 0; index < 10; ++index )
       {
-         std::shared_ptr< base::os::Thread > p_thread( new base::os::Thread( thread_loop, index ) );
+         std::shared_ptr< carpc::os::Thread > p_thread( new carpc::os::Thread( thread_loop, index ) );
          threads.push_back( p_thread );
          p_thread->run( );
       }

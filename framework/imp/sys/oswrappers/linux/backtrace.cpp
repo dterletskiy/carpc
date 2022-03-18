@@ -10,7 +10,7 @@
 
 
 
-namespace base::os::os_linux {
+namespace carpc::os::os_linux {
 
    const char* wrn_duffer_size = "not enough buffer size\n";
    void back_trace( int _fd )
@@ -50,4 +50,4 @@ namespace base::os::os_linux {
       }
    }
 
-} // namespace base::os::os_linux
+} // namespace carpc::os::os_linux

@@ -5,20 +5,20 @@
 
 
 
-namespace base::command {
+namespace carpc::command {
 
    namespace queue
    {
       class QueueID;
-      using ID = base::TID< QueueID >;
-      using Name = base::TName< QueueID >;
+      using ID = carpc::TID< QueueID >;
+      using Name = carpc::TName< QueueID >;
    }
 
    namespace command
    {
       class CommandID;
-      using ID = base::TID< CommandID >;
-      using Name = base::TName< CommandID >;
+      using ID = carpc::TID< CommandID >;
+      using Name = carpc::TName< CommandID >;
    }
 
-} // namespace base::events
+} // namespace carpc::events

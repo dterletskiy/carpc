@@ -7,7 +7,7 @@
 
 
 
-namespace base {
+namespace carpc {
 
    template< typename T, typename V = std::uint64_t >
    class TID
@@ -127,7 +127,7 @@ namespace base {
          }
          const std::string name( ) const
          {
-            return base::format_string( "0x", std::hex, m_value );
+            return carpc::format_string( "0x", std::hex, m_value );
          }
       private:
          VALUE_TYPE m_value = invalid_value;
@@ -144,7 +144,7 @@ namespace base {
    template< typename T, typename V >
       const TID< T, V > TID< T, V >::zero{ zero_value };
 
-} // namespace base
+} // namespace carpc
 
 
 
@@ -154,7 +154,7 @@ namespace base {
    class A
    {
       public:
-         using ID = base::TID< A >;
+         using ID = carpc::TID< A >;
 
       public:
          A( ) = default;
@@ -169,7 +169,7 @@ namespace base {
    class B
    {
       public:
-         using ID = base::TID< B >;
+         using ID = carpc::TID< B >;
 
       public:
          B( ) = default;

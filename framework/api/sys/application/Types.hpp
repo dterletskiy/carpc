@@ -7,38 +7,38 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    namespace component
    {
       class ComponentID;
-      using ID = base::TID< ComponentID >;
+      using ID = carpc::TID< ComponentID >;
       const ID invalid = ID::invalid;
-      using Name = base::TName< ComponentID >;
+      using Name = carpc::TName< ComponentID >;
 
    }
 
    namespace process
    {
       class ProcessID;
-      using ID = base::TID< ProcessID >;
+      using ID = carpc::TID< ProcessID >;
       const ID invalid = ID::invalid;
       const ID broadcast = ID::invalid - ID::VALUE_TYPE( 1 );
       const ID local = broadcast - ID::VALUE_TYPE( 1 );
       const ID& current_id( );
-      using Name = base::TName< ProcessID >;
+      using Name = carpc::TName< ProcessID >;
 
    }
 
    namespace thread
    {
       class ThreadID;
-      using ID = base::TID< ThreadID >;
+      using ID = carpc::TID< ThreadID >;
       const ID invalid = ID::invalid;
       const ID broadcast = ID::invalid - ID::VALUE_TYPE( 1 );
       const ID local = broadcast - ID::VALUE_TYPE( 1 );
       const ID& current_id( );
-      using Name = base::TName< ThreadID >;
+      using Name = carpc::TName< ThreadID >;
 
    }
 
@@ -60,4 +60,4 @@ namespace base::application {
       const Data& current( );
    }
 
-} // namespace base::application
+} // namespace carpc::application

@@ -13,7 +13,7 @@
 
 // Based on
 // link: https://stackoverflow.com/questions/25492589/can-i-use-sfinae-to-selectively-define-a-member-variable-in-a-template-class
-namespace base_v1 {
+namespace __private_carpc_async_v1__ {
 
    template< typename TYPE >
    class TBaseAsyncTypeID
@@ -42,13 +42,13 @@ namespace base_v1 {
          }
 
       public:
-         const bool to_stream( base::ipc::tStream& stream ) const
+         const bool to_stream( carpc::ipc::tStream& stream ) const
          {
-            return base::ipc::serialize( stream, m_value );
+            return carpc::ipc::serialize( stream, m_value );
          }
-         const bool from_stream( base::ipc::tStream& stream )
+         const bool from_stream( carpc::ipc::tStream& stream )
          {
-            return base::ipc::deserialize( stream, m_value );
+            return carpc::ipc::deserialize( stream, m_value );
          }
 
       public:
@@ -106,7 +106,7 @@ namespace base_v1 {
          TAsyncTypeID( ) = default;
          TAsyncTypeID( const TYPE& _value )
             : TBaseAsyncTypeID< TYPE >( _value )
-            , m_name( base::format_string( "0x", std::hex, _value ) )
+            , m_name( carpc::format_string( "0x", std::hex, _value ) )
          { }
          TAsyncTypeID( const TAsyncTypeID< TYPE >& _other )
             : TBaseAsyncTypeID< TYPE >( _other.m_value )
@@ -115,20 +115,20 @@ namespace base_v1 {
          ~TAsyncTypeID( ) = default;
 
       public:
-         const bool to_stream( base::ipc::tStream& stream ) const
+         const bool to_stream( carpc::ipc::tStream& stream ) const
          {
-            return base::ipc::serialize( stream, TAsyncTypeID< TYPE >::m_value, m_name );
+            return carpc::ipc::serialize( stream, TAsyncTypeID< TYPE >::m_value, m_name );
          }
-         const bool from_stream( base::ipc::tStream& stream )
+         const bool from_stream( carpc::ipc::tStream& stream )
          {
-            return base::ipc::deserialize( stream, TAsyncTypeID< TYPE >::m_value, m_name );
+            return carpc::ipc::deserialize( stream, TAsyncTypeID< TYPE >::m_value, m_name );
          }
 
       public:
          template< typename T >
             static std::size_t generate( )
             {
-               const std::string _name = base::format_string( std::hex, typeid( T ).name( ) );
+               const std::string _name = carpc::format_string( std::hex, typeid( T ).name( ) );
                const std::size_t _hash_code = typeid( T ).hash_code( );
                SYS_DBG( "async typeid: %p => %s", (void*)_hash_code, _name.c_str( ) );
                return typeid( T ).hash_code( );
@@ -150,7 +150,7 @@ namespace base_v1 {
 }
 
 // This variant in not prefereble but interesting from implementation point of view of methods "name" and "generate"
-namespace base_v2 {
+namespace __private_carpc_async_v2__ {
 
    template< typename T >
    class TAsyncTypeID
@@ -182,13 +182,13 @@ namespace base_v2 {
          }
 
       public:
-         const bool to_stream( base::ipc::tStream& stream ) const
+         const bool to_stream( carpc::ipc::tStream& stream ) const
          {
-            return base::ipc::serialize( stream, m_value );
+            return carpc::ipc::serialize( stream, m_value );
          }
-         const bool from_stream( base::ipc::tStream& stream )
+         const bool from_stream( carpc::ipc::tStream& stream )
          {
-            return base::ipc::deserialize( stream, m_value );
+            return carpc::ipc::deserialize( stream, m_value );
          }
 
       public:
@@ -241,11 +241,11 @@ namespace base_v2 {
 
 }
 
-namespace base::async {
+namespace carpc::async {
 
    // using tAsyncTypeID = std::string;
-   // using tAsyncTypeID = base_v1::TAsyncTypeID< std::size_t >;
-   using tAsyncTypeID = base_v1::TAsyncTypeID< std::string >;
+   // using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::size_t >;
+   using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::string >;
 
    using NoServiceType = void;
    #define IS_IPC_EVENT ( false == std::is_same_v< tService, NoServiceType > )
@@ -253,7 +253,7 @@ namespace base::async {
    enum class eAsyncType : std::uint8_t { EVENT, RUNNABLE, CALLABLE };
    const char* c_str( const eAsyncType );
 
-} // namespace base::async
+} // namespace carpc::async
 
 
 

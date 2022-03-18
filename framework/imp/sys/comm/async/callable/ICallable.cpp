@@ -5,7 +5,7 @@
 #define CLASS_ABBR "ICallable"
 
 
-using namespace base::async;
+using namespace carpc::async;
 
 
 
@@ -35,7 +35,7 @@ const bool ICallable::send( const application::Context& to_context )
          result &= p_thread_ipc->insert_event( p_callable );
       }
 
-      application::IThread::tSptrList thread_list = base::application::Process::instance( )->thread_list( );
+      application::IThread::tSptrList thread_list = carpc::application::Process::instance( )->thread_list( );
       for( auto p_thread : thread_list )
          result &= p_thread->insert_event( p_callable );
 
@@ -44,7 +44,7 @@ const bool ICallable::send( const application::Context& to_context )
    else if( application::thread::local == to_context.tid( ) )
    {
       SYS_INF( "sending callable to current application thread: %s", to_context.tid( ).name( ).c_str( ) );
-      application::IThread::tSptr p_thread = base::application::Process::instance( )->current_thread( );
+      application::IThread::tSptr p_thread = carpc::application::Process::instance( )->current_thread( );
       if( nullptr == p_thread )
       {
          SYS_ERR( "sending callable not from application thread" );
@@ -56,7 +56,7 @@ const bool ICallable::send( const application::Context& to_context )
    else
    {
       SYS_INF( "sending callable to %s application thread", to_context.tid( ).name( ).c_str( ) );
-      application::IThread::tSptr p_thread = base::application::Process::instance( )->thread( to_context.tid( ) );
+      application::IThread::tSptr p_thread = carpc::application::Process::instance( )->thread( to_context.tid( ) );
       if( nullptr == p_thread )
       {
          SYS_ERR( "sending callable to unknown application thread" );

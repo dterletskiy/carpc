@@ -13,7 +13,7 @@
 
 
 
-namespace base::application {
+namespace carpc::application {
 
    class IThread
       : public std::enable_shared_from_this< IThread >
@@ -40,15 +40,15 @@ namespace base::application {
          virtual bool wait( ) = 0;
          virtual void boot( const std::string& ) = 0;
          virtual void shutdown( const std::string& ) = 0;
-         virtual const base::os::Thread& thread( ) const = 0;
+         virtual const carpc::os::Thread& thread( ) const = 0;
          virtual void dump( ) const = 0;
 
       public:
-         virtual void set_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
-         virtual void clear_notification( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
-         virtual void clear_all_notifications( const base::async::IAsync::ISignature::tSptr, base::async::IAsync::IConsumer* ) = 0;
-         virtual bool insert_event( const base::async::IAsync::tSptr ) = 0;
-         virtual bool send( const base::async::IAsync::tSptr, const application::Context& ) = 0;
+         virtual void set_notification( const carpc::async::IAsync::ISignature::tSptr, carpc::async::IAsync::IConsumer* ) = 0;
+         virtual void clear_notification( const carpc::async::IAsync::ISignature::tSptr, carpc::async::IAsync::IConsumer* ) = 0;
+         virtual void clear_all_notifications( const carpc::async::IAsync::ISignature::tSptr, carpc::async::IAsync::IConsumer* ) = 0;
+         virtual bool insert_event( const carpc::async::IAsync::tSptr ) = 0;
+         virtual bool send( const carpc::async::IAsync::tSptr, const application::Context& ) = 0;
 
       public:
          const thread::ID& id( ) const;
@@ -106,4 +106,4 @@ namespace base::application {
       return m_process_started.store( 0 );
    }
 
-} // namespace base::application
+} // namespace carpc::application

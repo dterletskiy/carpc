@@ -5,7 +5,7 @@
 #define CLASS_ABBR "SystemEventConsumer"
 
 
-using namespace base::application;
+using namespace carpc::application;
 
 
 
