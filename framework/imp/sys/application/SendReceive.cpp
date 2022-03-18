@@ -177,7 +177,7 @@ SendReceive::ServiceBrocker::ServiceBrocker( SendReceive& parent )
 bool SendReceive::ServiceBrocker::setup_connection( )
 {
    mp_socket = os::Socket::create_shared(
-      Process::instance( )->configuration( ).ipc_sb.socket, Process::instance( )->configuration( ).ipc_sb.buffer_size
+      process::configuration::current( ).ipc_sb.socket, process::configuration::current( ).ipc_sb.buffer_size
    );
 
    if( nullptr == mp_socket )
@@ -248,8 +248,8 @@ bool SendReceive::ServiceBrocker::process_package( dsi::Package& package, os::So
 
             dsi::Packet packet(
                dsi::eCommand::RegisterProcess,
-               application::Process::instance( )->id( ),
-               static_cast< dsi::SocketCongiguration >( Process::instance( )->configuration( ).ipc_app.socket )
+               application::process::current_id( ),
+               static_cast< dsi::SocketCongiguration >( process::configuration::current( ).ipc_app.socket )
             );
             m_parent.send( packet, p_socket_send );
 
@@ -300,7 +300,7 @@ SendReceive::Master::Master( SendReceive& parent )
 bool SendReceive::Master::setup_connection( )
 {
    mp_socket = os::Socket::create_shared(
-      Process::instance( )->configuration( ).ipc_app.socket, Process::instance( )->configuration( ).ipc_app.buffer_size
+      process::configuration::current( ).ipc_app.socket, process::configuration::current( ).ipc_app.buffer_size
    );
 
    if( nullptr == mp_socket )
@@ -458,7 +458,7 @@ bool SendReceive::Connections::process_package( dsi::Package& package, os::Socke
 
          channel::recv::update( p_socket, pid );
 
-         dsi::Packet packet( dsi::eCommand::RegisterProcessAck, application::Process::instance( )->id( ) );
+         dsi::Packet packet( dsi::eCommand::RegisterProcessAck, application::process::current_id( ) );
          m_parent.send( packet, p_socket_send );
 
          break;
@@ -614,7 +614,7 @@ base::os::Socket::tSptr SendReceive::Connections::channel::send::create(
       return iterator->second;
    }
 
-   os::Socket::tSptr p_socket = os::Socket::create_shared( inet_address, Process::instance( )->configuration( ).ipc_app.buffer_size );
+   os::Socket::tSptr p_socket = os::Socket::create_shared( inet_address, process::configuration::current( ).ipc_app.buffer_size );
    if( os::Socket::eResult::ERROR == p_socket->create( ) )
       return nullptr;
    if( os::Socket::eResult::ERROR == p_socket->connect( ) )

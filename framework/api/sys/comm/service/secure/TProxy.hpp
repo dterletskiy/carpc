@@ -455,7 +455,7 @@ namespace base::service::secure::__private {
          return sp_proxy;
       }
 
-      if( application::Process::instance( )->current_thread( )->id( ).is_invalid( ) )
+      if( application::thread::current_id( ).is_invalid( ) )
       {
          SYS_ERR( "creating proxy '%s.%s' not from application thread", interface_type_id.name( ).c_str( ), role_name.c_str( ) );
          return nullptr;

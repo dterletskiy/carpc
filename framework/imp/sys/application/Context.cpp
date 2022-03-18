@@ -33,10 +33,8 @@ Context::Context( const eInitType init_type )
       }
       case eInitType::CURRENT:
       {
-         m_pid = Process::instance( )->id( );
-         IThread::tSptr thread = Process::instance( )->current_thread( );
-         if( nullptr != thread )
-            m_tid = thread->id( );
+         m_pid = process::current_id( );
+         m_tid = thread::current_id( );
          break;
       }
       case eInitType::INVALID:
@@ -66,14 +64,27 @@ Context Context::current( )
    return Context{ eInitType::CURRENT };
 }
 
-bool Context::is_local( ) const
+bool Context::is_internal( ) const
 {
-   return ( application::Process::instance( )->id( ) == m_pid ) || ( process::local == m_pid );
+   return ( process::current_id( ) == m_pid ) || ( process::local == m_pid );
+}
+
+bool Context::is_internal_local( ) const
+{
+   if( false == is_internal( ) )
+      return false;
+
+   return ( thread::current_id( ) == m_tid ) || ( thread::local == m_tid );
+}
+
+bool Context::is_internal_broadcast( ) const
+{
+   return !is_internal_local( );
 }
 
 bool Context::is_external( ) const
 {
-   return !is_local( );
+   return !is_internal( );
 }
 
 bool Context::is_valid( ) const

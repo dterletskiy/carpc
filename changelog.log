@@ -1,3 +1,6 @@
+version 3.4.4
+   - Minor chages in application part.
+
 version 3.4.3
    - Improve starting and initializing application sequence to avoid chaotic starting application threads and registering services before starting IPC thread.
 

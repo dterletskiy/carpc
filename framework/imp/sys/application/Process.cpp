@@ -150,20 +150,6 @@ IThread::tSptr Process::current_thread( ) const
    return nullptr;
 }
 
-Context Process::current_context( ) const
-{
-   for( auto& p_thread : m_thread_list )
-   {
-      if( os::Thread::current_id( ) == p_thread->thread( ).id( ) )
-         return { m_id, p_thread->id( ) };
-   }
-
-   if( os::Thread::current_id( ) == mp_thread_ipc->thread( ).id( ) )
-      return { m_id, mp_thread_ipc->id( ) };
-
-   return Context::invalid;
-}
-
 bool Process::start( const Thread::Configuration::tVector& thread_configs )
 {
    // Creating IPC brocker thread

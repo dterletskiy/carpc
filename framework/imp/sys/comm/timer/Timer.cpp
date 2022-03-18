@@ -236,7 +236,7 @@ namespace base::timer {
 
    base::comm::timer::ID start( const std::size_t milliseconds, const std::size_t count, tCallback callback, const bool asynchronous )
    {
-      application::Context context = application::Process::instance( )->current_context( );
+      application::Context context = application::Context::current( );
       if( application::Context::invalid == context )
       {
          SYS_ERR( "application::Thread has not been found. Creating timer not in application thread" );

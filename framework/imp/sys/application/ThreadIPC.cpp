@@ -18,7 +18,7 @@ using namespace base::application;
 ThreadIPC::ThreadIPC( )
    : IThread( "IPC", 10 )
    , m_thread( std::bind( &ThreadIPC::thread_loop, this ) )
-   , m_event_queue( Process::instance( )->configuration( ).max_priority, "IPC" )
+   , m_event_queue( configuration::current( ).max_priority, "IPC" )
    , m_consumers_map( "IPC" )
 {
    SYS_VRB( "'%s': created", m_name.c_str( ) );

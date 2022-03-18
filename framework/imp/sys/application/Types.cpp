@@ -8,7 +8,7 @@ namespace base::application {
 
    namespace process {
 
-      ID current( )
+      const ID& current_id( )
       {
          return Process::instance( )->id( );
       }
@@ -17,13 +17,22 @@ namespace base::application {
 
    namespace thread {
 
-      ID current( )
+      const ID& current_id( )
       {
-         ID tid{ ID::invalid };
          IThread::tSptr thread = Process::instance( )->current_thread( );
          if( nullptr != thread )
-            tid = thread->id( );
-         return tid;
+            return thread->id( );
+
+         return invalid;
+      }
+
+   }
+
+   namespace configuration {
+
+      const Data& current( )
+      {
+         return Process::instance( )->configuration( );
       }
 
    }

@@ -15,7 +15,7 @@ using namespace base::application;
 Thread::Thread( const Configuration& config )
    : IThread( config.m_name, config.m_wd_timeout )
    , m_thread( std::bind( &Thread::thread_loop, this ) )
-   , m_event_queue( Process::instance( )->configuration( ).max_priority, config.m_name )
+   , m_event_queue( configuration::current( ).max_priority, config.m_name )
    , m_consumers_map( config.m_name )
    , m_components( )
    , m_component_creators( config.m_component_creators )

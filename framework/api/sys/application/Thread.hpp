@@ -17,7 +17,7 @@ namespace base::application {
             using tVector = std::vector< Configuration >;
             std::string                m_name;
             IComponent::tCreatorVector m_component_creators;
-            size_t                     m_wd_timeout;
+            std::size_t                m_wd_timeout;
          };
 
       public:

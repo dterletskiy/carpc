@@ -43,7 +43,9 @@ namespace base::application {
          const std::string name( ) const;
 
       public:
-         bool is_local( ) const;
+         bool is_internal( ) const;
+         bool is_internal_local( ) const;
+         bool is_internal_broadcast( ) const;
          bool is_external( ) const;
          bool is_valid( ) const;
 

@@ -1,10 +1,6 @@
 #pragma once
 
-#include "api/sys/common/ID.hpp"
-#include "api/sys/common/Name.hpp"
-#include "api/sys/common/Priority.hpp"
 #include "api/sys/oswrappers/Types.hpp"
-#include "api/sys/oswrappers/linux/socket.hpp"
 #include "api/sys/oswrappers/linux/timer.hpp"
 #include "api/sys/comm/service/Registry.hpp"
 #include "api/sys/application/Thread.hpp"
@@ -61,7 +57,6 @@ namespace base::application {
       public:
          IThread::tSptr thread( const thread::ID& ) const;
          IThread::tSptr current_thread( ) const;
-         Context current_context( ) const;
          const IThread::tSptrList& thread_list( ) const;
       private:
          IThread::tSptrList  m_thread_list;
@@ -75,22 +70,9 @@ namespace base::application {
          os::os_linux::timer::tID      m_timer_id;
 
       public:
-         struct Configuration
-         {
-            struct IPC
-            {
-               os::os_linux::socket::configuration socket;
-               std::size_t                         buffer_size;
-            };
-            IPC ipc_sb;
-            IPC ipc_app;
-
-            const tPriority max_priority = priority( ePriority::MAX );
-         };
-      public:
-         const Configuration& configuration( ) const;
+         const configuration::Data& configuration( ) const;
       private:
-         Configuration m_configuration;
+         configuration::Data m_configuration;
 
       public:
          const tools::PCE& pce( ) const;
@@ -125,7 +107,7 @@ namespace base::application {
    }
 
    inline
-   const Process::Configuration& Process::configuration( ) const
+   const configuration::Data& Process::configuration( ) const
    {
       return m_configuration;
    }
