@@ -26,19 +26,16 @@ namespace carpc::async {
             return _s_type_id;
          }
 
-      private:
+      public:
          TSignature( ) = default;
          TSignature( const tUserSignature& user_signature )
             : m_user_signature( user_signature )
          { }
-         TSignature( const TSignature& other )
-            : m_user_signature( other.m_user_signature )
-         { }
-      public:
+         TSignature( const TSignature& other ) = delete;
          ~TSignature( ) override = default;
          static tSptr create( const tUserSignature& user_signature = { } )
          {
-            return tSptr( new tSignature( user_signature ) );
+            return std::make_shared< tSignature >( user_signature );
          }
 
       public:
@@ -61,7 +58,7 @@ namespace carpc::async {
          }
          const bool to_stream( ipc::tStream& stream ) const override
          {
-            if constexpr( false == std::is_same_v< tService, NoServiceType > )
+            if constexpr( IS_IPC_EVENT )
             {
                return ipc::serialize( stream, m_user_signature );
             }
@@ -69,7 +66,7 @@ namespace carpc::async {
          }
          const bool from_stream( ipc::tStream& stream ) override
          {
-            if constexpr( false == std::is_same_v< tService, NoServiceType > )
+            if constexpr( IS_IPC_EVENT )
             {
                return ipc::deserialize( stream, m_user_signature );
             }
@@ -87,7 +84,7 @@ namespace carpc::async {
          }
       private:
          // static const tAsyncTypeID ms_type_id;
-         tUserSignature m_user_signature;
+         tUserSignature m_user_signature = { };
    };
 
    // template< typename _Generator >

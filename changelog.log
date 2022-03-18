@@ -1,3 +1,8 @@
+version 3.5.1
+   - Implementation serialization/deserialization for "shared_ptr" and "unique_ptr" in ByteStream.
+   - Applying "shared_ptr" serialization/deserialization in TEvent.
+   - Example "stream" extended for "shared_ptr" and "unique_ptr".
+
 version 3.5.0
    - Renaming main namespace "base" to "carpc"
    - Build fix after previous commit by renaming "process::configuration::current" to "configuration::current".

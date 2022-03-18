@@ -12,6 +12,14 @@ const carpc::application::Thread::Configuration::tVector services = { };
 
 struct Data
 {
+   Data( ) = default;
+
+   Data( const std::size_t& id, const std::string& name )
+      : m_id( id )
+      , m_name( name )
+   {
+   }
+
    bool to_stream( carpc::ipc::tStream& stream ) const
    {
       return carpc::ipc::serialize( stream, m_id, m_name );
@@ -74,6 +82,7 @@ bool test( int argc, char** argv, char** envp )
 
 
 
+   if( true )
    {
       bool                       value_bool = true,                        test_value_bool = false;
       std::uint8_t               value_uint8_t = 0xAB,                     test_value_uint8_t = 0;
@@ -89,6 +98,8 @@ bool test( int argc, char** argv, char** envp )
       sensor::Data               value_sensor_data,                        test_value_sensor_data;
       value_sensor_data.set_id( 0xAABBCCDD );
       value_sensor_data.set_name( "GPB_DATA" );
+      std::shared_ptr< Data > p_value_data = std::make_shared< Data >( 0xABCDEF, "SHARED" );
+      std::shared_ptr< Data > p_value_data_test = nullptr;//std::make_shared< Data >( 0x12345678, "NoName" );
 
       std::map<
             std::size_t,
@@ -135,6 +146,7 @@ bool test( int argc, char** argv, char** envp )
             , value_data
             , value_sensor_data
             , value
+            , p_value_data
          );
 
       carpc::ipc::deserialize(
@@ -152,6 +164,7 @@ bool test( int argc, char** argv, char** envp )
             , test_value_data
             , test_value_sensor_data
             , test_value
+            , p_value_data_test
          );
 
       TEST( value_bool, test_value_bool );
@@ -167,6 +180,109 @@ bool test( int argc, char** argv, char** envp )
       TEST( value_data, test_value_data );
       TEST( value_sensor_data, test_value_sensor_data );
       TEST( value, test_value );
+
+      if( nullptr != p_value_data )
+      {
+         p_value_data->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data = nullptr" );
+      }
+      if( nullptr != p_value_data_test )
+      {
+         p_value_data_test->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data_test = nullptr" );
+      }
+   }
+
+   if( false )
+   {
+      std::shared_ptr< Data > p_value_data = std::make_shared< Data >( 0xABCDEF, "SHARED" );
+      std::shared_ptr< Data > p_value_data_test = nullptr;//std::make_shared< Data >( 0x12345678, "NoName" );
+      if( nullptr != p_value_data )
+      {
+         p_value_data->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data = nullptr" );
+      }
+      if( nullptr != p_value_data_test )
+      {
+         p_value_data_test->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data_test = nullptr" );
+      }
+
+      carpc::ipc::serialize( stream, p_value_data );
+
+      carpc::ipc::deserialize( stream, p_value_data_test );
+
+      if( nullptr != p_value_data )
+      {
+         p_value_data->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data = nullptr" );
+      }
+      if( nullptr != p_value_data_test )
+      {
+         p_value_data_test->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data_test = nullptr" );
+      }
+   }
+
+   if( false )
+   {
+      std::unique_ptr< Data > p_value_data = std::make_unique< Data >( 0xABCDEF, "UNIQUE" );
+      std::unique_ptr< Data > p_value_data_test = nullptr;//std::make_unique< Data >( 0x12345678, "NoName" );
+      if( nullptr != p_value_data )
+      {
+         p_value_data->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data = nullptr" );
+      }
+      if( nullptr != p_value_data_test )
+      {
+         p_value_data_test->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data_test = nullptr" );
+      }
+
+      carpc::ipc::serialize( stream, p_value_data );
+
+      carpc::ipc::deserialize( stream, p_value_data_test );
+
+      if( nullptr != p_value_data )
+      {
+         p_value_data->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data = nullptr" );
+      }
+      if( nullptr != p_value_data_test )
+      {
+         p_value_data_test->print( );
+      }
+      else
+      {
+         MSG_DBG( "p_value_data_test = nullptr" );
+      }
    }
 
 

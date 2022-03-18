@@ -123,50 +123,25 @@ namespace carpc::async {
       public:
          const bool to_stream_t( ipc::tStream& stream ) const override final
          {
-            if constexpr( false == std::is_same_v< tService, NoServiceType > )
+            if constexpr( IS_IPC_EVENT )
             {
-               if( !mp_signature )
-               {
-                  SYS_ERR( "missing event signature for serrialization" );
-                  return false;
-               }
-
-               if( false == ipc::serialize( stream, *mp_signature, m_context, m_priority ) )
-                  return false;
-
-               if( false == ipc::serialize( stream, ( nullptr != mp_data ) ) )
-                  return false;
-               if( mp_data )
-                  if( false == ipc::serialize( stream, *mp_data ) )
-                     return false;
-
-               return true;
+               return ipc::serialize( stream, mp_signature, m_context, m_priority, mp_data );
             }
 
             return false;
          }
          const bool from_stream_t( ipc::tStream& stream ) override final
          {
-            if constexpr( false == std::is_same_v< tService, NoServiceType > )
+            if constexpr( IS_IPC_EVENT )
             {
-               mp_signature = tSignature::create( );
-               if( false == ipc::deserialize( stream, *mp_signature, m_context, m_priority ) )
-                  return false;
-
-               bool is_data = false;
-               if( false == ipc::deserialize( stream, is_data ) )
-                  return false;
-               if( false == is_data )
-                  return true;
-               mp_data = std::make_shared< tData >( );
-               return ipc::deserialize( stream, *mp_data );
+               return ipc::deserialize( stream, mp_signature, m_context, m_priority, mp_data );
             }
 
             return false;
          }
 
       public:
-         const bool is_ipc( ) const override { return false == std::is_same_v< tService, NoServiceType >; }
+         const bool is_ipc( ) const override { return IS_IPC_EVENT; }
 
       // signature
       public:

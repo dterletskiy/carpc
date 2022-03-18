@@ -102,6 +102,10 @@ namespace carpc {
          template< typename TYPE >
             bool push( const std::optional< TYPE >& value );
          template< typename TYPE >
+            bool push( const std::unique_ptr< TYPE >& value );
+         template< typename TYPE >
+            bool push( const std::shared_ptr< TYPE >& value );
+         template< typename TYPE >
             bool push( const std::vector< TYPE >& vector );
          template< typename TYPE >
             bool push( const std::list< TYPE >& list );
@@ -162,6 +166,10 @@ namespace carpc {
             bool pop( TYPE (&array)[ N ] );
          template< typename TYPE >
             bool pop( std::optional< TYPE >& value );
+         template< typename TYPE >
+            bool pop( std::unique_ptr< TYPE >& value );
+         template< typename TYPE >
+            bool pop( std::shared_ptr< TYPE >& value );
          template< typename TYPE >
             bool pop( std::vector< TYPE >& vactor );
          template< typename TYPE >
@@ -274,6 +282,32 @@ namespace carpc {
 
       if( std::nullopt != optional )
          if( false == push( optional.value( ) ) )
+            return false;
+
+      return true;
+   }
+
+   template< typename TYPE >
+   bool ByteStream::push( const std::unique_ptr< TYPE >& ptr )
+   {
+      if( false == push( nullptr != ptr ) )
+         return false;
+
+      if( nullptr != ptr )
+         if( false == push( *ptr ) )
+            return false;
+
+      return true;
+   }
+
+   template< typename TYPE >
+   bool ByteStream::push( const std::shared_ptr< TYPE >& ptr )
+   {
+      if( false == push( nullptr != ptr ) )
+         return false;
+
+      if( nullptr != ptr )
+         if( false == push( *ptr ) )
             return false;
 
       return true;
@@ -418,6 +452,48 @@ namespace carpc {
          optional = value;
       }
       else optional = std::nullopt;
+
+      return true;
+   }
+
+   template< typename TYPE >
+   bool ByteStream::pop( std::unique_ptr< TYPE >& ptr )
+   {
+      bool is_data = false;
+      if( false == pop( is_data ) )
+         return false;
+
+      if( false == is_data )
+      {
+         ptr.reset( );
+         return true;
+      }
+
+      if( nullptr == ptr )
+         ptr = std::make_unique< TYPE >( );
+      if( false == pop( *ptr ) )
+         return false;
+
+      return true;
+   }
+
+   template< typename TYPE >
+   bool ByteStream::pop( std::shared_ptr< TYPE >& ptr )
+   {
+      bool is_data = false;
+      if( false == pop( is_data ) )
+         return false;
+
+      if( false == is_data )
+      {
+         ptr.reset( );
+         return true;
+      }
+
+      if( nullptr == ptr )
+         ptr = std::make_shared< TYPE >( );
+      if( false == pop( *ptr ) )
+         return false;
 
       return true;
    }
