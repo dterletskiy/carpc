@@ -35,11 +35,10 @@ namespace carpc::application {
          std::atomic< bool >        m_started = false;
 
       public:
-         bool send( const RawBuffer&, const application::Context& );
          bool send( const dsi::Packet&, const application::Context& );
          bool send( const async::IEvent::tSptr, const application::Context& );
       private:
-         bool send( const RawBuffer&, os::Socket::tSptr );
+         bool send( const void* const p_buffer, const std::size_t size, os::Socket::tSptr );
          bool send( const ipc::tStream&, os::Socket::tSptr );
          bool send( const dsi::Packet&, os::Socket::tSptr );
          os::Socket::tSptr socket( const application::Context& );

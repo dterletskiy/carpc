@@ -12,13 +12,9 @@ namespace local {
 
    bool send( carpc::os::Socket::tSptr p_socket, carpc::ipc::tStream& stream )
    {
-      size_t size = 0;
-      void* buffer = nullptr;
-      if( false == stream.is_linear( buffer, size ) )
-      {
-         SYS_WRN( "stream is not linear" );
-         return false;
-      }
+      std::size_t size = 0;
+      const void* buffer = nullptr;
+      stream.buffer( buffer, size );
       p_socket->send( buffer, size );
       stream.erase( size );
       return true;
@@ -60,8 +56,7 @@ void ConnectionProcessor::read_slave( carpc::os::Socket::tSptr p_socket )
 {
    std::size_t recv_size = 0;
    const void* const p_buffer = p_socket->buffer( recv_size );
-   carpc::ipc::tStream stream;
-   carpc::ipc::append( stream, p_buffer, recv_size );
+   carpc::ipc::tStream stream( p_buffer, recv_size );
    while( 0 < stream.size( ) )
    {
       SYS_INF( "stream size = %zu", stream.size( ) );

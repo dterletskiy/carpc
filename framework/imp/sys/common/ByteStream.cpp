@@ -11,12 +11,14 @@ using namespace carpc;
 
 ByteStream::ByteStream( const std::size_t capacity, const bool is_reallocate_allowed )
    : m_buffer( capacity, false, is_reallocate_allowed )
+   // this configuration means that m_buffer will be a linear extendable buffer
 {
    SYS_INF( );
 }
 
 ByteStream::ByteStream( const void* const buffer, const std::size_t size, const std::size_t capacity, const bool is_reallocate_allowed )
    : m_buffer( ( capacity > size ? capacity : size ), false, is_reallocate_allowed )
+   // this configuration means that m_buffer will be a linear extendable buffer
 {
    SYS_INF( );
    push( buffer, size );
@@ -55,20 +57,20 @@ bool ByteStream::push( void* const buffer, const std::size_t size )
    return push( const_cast< const void* const >( buffer ), size );
 }
 
-bool ByteStream::push( const CircularBuffer& buffer )
-{
-   if( false == push( buffer.size( ) ) )
-      return false;
-
-   return CircularBuffer::ePush::Error != m_buffer.push_back( buffer );
-}
-
 bool ByteStream::push( const RawBuffer& buffer )
 {
    if( false == push( buffer.size ) )
       return false;
 
    return push( buffer.ptr, buffer.size );
+}
+
+bool ByteStream::push( const CircularBuffer& buffer )
+{
+   if( false == push( buffer.size( ) ) )
+      return false;
+
+   return CircularBuffer::ePush::Error != m_buffer.push_back( buffer );
 }
 
 bool ByteStream::push( const ByteStream& stream )
@@ -125,18 +127,6 @@ bool ByteStream::pop( const void* buffer, const std::size_t size )
    return pop( const_cast< void* const >( buffer ), size );
 }
 
-bool ByteStream::pop( CircularBuffer& buffer )
-{
-   RawBuffer rb;
-   if( false == pop( rb ) )
-      return false;
-
-   bool result = CircularBuffer::ePush::Error != buffer.push_back( rb );
-   rb.free( );
-
-   return result;
-}
-
 bool ByteStream::pop( RawBuffer& buffer )
 {
    if( nullptr != buffer.ptr )
@@ -147,6 +137,18 @@ bool ByteStream::pop( RawBuffer& buffer )
 
    buffer.alloc( buffer.size );
    return pop( buffer.ptr, buffer.size );
+}
+
+bool ByteStream::pop( CircularBuffer& buffer )
+{
+   RawBuffer rb;
+   if( false == pop( rb ) )
+      return false;
+
+   bool result = CircularBuffer::ePush::Error != buffer.push_back( rb );
+   rb.free( );
+
+   return result;
 }
 
 bool ByteStream::pop( ByteStream& stream )

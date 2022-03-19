@@ -117,6 +117,27 @@ bool CircularBuffer::reallocate( std::size_t capacity )
    return true;
 }
 
+bool CircularBuffer::normalize( const bool trancate )
+{
+   bool result = true;
+
+   if( true == is_linear( ) )
+   {
+      if( true == trancate )
+         if( 0 != free_space( ) )
+            result = reallocate( m_size );
+   }
+   else
+   {
+      if( true == trancate )
+         result = reallocate( m_size );
+      else
+         result = reallocate( m_capacity );
+   }
+
+   return result;
+}
+
 void CircularBuffer::info( ) const
 {
    SYS_INF( "head: %p / tail: %p", mp_head, mp_tail );

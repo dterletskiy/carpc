@@ -141,10 +141,29 @@ namespace carpc {
 
       /******************************************************************************
        *
-       * Trancate buffer to current size value.
+       * Checks if phisical representation of data in the memory is linear in the buffer.
        *
        *****************************************************************************/
-      bool trancate( );
+      bool is_linear( ) const;
+
+      /******************************************************************************
+       *
+       * Trancate buffer to current size value.
+       * This operation will performe memory reallocation for new buffer with capacity
+       * equal to size.
+       *
+       *****************************************************************************/
+      // bool trancate( );
+
+      /******************************************************************************
+       *
+       * Checks if phisical representation of data is linear in the buffer and
+       * in case of not it will be realocated with linear representation of data in the memory.
+       * Parameters:
+       *    trancate - flag indicates is new buffer will be trancated to current size.
+       *
+       *****************************************************************************/
+      bool normalize( const bool trancate = false );
 
       /******************************************************************************
        *
@@ -257,18 +276,6 @@ namespace carpc {
        *****************************************************************************/
       void fill( const char symbol = 0 ) const;
 
-      /******************************************************************************
-       *
-       * Checks if phisical representation of data is linear in the buffer.
-       * Parameter:
-       *    pointer - pointer to the buffer will be set as a result if result as true, otherwise - nullptr.
-       *    size - size of buffer will be set as a result if result is true, otherwise - 0.
-       *
-       *****************************************************************************/
-      bool is_linear( void*& pointer, std::size_t& size ) const;
-      bool is_linear( RawBuffer& buffer ) const;
-      bool is_linear( ) const;
-
    public:
       std::size_t size( ) const;
       std::size_t capacity( ) const;
@@ -301,10 +308,19 @@ namespace carpc {
    }
 
    inline
-   bool CircularBuffer::trancate( )
+   bool CircularBuffer::is_linear( ) const
    {
-      return reallocate( m_size );
+      return m_size <= static_cast< std::size_t >( diff( mp_tail, mp_begin ) );
    }
+
+   // inline
+   // bool CircularBuffer::trancate( )
+   // {
+   //    if( 0 == free_space( ) )
+   //       return false;
+
+   //    return reallocate( m_size );
+   // }
 
    inline
    void CircularBuffer::reset( )
@@ -348,33 +364,6 @@ namespace carpc {
    const RawBuffer CircularBuffer::buffer( ) const
    {
       return { mp_head, m_size };
-   }
-
-   inline
-   bool CircularBuffer::is_linear( ) const
-   {
-      return m_size <= static_cast< std::size_t >( diff( mp_tail, mp_begin ) );
-   }
-
-   inline
-   bool CircularBuffer::is_linear( void*& pointer, std::size_t& size ) const
-   {
-      if( false == is_linear( ) )
-      {
-         pointer = nullptr;
-         size = 0;
-         return false;
-      }
-
-      pointer = mp_begin;
-      size = m_size;
-      return true;
-   }
-
-   inline
-   bool CircularBuffer::is_linear( RawBuffer& buffer ) const
-   {
-      return is_linear( buffer.ptr, buffer.size );
    }
 
 } // namespace carpc

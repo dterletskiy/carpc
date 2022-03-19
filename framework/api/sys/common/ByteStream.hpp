@@ -216,12 +216,12 @@ namespace carpc {
          void erase( const std::size_t size, const std::size_t offset = 0 );
 
       public:
+         void buffer( const void*& pointer, std::size_t& size ) const;
+         const void* const buffer( ) const;
          std::size_t size( ) const;
          std::size_t capacity( ) const;
          void dump( ) const;
          void reset( );
-         bool is_linear( void*& pointer, std::size_t& size ) const;
-         bool is_linear( RawBuffer& buffer ) const;
       private:
          CircularBuffer m_buffer;
    };
@@ -629,6 +629,12 @@ namespace carpc {
     *
     ****************************************/
    inline
+   const void* const ByteStream::buffer( ) const
+   {
+      return m_buffer.ptr( );
+   }
+
+   inline
    std::size_t ByteStream::size( ) const
    {
       return m_buffer.size( );
@@ -653,21 +659,16 @@ namespace carpc {
    }
 
    inline
-   bool ByteStream::is_linear( void*& pointer, std::size_t& size ) const
-   {
-      return m_buffer.is_linear( pointer, size );
-   }
-
-   inline
-   bool ByteStream::is_linear( RawBuffer& buffer ) const
-   {
-      return m_buffer.is_linear( buffer );
-   }
-
-   inline
    void ByteStream::erase( const std::size_t size, const std::size_t offset )
    {
       m_buffer.pop_front( size );
+   }
+ 
+   inline
+   void ByteStream::buffer( const void*& pointer, std::size_t& size ) const
+   {
+      pointer = m_buffer.ptr( );
+      size = m_buffer.size( );
    }
 
 } // namespace carpc

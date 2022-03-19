@@ -94,29 +94,22 @@ carpc::os::Socket::tSptr SendReceive::socket( const application::Context& contex
    return p_socket_send;
 }
 
-bool SendReceive::send( const RawBuffer& buffer, os::Socket::tSptr p_socket )
+bool SendReceive::send( const void* const p_buffer, const std::size_t size, os::Socket::tSptr p_socket )
 {
-   if( nullptr == buffer.ptr )
+   if( nullptr == p_buffer )
       return false;
    if( nullptr == p_socket )
       return false;
 
    // @TDA: here could be a crash in case of servicebrocker socket created but was not connected.
    // => sending to not connected socket will lead to crash.
-   return os::Socket::eResult::OK == p_socket->send( buffer.ptr, buffer.size );
+   // https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
+   return os::Socket::eResult::OK == p_socket->send( p_buffer, size );
 }
 
 bool SendReceive::send( const ipc::tStream& stream, os::Socket::tSptr p_socket )
 {
-   RawBuffer buffer;
-   if( false == ipc::raw_buffer( stream, buffer ) )
-      return false;
-   return send( buffer, p_socket );
-}
-
-bool SendReceive::send( const RawBuffer& buffer, const application::Context& to_context )
-{
-   return send( buffer, socket( to_context ) );
+   return send( stream.buffer( ), stream.size( ), p_socket );
 }
 
 bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
@@ -214,8 +207,7 @@ void SendReceive::ServiceBrocker::process_select( os::os_linux::socket::fd& fd_s
    {
       std::size_t recv_size = 0;
       const void* const p_buffer = mp_socket->buffer( recv_size );
-      ipc::tStream stream;
-      ipc::append( stream, p_buffer, recv_size );
+      ipc::tStream stream( p_buffer, recv_size );
       process_stream( stream, mp_socket );
    }
 }
@@ -419,8 +411,7 @@ void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set 
       {
          std::size_t recv_size = 0;
          const void* const p_buffer = p_socket_recv->buffer( recv_size );
-         ipc::tStream stream;
-         ipc::append( stream, p_buffer, recv_size );
+         ipc::tStream stream( p_buffer, recv_size );
          process_stream( stream, p_socket_recv );
          ++iterator;
       }
