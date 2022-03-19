@@ -1,3 +1,6 @@
+version 3.5.4
+   Fix: crash in case of sending data to not connected socket in carpc::os::Socket wrapper.
+
 version 3.5.3
    - Refactoring for CircularBuffer and ByteStream interfaces.
 

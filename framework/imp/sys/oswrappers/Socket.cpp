@@ -159,7 +159,9 @@ Socket::eResult Socket::connect( )
 
 Socket::eResult Socket::send( const void* p_buffer, const size_t size, const int flags )
 {
-   ssize_t send_size = os_linux::socket::send( m_socket, p_buffer, size, flags );
+   // MSG_NOSIGNAL flag is needed to avoid receiving SIGPIPE signal in case of sending to not connected socket.
+   // https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
+   ssize_t send_size = os_linux::socket::send( m_socket, p_buffer, size, flags | MSG_NOSIGNAL );
    m_total_send_size += send_size;
    return send_size == static_cast< ssize_t >( size ) ? eResult::OK : eResult::ERROR;
 }

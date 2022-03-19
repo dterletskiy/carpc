@@ -101,9 +101,6 @@ bool SendReceive::send( const void* const p_buffer, const std::size_t size, os::
    if( nullptr == p_socket )
       return false;
 
-   // @TDA: here could be a crash in case of servicebrocker socket created but was not connected.
-   // => sending to not connected socket will lead to crash.
-   // https://stackoverflow.com/questions/19172804/crash-when-sending-data-without-connection-via-socket-in-linux
    return os::Socket::eResult::OK == p_socket->send( p_buffer, size );
 }
 
