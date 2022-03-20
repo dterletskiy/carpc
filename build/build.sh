@@ -32,7 +32,7 @@ function setup_sdk( )
       print_info "SDK is set to '${SDK}'";
       if [ ! -f "${SDK}" ]; then
          print_error "'${SDK}' file does not exist"
-         exit
+         exit 1
       fi
       source ${SDK}
    fi
@@ -69,6 +69,7 @@ function clean( )
 
 function configure( )
 {
+   print_info "cmake configuration"
    cmake \
       -S ${PROJECT_CONFIG[SOURCE_DIR]} \
       -B ${PROJECT_CONFIG[BUILD_DIR]} \
@@ -81,18 +82,47 @@ function configure( )
       -DROOT_BUILD_DIR=${PROJECT_CONFIG[BUILD_DIR]} \
       -DROOT_DELIVERY_DIR=${PROJECT_CONFIG[DELIVERY_DIR]} \
       -DROOT_DOCUMENTATION_DIR=${PROJECT_CONFIG[DOCUMENTATION_DIR]}
+
+   local RESULT=$?
+   if [ 0 -eq ${RESULT} ]; then
+      print_ok "cmake configuration result: " ${RESULT}
+   else
+      print_error "cmake configuration result: " ${RESULT}
+      exit ${RESULT}
+   fi
+   return ${RESULT}
 }
 
 function build( )
 {
+   print_info "cmake build"
    # cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target help
    cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target ${ACTION[TARGET]} -j ${CORES}
+
+   local RESULT=$?
+   if [ 0 -eq ${RESULT} ]; then
+      print_ok "cmake build result: " ${RESULT}
+   else
+      print_error "cmake build result: " ${RESULT}
+      exit ${RESULT}
+   fi
+   return ${RESULT}
 }
 
 function install( )
 {
+   print_info "cmake install"
    cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target install
    # cmake --install ${PROJECT_CONFIG[BUILD_DIR]} --prefix ${PROJECT_CONFIG[DELIVERY_DIR]}
+
+   local RESULT=$?
+   if [ 0 -eq ${RESULT} ]; then
+      print_ok "cmake install result: " ${RESULT}
+   else
+      print_error "cmake install result: " ${RESULT}
+      exit ${RESULT}
+   fi
+   return ${RESULT}
 }
 
 function gpb_generate( )

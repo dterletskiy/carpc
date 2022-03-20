@@ -1,6 +1,10 @@
+![Build linux](https://github.com/dterletskiy/carpc/workflows/Build%20linux/badge.svg)
+
 # ***CARPC***
 
-![Build linux](https://github.com/dterletskiy/carpc/workflows/Build%20linux/badge.svg)
+![DMA_Framework logo](./.md/logo/01.png)
+
+----
 
 ## ***Table of contents***
 
@@ -19,6 +23,4 @@
 
 
 
-## Repo size:
-
-### [Read it here](./.md/repo_size/repo_size.md)
+## [Repo size](./.md/repo_size/repo_size.md)

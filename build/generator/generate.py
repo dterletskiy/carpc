@@ -8,7 +8,7 @@ import pfw.console
 
 
 
-project_path: str = "/home/dmytro_terletskyi/Sources/TDA/python/generate/"
+project_path: str = "/mnt/dev/TDA/rpc/build/generator/generate/"
 
 api_path: str = project_path + "api/"
 configuration_file_name: str = api_path + "System.xml"
