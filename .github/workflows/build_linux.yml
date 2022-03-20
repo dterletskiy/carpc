@@ -2,15 +2,15 @@ name: Build linux
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       branch:
         description: 'Target branch'     
         required: true
-        default: 'master'
+        default: 'main'
 
 jobs:
   build_linux:
@@ -19,19 +19,32 @@ jobs:
 
     steps:
 
+    # Install google protobuf
+    - name: Setup protoc
+      run: sudo apt install libprotobuf-dev protobuf-compiler
+      shell: bash
+
+    # Checkout shell framework project
+    - name: Checkout shell framework
+      uses: actions/checkout@v2
+      with:
+        repository: dterletskiy/shell_fw
+        path: ./shell_fw
+        ref: ${{ github.ref }}
+
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
       uses: actions/checkout@v2
       with:
         repository: dterletskiy/${{ github.event.repository.name }}
-        path: ./
+        path: ./${{ github.event.repository.name }}
         ref: ${{ github.ref }}
 
     # CMake execution
-    - name: build
+    - name: Build
       run: ./build.sh --arch=x86_64 --os=linux --action=clean_build
       shell: bash
-      working-directory: ./
+      working-directory: ./${{ github.event.repository.name }}
 
 
 

@@ -1,5 +1,7 @@
 # ***CARPC***
 
+![Build linux](https://github.com/dterletskiy/carpc/workflows/Build%20linux/badge.svg)
+
 ## ***Table of contents***
 
 - [What is CARPC](./.md/what_is_carpc.md)
