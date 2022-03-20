@@ -57,6 +57,6 @@ jobs:
           commit_options: '--no-verify --signoff'
           file_pattern: ./.md/repo_size/*.md
           repository: .
-          commit_user_name: DMA Actions Bot
-          commit_user_email: DMA_Actions_Bot@gmail.com
-          commit_author: DMA Actions Bot <DMA_Actions_Bot@gmail.com>
+          commit_user_name: CARPC Actions Bot
+          commit_user_email: CARPC_Actions_Bot@gmail.com
+          commit_author: CARPC Actions Bot <CARPC_Actions_Bot@gmail.com>
