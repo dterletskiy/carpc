@@ -62,10 +62,10 @@ namespace carpc {
 
    enum class eByteOrder : std::uint32_t
    {
-      O32_LITTLE_ENDIAN    = 0x03020100ul,                                                   // 00000011 00000010 00000001 00000000
-      O32_BIG_ENDIAN       = 0x00010203ul,                                                   // 00000000 00000001 00000010 00000011
-      O32_PDP_ENDIAN       = 0x01000302ul,      /* DEC PDP-11 (aka ENDIAN_LITTLE_WORD) */    // 00000001 00000000 00000011 00000010
-      O32_HONEYWELL_ENDIAN = 0x02030001ul /* Honeywell 316 (aka ENDIAN_BIG_WORD) */          // 00000010 00000011 00000000 00000001
+      O32_LITTLE_ENDIAN    = 0x03020100ul,                                             // 00000011 00000010 00000001 00000000
+      O32_BIG_ENDIAN       = 0x00010203ul,                                             // 00000000 00000001 00000010 00000011
+      O32_PDP_ENDIAN       = 0x01000302ul, /* DEC PDP-11 (aka ENDIAN_LITTLE_WORD) */   // 00000001 00000000 00000011 00000010
+      O32_HONEYWELL_ENDIAN = 0x02030001ul  /* Honeywell 316 (aka ENDIAN_BIG_WORD) */   // 00000010 00000011 00000000 00000001
    };
 
    const char* const to_str( const eByteOrder& value );

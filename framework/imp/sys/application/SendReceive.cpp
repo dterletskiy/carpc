@@ -109,21 +109,21 @@ bool SendReceive::send( const ipc::tStream& stream, os::Socket::tSptr p_socket )
    return send( stream.buffer( ), stream.size( ), p_socket );
 }
 
-bool SendReceive::send( const dsi::Packet& packet, os::Socket::tSptr p_socket )
+bool SendReceive::send( const ipc::Packet& packet, os::Socket::tSptr p_socket )
 {
    ipc::tStream stream;
    ipc::serialize( stream, packet );
    return send( stream, p_socket );
 }
 
-bool SendReceive::send( const dsi::Packet& packet, const application::Context& to_context )
+bool SendReceive::send( const ipc::Packet& packet, const application::Context& to_context )
 {
    return send( packet, socket( to_context ) );
 }
 
 bool SendReceive::send( const async::IEvent::tSptr p_event, const application::Context& to_context )
 {
-   dsi::Packet packet( dsi::eCommand::IpcEvent, *p_event, to_context );
+   ipc::Packet packet( ipc::eCommand::IpcEvent, *p_event, to_context );
    return send( packet, to_context );
 }
 
@@ -141,17 +141,17 @@ bool SendReceive::Base::process_stream( ipc::tStream& stream, os::Socket::tSptr 
    bool result = true;
    while( 0 < stream.size( ) )
    {
-      dsi::Packet packet;
+      ipc::Packet packet;
       ipc::deserialize( stream, packet );
       result &= process_packet( packet, p_socket );
    }
    return result;
 }
 
-bool SendReceive::Base::process_packet( dsi::Packet& packet, os::Socket::tSptr p_socket )
+bool SendReceive::Base::process_packet( ipc::Packet& packet, os::Socket::tSptr p_socket )
 {
    bool result = true;
-   for( dsi::Package& package : packet.packages( ) )
+   for( ipc::Package& package : packet.packages( ) )
       result &= process_package( package, p_socket );
 
    return result;
@@ -209,16 +209,16 @@ void SendReceive::ServiceBrocker::process_select( os::os_linux::socket::fd& fd_s
    }
 }
 
-bool SendReceive::ServiceBrocker::process_package( dsi::Package& package, os::Socket::tSptr p_socket )
+bool SendReceive::ServiceBrocker::process_package( ipc::Package& package, os::Socket::tSptr p_socket )
 {
    SYS_VRB( "Processing package '%s'", package.c_str( ) );
 
    switch( package.command( ) )
    {
-      case dsi::eCommand::DetectedServer:
+      case ipc::eCommand::DetectedServer:
       {
          service::Passport service_passport;
-         dsi::SocketCongiguration inet_address;
+         ipc::SocketCongiguration inet_address;
          if( false == package.data( service_passport, inet_address ) )
          {
             SYS_ERR( "parce package error" );
@@ -235,10 +235,10 @@ bool SendReceive::ServiceBrocker::process_package( dsi::Package& package, os::So
             if( nullptr == p_socket_send )
                return false;
 
-            dsi::Packet packet(
-               dsi::eCommand::RegisterProcess,
+            ipc::Packet packet(
+               ipc::eCommand::RegisterProcess,
                application::process::current_id( ),
-               static_cast< dsi::SocketCongiguration >( configuration::current( ).ipc_app.socket )
+               static_cast< ipc::SocketCongiguration >( configuration::current( ).ipc_app.socket )
             );
             m_parent.send( packet, p_socket_send );
 
@@ -249,17 +249,17 @@ bool SendReceive::ServiceBrocker::process_package( dsi::Package& package, os::So
             auto clients_addresses = application::Process::instance( )->service_registry( ).clients( service_passport );
             for( const auto& client_address : clients_addresses )
             {
-               dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( service_passport.signature, client_address ) );
+               ipc::Packet packet( ipc::eCommand::RegisterClient, service::Passport( service_passport.signature, client_address ) );
                m_parent.send( packet, p_socket_send );
             }
          }
 
          break;
       }
-      case dsi::eCommand::DetectedClient:
+      case ipc::eCommand::DetectedClient:
       {
          service::Passport service_passport;
-         dsi::SocketCongiguration inet_address;
+         ipc::SocketCongiguration inet_address;
          if( false == package.data( service_passport, inet_address ) )
          {
             SYS_ERR( "parce package error" );
@@ -327,7 +327,7 @@ void SendReceive::Master::process_select( os::os_linux::socket::fd& fd_set )
    }
 }
 
-bool SendReceive::Master::process_package( dsi::Package& package, os::Socket::tSptr p_socket )
+bool SendReceive::Master::process_package( ipc::Package& package, os::Socket::tSptr p_socket )
 {
    SYS_VRB( "Processing package '%s'", package.c_str( ) );
 
@@ -419,16 +419,16 @@ void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set 
    }
 }
 
-bool SendReceive::Connections::process_package( dsi::Package& package, os::Socket::tSptr p_socket )
+bool SendReceive::Connections::process_package( ipc::Package& package, os::Socket::tSptr p_socket )
 {
    SYS_VRB( "Processing package '%s'", package.c_str( ) );
 
    switch( package.command( ) )
    {
-      case dsi::eCommand::RegisterProcess:
+      case ipc::eCommand::RegisterProcess:
       {
          application::process::ID pid;
-         dsi::SocketCongiguration inet_address;
+         ipc::SocketCongiguration inet_address;
          if( false == package.data( pid, inet_address ) )
          {
             SYS_ERR( "parce package error" );
@@ -446,12 +446,12 @@ bool SendReceive::Connections::process_package( dsi::Package& package, os::Socke
 
          channel::recv::update( p_socket, pid );
 
-         dsi::Packet packet( dsi::eCommand::RegisterProcessAck, application::process::current_id( ) );
+         ipc::Packet packet( ipc::eCommand::RegisterProcessAck, application::process::current_id( ) );
          m_parent.send( packet, p_socket_send );
 
          break;
       }
-      case dsi::eCommand::RegisterProcessAck:
+      case ipc::eCommand::RegisterProcessAck:
       {
          application::process::ID pid;
          if( false == package.data( pid ) )
@@ -475,7 +475,7 @@ bool SendReceive::Connections::process_package( dsi::Package& package, os::Socke
             auto clients_addresses = application::Process::instance( )->service_registry( ).clients( passport );
             for( const auto& client_address : clients_addresses )
             {
-               dsi::Packet packet( dsi::eCommand::RegisterClient, service::Passport( passport.signature, client_address ) );
+               ipc::Packet packet( ipc::eCommand::RegisterClient, service::Passport( passport.signature, client_address ) );
                m_parent.send( packet, p_socket_send );
             }
          }
@@ -483,7 +483,7 @@ bool SendReceive::Connections::process_package( dsi::Package& package, os::Socke
 
          break;
       }
-      case dsi::eCommand::IpcEvent:
+      case ipc::eCommand::IpcEvent:
       {
          async::IEvent::tSptr p_event = async::IEvent::deserialize( package.data( ) );
          if( nullptr == p_event )
@@ -503,7 +503,7 @@ bool SendReceive::Connections::process_package( dsi::Package& package, os::Socke
 
          break;
       }
-      case dsi::eCommand::RegisterServer:
+      case ipc::eCommand::RegisterServer:
       {
          service::Passport server_passport;
          if( false == package.data( server_passport ) )
@@ -532,7 +532,7 @@ bool SendReceive::Connections::process_package( dsi::Package& package, os::Socke
 
          break;
       }
-      case dsi::eCommand::RegisterClient:
+      case ipc::eCommand::RegisterClient:
       {
          service::Passport client_passport;
          if( false == package.data( client_passport ) )
@@ -564,7 +564,7 @@ bool SendReceive::Connections::process_package( dsi::Package& package, os::Socke
          }
          service::Passport server_passport( client_passport.signature, server_address );
          auto p_socket_send = channel::send::socket( pid );
-         dsi::Packet packet( dsi::eCommand::RegisterServer, server_passport );
+         ipc::Packet packet( ipc::eCommand::RegisterServer, server_passport );
          m_parent.send( packet, p_socket_send );
 
          interface::client::add( pid, client_passport );
@@ -592,7 +592,7 @@ SendReceive::Connections::tProcessServiceMap SendReceive::Connections::data::ms_
 
 carpc::os::Socket::tSptr SendReceive::Connections::channel::send::create(
         const application::process::ID& pid
-      , const dsi::SocketCongiguration& inet_address
+      , const ipc::SocketCongiguration& inet_address
    )
 {
    auto iterator = data::ms_send.find( pid );

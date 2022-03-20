@@ -1,12 +1,12 @@
 #include "api/sys/helpers/functions/format.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/Packet.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "DSI_TYPES"
 
 
 
-namespace carpc::dsi {
+namespace carpc::ipc {
 
    const char* c_str( const eCommand comm_type )
    {
@@ -31,7 +31,7 @@ namespace carpc::dsi {
 }
 
 
-using namespace carpc::dsi;
+using namespace carpc::ipc;
 
 
 

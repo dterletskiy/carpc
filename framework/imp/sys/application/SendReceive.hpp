@@ -4,7 +4,7 @@
 #include "api/sys/oswrappers/Socket.hpp"
 #include "api/sys/comm/async/event/IEvent.hpp"
 #include "api/sys/comm/service/Passport.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/Packet.hpp"
 
 
 
@@ -35,12 +35,12 @@ namespace carpc::application {
          std::atomic< bool >        m_started = false;
 
       public:
-         bool send( const dsi::Packet&, const application::Context& );
+         bool send( const ipc::Packet&, const application::Context& );
          bool send( const async::IEvent::tSptr, const application::Context& );
       private:
          bool send( const void* const p_buffer, const std::size_t size, os::Socket::tSptr );
          bool send( const ipc::tStream&, os::Socket::tSptr );
-         bool send( const dsi::Packet&, os::Socket::tSptr );
+         bool send( const ipc::Packet&, os::Socket::tSptr );
          os::Socket::tSptr socket( const application::Context& );
 
       private:
@@ -55,8 +55,8 @@ namespace carpc::application {
             virtual void process_select( os::os_linux::socket::fd& ) = 0;
 
             bool process_stream( ipc::tStream&, os::Socket::tSptr );
-            bool process_packet( dsi::Packet&, os::Socket::tSptr );
-            virtual bool process_package( dsi::Package&, os::Socket::tSptr ) = 0;
+            bool process_packet( ipc::Packet&, os::Socket::tSptr );
+            virtual bool process_package( ipc::Package&, os::Socket::tSptr ) = 0;
 
             SendReceive& m_parent;
          };
@@ -75,7 +75,7 @@ namespace carpc::application {
             void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
             void process_select( os::os_linux::socket::fd& ) override;
 
-            bool process_package( dsi::Package&, os::Socket::tSptr ) override;
+            bool process_package( ipc::Package&, os::Socket::tSptr ) override;
 
             os::Socket::tSptr mp_socket = nullptr;
          };
@@ -90,7 +90,7 @@ namespace carpc::application {
             void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
             void process_select( os::os_linux::socket::fd& ) override;
 
-            bool process_package( dsi::Package&, os::Socket::tSptr ) override;
+            bool process_package( ipc::Package&, os::Socket::tSptr ) override;
 
             os::Socket::tSptr mp_socket = nullptr;
          };
@@ -144,7 +144,7 @@ namespace carpc::application {
                {
                   struct send
                   {
-                     static os::Socket::tSptr create( const application::process::ID& pid, const dsi::SocketCongiguration& inet_address );
+                     static os::Socket::tSptr create( const application::process::ID& pid, const ipc::SocketCongiguration& inet_address );
                      static bool remove( const application::process::ID& pid );
                      static os::Socket::tSptr socket( const application::process::ID& pid );
                      static const application::process::ID& pid( os::Socket::tSptr p_socket );
@@ -264,7 +264,7 @@ namespace carpc::application {
                void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
                void process_select( os::os_linux::socket::fd& ) override;
 
-               bool process_package( dsi::Package&, os::Socket::tSptr ) override;
+               bool process_package( ipc::Package&, os::Socket::tSptr ) override;
          };
          Connections m_connections;
    };

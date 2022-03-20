@@ -60,34 +60,34 @@ void ConnectionProcessor::read_slave( carpc::os::Socket::tSptr p_socket )
    while( 0 < stream.size( ) )
    {
       SYS_INF( "stream size = %zu", stream.size( ) );
-      carpc::dsi::Packet packet;
+      carpc::ipc::Packet packet;
       carpc::ipc::deserialize( stream, packet );
-      for( carpc::dsi::Package& package : packet.packages( ) )
+      for( carpc::ipc::Package& package : packet.packages( ) )
       {
          SYS_INF( "processing package: %s", package.c_str( ) );
          switch( package.command( ) )
          {
-            case carpc::dsi::eCommand::IpcEvent:
+            case carpc::ipc::eCommand::IpcEvent:
             {
                process_broadcast_event( p_socket, package );
                break;
             }
-            case carpc::dsi::eCommand::RegisterServer:
+            case carpc::ipc::eCommand::RegisterServer:
             {
                register_server( p_socket, package );
                break;
             }
-            case carpc::dsi::eCommand::UnregisterServer:
+            case carpc::ipc::eCommand::UnregisterServer:
             {
                unregister_server( p_socket, package );
                break;
             }
-            case carpc::dsi::eCommand::RegisterClient:
+            case carpc::ipc::eCommand::RegisterClient:
             {
                register_client( p_socket, package );
                break;
             }
-            case carpc::dsi::eCommand::UnregisterClient:
+            case carpc::ipc::eCommand::UnregisterClient:
             {
                unregister_client( p_socket, package );
                break;
@@ -146,9 +146,9 @@ void ConnectionProcessor::connection_loop( )
    }
 }
 
-void ConnectionProcessor::process_broadcast_event( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package )
+void ConnectionProcessor::process_broadcast_event( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package )
 {
-   carpc::dsi::Packet packet;
+   carpc::ipc::Packet packet;
    packet.add_package( std::move( package ) );
    carpc::ipc::tStream stream;
    carpc::ipc::serialize( stream, packet );
@@ -156,10 +156,10 @@ void ConnectionProcessor::process_broadcast_event( carpc::os::Socket::tSptr p_so
    local::send( p_socket, stream );
 }
 
-void ConnectionProcessor::register_server( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package )
+void ConnectionProcessor::register_server( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package )
 {
    carpc::service::Passport service_passport;
-   carpc::dsi::SocketCongiguration inet_address;
+   carpc::ipc::SocketCongiguration inet_address;
    if( false == package.data( service_passport, inet_address ) )
    {
       SYS_ERR( "parce package error" );
@@ -197,18 +197,18 @@ void ConnectionProcessor::register_server( carpc::os::Socket::tSptr p_socket, ca
 
    // Send notification packet to clients about registered server with current service signature
    SYS_INF( "notifying clients due to registered server with service signature '%s'", service_passport.name( ).c_str( ) );
-   carpc::dsi::Packet packet;
-   packet.add_package( carpc::dsi::eCommand::DetectedServer, service_passport, inet_address );
+   carpc::ipc::Packet packet;
+   packet.add_package( carpc::ipc::eCommand::DetectedServer, service_passport, inet_address );
    carpc::ipc::tStream stream;
    carpc::ipc::serialize( stream, packet );
    for( auto connection : service_connection.clients )
       local::send( connection.socket, stream );
 }
 
-void ConnectionProcessor::unregister_server( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package )
+void ConnectionProcessor::unregister_server( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package )
 {
    carpc::service::Passport service_passport;
-   carpc::dsi::SocketCongiguration inet_address;
+   carpc::ipc::SocketCongiguration inet_address;
    if( false == package.data( service_passport, inet_address ) )
    {
       SYS_ERR( "parce package error" );
@@ -247,10 +247,10 @@ void ConnectionProcessor::unregister_server( carpc::os::Socket::tSptr p_socket, 
    SYS_INF( "notifying clients due to unregistered server with service signature '%s'", service_passport.name( ).c_str( ) );
 }
 
-void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package )
+void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package )
 {
    carpc::service::Passport service_passport;
-   carpc::dsi::SocketCongiguration inet_address;
+   carpc::ipc::SocketCongiguration inet_address;
    if( false == package.data( service_passport, inet_address ) )
    {
       SYS_ERR( "parce package error" );
@@ -294,9 +294,9 @@ void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, ca
    // Send notification events to client about registered server with current service signature
    const Connection& server = service_connection.server.value( );
    SYS_INF( "notifying server due to registered client with service signature '%s'", service_passport.name( ).c_str( ) );
-   carpc::dsi::Packet packet;
+   carpc::ipc::Packet packet;
    packet.add_package(
-      carpc::dsi::eCommand::DetectedServer,
+      carpc::ipc::eCommand::DetectedServer,
       carpc::service::Passport( service_passport.signature, server.service_address ),
       server.inet_address
    );
@@ -305,10 +305,10 @@ void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, ca
    local::send( p_socket, stream );
 }
 
-void ConnectionProcessor::unregister_client( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package )
+void ConnectionProcessor::unregister_client( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package )
 {
    carpc::service::Passport service_passport;
-   carpc::dsi::SocketCongiguration inet_address;
+   carpc::ipc::SocketCongiguration inet_address;
    if( false == package.data( service_passport, inet_address ) )
    {
       SYS_ERR( "parce package error" );

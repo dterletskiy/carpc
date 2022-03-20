@@ -7,7 +7,7 @@
 #include "api/sys/comm/service/Address.hpp"
 #include "api/sys/comm/service/Signature.hpp"
 #include "api/sys/comm/service/Passport.hpp"
-#include "api/sys/dsi/Types.hpp"
+#include "api/sys/common/Packet.hpp"
 
 
 
@@ -20,7 +20,7 @@ struct Connection
 
    carpc::os::Socket::tSptr socket = nullptr;
    carpc::service::Address  service_address;
-   carpc::dsi::SocketCongiguration inet_address;
+   carpc::ipc::SocketCongiguration inet_address;
 };
 
 struct ServiceConnection
@@ -45,11 +45,11 @@ class ConnectionProcessor : public carpc::os::SocketServer::IConsumer
       void disconnected( carpc::os::Socket::tSptr ) override;
 
    private:
-      void process_broadcast_event( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
-      void register_server( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
-      void unregister_server( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
-      void register_client( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
-      void unregister_client( carpc::os::Socket::tSptr p_socket, carpc::dsi::Package& package );
+      void process_broadcast_event( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package );
+      void register_server( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package );
+      void unregister_server( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package );
+      void register_client( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package );
+      void unregister_client( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package );
 
    private:
       carpc::os::SocketServer::tSptr                            mp_socket;

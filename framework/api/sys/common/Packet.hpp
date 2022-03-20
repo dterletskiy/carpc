@@ -8,7 +8,7 @@
 
 
 
-namespace carpc::dsi {
+namespace carpc::ipc {
 
    struct SocketCongiguration : public os::os_linux::socket::configuration
    {
@@ -91,7 +91,7 @@ namespace carpc::dsi {
    inline
    const char* const Package::c_str( ) const
    {
-      return dsi::c_str( m_command );
+      return ipc::c_str( m_command );
    }
 
    inline
@@ -116,7 +116,7 @@ namespace carpc::dsi {
 
 
 
-namespace carpc::dsi {
+namespace carpc::ipc {
 
    class Packet
    {
