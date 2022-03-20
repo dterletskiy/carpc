@@ -97,7 +97,8 @@ function build( )
 {
    print_info "cmake build"
    # cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target help
-   cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target ${ACTION[TARGET]} -j ${CORES}
+   # cmake --build ${PROJECT_CONFIG[BUILD_DIR]} --target ${ACTION[TARGET]} -j ${CORES}
+   cmake --build ${PROJECT_CONFIG[BUILD_DIR]} -j ${CORES}
 
    local RESULT=$?
    if [ 0 -eq ${RESULT} ]; then
