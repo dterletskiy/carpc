@@ -25,7 +25,7 @@ namespace {
          if( 0 == time_stamp )
             continue;
 
-         if( p_thread->wd_timeout( ) > static_cast< size_t >( time( nullptr ) - time_stamp ) )
+         if( p_thread->wd_timeout( ) > static_cast< std::size_t >( time( nullptr ) - time_stamp ) )
             continue;
 
          SYS_ERR( "WatchDog error: '%s'", p_thread->name( ).c_str( ) );
@@ -64,6 +64,12 @@ Process::Process( int argc, char** argv, char** envp )
 
    m_pce.print( );
 
+   const std::string is_ipc = m_pce.value( "ipc_servicebrocker_domain" ).value_or( "true" );
+   if( "true" == is_ipc )
+      m_configuration.ipc = true;
+   else
+      m_configuration.ipc = false;
+
    m_configuration.ipc_sb.socket = os::os_linux::socket::configuration {
       carpc::os::os_linux::socket::socket_domain_from_string(
             m_pce.value( "ipc_servicebrocker_domain" ).value( ).c_str( )
@@ -75,7 +81,7 @@ Process::Process( int argc, char** argv, char** envp )
       m_pce.value( "ipc_servicebrocker_address" ).value( ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_port" ).value( ) ) )
    };
-   m_configuration.ipc_sb.buffer_size = static_cast< size_t >( std::stoll(
+   m_configuration.ipc_sb.buffer_size = static_cast< std::size_t >( std::stoll(
          m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) )
       );
 
@@ -90,7 +96,7 @@ Process::Process( int argc, char** argv, char** envp )
       m_pce.value( "ipc_application_address" ).value( ),
       static_cast< int >( std::stoll( m_pce.value( "ipc_application_port" ).value( ) ) )
    };
-   m_configuration.ipc_app.buffer_size = static_cast< size_t >(
+   m_configuration.ipc_app.buffer_size = static_cast< std::size_t >(
          std::stoll( m_pce.value( "ipc_application_buffer_size" ).value( ) )
       );
 
@@ -140,11 +146,11 @@ IThread::tSptr Process::current_thread( ) const
 {
    for( auto& p_thread : m_thread_list )
    {
-      if( os::Thread::current_id( ) == p_thread->thread( ).id( ) )
+      if( p_thread && os::Thread::current_id( ) == p_thread->thread( ).id( ) )
          return p_thread;
    }
 
-   if( os::Thread::current_id( ) == mp_thread_ipc->thread( ).id( ) )
+   if( mp_thread_ipc && os::Thread::current_id( ) == mp_thread_ipc->thread( ).id( ) )
       return mp_thread_ipc;
 
    return nullptr;
@@ -152,25 +158,32 @@ IThread::tSptr Process::current_thread( ) const
 
 bool Process::start( const Thread::Configuration::tVector& thread_configs )
 {
-   // Creating IPC brocker thread
-   mp_thread_ipc = std::make_shared< ThreadIPC >( );
-   if( nullptr == mp_thread_ipc )
-      return false;
-
-   // Starting IPC brocker thread
-   if( true == mp_thread_ipc->start( ) )
+   if( true == m_configuration.ipc )
    {
-      SYS_INF( "starting IPC thread started" );
-      while( false == mp_thread_ipc->started( ) )
+      // Creating IPC brocker thread
+      mp_thread_ipc = std::make_shared< ThreadIPC >( );
+      if( nullptr == mp_thread_ipc )
+         return false;
+
+      // Starting IPC brocker thread
+      if( true == mp_thread_ipc->start( ) )
       {
-         std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-         SYS_WRN( "waiting to strat IPC thread" );
+         SYS_INF( "starting IPC thread started" );
+         while( false == mp_thread_ipc->started( ) )
+         {
+            std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+            SYS_WRN( "waiting to strat IPC thread" );
+         }
+         SYS_INF( "IPC thread started" );
       }
-      SYS_INF( "IPC thread started" );
+      else
+      {
+         SYS_WRN( "starting without IPC thread" );
+      }
    }
    else
    {
-      SYS_WRN( "starting without IPC thread" );
+      SYS_INF( "starting without IPC thread" );
    }
 
    // Creating application threads
@@ -230,9 +243,11 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
 bool Process::stop( )
 {
    for( auto& p_thread : m_thread_list )
-      p_thread->stop( );
+      if( p_thread )
+         p_thread->stop( );
    m_thread_list.clear( );
-   mp_thread_ipc->stop( );
+   if( mp_thread_ipc )
+      mp_thread_ipc->stop( );
 
    os::os_linux::timer::remove( m_timer_id );
 
@@ -246,10 +261,12 @@ void Process::boot( )
    events::system::System::Event::create_send( { events::system::eID::boot }, { "booting application" } );
 
    for( auto& p_thread : m_thread_list )
-      p_thread->wait( );
+      if( p_thread )
+         p_thread->wait( );
    SYS_INF( "All application threads are stopped" );
 
-   mp_thread_ipc->wait( );
+   if( mp_thread_ipc )
+      mp_thread_ipc->wait( );
    SYS_INF( "IPC thread is stopped" );
 
    os::os_linux::timer::remove( m_timer_id );

@@ -1,3 +1,6 @@
+version 3.5.7
+   - Adding and processing configuration parametes what allowes to enable or disable IPC thread and IPC communication.
+
 version 3.5.6
    - Minor changes.
 
