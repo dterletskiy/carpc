@@ -64,41 +64,59 @@ Process::Process( int argc, char** argv, char** envp )
 
    m_pce.print( );
 
-   const std::string is_ipc = m_pce.value( "ipc_servicebrocker_domain" ).value_or( "true" );
+   const std::string is_ipc = m_pce.value( "ipc" ).value_or( "true" );
    if( "true" == is_ipc )
       m_configuration.ipc = true;
    else
       m_configuration.ipc = false;
 
-   m_configuration.ipc_sb.socket = os::os_linux::socket::configuration {
-      carpc::os::os_linux::socket::socket_domain_from_string(
-            m_pce.value( "ipc_servicebrocker_domain" ).value( ).c_str( )
-         ),
-      carpc::os::os_linux::socket::socket_type_from_string(
-            m_pce.value( "ipc_servicebrocker_type" ).value( ).c_str( )
-         ),
-      static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
-      m_pce.value( "ipc_servicebrocker_address" ).value( ),
-      static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_port" ).value( ) ) )
-   };
-   m_configuration.ipc_sb.buffer_size = static_cast< std::size_t >( std::stoll(
-         m_pce.value( "ipc_servicebrocker_buffer_size" ).value( ) )
-      );
+   if(
+            false == m_configuration.ipc
+         || std::nullopt == m_pce.value( "ipc_servicebrocker_domain" )
+         || std::nullopt == m_pce.value( "ipc_servicebrocker_type" )
+         || std::nullopt == m_pce.value( "ipc_servicebrocker_protocole" )
+         || std::nullopt == m_pce.value( "ipc_servicebrocker_address" )
+         || std::nullopt == m_pce.value( "ipc_servicebrocker_port" )
 
-   m_configuration.ipc_app.socket = os::os_linux::socket::configuration {
-      carpc::os::os_linux::socket::socket_domain_from_string(
-            m_pce.value( "ipc_application_domain" ).value( ).c_str( )
-         ),
-      carpc::os::os_linux::socket::socket_type_from_string(
-            m_pce.value( "ipc_application_type" ).value( ).c_str( )
-         ),
-      static_cast< int >( std::stoll( m_pce.value( "ipc_application_protocole" ).value( ) ) ),
-      m_pce.value( "ipc_application_address" ).value( ),
-      static_cast< int >( std::stoll( m_pce.value( "ipc_application_port" ).value( ) ) )
-   };
-   m_configuration.ipc_app.buffer_size = static_cast< std::size_t >(
-         std::stoll( m_pce.value( "ipc_application_buffer_size" ).value( ) )
-      );
+         || std::nullopt == m_pce.value( "ipc_application_domain" )
+         || std::nullopt == m_pce.value( "ipc_application_type" )
+         || std::nullopt == m_pce.value( "ipc_application_protocole" )
+         || std::nullopt == m_pce.value( "ipc_application_address" )
+         || std::nullopt == m_pce.value( "ipc_application_port" )
+      ) m_configuration.ipc = false;
+
+   if( true == m_configuration.ipc )
+   {
+      m_configuration.ipc_sb.socket = os::os_linux::socket::configuration {
+         carpc::os::os_linux::socket::socket_domain_from_string(
+               m_pce.value( "ipc_servicebrocker_domain" ).value( ).c_str( )
+            ),
+         carpc::os::os_linux::socket::socket_type_from_string(
+               m_pce.value( "ipc_servicebrocker_type" ).value( ).c_str( )
+            ),
+         static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_protocole" ).value( ) ) ),
+         m_pce.value( "ipc_servicebrocker_address" ).value( ),
+         static_cast< int >( std::stoll( m_pce.value( "ipc_servicebrocker_port" ).value( ) ) )
+      };
+      m_configuration.ipc_sb.buffer_size = static_cast< std::size_t >( std::stoll(
+            m_pce.value( "ipc_servicebrocker_buffer_size" ).value_or( "4096" ) )
+         );
+
+      m_configuration.ipc_app.socket = os::os_linux::socket::configuration {
+         carpc::os::os_linux::socket::socket_domain_from_string(
+               m_pce.value( "ipc_application_domain" ).value( ).c_str( )
+            ),
+         carpc::os::os_linux::socket::socket_type_from_string(
+               m_pce.value( "ipc_application_type" ).value( ).c_str( )
+            ),
+         static_cast< int >( std::stoll( m_pce.value( "ipc_application_protocole" ).value( ) ) ),
+         m_pce.value( "ipc_application_address" ).value( ),
+         static_cast< int >( std::stoll( m_pce.value( "ipc_application_port" ).value( ) ) )
+      };
+      m_configuration.ipc_app.buffer_size = static_cast< std::size_t >(
+            std::stoll( m_pce.value( "ipc_application_buffer_size" ).value_or( "4096" ) )
+         );
+   }
 
    DUMP_IPC_EVENTS;
 }

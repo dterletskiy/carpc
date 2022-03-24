@@ -34,7 +34,7 @@ namespace carpc::application {
       private:
          const carpc::os::Thread& thread( ) const override;
          void thread_loop( );
-         carpc::os::Thread                             m_thread;
+         carpc::os::Thread                            m_thread;
          std::atomic< bool >                          m_started = false;
 
       private:

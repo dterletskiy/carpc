@@ -51,7 +51,7 @@ namespace carpc::application {
       };
       struct Data
       {
-         bool ipc;
+         bool ipc = true;
 
          IPC ipc_sb;
          IPC ipc_app;

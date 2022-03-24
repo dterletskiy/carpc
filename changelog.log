@@ -1,5 +1,9 @@
+version 3.5.9
+   - Application crash occurs during parsing configuration parameters in case of some configuration is missing:
+     terminate called after throwing an instance of 'std::bad_optional_access'
+
 version 3.5.8
-   - Fix: Android build due to specifica functions and defines in libc and bionic libraries.
+   - Fix: Android build due to specific functions and defines in libc and bionic libraries.
 
 version 3.5.7
    - Adding and processing configuration parametes what allowes to enable or disable IPC thread and IPC communication.
