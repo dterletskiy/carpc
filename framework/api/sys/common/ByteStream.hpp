@@ -8,6 +8,7 @@
 #include <set>
 #include <map>
 #include <optional>
+#include <memory>
 #ifdef USE_GPB
    #include <google/protobuf/message.h>
 #endif

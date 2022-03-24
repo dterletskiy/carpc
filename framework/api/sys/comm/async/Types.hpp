@@ -2,12 +2,58 @@
 
 #include <string>
 #include <type_traits>
+#include <functional>
 
 #include "api/sys/comm/Types.hpp"
 #include "api/sys/helpers/functions/format.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "BASE_ASYNC"
+
+
+
+
+#if defined(__clang__)
+   #if __has_feature(cxx_rtti)
+      #define RTTI_ENABLED
+   #endif
+#elif defined(__GNUG__)
+   #if defined(__GXX_RTTI)
+      #define RTTI_ENABLED
+   #endif
+#elif defined(_MSC_VER)
+   #if defined(_CPPRTTI)
+      #define RTTI_ENABLED
+   #endif
+#endif
+
+
+
+template< typename T >
+std::string generate_type_string( )
+{
+   std::string value{ };
+   #ifdef RTTI_ENABLED
+      value = typeid( T ).name( );
+   #else
+      value = __PRETTY_FUNCTION__;
+   #endif
+   // SYS_ERR( "%s", value.c_str( ) );
+   return value;
+}
+
+template< typename T >
+std::size_t generate_type_hash( )
+{
+   std::size_t value{ };
+   #ifdef RTTI_ENABLED
+      value = typeid( T ).hash_code( );
+   #else
+      value = std::hash< std::string >{ }( std::string{ __PRETTY_FUNCTION__ } );
+   #endif
+   // SYS_ERR( "%zu", value );
+   return value;
+}
 
 
 
@@ -84,7 +130,7 @@ namespace __private_carpc_async_v1__ {
          template< typename T >
             static std::string generate( )
             {
-               return typeid( T ).name( );
+               return generate_type_string< T >( );
             }
 
          const std::string& name( ) const
@@ -128,10 +174,10 @@ namespace __private_carpc_async_v1__ {
          template< typename T >
             static std::size_t generate( )
             {
-               const std::string _name = carpc::format_string( std::hex, typeid( T ).name( ) );
-               const std::size_t _hash_code = typeid( T ).hash_code( );
-               SYS_DBG( "async typeid: %p => %s", (void*)_hash_code, _name.c_str( ) );
-               return typeid( T ).hash_code( );
+               const std::string _name = carpc::format_string( std::hex, generate_type_string< T >( ) );
+               const std::size_t _hash_code = generate_type_hash< T >( );
+               SYS_DBG( "async type_id: %p => %s", (void*)_hash_code, _name.c_str( ) );
+               return generate_type_hash< T >( );
             }
 
          const std::string& name( ) const
@@ -202,13 +248,13 @@ namespace __private_carpc_async_v2__ {
             static std::enable_if_t< std::is_same_v< V, std::size_t >, T >
                generate_t( )
                {
-                  return typeid( TYPE ).hash_code( );
+                  return generate_type_hash< T >( );
                }
          template< typename TYPE, typename V = T >
             static std::enable_if_t< std::is_same_v< V, std::string >, T >
                generate_t( )
                {
-                  return typeid( TYPE ).name( );
+                  return generate_type_string< T >( );
                }
 
       public:
@@ -244,8 +290,8 @@ namespace __private_carpc_async_v2__ {
 namespace carpc::async {
 
    // using tAsyncTypeID = std::string;
-   // using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::size_t >;
-   using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::string >;
+   using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::size_t >;
+   // using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::string >;
 
    using NoServiceType = void;
    #define IS_IPC_EVENT ( false == std::is_same_v< tService, NoServiceType > )

@@ -9,7 +9,8 @@ option( DLT_TRACE                "Enable dlt tracing"                           
 option( MEMORY_HOOK              "Enable memory allocator hooks"                                OFF )
 option( INSTRUMENTAL             "Enable instrumental functionality"                            OFF )
 option( USE_DEBUG                "Enable debug information"                                     OFF )
-option( USE_GPB                  "Enable goolgle protobuf"                                      ON )
+option( USE_GPB                  "Enable goolgle protobuf"                                      OFF )
+option( USE_RTTI                 "Enable RTTI"                                                  OFF )
 
 
 
@@ -65,6 +66,11 @@ else( )
 endif( )
 if( USE_DEBUG OR INSTRUMENTAL )
    add_definitions( -g )
+endif( )
+if( USE_RTTI )
+   add_definitions( -frtti )
+else( )
+   add_definitions( -fno-rtti )
 endif( )
 
 add_compile_definitions( OS_ANDROID=${OS_ANDROID} )

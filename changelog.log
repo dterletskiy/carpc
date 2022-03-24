@@ -1,3 +1,8 @@
+version 3.6.0
+   - Implement typeid generation without RTTI using __PRETTY_FUNCTION__ macro.
+   - Added possibility to enable or disable RTTI typeid generation.
+   - Disable RTTI for Android build.
+
 version 3.5.10
    - Moved "wd_timeout" to application configuration.
 
