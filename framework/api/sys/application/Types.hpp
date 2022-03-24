@@ -56,6 +56,7 @@ namespace carpc::application {
          IPC ipc_sb;
          IPC ipc_app;
 
+         std::size_t wd_timout = -1;
          const tPriority max_priority = priority( ePriority::MAX );
       };
 

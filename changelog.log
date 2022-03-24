@@ -1,5 +1,8 @@
+version 3.5.10
+   - Moved "wd_timeout" to application configuration.
+
 version 3.5.9
-   - Application crash occurs during parsing configuration parameters in case of some configuration is missing:
+   - Fix: Application crash occurs during parsing configuration parameters in case of some configuration is missing:
      terminate called after throwing an instance of 'std::bad_optional_access'
 
 version 3.5.8

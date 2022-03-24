@@ -64,11 +64,8 @@ Process::Process( int argc, char** argv, char** envp )
 
    m_pce.print( );
 
-   const std::string is_ipc = m_pce.value( "ipc" ).value_or( "true" );
-   if( "true" == is_ipc )
-      m_configuration.ipc = true;
-   else
-      m_configuration.ipc = false;
+   if( "true" == m_pce.value( "ipc" ).value_or( "true" ) )  m_configuration.ipc = true;
+   else                                                     m_configuration.ipc = false;
 
    if(
             false == m_configuration.ipc
@@ -117,6 +114,8 @@ Process::Process( int argc, char** argv, char** envp )
             std::stoll( m_pce.value( "ipc_application_buffer_size" ).value_or( "4096" ) )
          );
    }
+
+   m_configuration.wd_timout = static_cast< std::size_t >( std::stoll( m_pce.value_or( "application_wd_timout", "10" ) ) );
 
    DUMP_IPC_EVENTS;
 }
@@ -241,13 +240,11 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    SYS_INF( "all application threads started" );
 
    // Watchdog timer
-   const std::size_t wd_timout =
-      static_cast< std::size_t >( std::stoll( m_pce.value_or( "application_wd_timout", "10" ) ) );
-   if( 0 < wd_timout )
+   if( 0 < m_configuration.wd_timout )
    {
       if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
          return false;
-      if( false == os::os_linux::timer::start( m_timer_id, wd_timout * 1000000000, os::os_linux::timer::eTimerType::continious ) )
+      if( false == os::os_linux::timer::start( m_timer_id, m_configuration.wd_timout * 1000000000, os::os_linux::timer::eTimerType::continious ) )
          return false;
    }
    else
