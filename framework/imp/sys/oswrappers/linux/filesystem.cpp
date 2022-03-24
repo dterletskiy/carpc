@@ -4,11 +4,26 @@
 #include <fcntl.h>
 #include <sys/sendfile.h>
 #include <cwctype>
+#include <syscall.h>
 
 #include "api/sys/oswrappers/linux/filesystem.hpp"
 
 #include "api/sys/trace/Trace.hpp"
 #define CLASS_ABBR "Filesystem"
+
+
+
+namespace {
+#if OS_TARGET == OS_ANDROID
+
+   ssize_t copy_file_range( int fd_in, off64_t *off_in, int fd_out, off64_t *off_out, size_t len, unsigned int flags )
+   {
+      // @TDA: maybe here we should also set errno
+      return ::syscall( SYS_copy_file_range, fd_in, off_in, fd_out, off_out, len, flags );
+   }
+
+#endif
+}
 
 
 

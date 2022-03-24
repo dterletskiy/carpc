@@ -35,15 +35,17 @@ namespace carpc::os::os_linux::socket {
          case AF_RDS:         return "AF_RDS";
          case AF_PPPOX:       return "AF_PPPOX";
          case AF_LLC:         return "AF_LLC";
-         case AF_IB:          return "AF_IB";
-         case AF_MPLS:        return "AF_MPLS";
          case AF_CAN:         return "AF_CAN";
          case AF_TIPC:        return "AF_TIPC";
          case AF_BLUETOOTH:   return "AF_BLUETOOTH";
          case AF_ALG:         return "AF_ALG";
          case AF_VSOCK:       return "AF_VSOCK";
          case AF_KCM:         return "AF_KCM";
+      #if OS_TARGET == OS_LINUX
+         case AF_IB:          return "AF_IB";
+         case AF_MPLS:        return "AF_MPLS";
          case AF_XDP:         return "AF_XDP";
+      #endif
          default:             return "AF_UNDEFINED";
       }
       return "AF_UNDEFINED";
@@ -66,15 +68,17 @@ namespace carpc::os::os_linux::socket {
       else if( 0 == std::strcmp( domain, "AF_RDS" )         ) return AF_RDS;
       else if( 0 == std::strcmp( domain, "AF_PPPOX" )       ) return AF_PPPOX;
       else if( 0 == std::strcmp( domain, "AF_LLC" )         ) return AF_LLC;
-      else if( 0 == std::strcmp( domain, "AF_IB" )          ) return AF_IB;
-      else if( 0 == std::strcmp( domain, "AF_MPLS" )        ) return AF_MPLS;
       else if( 0 == std::strcmp( domain, "AF_CAN" )         ) return AF_CAN;
       else if( 0 == std::strcmp( domain, "AF_TIPC" )        ) return AF_TIPC;
       else if( 0 == std::strcmp( domain, "AF_BLUETOOTH" )   ) return AF_BLUETOOTH;
       else if( 0 == std::strcmp( domain, "AF_ALG" )         ) return AF_ALG;
       else if( 0 == std::strcmp( domain, "AF_VSOCK" )       ) return AF_VSOCK;
       else if( 0 == std::strcmp( domain, "AF_KCM" )         ) return AF_KCM;
+   #if OS_TARGET == OS_LINUX
+      else if( 0 == std::strcmp( domain, "AF_IB" )          ) return AF_IB;
+      else if( 0 == std::strcmp( domain, "AF_MPLS" )        ) return AF_MPLS;
       else if( 0 == std::strcmp( domain, "AF_XDP" )         ) return AF_XDP;
+   #endif
       else                                                    return -1;
 
       return -1;
