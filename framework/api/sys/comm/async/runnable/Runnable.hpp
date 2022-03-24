@@ -8,11 +8,11 @@ namespace carpc::async {
 
    class Runnable : public IRunnable
    {
-      public:
+      private:
          Runnable( const tOperation );
-         ~Runnable( ) override = default;
 
       public:
+         ~Runnable( ) override = default;
          static tSptr create( const tOperation );
          static const bool create_send( const tOperation, const application::Context& to_context = application::Context::internal_local );
    };

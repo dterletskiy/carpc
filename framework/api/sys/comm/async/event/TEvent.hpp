@@ -152,7 +152,7 @@ namespace carpc::async {
 
       // data
       public:
-         tDataPtr data( ) const { return mp_data; }
+         const tDataPtr data( ) const { return mp_data; }
          void data( const tData& data ) { mp_data = std::make_shared< tData >( data ); }
          void data( const tDataPtr data ) { mp_data = data; }
       private:

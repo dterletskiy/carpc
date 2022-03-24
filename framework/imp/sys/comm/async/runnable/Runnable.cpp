@@ -10,7 +10,7 @@ using namespace carpc::async;
 
 Runnable::tSptr Runnable::create( const tOperation operation )
 {
-   return std::make_shared< Runnable >( operation );
+   return std::shared_ptr< Runnable >( new Runnable( operation ) );
 }
 
 const bool Runnable::create_send( const tOperation operation, const application::Context& to_context )

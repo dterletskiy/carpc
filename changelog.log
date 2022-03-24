@@ -1,3 +1,6 @@
+version 3.5.6
+   - Minor changes.
+
 version 3.5.5
    - Moving "api/sys/dsi/Types.hpp" to "api/sys/common/Packet.hpp" and renaming namespace "carpc::dsi" to "carpc::ipc".
    - Initial README.md.
