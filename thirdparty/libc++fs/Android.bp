@@ -1,5 +1,5 @@
 package {
-    default_applicable_licenses: ["vendor_tda_license"],
+    default_applicable_licenses: ["vendor_tda_carpc_license"],
 }
 
 cc_defaults {
