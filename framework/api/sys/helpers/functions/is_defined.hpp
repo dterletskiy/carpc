@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/helpers/functions/generate.hpp"
 #include "api/sys/helpers/functions/is_base.hpp"
 
 #include "api/sys/trace/Trace.hpp"
@@ -59,7 +60,7 @@ namespace carpc::is_defined::__private__ {
                                                                                                                                        \
                static void debug( )                                                                                                    \
                {                                                                                                                       \
-                  SYS_DBG( "%s", typeid( Helper ).name( ) );                                                                           \
+                  SYS_DBG( "%s", carpc::generate::name< Helper >( ).c_str( ) );                                                                           \
                }                                                                                                                       \
             };                                                                                                                         \
                                                                                                                                        \
@@ -226,7 +227,7 @@ namespace carpc::is_defined::__private__ {
                                                                                                                                           \
                   static void debug( )                                                                                                    \
                   {                                                                                                                       \
-                     SYS_DBG( "%s", typeid( Helper ).name( ) );                                                                           \
+                     SYS_DBG( "%s", carpc::generate::name< Helper >( ).c_str( ) );                                                                           \
                   }                                                                                                                       \
                };                                                                                                                         \
                                                                                                                                           \
