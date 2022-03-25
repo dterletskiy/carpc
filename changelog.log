@@ -1,3 +1,6 @@
+version 3.6.2
+   - Disabling application thread watchdog timeout by setting it to 0 or negative value.
+
 version 3.6.1
    - Minor changes. Refactoring.
 

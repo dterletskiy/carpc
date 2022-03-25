@@ -25,6 +25,8 @@ namespace {
          if( 0 == time_stamp )
             continue;
 
+         if( 0 >= p_thread->wd_timeout( ) )
+            continue;
          if( p_thread->wd_timeout( ) > static_cast< std::size_t >( time( nullptr ) - time_stamp ) )
             continue;
 
