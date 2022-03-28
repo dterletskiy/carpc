@@ -161,6 +161,17 @@ IThread::tSptr Process::thread( const thread::ID& id ) const
    return nullptr;
 }
 
+IThread::tSptr Process::thread( const std::string& name ) const
+{
+   for( auto& p_thread : m_thread_list )
+   {
+      if( p_thread->name( ) == name )
+         return p_thread;
+   }
+
+   return nullptr;
+}
+
 IThread::tSptr Process::current_thread( ) const
 {
    for( auto& p_thread : m_thread_list )

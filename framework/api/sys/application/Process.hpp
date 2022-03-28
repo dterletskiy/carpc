@@ -56,6 +56,7 @@ namespace carpc::application {
 
       public:
          IThread::tSptr thread( const thread::ID& ) const;
+         IThread::tSptr thread( const std::string& ) const;
          IThread::tSptr current_thread( ) const;
          const IThread::tSptrList& thread_list( ) const;
       private:

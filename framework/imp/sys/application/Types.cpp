@@ -26,6 +26,15 @@ namespace carpc::application {
          return invalid;
       }
 
+      const ID& id( const std::string& name )
+      {
+         IThread::tSptr thread = Process::instance( )->thread( name );
+         if( nullptr != thread )
+            return thread->id( );
+
+         return invalid;
+      }
+
    }
 
    namespace configuration {

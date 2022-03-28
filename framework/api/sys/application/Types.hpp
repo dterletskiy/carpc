@@ -38,6 +38,7 @@ namespace carpc::application {
       const ID broadcast = ID::invalid - ID::VALUE_TYPE( 1 );
       const ID local = broadcast - ID::VALUE_TYPE( 1 );
       const ID& current_id( );
+      const ID& id( const std::string& );
       using Name = carpc::TName< ThreadID >;
 
    }
