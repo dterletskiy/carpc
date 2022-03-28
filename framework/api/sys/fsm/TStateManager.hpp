@@ -173,7 +173,7 @@ namespace carpc::fsm {
       auto result = m_states.emplace( std::make_pair( p_state->uid( ), p_state ) );
       if( false == result.second )
       {
-         SYS_WRN( "%s: current state was already registered", m_name.c_str( ) );
+         SYS_WRN( "%s: statewith current id was already registered", m_name.c_str( ) );
          return false;
       }
 

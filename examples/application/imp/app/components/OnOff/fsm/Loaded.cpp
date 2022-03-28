@@ -26,7 +26,7 @@ void Loaded::leave( )
 {
 }
 
-const std::optional< Types::tID > Loaded::process( const Data& data )
+const std::optional< Types::tID > Loaded::process( const Types::tData& data )
 {
    MSG_VRB( );
    return NoTransition;

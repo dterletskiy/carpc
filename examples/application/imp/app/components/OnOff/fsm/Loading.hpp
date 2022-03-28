@@ -1,7 +1,7 @@
 #pragma once
 
 #include "api/sys/fsm/TState.hpp"
-#include "imp/app/components/OnOff/fsm/Data.hpp"
+#include "imp/app/components/OnOff/fsm/Types.hpp"
 
 
 
@@ -22,10 +22,10 @@ namespace application::components::onoff {
          void leave( ) override;
 
       private:
-         const std::optional< Types::tID > process( const Data& ) override;
+         const std::optional< Types::tID > process( const Types::tData& ) override;
 
       private:
          Manager& m_manager;
    };
 
-} // namespace carpc::events
+} // namespace application::components::onoff

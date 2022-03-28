@@ -111,8 +111,8 @@ namespace carpc::fsm {
    const std::optional< typename TYPES::tID > TState< TYPES >::in( )
    {
       SYS_VRB( "%s: enter", m_name.c_str( ) );
-      auto p_next_state = enter( );
-      return p_next_state;
+      auto next_state_uid = enter( );
+      return next_state_uid;
    }
 
    template< typename TYPES >
