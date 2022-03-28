@@ -45,27 +45,51 @@ namespace carpc {
          }
          bool operator==( const tName& other ) const
          {
-            return m_value == other.m_value;
+            return other.m_value == m_value;
+         }
+         bool operator==( const VALUE_TYPE& value ) const
+         {
+            return value == m_value;
          }
          bool operator!=( const tName& other ) const
          {
-            return m_value != other.m_value;
+            return other.m_value != m_value;
+         }
+         bool operator!=( const VALUE_TYPE& value ) const
+         {
+            return value != m_value;
          }
          bool operator<( const tName& other ) const
          {
             return m_value < other.m_value;
          }
+         bool operator<( const VALUE_TYPE& value ) const
+         {
+            return m_value < value;
+         }
          bool operator>( const tName& other ) const
          {
             return m_value > other.m_value;
+         }
+         bool operator>( const VALUE_TYPE& value ) const
+         {
+            return m_value > value;
          }
          bool operator<=( const tName& other ) const
          {
             return m_value <= other.m_value;
          }
+         bool operator<=( const VALUE_TYPE& value ) const
+         {
+            return m_value <= value;
+         }
          bool operator>=( const tName& other ) const
          {
             return m_value >= other.m_value;
+         }
+         bool operator>=( const VALUE_TYPE& value ) const
+         {
+            return m_value >= value;
          }
 
       public:
