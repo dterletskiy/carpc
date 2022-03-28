@@ -9,6 +9,25 @@ source ${CARPC_FW}/tools.sh
 
 
 
+COMPILER="clang"
+
+case ${COMPILER} in
+   "gcc")
+      export CC=/usr/bin/cc
+      export CXX=/usr/bin/c++
+      # export CXX=/usr/bin/g++
+   ;;
+   "clang")
+      export CC=/usr/bin/clang
+      export CXX=/usr/bin/clang++
+   ;;
+   *)
+   ;;
+esac
+
+
+
+
 declare -A PROJECT_CONFIG
 declare -A TARGET_CONFIG
 declare -A ACTION

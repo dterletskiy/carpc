@@ -1,3 +1,7 @@
+version 3.6.8
+   - Extend build system for switching compilers.
+   - Implement different compiler options for clang and gcc.
+
 version 3.6.7
    - Extended async::Runnable object for blocking current (caller) thread until it was not executed in destination thread.
      This functionality will be useful for synchronization application with android hidl/aidl oneway interfaces' methods.
