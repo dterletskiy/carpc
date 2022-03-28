@@ -47,7 +47,7 @@ Context::Context( const eInitType init_type )
    }
 }
 
-Context::Context( const process::ID& pid, const thread::ID& tid )
+Context::Context( const thread::ID& tid, const process::ID& pid )
    : m_pid( pid )
    , m_tid( tid )
 {

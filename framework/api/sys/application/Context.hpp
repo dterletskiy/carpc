@@ -25,7 +25,7 @@ namespace carpc::application {
 
       public:
          Context( const eInitType init_type );
-         Context( const process::ID&, const thread::ID& );
+         Context( const thread::ID&, const process::ID& pid = process::current_id( ) );
          Context( const Context& );
          ~Context( ) = default;
 

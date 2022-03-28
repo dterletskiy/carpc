@@ -1,3 +1,6 @@
+version 3.6.4
+   - Exchange application::Context constuctor parameters order to have an easier way to build local context without setting PID.
+
 version 3.6.3
    - Extended condition variable wrapper for spurious wakeup flag testing.
 

@@ -143,7 +143,7 @@ namespace carpc::service::fast::__private__ {
       // Notifying all subscribers by sending notification broadcast event to each process.
       for( const auto& subscriber : subscribers )
       {
-         p_event->send( application::Context( subscriber.first, application::thread::broadcast ) );
+         p_event->send( application::Context( application::thread::broadcast, subscriber.first ) );
       }
    }
 
