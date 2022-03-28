@@ -38,6 +38,8 @@ ConditionVariable::~ConditionVariable( )
 
 bool ConditionVariable::wait( )
 {
+   m_is_cond_var.store( false );
+
    MESSAGE( "%s: waiting(%#10lx)\n", m_id.name( ).c_str( ), pthread_self( ) );
    const int result = pthread_cond_wait( &m_cond_var, &m_mutex );
    m_error = errno;
@@ -53,6 +55,8 @@ bool ConditionVariable::wait( )
 
 bool ConditionVariable::notify( const bool all )
 {
+   m_is_cond_var.store( true );
+
    int result = 0;
    if( all )
    {
@@ -74,4 +78,9 @@ bool ConditionVariable::notify( const bool all )
    }
 
    return true;
+}
+
+bool ConditionVariable::test( ) const
+{
+   return m_is_cond_var.load( );
 }
