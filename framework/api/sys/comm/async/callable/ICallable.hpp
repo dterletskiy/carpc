@@ -74,6 +74,13 @@ namespace carpc::async {
          virtual ~ICallable( ) = default;
 
       public:
+         /******************************************************************************
+          *
+          * Sending CALLABLE async object for execution to appropriate context.
+          * Parameters:
+          *    to_context - context for execution operation object.
+          *
+          *****************************************************************************/
          const bool send( const application::Context& to_context = application::Context::internal_local );
 
       public:

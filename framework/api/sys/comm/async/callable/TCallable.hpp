@@ -78,9 +78,13 @@ namespace carpc::async {
          }
 
       public:
-         void call( ) const
+         void call( ) const override
          {
-            return call_function( typename gen_sequence< sizeof...( Args ) >::type( ) );
+            // https://stackoverflow.com/questions/47496358/c-lambdas-how-to-capture-variadic-parameter-pack-from-the-upper-scope
+            std::apply( m_function, m_params );
+
+            // deprecated implementation
+            // call_function( typename gen_sequence< sizeof...( Args ) >::type( ) );
          }
 
       private:
@@ -99,6 +103,18 @@ namespace carpc::async {
          const tFunction         m_function;
          const tParameters       m_params;
    };
+
+
+
+   namespace callable {
+
+      template < typename ...Args >
+      ICallable::tSptr create( std::function< void( Args... ) > p_func, Args... args )
+      {
+         return TCallable< Args... >::create( p_func, args... );
+      }
+
+   }
 
 } // namespace carpc::async
 

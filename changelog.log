@@ -1,3 +1,7 @@
+version 3.6.9
+   - Changed implementation for TCallable::call( ) with expanding tuple to parameter pack and calling function using C++17 std::apply.
+   - Implement wrapper function for TCallable::create( ... ).
+
 version 3.6.8
    - Extend build system for switching compilers.
    - Implement different compiler options for clang and gcc.
