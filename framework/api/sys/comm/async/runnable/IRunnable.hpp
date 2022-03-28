@@ -66,7 +66,21 @@ namespace carpc::async {
          ~IRunnable( ) override = default;
 
       public:
-         const bool send( const application::Context& to_context = application::Context::internal_local );
+         /******************************************************************************
+          *
+          * Sending RUNNABLE async object for execution to appropriate context.
+          * Parameters:
+          *    to_context - context for execution operation object.
+          *    is_block - boolean flag what indicates is sender thread will be locked or not until execution will be finished.
+          * In case if 'is_block = true' and 'to_context = current' sender thread will be also
+          * destination thread for execution and this will lead to dead lock.
+          * For this case there is additional implementation what does not allow to send block runnable object
+          * to the same context. Current funtion returns false for this case with appropriate message.
+          *
+          *****************************************************************************/
+         const bool send( const application::Context& to_context, const bool is_block = false );
+      private:
+         const bool send_to( const application::Context& to_context = application::Context::internal_local );
 
       private:
          void process( IAsync::IConsumer* ) const override;

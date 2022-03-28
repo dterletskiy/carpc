@@ -1,3 +1,7 @@
+version 3.6.7
+   - Extended async::Runnable object for blocking current (caller) thread until it was not executed in destination thread.
+     This functionality will be useful for synchronization application with android hidl/aidl oneway interfaces' methods.
+
 version 3.6.6
    - Extend implementation by functionality to obtain application thread or its id by its name.
      This is need for building context for sending async object. In this case there is no other information about context to send except of its thread name (process id is current or must be known).

@@ -14,7 +14,11 @@ namespace carpc::async {
       public:
          ~Runnable( ) override = default;
          static tSptr create( const tOperation );
-         static const bool create_send( const tOperation, const application::Context& to_context = application::Context::internal_local );
+         static const bool create_send(
+               const tOperation,
+               const application::Context& to_context = application::Context::internal_local,
+               const bool is_block = false
+            );
    };
 
 
