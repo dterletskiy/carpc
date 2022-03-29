@@ -3,71 +3,136 @@
 #include <functional>
 #include <memory>
 
+#include "api/sys/common/ID.hpp"
+#include "api/sys/common/Name.hpp"
+
+#include "api/sys/trace/Trace.hpp"
+#define CLASS_ABBR "Callback"
 
 
-namespace carpc {
 
+namespace carpc::callback {
 
+   class SharedCallback;
+   using ID = carpc::TID< SharedCallback >;
+   using Name = carpc::TName< SharedCallback >;
 
-template< typename DATA >
-class SharedCallback
-{
-public:
-   using Data = DATA;
-   using Finalizer = std::function< void( const Data& ) >;
-
-public:
-   SharedCallback( Data data, Finalizer finalizer )
-      : m_data( data )
-      , m_finalizer( finalizer )
-   { }
-
-   ~SharedCallback( )
+   class SharedCallback
    {
-      m_finalizer( m_data );
-   }
+      protected:
+         SharedCallback( )
+         {
+            SYS_VRB( "'%s': created", m_id.name( ).c_str( ) );
+         }
+      public:
+         virtual ~SharedCallback( )
+         {
+            SYS_VRB( "'%s': destroyed", m_id.name( ).c_str( ) );
+         }
 
-private:
-   const Finalizer   m_finalizer;
-   Data              m_data;
-};
+      public:
+         const ID& id( ) const
+         {
+            return m_id;
+         }
+      private:
+         ID m_id = ID::generate( );
+   };
 
 
 
-template< >
-class SharedCallback< void >
-{
-public:
-   using Finalizer = std::function< void( ) >;
-
-public:
-   SharedCallback( Finalizer finalizer )
-      : m_finalizer( finalizer )
-   { }
-
-   ~SharedCallback( )
+   template< typename DATA >
+   class TSharedCallback : public SharedCallback
    {
-      m_finalizer( );
-   }
+      public:
+         using tObject = TSharedCallback< DATA >;
+         using tSptr = std::shared_ptr< tObject >;
+         using tWptr = std::weak_ptr< tObject >;
+         using tData = DATA;
+         using tFinalizer = std::function< void( const tData& ) >;
 
-   static std::shared_ptr< SharedCallback< void > > create( Finalizer finalizer )
+      private:
+         TSharedCallback( tFinalizer finalizer, tData data )
+            : m_finalizer( finalizer )
+            , m_data( data )
+         { }
+         template< typename... Args >
+         TSharedCallback( tFinalizer finalizer, Args... args )
+            : m_finalizer( finalizer )
+            , m_data( args... )
+         { }
+      public:
+         ~TSharedCallback( ) override
+         {
+            m_finalizer( m_data );
+         }
+
+      public:
+         static tSptr create( tFinalizer finalizer, tData data )
+         {
+            return tSptr( new tObject( finalizer, data ) );
+         }
+
+         template< typename... Args >
+         static tSptr create( tFinalizer finalizer, Args... args )
+         {
+            return tSptr( new tObject( finalizer, args... ) );
+         }
+
+      private:
+         const tFinalizer  m_finalizer;
+         const tData       m_data;
+   };
+
+
+
+   template< >
+   class TSharedCallback< void > : public SharedCallback
    {
-      return std::make_shared< SharedCallback< void > >( finalizer );
-   }
+      public:
+         using tObject = TSharedCallback< void >;
+         using tSptr = std::shared_ptr< tObject >;
+         using tWptr = std::weak_ptr< tObject >;
+         using tFinalizer = std::function< void( ) >;
 
-private:
-   const Finalizer   m_finalizer;
-};
+      private:
+         TSharedCallback( tFinalizer finalizer )
+            : m_finalizer( finalizer )
+         { }
+      public:
+         ~TSharedCallback( ) override
+         {
+            m_finalizer( );
+         }
+
+      public:
+         static tSptr create( tFinalizer finalizer )
+         {
+            return tSptr( new tObject( finalizer ) );
+         }
+
+         static bool is_locked( const tWptr& wp )
+         {
+            return 0 != wp.use_count( );
+         }
+
+         static bool is_unlocked( const tWptr& wp )
+         {
+            return 0 == wp.use_count( );
+         }
+
+      private:
+         const tFinalizer  m_finalizer;
+   };
 
 
 
-/// Blocker is reference-counter mechanism, used in asyncronous parts of logic
-/// Entity, receives this Blocker may yeld Blocker owner lifetime.
-using Blocker = std::shared_ptr< void >;
+   using tBlockerRoot = TSharedCallback< void >;
+   using tBlocker = tBlockerRoot::tSptr;
+   using tBlockerLink = tBlockerRoot::tWptr;
 
-/// Shared callback with no data, used as Blocker with defined Final Action
-using BlockerRoot = SharedCallback< void >;
-
+} // namespace carpc::callback
 
 
-} // namespace carpc
+
+#undef CLASS_ABBR
