@@ -42,7 +42,7 @@ namespace controller::components::onoff {
          ~Component( ) override;
 
       private:
-         void boot( const std::string& ) override;
+         void process_boot( const std::string& ) override;
 
       private:
          void process_timer( const carpc::comm::timer::ID ) override;

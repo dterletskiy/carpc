@@ -25,7 +25,8 @@ namespace application::components::onoff {
          ~Component( ) override;
 
       private:
-         void boot( const std::string& ) override;
+         void process_boot( const std::string& ) override;
+         void process_shutdown( carpc::callback::tBlocker ) override;
 
       private:
          Server m_server_onoff;

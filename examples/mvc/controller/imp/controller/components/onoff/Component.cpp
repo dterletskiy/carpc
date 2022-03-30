@@ -48,7 +48,7 @@ Component::~Component( )
    MSG_DBG( "Destroyed: %s", name( ).c_str( ) );
 }
 
-void Component::boot( const std::string& command )
+void Component::process_boot( const std::string& command )
 {
    MSG_DBG( "%s", command.c_str( ) );
 

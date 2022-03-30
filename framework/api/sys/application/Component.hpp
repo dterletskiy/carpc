@@ -14,8 +14,8 @@ namespace carpc::application {
 
       private:
          const bool is_root( ) const override { return false; }
-         void boot( const std::string& info = "boot" ) override final { }
-         void shutdown( const std::string& info = "shutdown" ) override final { }
+         void process_boot( const std::string& info = "process_boot" ) override final { }
+         void process_shutdown( carpc::callback::tBlocker ) override final { }
    };
 
 } // namespace carpc::application

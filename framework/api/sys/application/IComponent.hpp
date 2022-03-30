@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "api/sys/common/SharedCallback.hpp"
 #include "api/sys/application/Types.hpp"
 
 
@@ -31,8 +32,8 @@ namespace carpc::application {
          component::Name   m_name{ "NoName_Component" };
 
       public:
-         virtual void boot( const std::string& message = "boot" ) = 0;
-         virtual void shutdown( const std::string& message = "shutdown" ) = 0;
+         virtual void process_boot( const std::string& message = "process_boot" ) = 0;
+         virtual void process_shutdown( carpc::callback::tBlocker ) { }
    };
 
 

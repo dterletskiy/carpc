@@ -75,13 +75,21 @@ void Thread::boot( const std::string& message )
    SYS_INF( "'%s': booting", m_name.c_str( ) );
    for( auto component : m_components )
       if( component->is_root( ) )
-         component->boot( message );
+         component->process_boot( message );
 }
 
 void Thread::shutdown( const std::string& message )
 {
-   SYS_INF( "'%s': shutting down", m_name.c_str( ) );
-   stop( );
+   SYS_INF( "'%s': shutting down components", m_name.c_str( ) );
+   auto blocker = callback::tBlockerRoot::create(
+         [ this ]( )
+         {
+            SYS_INF( "'%s': shutting down", m_name.c_str( ) );
+            stop( );
+         }
+      );
+   for( auto component : m_components )
+      component->process_shutdown( blocker );
 }
 
 bool Thread::insert_event( const carpc::async::IAsync::tSptr p_event )
