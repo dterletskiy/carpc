@@ -9,25 +9,6 @@ source ${CARPC_FW}/tools.sh
 
 
 
-COMPILER="clang"
-
-case ${COMPILER} in
-   "gcc")
-      export CC=/usr/bin/cc
-      export CXX=/usr/bin/c++
-      # export CXX=/usr/bin/g++
-   ;;
-   "clang")
-      export CC=/usr/bin/clang
-      export CXX=/usr/bin/clang++
-   ;;
-   *)
-   ;;
-esac
-
-
-
-
 declare -A PROJECT_CONFIG
 declare -A TARGET_CONFIG
 declare -A ACTION
@@ -44,22 +25,27 @@ function pre_main( )
             print_info "arch"
             TARGET_CONFIG[ARCH]="${option#*=}"
             shift # past argument=value
-            ;;
+         ;;
          --os=*)
             print_info "os"
             TARGET_CONFIG[OS]="${option#*=}"
             shift # past argument=value
-            ;;
+         ;;
          --action=*)
             print_info "action"
             ACTION[NAME]="${option#*=}"
             shift # past argument=value
-            ;;
+         ;;
          --target=*)
             print_info "target"
             ACTION[TARGET]="${option#*=}"
             shift # past argument=value
-            ;;
+         ;;
+         --compiler=*)
+            print_info "compiler"
+            set_compiler ${option#*=}
+            shift # past argument=value
+         ;;
       esac
    done
 

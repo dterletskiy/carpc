@@ -1,3 +1,24 @@
+function set_compiler( )
+{
+   local LOCAL_COMPILER=${1}
+   case ${LOCAL_COMPILER} in
+      "gcc")
+         print_info "compiler: GCC"
+         export CC=/usr/bin/cc
+         export CXX=/usr/bin/c++
+         # export CXX=/usr/bin/g++
+      ;;
+      "clang")
+         print_info "compiler: Clang"
+         export CC=/usr/bin/clang
+         export CXX=/usr/bin/clang++
+      ;;
+      *)
+         print_info "compiler: Default"
+      ;;
+   esac
+}
+
 function setup( )
 {
    PROJECT_CONFIG[ROOT_DIR]=${PWD}
