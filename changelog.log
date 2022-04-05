@@ -1,3 +1,6 @@
+version 3.7.4
+   - Implement object type template parameter for TVersion to distinguish versions for different types.
+
 version 3.7.3
    - TVersion implementation.
 

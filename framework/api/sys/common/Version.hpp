@@ -9,12 +9,13 @@
 
 namespace carpc {
 
-   template< typename T >
+   template< typename T, typename V = std::uint8_t >
    class TVersion
    {
       public:
-         using tVersion = TVersion< T >;
-         using VALUE_TYPE = T;
+         using tVersion = TVersion< T, V >;
+         using OBJECT_TYPE = T;
+         using VALUE_TYPE = V;
 
          static constexpr VALUE_TYPE min_value     = std::numeric_limits< VALUE_TYPE >::min( );
          static constexpr VALUE_TYPE max_value     = std::numeric_limits< VALUE_TYPE >::max( );
@@ -136,15 +137,13 @@ namespace carpc {
 
 
 
-   template< typename T >
-      const TVersion< T > TVersion< T >::min{ min_value };
-   template< typename T >
-      const TVersion< T > TVersion< T >::max{ max_value };
-   template< typename T >
-      const TVersion< T > TVersion< T >::invalid{ invalid_value };
-   template< typename T >
-      const TVersion< T > TVersion< T >::zero{ zero_value };
-
-   using Version = TVersion< std::uint8_t >;
+   template< typename T, typename V >
+      const TVersion< T, V > TVersion< T, V >::min{ min_value };
+   template< typename T, typename V >
+      const TVersion< T, V > TVersion< T, V >::max{ max_value };
+   template< typename T, typename V >
+      const TVersion< T, V > TVersion< T, V >::invalid{ invalid_value };
+   template< typename T, typename V >
+      const TVersion< T, V > TVersion< T, V >::zero{ zero_value };
 
 } // namespace carpc
