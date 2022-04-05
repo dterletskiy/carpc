@@ -1,3 +1,6 @@
+version 3.7.3
+   - TVersion implementation.
+
 version 3.7.2
    - Implement "compiler" option to build.sh.
 
