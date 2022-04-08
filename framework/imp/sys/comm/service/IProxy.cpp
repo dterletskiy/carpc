@@ -13,7 +13,7 @@ using namespace carpc::service;
 
 
 IProxy::IProxy( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_import )
-   : IConnection( interface_type_id, role_name, is_import )
+   : IConnection( interface_type_id, role_name, is_import, IConnection::eType::Proxy )
 {
    ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ServerConnected } );
 

@@ -12,9 +12,10 @@ using namespace carpc::service;
 
 
 
-IConnection::IConnection( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role, const bool is_external )
+IConnection::IConnection( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role, const bool is_external, const eType type )
    : m_signature( interface_type_id, role )
    , m_is_external( is_external )
+   , m_type( type )
 {
    if( false == m_context.is_valid( ) )
    {

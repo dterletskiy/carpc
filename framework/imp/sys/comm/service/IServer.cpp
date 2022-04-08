@@ -12,7 +12,7 @@ using namespace carpc::service;
 
 
 IServer::IServer( const carpc::async::tAsyncTypeID& interface_type_id, const std::string& role_name, const bool is_export )
-   : IConnection( interface_type_id, role_name, is_export )
+   : IConnection( interface_type_id, role_name, is_export, IConnection::eType::Server )
 {
    ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ClientConnected } );
    ev_i::Status::Event::set_notification( this, { signature( ), ev_i::eStatus::ClientDisconnected } );

@@ -17,11 +17,13 @@ namespace carpc::service {
    class IConnection : public events::service::Status::Consumer
    {
       public:
-         IConnection( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
+         enum class eType: std::uint8_t { Server, Proxy, Undefined };
+      public:
+         IConnection( const carpc::async::tAsyncTypeID&, const std::string&, const bool, const eType );
          virtual ~IConnection( );
 
       protected:
-         enum class eStatus { Connected, Disconnected };
+         enum class eStatus: std::uint8_t { Connected, Disconnected };
 
       protected:
          virtual void status( const Address&, const eStatus ) = 0;
@@ -56,6 +58,11 @@ namespace carpc::service {
          bool is_external( ) const;
       protected:
          bool                    m_is_external = false;
+
+      public:
+         eType type( ) const;
+      protected:
+         eType                   m_type = eType::Undefined;
    };
 
 
@@ -89,6 +96,12 @@ namespace carpc::service {
    {
       // @TDA: here should be check of combination is_export and is_ipc
       return m_is_external;
+   }
+
+   inline
+   IConnection::eType IConnection::type( ) const
+   {
+      return m_type;
    }
 
 } // namespace carpc::service

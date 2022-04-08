@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# used commands:
+# ./build.sh --arch=x86_64 --os=linux --action=clean_build
+# ./build.sh --arch=x86_64 --os=linux --action=start --target=service_version
+
 readonly CARPC_FW=./build
 source ${CARPC_FW}/base.sh
 source ${CARPC_FW}/constants.sh
