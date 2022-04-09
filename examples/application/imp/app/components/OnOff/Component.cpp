@@ -68,10 +68,7 @@ void Component::on_timer( const carpc::comm::timer::ID id )
 {
    MSG_DBG( "Timer expired: %s", id.name( ).c_str( ) );
 
-   MSG_WRN( "Shutting down system" );
-   shutdown( );
-
-   #if 0
+   #if 1
    {
       auto operation = [ this ]( )
       {

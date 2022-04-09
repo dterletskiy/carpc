@@ -56,9 +56,9 @@ namespace carpc::onoff::ipc {
    class RequestTriggerStateData : public BaseData
    {
       public:
-         static const eOnOff REQUEST;
-         static const eOnOff RESPONSE;
-         static const eOnOff BUSY;
+         static constexpr eOnOff REQUEST = eOnOff::RequestTriggerState;
+         static constexpr eOnOff RESPONSE = eOnOff::ResponseTriggerState;
+         static constexpr eOnOff BUSY = eOnOff::RequestTriggerStateBusy;
 
       public:
          RequestTriggerStateData( ) = default;
@@ -71,8 +71,8 @@ namespace carpc::onoff::ipc {
       private:
          bool to_stream( carpc::ipc::tStream& ) override;
          bool from_stream( carpc::ipc::tStream& ) override;
-         const eOnOff id( ) const override;
-         static const eOnOff ID;
+         const eOnOff id( ) const override { return ID; }
+         static constexpr eOnOff ID = eOnOff::RequestTriggerState;
    };
 
 
@@ -80,9 +80,9 @@ namespace carpc::onoff::ipc {
    class ResponseTriggerStateData : public BaseData
    {
       public:
-         static const eOnOff REQUEST;
-         static const eOnOff RESPONSE;
-         static const eOnOff BUSY;
+         static constexpr eOnOff REQUEST = eOnOff::RequestTriggerState;
+         static constexpr eOnOff RESPONSE = eOnOff::ResponseTriggerState;
+         static constexpr eOnOff BUSY = eOnOff::RequestTriggerStateBusy;
 
       public:
          ResponseTriggerStateData( ) = default;
@@ -94,8 +94,8 @@ namespace carpc::onoff::ipc {
       private:
          bool to_stream( carpc::ipc::tStream& ) override;
          bool from_stream( carpc::ipc::tStream& ) override;
-         const eOnOff id( ) const override;
-         static const eOnOff ID;
+         const eOnOff id( ) const override { return ID; }
+         static constexpr eOnOff ID = eOnOff::ResponseTriggerState;
    };
 
 
@@ -103,9 +103,9 @@ namespace carpc::onoff::ipc {
    class RequestStartData : public BaseData
    {
       public:
-         static const eOnOff REQUEST;
-         static const eOnOff RESPONSE;
-         static const eOnOff BUSY;
+         static constexpr eOnOff REQUEST = eOnOff::RequestStart;
+         static constexpr eOnOff RESPONSE = eOnOff::Undefined;
+         static constexpr eOnOff BUSY = eOnOff::RequestStartBusy;
 
       public:
          RequestStartData( ) = default;
@@ -114,8 +114,8 @@ namespace carpc::onoff::ipc {
       private:
          bool to_stream( carpc::ipc::tStream& ) override;
          bool from_stream( carpc::ipc::tStream& ) override;
-         const eOnOff id( ) const override;
-         static const eOnOff ID;
+         const eOnOff id( ) const override { return ID; }
+         static constexpr eOnOff ID = eOnOff::RequestTriggerState;
    };
 
 
@@ -123,9 +123,9 @@ namespace carpc::onoff::ipc {
    class NotificationCurrentStateData : public BaseData
    {
       public:
-         static const eOnOff SUBSCRIBE;
-         static const eOnOff UNSUBSCRIBE;
-         static const eOnOff NOTIFICATION;
+         static constexpr eOnOff SUBSCRIBE = eOnOff::SubscribeCurrentState;
+         static constexpr eOnOff UNSUBSCRIBE = eOnOff::UnsubscribeCurrentState;
+         static constexpr eOnOff NOTIFICATION = eOnOff::NotificationCurrentState;
 
       public:
          NotificationCurrentStateData( ) = default;
@@ -137,8 +137,8 @@ namespace carpc::onoff::ipc {
       private:
          bool to_stream( carpc::ipc::tStream& ) override;
          bool from_stream( carpc::ipc::tStream& ) override;
-         const eOnOff id( ) const override;
-         static const eOnOff ID;
+         const eOnOff id( ) const override { return ID; }
+         static constexpr eOnOff ID = eOnOff::NotificationCurrentState;
    };
 
 
@@ -173,9 +173,9 @@ namespace carpc::onoff::no_ipc {
    class RequestTriggerStateData : public BaseData
    {
       public:
-         static const eOnOff REQUEST;
-         static const eOnOff RESPONSE;
-         static const eOnOff BUSY;
+         static constexpr eOnOff REQUEST = eOnOff::RequestTriggerState;
+         static constexpr eOnOff RESPONSE = eOnOff::ResponseTriggerState;
+         static constexpr eOnOff BUSY = eOnOff::RequestTriggerStateBusy;
 
       public:
          RequestTriggerStateData( ) = default;
@@ -192,9 +192,9 @@ namespace carpc::onoff::no_ipc {
    class ResponseTriggerStateData : public BaseData
    {
       public:
-         static const eOnOff REQUEST;
-         static const eOnOff RESPONSE;
-         static const eOnOff BUSY;
+         static constexpr eOnOff REQUEST = eOnOff::RequestTriggerState;
+         static constexpr eOnOff RESPONSE = eOnOff::ResponseTriggerState;
+         static constexpr eOnOff BUSY = eOnOff::RequestTriggerStateBusy;
 
       public:
          ResponseTriggerStateData( ) = default;
@@ -210,9 +210,9 @@ namespace carpc::onoff::no_ipc {
    class RequestStartData : public BaseData
    {
       public:
-         static const eOnOff REQUEST;
-         static const eOnOff RESPONSE;
-         static const eOnOff BUSY;
+         static constexpr eOnOff REQUEST = eOnOff::RequestStart;
+         static constexpr eOnOff RESPONSE = eOnOff::Undefined;
+         static constexpr eOnOff BUSY = eOnOff::RequestStartBusy;
 
       public:
          RequestStartData( ) = default;
@@ -224,9 +224,9 @@ namespace carpc::onoff::no_ipc {
    class NotificationCurrentStateData : public BaseData
    {
       public:
-         static const eOnOff SUBSCRIBE;
-         static const eOnOff UNSUBSCRIBE;
-         static const eOnOff NOTIFICATION;
+         static constexpr eOnOff SUBSCRIBE = eOnOff::SubscribeCurrentState;
+         static constexpr eOnOff UNSUBSCRIBE = eOnOff::UnsubscribeCurrentState;
+         static constexpr eOnOff NOTIFICATION = eOnOff::NotificationCurrentState;
 
       public:
          NotificationCurrentStateData( ) = default;

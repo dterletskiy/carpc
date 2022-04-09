@@ -1,3 +1,6 @@
+version 3.7.7
+   - Service onoff code optimization.
+
 version 3.7.6
    - Implemented connection type field in IConnection.
    - Implemented example with interface versioning. Using the same interface with different versions.
