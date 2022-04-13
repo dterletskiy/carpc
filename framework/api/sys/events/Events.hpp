@@ -14,11 +14,11 @@ namespace carpc::events {
       enum class eID : std::uint8_t { boot, shutdown, ping, undefined };
       const char* c_str( const eID );
 
-      struct Data
+      struct SystemData
       {
          std::string message;
       };
-      DEFINE_EVENT( System, Data, carpc::async::id::TSignature< eID > );
+      DEFINE_EVENT( System, SystemData, carpc::async::id::TSignature< eID > );
 
    }
 

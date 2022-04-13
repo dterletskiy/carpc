@@ -1,3 +1,7 @@
+version 3.7.8
+   - Event definition macros improvement.
+   - Rename unwanted structure name "Data" for event data type.
+
 version 3.7.7
    - Service onoff code optimization.
 

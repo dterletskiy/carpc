@@ -13,13 +13,13 @@ namespace hmi::event {
    enum class eID : size_t { boot, shutdown, ping, undefined };
    const char* c_str( const eID );
 
-   struct Data
+   struct AppData
    {
       bool to_stream( carpc::ipc::tStream& _stream ) const { return true; }
       bool from_stream( carpc::ipc::tStream& _stream ) { return true; }
    };
 
-   DEFINE_IPC_EVENT( App, Data, carpc::async::id::TSignature< eID > );
+   DEFINE_IPC_EVENT( App, AppData, carpc::async::id::TSignature< eID > );
 
 }
 

@@ -393,7 +393,6 @@ namespace carpc::service::fast::__private__ {
       using tProxy = TProxy< TYPES >;
       using tRequestProcessor = RequestProcessor< TYPES >;
       using tNotificationProcessor = NotificationProcessor< TYPES >;
-      using tAttributeMap = std::map< typename TYPES::tEventID, typename TYPES::tEvent >;
 
       private:
          TProxy( const carpc::async::tAsyncTypeID&, const std::string&, const bool );
