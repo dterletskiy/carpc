@@ -3,9 +3,9 @@
 // Framework
 #include "api/sys/application/RootComponent.hpp"
 // Application
+#include "imp/hybrid/events/AppEvent.hpp"
 #include "imp/hybrid/components/onoff/server/OnOff.hpp"
 #include "imp/hybrid/components/onoff/client/OnOff.hpp"
-#include "imp/hybrid/components/onoff/server/SomeIP.hpp"
 
 
 
@@ -13,6 +13,7 @@ namespace hybrid::components::onoff {
 
    class Component
       : public carpc::application::RootComponent
+      , public events::AppEvent::Consumer
    {
       public:
          static carpc::application::IComponent::tSptr creator( );
@@ -23,13 +24,14 @@ namespace hybrid::components::onoff {
          ~Component( ) override;
 
       private:
-         void boot( const std::string& ) override;
+         void process_boot( const std::string& ) override;
+
+      private:
+         void process_event( const events::AppEvent::Event& ) override;
 
       private:
          interface::onoff::Server m_server_onoff;
          interface::onoff::Client m_client_onoff;
-
-         interface::someip::Server m_server_someip;
    };
 
 } // namespace hybrid::components::onoff

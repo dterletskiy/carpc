@@ -19,26 +19,23 @@ Component::Component( const std::string& _name )
    : carpc::application::RootComponent( _name )
 {
    MSG_DBG( "Created: %s", name( ).c_str( ) );
+   events::AppEvent::Event::set_notification( this, events::eAppEventID::BOOT );
+   events::AppEvent::Event::set_notification( this, events::eAppEventID::SHUTDOWN );
+   events::AppEvent::Event::set_notification( this, events::eAppEventID::PING );
 }
 
 Component::~Component( )
 {
    MSG_DBG( "Destroyed: %s", name( ).c_str( ) );
+   events::AppEvent::Event::clear_all_notifications( this );
 }
 
-#include <thread>
 void Component::process_boot( const std::string& command )
 {
    MSG_DBG( "%s", command.c_str( ) );
+}
 
-   // if( true == m_server_someip.init( ) )
-   //    m_server_someip.start( );
-
-   std::thread thread(
-      [ this ]( )
-      {
-         if( m_server_someip.init( ) ) m_server_someip.start( );
-      }
-   );
-   thread.detach( );
+void Component::process_event( const events::AppEvent::Event& event )
+{
+   MSG_DBG( "message = %s", event.data( )->message.c_str( ) );
 }

@@ -1,3 +1,6 @@
+version 3.8.1
+   - Removed some/ip code (client/server) from "rolename" example what was used for comparison metrix.
+
 version 3.8.0
    - Service experimental implementation added.
      Complete TServer, TProxy, TClient, TSignature, TGenerator refactoring.

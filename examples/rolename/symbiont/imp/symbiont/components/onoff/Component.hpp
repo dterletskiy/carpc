@@ -6,7 +6,6 @@
 #include "imp/symbiont/events/AppEvent.hpp"
 #include "imp/symbiont/components/onoff/server/OnOff.hpp"
 #include "imp/symbiont/components/onoff/client/OnOff.hpp"
-#include "imp/symbiont/components/onoff/client/SomeIP.hpp"
 
 
 
@@ -33,8 +32,6 @@ namespace symbiont::components::onoff {
       private:
          interface::onoff::Server m_server_onoff;
          interface::onoff::Client m_client_onoff;
-
-         interface::someip::Client m_client_someip;
    };
 
 } // namespace symbiont::components::onoff

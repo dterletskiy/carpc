@@ -9,8 +9,8 @@ option( DLT_TRACE                "Enable dlt tracing"                           
 option( MEMORY_HOOK              "Enable memory allocator hooks"                                OFF )
 option( INSTRUMENTAL             "Enable instrumental functionality"                            OFF )
 option( USE_DEBUG                "Enable debug information"                                     OFF )
-option( USE_GPB                  "Enable goolgle protobuf"                                      OFF )
-option( USE_RTTI                 "Enable RTTI"                                                  OFF )
+option( USE_GPB                  "Enable goolgle protobuf"                                      ON )
+option( USE_RTTI                 "Enable RTTI"                                                  ON )
 
 
 
