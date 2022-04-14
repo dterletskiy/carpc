@@ -8,16 +8,13 @@
 
 ## ***Table of contents***
 
-- [What is CARPC](./.md/what_is_carpc.md)
-- [CARPC entities description](./.md/carpc_entities_description.md)
-   - [Process](./.md/carpc_entities_description.md#process)
-   - [Thread](./.md/carpc_entities_description.md#thread)
-   - [Event](./.md/carpc_entities_description.md#event)
-   - [Component](./.md/carpc_entities_description.md#component)
-   - [Service](./.md/carpc_entities_description.md#service)
-- [Application structure](./.md/application_structure.md)
-- [Tracing](./.md/tracing.md)
-- [Abbreviations](./.md/abbreviations.md)
+- [What is CARPC](./.md/what_is_carpc.md#what-is-carpc)
+- [Why is CARPC]
+- [How to build]
+- [CARPC entities description](./.md/carpc_entities_description.md#carpc-entities-description)
+- [Application structure](./.md/application_structure.md#application-structure)
+- [Tracing](./.md/tracing.md#tracing)
+- [Abbreviations](./.md/abbreviations.md#abbreviations)
 
 ----
 
