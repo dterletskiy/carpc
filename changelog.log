@@ -1,3 +1,6 @@
+version 3.8.2b
+   - Repository cleanup from legacy code.
+
 version 3.8.2a
    - Examples code adaptation to new OnOff service location and implementation.
    - "service_version" example removed.
