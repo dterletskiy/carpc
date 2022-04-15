@@ -1,14 +1,14 @@
 #pragma once
 
 #include <functional>
-#include "api/sys/services/onoff/Client.hpp"
+#include "api/service/onoff/1.0.0/Client.hpp"
 
 
 
 namespace application::clients::onoff {
 
    class Client
-      : public carpc::onoff::Client
+      : public service::onoff::V1_0_0::Client
    {
       using tConnectedCallback = std::function< void( void ) >;
 

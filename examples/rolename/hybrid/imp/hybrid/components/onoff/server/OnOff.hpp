@@ -1,13 +1,13 @@
 #pragma once
 
-#include "api/sys/services/onoff/Server.hpp"
+#include "api/service/onoff/1.0.0/Server.hpp"
 
 
 
 namespace hybrid::interface::onoff {
 
    class Server
-      : public carpc::onoff::Server
+      : public service::onoff::V1_0_0::Server
    {
       public:
          Server( );

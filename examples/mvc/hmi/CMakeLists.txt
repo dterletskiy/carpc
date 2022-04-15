@@ -23,6 +23,7 @@ message( NOTICE "TARGET_NAME = " ${TARGET_NAME} )
 include_directories( ${PROJECT_SOURCE_DIR} )
 include_directories( ${TRACING_SOURCE_DIR} )
 include_directories( ${FRAMEWORK_SOURCE_DIR} )
+include_directories( ${SERVICE_SOURCE_DIR} )
 
 
 
@@ -33,6 +34,7 @@ include_directories( ${FRAMEWORK_SOURCE_DIR} )
 ###########################################################################################
 link_directories( ${TRACING_BINARY_DIR} )
 link_directories( ${FRAMEWORK_BINARY_DIR} )
+link_directories( ${SERVICE_BINARY_DIR} )
 
 
 
@@ -69,6 +71,7 @@ add_executable( ${TARGET_NAME} ${SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
 target_link_libraries( ${TARGET_NAME} framework )
+target_link_libraries( ${TARGET_NAME} service )
 if( MEMORY_HOOK )
    target_link_libraries( ${TARGET_NAME} hooks )
 endif( )

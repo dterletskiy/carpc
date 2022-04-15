@@ -11,7 +11,7 @@ using namespace symbiont::interface::onoff;
 
 
 Server::Server( )
-   : carpc::onoff::Server( "symbiont" )
+   : service::onoff::V1_0_0::Server( "symbiont" )
 {
    MSG_DBG( "created" );
    current_state( "UNLOADED" );

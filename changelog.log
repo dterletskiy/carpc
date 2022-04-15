@@ -1,3 +1,7 @@
+version 3.8.2a
+   - Examples code adaptation to new OnOff service location and implementation.
+   - "service_version" example removed.
+
 version 3.8.2
    - Moved OnOff service implementation from "framework" library to "service" library.
    - Introduced versioning for OnOff service.

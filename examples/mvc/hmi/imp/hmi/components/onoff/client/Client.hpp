@@ -1,13 +1,13 @@
 #pragma once
 
-#include "api/sys/services/onoff/Client.hpp"
+#include "api/service/onoff/1.0.0/Client.hpp"
 
 
 
 namespace hmi::components::onoff {
 
    class Client
-      : public carpc::onoff::Client
+      : public service::onoff::V1_0_0::Client
    {
       public:
          Client( );

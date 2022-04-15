@@ -2,19 +2,23 @@
 
 // Framework
 #include "api/sys/comm/timer/Timer.hpp"
-#include "api/sys/services/onoff/Server.hpp"
+#include "api/service/onoff/1.0.0/Server.hpp"
 
 
 
 namespace application::components::onoff {
 
    class Server
-      : public carpc::onoff::Server
+      : public service::onoff::V1_0_0::Server
       , public carpc::timer::ITimerConsumer
    {
       public:
          Server( const std::string&, const std::string& name = { } );
          ~Server( );
+
+      public:
+         void connected( ) override;
+         void disconnected( ) override;
 
       public:
          void request_start( ) override;
