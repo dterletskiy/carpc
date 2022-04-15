@@ -1,3 +1,8 @@
+version 3.8.2
+   - Moved OnOff service implementation from "framework" library to "service" library.
+   - Introduced versioning for OnOff service.
+   - OnOff service "generated" code refactoring.
+
 version 3.8.1
    - Removed some/ip code (client/server) from "rolename" example what was used for comparison metrix.
 

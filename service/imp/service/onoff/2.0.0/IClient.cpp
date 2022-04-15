@@ -1,65 +1,44 @@
-#include "api/sys/services/onoff_exp/Client.hpp"
-
-#include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "OnOffClientBase"
+#include "IClient.hpp"
 
 
 
-using namespace service::onoff;
+using namespace service::onoff::V2_0_0;
 
 
 
-Client::Client( const std::string& role_name )
+IClient::IClient( const std::string& role_name )
    : carpc::service::experimental::TClient< data::Types >( role_name, true )
 {
 }
 
-Client::~Client( )
+void IClient::request_start( )
 {
-}
-
-void Client::connected( )
-{
-   SYS_DBG( );
-}
-
-void Client::disconnected( )
-{
-   SYS_DBG( );
-}
-
-void Client::request_start( )
-{
-   SYS_VRB( );
    request< data::method::request::StartData >( this );
 }
 
-const carpc::comm::sequence::ID Client::request_trigger_state( const std::string& state, const std::size_t delay )
+const carpc::comm::sequence::ID IClient::request_trigger_state( const std::string& state, const std::size_t delay )
 {
-   SYS_VRB( "state: %s / delay: %zu", state.c_str( ), delay );
    return request< data::method::request::TriggerStateData >( this, state, delay );
 }
 
-void Client::subscribe_current_state( )
+void IClient::subscribe_current_state( )
 {
-   SYS_VRB( );
    subscribe< data::attribute::notification::CurrentStateData >( this );
 }
 
-void Client::unsubscribe_current_state( )
+void IClient::unsubscribe_current_state( )
 {
-   SYS_VRB( );
    unsubscribe< data::attribute::notification::CurrentStateData >( this );
 }
 
-void Client::process_event( const tMethod::Event& event )
+void IClient::process_event( const tMethod::Event& event )
 {
-   onoff::method::eID event_id = event.info( ).id( );
+   onoff::V2_0_0::method::eID event_id = event.info( ).id( );
    carpc::service::eType event_type = event.info( ).type( );
 
    switch( event_id )
    {
-      case onoff::method::eID::TriggerState:
+      case onoff::V2_0_0::method::eID::TriggerState:
       {
          if( carpc::service::eType::RESPONSE == event_type )
          {
@@ -80,14 +59,14 @@ void Client::process_event( const tMethod::Event& event )
    }
 }
 
-void Client::process_event( const tAttribute::Event& event )
+void IClient::process_event( const tAttribute::Event& event )
 {
-   onoff::attribute::eID event_id = event.info( ).id( );
+   onoff::V2_0_0::attribute::eID event_id = event.info( ).id( );
    carpc::service::eType event_type = event.info( ).type( );
 
    switch( event_id )
    {
-      case onoff::attribute::eID::CurrentState:
+      case onoff::V2_0_0::attribute::eID::CurrentState:
       {
          if( carpc::service::eType::NOTIFICATION == event_type )
          {

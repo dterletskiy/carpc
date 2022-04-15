@@ -1,8 +1,8 @@
-#include "api/sys/services/onoff/Data.hpp"
+#include "Data.hpp"
 
 
 
-namespace carpc::onoff {
+namespace service::onoff::V1_0_0 {
 
    const carpc::service::RequestResponseIDs< eOnOff >::tVector s_rr = {
       { eOnOff::RequestTriggerState, eOnOff::RequestTriggerStateBusy, eOnOff::ResponseTriggerState },
@@ -13,11 +13,11 @@ namespace carpc::onoff {
       { eOnOff::SubscribeCurrentState, eOnOff::UnsubscribeCurrentState, eOnOff::NotificationCurrentState }
    };
 
-} // namespace carpc::onoff
+} // namespace service::onoff::V1_0_0
 
 
 
-namespace carpc::onoff::ipc {
+namespace service::onoff::V1_0_0::ipc {
 
    const carpc::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
    const carpc::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
@@ -82,11 +82,11 @@ namespace carpc::onoff::ipc {
    bool NotificationCurrentStateData::to_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::serialize( stream, state ); }
    bool NotificationCurrentStateData::from_stream( carpc::ipc::tStream& stream ) { return carpc::ipc::deserialize( stream, state ); }
 
-} // namespace carpc::onoff::ipc
+} // namespace service::onoff::V1_0_0::ipc
 
 
 
-namespace carpc::onoff::no_ipc {
+namespace service::onoff::V1_0_0::no_ipc {
 
    const carpc::service::RequestResponseIDs< Types::tID >::tVector& Types::RR = s_rr;
    const carpc::service::NotificationIDs< Types::tID >::tVector& Types::N = s_n;
@@ -106,4 +106,4 @@ namespace carpc::onoff::no_ipc {
    NotificationCurrentStateData::NotificationCurrentStateData( const std::string& _state )
       : BaseData( ), state( _state ) { }
 
-} // namespace carpc::onoff::no_ipc
+} // namespace service::onoff::V1_0_0::no_ipc

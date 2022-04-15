@@ -2,6 +2,7 @@
 
 #include "api/sys/common/ID.hpp"
 #include "api/sys/common/Name.hpp"
+#include "api/sys/common/Version.hpp"
 #include "api/sys/common/IPC.hpp"
 
 
@@ -10,27 +11,28 @@ namespace carpc::comm {
 
    namespace async
    {
-      class AsyncID;
+      class Async;
    }
 
    namespace service
    {
-      class ServiceID;
-      using ID = carpc::TID< ServiceID >;
-      using Name = carpc::TName< ServiceID >;
+      class Service;
+      using ID = carpc::TID< Service >;
+      using Name = carpc::TName< Service >;
+      using Version = carpc::TVersion< Service >;
    }
 
    namespace sequence
    {
-      class SequenceID;
-      using ID = carpc::TID< SequenceID >;
+      class Sequence;
+      using ID = carpc::TID< Sequence >;
    }
 
    namespace timer
    {
-      class TimerID;
-      using ID = carpc::TID< TimerID >;
-      using Name = carpc::TName< TimerID >;
+      class Timer;
+      using ID = carpc::TID< Timer >;
+      using Name = carpc::TName< Timer >;
    }
 
 } // namespace carpc::service

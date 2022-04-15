@@ -2,28 +2,21 @@
 
 #include "api/sys/comm/service/fast/TServer.hpp"
 #include "api/sys/comm/service/secure/TServer.hpp"
-#include "api/sys/services/onoff/Data.hpp"
+#include "Data.hpp"
 
 
 
-namespace carpc::onoff {
+namespace service::onoff::V1_0_0 {
 
-   class Server
+   class IServer
       : public carpc::service::SERVICE_NAMESPACE::TServer< data::Types >
    {
       public:
-         using tSptr = std::shared_ptr< Server >;
-
-      public:
-         Server( const std::string& );
-         virtual ~Server( );
+         IServer( const std::string& );
+         virtual ~IServer( ) = default;
 
       private:
-         void connected( ) override;
-         void disconnected( ) override;
-
-      private:
-         void process_request_event( const tService::Event& ) override;
+         void process_request_event( const tService::Event& ) override final;
 
       public:
          virtual void request_start( ) = 0;
@@ -35,4 +28,4 @@ namespace carpc::onoff {
          const std::string& current_state( ) const;
    };
 
-} // namespace carpc::onoff
+} // namespace service::onoff::V1_0_0

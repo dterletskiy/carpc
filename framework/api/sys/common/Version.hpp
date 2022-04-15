@@ -30,9 +30,9 @@ namespace carpc {
       public:
          TVersion( ) = default;
          TVersion( const VALUE_TYPE& major, const VALUE_TYPE& minor, const VALUE_TYPE& patch )
-            : m_major( value )
-            , m_minor( value )
-            , m_patch( value )
+            : m_major( major )
+            , m_minor( minor )
+            , m_patch( patch )
          { }
          TVersion( const tVersion& other )
             : m_major( other.m_major )

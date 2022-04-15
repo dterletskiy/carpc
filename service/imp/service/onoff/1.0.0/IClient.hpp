@@ -2,25 +2,18 @@
 
 #include "api/sys/comm/service/fast/TClient.hpp"
 #include "api/sys/comm/service/secure/TClient.hpp"
-#include "api/sys/services/onoff/Data.hpp"
+#include "Data.hpp"
 
 
 
-namespace carpc::onoff {
+namespace service::onoff::V1_0_0 {
 
-   class Client
+   class IClient
       : public carpc::service::SERVICE_NAMESPACE::TClient< data::Types >
    {
       public:
-         using tSptr = std::shared_ptr< Client >;
-
-      public:
-         Client( const std::string& );
-         virtual ~Client( );
-
-      private:
-         void connected( ) override;
-         void disconnected( ) override;
+         IClient( const std::string& );
+         virtual ~IClient( ) = default;
 
       private:
          void process_response_event( const tService::Event& ) override;
@@ -42,4 +35,4 @@ namespace carpc::onoff {
          virtual void on_current_state( const std::string& ) = 0;
    };
 
-} // namespace carpc::onoff
+} // namespace service::onoff::V1_0_0

@@ -12,13 +12,13 @@
 
 #include <memory>
 
-#include "api/sys/comm/service/Types.hpp"
 #include "api/sys/helpers/macros/enum.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
+#include "api/service/onoff/1.0.0/Version.hpp"
 
 
 
-namespace carpc::onoff {
+namespace service::onoff::V1_0_0 {
 
    DEFINE_ENUMERATION( eOnOff, std::size_t
       , RequestTriggerState, RequestTriggerStateBusy, ResponseTriggerState
@@ -31,7 +31,7 @@ namespace carpc::onoff {
 
 
 
-namespace carpc::onoff::ipc {
+namespace service::onoff::V1_0_0::ipc {
 
    class BaseData
    {
@@ -153,11 +153,11 @@ namespace carpc::onoff::ipc {
       static const carpc::service::NotificationIDs< tID >::tVector& N;
    };
 
-} // namespace carpc::onoff::ipc
+} // namespace service::onoff::V1_0_0::ipc
 
 
 
-namespace carpc::onoff::no_ipc {
+namespace service::onoff::V1_0_0::no_ipc {
 
    class BaseData
    {
@@ -249,12 +249,12 @@ namespace carpc::onoff::no_ipc {
       static const carpc::service::NotificationIDs< tID >::tVector& N;
    };
 
-} // namespace carpc::onoff::no_ipc
+} // namespace service::onoff::V1_0_0::no_ipc
 
 
 
-namespace carpc::onoff {
+namespace service::onoff::V1_0_0 {
 
-   namespace data = carpc::onoff::ipc;
+   namespace data = service::onoff::V1_0_0::ipc;
 
-} // namespace carpc::onoff
+} // namespace service::onoff::V1_0_0

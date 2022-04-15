@@ -1,58 +1,37 @@
-#include "api/sys/services/onoff/Client.hpp"
-
-#include "api/sys/trace/Trace.hpp"
-#define CLASS_ABBR "OnOffClientBase"
+#include "IClient.hpp"
 
 
 
-using namespace carpc::onoff;
+using namespace service::onoff::V1_0_0;
 
 
 
-Client::Client( const std::string& role_name )
+IClient::IClient( const std::string& role_name )
    : carpc::service::SERVICE_NAMESPACE::TClient< data::Types >( role_name, true )
 {
 }
 
-Client::~Client( )
+void IClient::request_start( )
 {
-}
-
-void Client::connected( )
-{
-   SYS_DBG( );
-}
-
-void Client::disconnected( )
-{
-   SYS_DBG( );
-}
-
-void Client::request_start( )
-{
-   SYS_VRB( );
    request< data::RequestStartData >( this );
 }
 
-const carpc::comm::sequence::ID Client::request_trigger_state( const std::string& state, const std::size_t delay )
+const carpc::comm::sequence::ID IClient::request_trigger_state( const std::string& state, const std::size_t delay )
 {
-   SYS_VRB( "state: %s / delay: %zu", state.c_str( ), delay );
    return request< data::RequestTriggerStateData >( this, state, delay );
 }
 
-void Client::subscribe_current_state( )
+void IClient::subscribe_current_state( )
 {
-   SYS_VRB( );
    subscribe< data::NotificationCurrentStateData >( this );
 }
 
-void Client::unsubscribe_current_state( )
+void IClient::unsubscribe_current_state( )
 {
-   SYS_VRB( );
    unsubscribe< data::NotificationCurrentStateData >( this );
 }
 
-void Client::process_response_event( const tService::Event& event )
+void IClient::process_response_event( const tService::Event& event )
 {
    switch( event.info( ).id( ) )
    {
@@ -77,7 +56,7 @@ void Client::process_response_event( const tService::Event& event )
    }
 }
 
-void Client::process_notification_event( const tService::Event& event )
+void IClient::process_notification_event( const tService::Event& event )
 {
    switch( event.info( ).id( ) )
    {

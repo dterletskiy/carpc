@@ -1,0 +1,17 @@
+version 2.0.0
+
+interface onoff
+{
+   request: trigger_state(
+      std::string& state,
+      std::size_t timeout
+   ) trigger_state;
+
+   response: trigger_state(
+      bool result
+   );
+
+   request: start( );
+
+   attribute: std::string current_state;
+}

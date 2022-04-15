@@ -1,14 +1,14 @@
-#include "api/sys/services/onoff_exp/Data.hpp"
+#include "Data.hpp"
 
 
 
-namespace service::onoff::ipc {
+namespace service::onoff::V2_0_0::ipc {
 
    namespace method {
 
       BaseData::tSptr BaseData::create( carpc::ipc::tStream& stream )
       {
-         onoff::method::eID id = onoff::method::eID::Undefined;
+         onoff::V2_0_0::method::eID id = onoff::V2_0_0::method::eID::Undefined;
          carpc::service::eType type = carpc::service::eType::UNDEFINED;
          if( false == carpc::ipc::deserialize( stream, id, type ) )
             return nullptr;
@@ -16,7 +16,7 @@ namespace service::onoff::ipc {
          tSptr ptr = nullptr;
          switch( id )
          {
-            case onoff::method::eID::TriggerState:
+            case onoff::V2_0_0::method::eID::TriggerState:
             {
                switch( type )
                {
@@ -125,7 +125,7 @@ namespace service::onoff::ipc {
 
       BaseData::tSptr BaseData::create( carpc::ipc::tStream& stream )
       {
-         onoff::attribute::eID id = onoff::attribute::eID::Undefined;
+         onoff::V2_0_0::attribute::eID id = onoff::V2_0_0::attribute::eID::Undefined;
          carpc::service::eType type = carpc::service::eType::UNDEFINED;
          if( false == carpc::ipc::deserialize( stream, id, type ) )
             return nullptr;
@@ -133,7 +133,7 @@ namespace service::onoff::ipc {
          tSptr ptr = nullptr;
          switch( id )
          {
-            case onoff::attribute::eID::CurrentState:
+            case onoff::V2_0_0::attribute::eID::CurrentState:
             {
                switch( type )
                {
@@ -193,11 +193,11 @@ namespace service::onoff::ipc {
 
    }
 
-} // namespace service::onoff::ipc
+} // namespace service::onoff::V2_0_0::ipc
 
 
 
-namespace service::onoff::no_ipc {
+namespace service::onoff::V2_0_0::no_ipc {
 
    namespace method {
 
@@ -242,4 +242,4 @@ namespace service::onoff::no_ipc {
 
    }
 
-} // namespace service::onoff::no_ipc
+} // namespace service::onoff::V2_0_0::no_ipc

@@ -1,25 +1,18 @@
 #pragma once
 
 #include "api/sys/comm/service/experimental/TServer.hpp"
-#include "api/sys/services/onoff_exp/Data.hpp"
+#include "Data.hpp"
 
 
 
-namespace service::onoff {
+namespace service::onoff::V2_0_0 {
 
-   class Server
+   class IServer
       : public carpc::service::experimental::TServer< data::Types >
    {
       public:
-         using tSptr = std::shared_ptr< Server >;
-
-      public:
-         Server( const std::string& );
-         virtual ~Server( );
-
-      private:
-         void connected( ) override;
-         void disconnected( ) override;
+         IServer( const std::string& );
+         virtual ~IServer( ) = default;
 
       private:
          void process_request_event( const tMethod::Event& ) override;
@@ -34,4 +27,4 @@ namespace service::onoff {
          const std::string& current_state( ) const;
    };
 
-} // namespace service::onoff
+} // namespace service::onoff::V2_0_0

@@ -4,10 +4,11 @@
 
 #include "api/sys/comm/service/Types.hpp"
 #include "api/sys/helpers/macros/strings.hpp"
+#include "api/service/onoff/2.0.0/Version.hpp"
 
 
 
-namespace service::onoff {
+namespace service::onoff::V2_0_0 {
 
    namespace method {
 
@@ -34,11 +35,11 @@ namespace service::onoff {
 
    }
 
-} // namespace service::onoff
+} // namespace service::onoff::V2_0_0
 
 
 
-namespace service::onoff::ipc {
+namespace service::onoff::V2_0_0::ipc {
 
    namespace method {
 
@@ -57,7 +58,7 @@ namespace service::onoff::ipc {
          private:
             virtual bool to_stream( carpc::ipc::tStream& ) = 0;
             virtual bool from_stream( carpc::ipc::tStream& ) = 0;
-            virtual onoff::method::eID id( ) const = 0;
+            virtual onoff::V2_0_0::method::eID id( ) const = 0;
             virtual carpc::service::eType type( ) const = 0;
       };
 
@@ -68,7 +69,7 @@ namespace service::onoff::ipc {
          class TriggerStateData : public BaseData
          {
             public:
-               static constexpr onoff::method::eID ID = onoff::method::eID::TriggerState;
+               static constexpr onoff::V2_0_0::method::eID ID = onoff::V2_0_0::method::eID::TriggerState;
 
             public:
                TriggerStateData( ) = default;
@@ -81,7 +82,7 @@ namespace service::onoff::ipc {
             private:
                bool to_stream( carpc::ipc::tStream& ) override;
                bool from_stream( carpc::ipc::tStream& ) override;
-               onoff::method::eID id( ) const override { return ID; }
+               onoff::V2_0_0::method::eID id( ) const override { return ID; }
                carpc::service::eType type( ) const override { return carpc::service::eType::REQUEST; }
          };
 
@@ -92,7 +93,7 @@ namespace service::onoff::ipc {
          class TriggerStateData : public BaseData
          {
             public:
-               static constexpr onoff::method::eID ID = onoff::method::eID::TriggerState;
+               static constexpr onoff::V2_0_0::method::eID ID = onoff::V2_0_0::method::eID::TriggerState;
 
             public:
                TriggerStateData( ) = default;
@@ -104,7 +105,7 @@ namespace service::onoff::ipc {
             private:
                bool to_stream( carpc::ipc::tStream& ) override;
                bool from_stream( carpc::ipc::tStream& ) override;
-               onoff::method::eID id( ) const override { return ID; }
+               onoff::V2_0_0::method::eID id( ) const override { return ID; }
                carpc::service::eType type( ) const override { return carpc::service::eType::RESPONSE; }
          };
  
@@ -115,7 +116,7 @@ namespace service::onoff::ipc {
          class StartData : public BaseData
          {
             public:
-               static constexpr onoff::method::eID ID = onoff::method::eID::Start;
+               static constexpr onoff::V2_0_0::method::eID ID = onoff::V2_0_0::method::eID::Start;
 
             public:
                StartData( ) = default;
@@ -124,7 +125,7 @@ namespace service::onoff::ipc {
             private:
                bool to_stream( carpc::ipc::tStream& ) override;
                bool from_stream( carpc::ipc::tStream& ) override;
-               onoff::method::eID id( ) const override { return ID; }
+               onoff::V2_0_0::method::eID id( ) const override { return ID; }
                carpc::service::eType type( ) const override { return carpc::service::eType::REQUEST; }
          };
 
@@ -151,7 +152,7 @@ namespace service::onoff::ipc {
          private:
             virtual bool to_stream( carpc::ipc::tStream& ) = 0;
             virtual bool from_stream( carpc::ipc::tStream& ) = 0;
-            virtual onoff::attribute::eID id( ) const = 0;
+            virtual onoff::V2_0_0::attribute::eID id( ) const = 0;
             virtual carpc::service::eType type( ) const = 0;
       };
 
@@ -162,7 +163,7 @@ namespace service::onoff::ipc {
          class CurrentStateData : public BaseData
          {
             public:
-               static constexpr onoff::attribute::eID ID = onoff::attribute::eID::CurrentState;
+               static constexpr onoff::V2_0_0::attribute::eID ID = onoff::V2_0_0::attribute::eID::CurrentState;
 
             public:
                CurrentStateData( ) = default;
@@ -174,7 +175,7 @@ namespace service::onoff::ipc {
             private:
                bool to_stream( carpc::ipc::tStream& ) override;
                bool from_stream( carpc::ipc::tStream& ) override;
-               onoff::attribute::eID id( ) const override { return ID; }
+               onoff::V2_0_0::attribute::eID id( ) const override { return ID; }
                carpc::service::eType type( ) const override { return carpc::service::eType::NOTIFICATION; }
          };
 
@@ -190,27 +191,27 @@ namespace service::onoff::ipc {
 
       struct method
       {
-         using tID         = service::onoff::method::eID;
-         using tBaseData   = service::onoff::ipc::method::BaseData;
+         using tID         = service::onoff::V2_0_0::method::eID;
+         using tBaseData   = service::onoff::V2_0_0::ipc::method::BaseData;
 
-         static bool has_response( const service::onoff::method::eID& request_id )
+         static bool has_response( const service::onoff::V2_0_0::method::eID& request_id )
          {
-            return service::onoff::method::has_response( request_id );
+            return service::onoff::V2_0_0::method::has_response( request_id );
          }
       };
 
       struct attribute
       {
-         using tID         = service::onoff::attribute::eID;
-         using tBaseData   = service::onoff::ipc::attribute::BaseData;
+         using tID         = service::onoff::V2_0_0::attribute::eID;
+         using tBaseData   = service::onoff::V2_0_0::ipc::attribute::BaseData;
       };
    };
 
-} // namespace service::onoff::ipc
+} // namespace service::onoff::V2_0_0::ipc
 
 
 
-namespace service::onoff::no_ipc {
+namespace service::onoff::V2_0_0::no_ipc {
 
    namespace method {
 
@@ -230,7 +231,7 @@ namespace service::onoff::no_ipc {
          class TriggerStateData : public BaseData
          {
             public:
-               static constexpr onoff::method::eID ID = onoff::method::eID::TriggerState;
+               static constexpr onoff::V2_0_0::method::eID ID = onoff::V2_0_0::method::eID::TriggerState;
 
             public:
                TriggerStateData( ) = default;
@@ -248,7 +249,7 @@ namespace service::onoff::no_ipc {
          class TriggerStateData : public BaseData
          {
             public:
-               static constexpr onoff::method::eID ID = onoff::method::eID::TriggerState;
+               static constexpr onoff::V2_0_0::method::eID ID = onoff::V2_0_0::method::eID::TriggerState;
 
             public:
                TriggerStateData( ) = default;
@@ -265,7 +266,7 @@ namespace service::onoff::no_ipc {
          class StartData : public BaseData
          {
             public:
-               static constexpr onoff::method::eID ID = onoff::method::eID::Start;
+               static constexpr onoff::V2_0_0::method::eID ID = onoff::V2_0_0::method::eID::Start;
 
             public:
                StartData( ) = default;
@@ -296,7 +297,7 @@ namespace service::onoff::no_ipc {
          class CurrentStateData : public BaseData
          {
             public:
-               static constexpr onoff::attribute::eID ID = onoff::attribute::eID::CurrentState;
+               static constexpr onoff::V2_0_0::attribute::eID ID = onoff::V2_0_0::attribute::eID::CurrentState;
 
             public:
                CurrentStateData( ) = default;
@@ -318,23 +319,23 @@ namespace service::onoff::no_ipc {
 
       struct method
       {
-         using tID         = service::onoff::method::eID;
-         using tBaseData   = service::onoff::ipc::method::BaseData;
+         using tID         = service::onoff::V2_0_0::method::eID;
+         using tBaseData   = service::onoff::V2_0_0::ipc::method::BaseData;
       };
 
       struct attribute
       {
-         using tID         = service::onoff::attribute::eID;
-         using tBaseData   = service::onoff::ipc::attribute::BaseData;
+         using tID         = service::onoff::V2_0_0::attribute::eID;
+         using tBaseData   = service::onoff::V2_0_0::ipc::attribute::BaseData;
       };
    };
 
-} // namespace service::onoff::no_ipc
+} // namespace service::onoff::V2_0_0::no_ipc
 
 
 
-namespace service::onoff {
+namespace service::onoff::V2_0_0 {
 
-   namespace data = service::onoff::ipc;
+   namespace data = service::onoff::V2_0_0::ipc;
 
-} // namespace service::onoff
+} // namespace service::onoff::V2_0_0
