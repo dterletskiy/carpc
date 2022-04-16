@@ -11,7 +11,7 @@ using namespace controller::components::onoff;
 
 
 Server::Server( )
-   : service::onoff::V1_0_0::Server( "OnOff_Controller" )
+   : service::onoff::V2_0_0::Server( "OnOff_Controller" )
 {
    MSG_DBG( "created" );
    current_state( "UNLOADED" );

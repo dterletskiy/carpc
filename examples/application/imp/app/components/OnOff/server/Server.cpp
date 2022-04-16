@@ -11,7 +11,7 @@ using namespace application::components::onoff;
 
 
 Server::Server( const std::string& role_name, const std::string& name )
-   : service::onoff::V1_0_0::Server( role_name )
+   : service::onoff::V2_0_0::Server( role_name )
    , m_name( name )
 {
    MSG_DBG( "%s: created", m_name.c_str( ) );

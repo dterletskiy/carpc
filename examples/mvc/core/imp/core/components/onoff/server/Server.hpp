@@ -1,14 +1,14 @@
 #pragma once
 
 #include "api/sys/comm/timer/Timer.hpp"
-#include "api/service/onoff/1.0.0/Server.hpp"
+#include "api/service/onoff/2.0.0/Server.hpp"
 
 
 
 namespace core::components::onoff {
 
    class Server
-      : public service::onoff::V1_0_0::Server
+      : public service::onoff::V2_0_0::Server
       , public carpc::timer::ITimerConsumer
    {
       public:

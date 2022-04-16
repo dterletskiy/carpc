@@ -1,13 +1,13 @@
 #pragma once
 
-#include "api/service/onoff/1.0.0/Client.hpp"
+#include "api/service/onoff/2.0.0/Client.hpp"
 
 
 
 namespace controller::components::onoff {
 
    class Client
-      : public service::onoff::V1_0_0::Client
+      : public service::onoff::V2_0_0::Client
    {
       public:
          Client( );

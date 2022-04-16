@@ -11,7 +11,7 @@ using namespace hybrid::interface::onoff;
 
 
 Server::Server( )
-   : service::onoff::V1_0_0::Server( "hybrid" )
+   : service::onoff::V2_0_0::Server( "hybrid" )
 {
    MSG_DBG( "created" );
    current_state( "UNLOADED" );

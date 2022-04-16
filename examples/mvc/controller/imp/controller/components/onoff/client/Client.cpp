@@ -12,7 +12,7 @@ using namespace controller::components::onoff;
 
 
 Client::Client( )
-   : service::onoff::V1_0_0::Client( "OnOff_Core" )
+   : service::onoff::V2_0_0::Client( "OnOff_Core" )
 {
    MSG_VRB( "created" );
 }
@@ -39,7 +39,7 @@ void Client::disconnected( )
 void Client::request_start( )
 {
    MSG_DBG( );
-   service::onoff::V1_0_0::Client::request_start( );
+   service::onoff::V2_0_0::Client::request_start( );
 }
 
 
@@ -51,7 +51,7 @@ void Client::response_trigger_state( const bool result )
 void Client::request_trigger_state( const std::string& state, const size_t delay )
 {
    MSG_DBG( "state: %s / delay: %zu", state.c_str( ), delay );
-   service::onoff::V1_0_0::Client::request_trigger_state( state, delay );
+   service::onoff::V2_0_0::Client::request_trigger_state( state, delay );
 }
 
 void Client::request_trigger_state_failed( const carpc::service::eError& error )

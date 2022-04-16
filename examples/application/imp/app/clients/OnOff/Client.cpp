@@ -12,7 +12,7 @@ using namespace application::clients::onoff;
 
 
 Client::Client( const std::string& role_name, const std::string& name, tConnectedCallback connected_callback )
-   : service::onoff::V1_0_0::Client( role_name )
+   : service::onoff::V2_0_0::Client( role_name )
    , m_name( name )
    , m_connected_callback( connected_callback )
 {
@@ -41,7 +41,7 @@ void Client::disconnected( )
 void Client::request_start( )
 {
    MSG_DBG( "%s", m_name.c_str( ) );
-   service::onoff::V1_0_0::Client::request_start( );
+   service::onoff::V2_0_0::Client::request_start( );
 }
 
 
@@ -53,7 +53,7 @@ void Client::response_trigger_state( const bool result )
 void Client::request_trigger_state( const std::string& state, const size_t delay )
 {
    MSG_DBG( "%s: state: %s / delay: %zu", m_name.c_str( ), state.c_str( ), delay );
-   service::onoff::V1_0_0::Client::request_trigger_state( state, delay );
+   service::onoff::V2_0_0::Client::request_trigger_state( state, delay );
 }
 
 void Client::request_trigger_state_failed( const carpc::service::eError& error )

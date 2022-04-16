@@ -99,7 +99,7 @@ namespace carpc::service::experimental::__private_server__ {
       const comm::sequence::ID seq_id = event.info( ).seq_id( );
       const auto from_context = event.context( );
 
-      // @TDA: just for debugging and must be deleted later
+      // @TDA-DEBUG:
       if( to_id != mp_server->id( ) )
       {
          SYS_ERR( "%s != %s", to_id.name( ).c_str( ), mp_server->id( ).name( ).c_str( ) );
@@ -240,15 +240,15 @@ namespace carpc::service::experimental::__private_server__ {
 
       public:
          bool is_subscribed( ) const;
-         void add_subscriber( const application::Context&, const comm::service::ID& );
-         void remove_subscriber( const application::Context&, const comm::service::ID& );
+         bool add_subscriber( const application::Context&, const comm::service::ID& );
+         bool remove_subscriber( const application::Context&, const comm::service::ID& );
          template< typename tAttributeData, typename... Args >
             void notify_subscribers( const tServer&, const Args& ... args );
 
       public:
          std::shared_ptr< typename TYPES::attribute::tBaseData > data( ) const;
       private:
-         std::map< application::process::ID, std::size_t > subscribers; // @TDA: could be changed to set without amount of subscribers
+         std::set< Address > subscribers;
          std::shared_ptr< typename TYPES::attribute::tBaseData > mp_data = nullptr;
    };
 
@@ -265,35 +265,37 @@ namespace carpc::service::experimental::__private_server__ {
    }
 
    template< typename TYPES >
-   void NotificationStatus< TYPES >::add_subscriber( const application::Context& context, const comm::service::ID& service_id )
+   bool NotificationStatus< TYPES >::add_subscriber( const application::Context& context, const comm::service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
       // It is current process ID and appliocation::process::local
       // Here we should standartize what exact value should be stored in collection.
-      application::process::ID pid = application::process::local;
-      if( context.is_external( ) )
-         pid = context.pid( );
-
-      auto iterator = subscribers.find( pid );
-      if( subscribers.end( ) == iterator )
-         subscribers.emplace( pid, 1 );
-      else
-         ++( iterator->second );
+      return subscribers.emplace(
+                  Address{
+                     application::Context{
+                        context.tid( ),
+                        context.is_external( ) ? context.pid( ) : application::process::local
+                     },
+                     service_id
+                  }
+               ).second;
    }
 
    template< typename TYPES >
-   void NotificationStatus< TYPES >::remove_subscriber( const application::Context& context, const comm::service::ID& service_id )
+   bool NotificationStatus< TYPES >::remove_subscriber( const application::Context& context, const comm::service::ID& service_id )
    {
       // In case of current process PID can have two different exact values but what can mean the same logic values.
       // It is current process ID and appliocation::process::local
       // Here we should standartize what exact value should be stored in collection.
-      application::process::ID pid = application::process::local;
-      if( context.is_external( ) )
-         pid = context.pid( );
-
-      auto iterator = subscribers.find( pid );
-      if( subscribers.end( ) != iterator && 0 != iterator->second )
-         --( iterator->second );
+      return 0 != subscribers.erase(
+                     Address{
+                        application::Context{
+                           context.tid( ),
+                           context.is_external( ) ? context.pid( ) : application::process::local
+                        },
+                        service_id
+                     }
+                  );
    }
 
    template< typename TYPES >
@@ -308,20 +310,18 @@ namespace carpc::service::experimental::__private_server__ {
          return;
       }
 
-      typename TYPES::attribute::tEventUserSignature event_signature(
-         server.signature( ).role( ),
-         tAttributeData::ID,
-         carpc::service::eType::NOTIFICATION,
-         server.id( ),
-         comm::service::ID::invalid
-      );
-      typename TYPES::attribute::tEventData event_data( mp_data );
-      auto p_event = TYPES::attribute::tEvent::create( event_signature, event_data );
 
-      // Notifying all subscribers by sending notification broadcast event to each process.
       for( const auto& subscriber : subscribers )
       {
-         p_event->send( application::Context( application::thread::broadcast, subscriber.first ) );
+         typename TYPES::attribute::tEventUserSignature event_signature(
+            server.signature( ).role( ),
+            tAttributeData::ID,
+            carpc::service::eType::NOTIFICATION,
+            server.id( ),
+            subscriber.id( )
+         );
+         typename TYPES::attribute::tEventData event_data( mp_data );
+         TYPES::attribute::tEvent::create_send( event_signature, event_data, subscriber.context( ) );
       }
    }
 
@@ -373,11 +373,22 @@ namespace carpc::service::experimental::__private_server__ {
 
       if( carpc::service::eType::SUBSCRIBE == event_type )
       {
-         auto emplace_result = m_attribute_status_map.emplace( event_id, tNotificationStatus{ } );\
+         // Processing attribute subscription event
+
+         auto emplace_result = m_attribute_status_map.emplace( event_id, tNotificationStatus{ } );
          auto attribute_status_map_iterator = emplace_result.first;
 
+         // In case there is cached attribute value => send notification event immidiatly to subscriber
          auto& notification_status = attribute_status_map_iterator->second;
-         notification_status.add_subscriber( from_context, from_id );
+         if( notification_status.add_subscriber( from_context, from_id ) )
+         {
+            // @TDA-DEBUG:
+            SYS_VRB(
+               "subscriber '%s' added for attribute '%s'",
+               Address{ from_context, from_id }.name( ).c_str( ),
+               event_id.c_str( )
+            );
+         }
          if( notification_status.data( ) )
          {
             typename TYPES::attribute::tEventUserSignature event_signature(
@@ -393,6 +404,8 @@ namespace carpc::service::experimental::__private_server__ {
       }
       else if( carpc::service::eType::UNSUBSCRIBE == event_type )
       {
+         // Processing attribute unsubscription event
+
          auto attribute_status_map_iterator = m_attribute_status_map.find( event_id );
          if( m_attribute_status_map.end( ) == attribute_status_map_iterator )
          {
@@ -401,7 +414,15 @@ namespace carpc::service::experimental::__private_server__ {
          }
 
          auto& notification_status = attribute_status_map_iterator->second;
-         notification_status.remove_subscriber( from_context, from_id );
+         if( notification_status.remove_subscriber( from_context, from_id ) )
+         {
+            // @TDA-DEBUG:
+            SYS_VRB(
+               "subscriber '%s' removed for attribute '%s'",
+               Address{ from_context, from_id }.name( ).c_str( ),
+               event_id.c_str( )
+            );
+         }
       }
       else
       {

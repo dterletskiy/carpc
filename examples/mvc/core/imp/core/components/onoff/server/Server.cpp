@@ -11,7 +11,7 @@ using namespace core::components::onoff;
 
 
 Server::Server( )
-   : service::onoff::V1_0_0::Server( "OnOff_Core" )
+   : service::onoff::V2_0_0::Server( "OnOff_Core" )
 {
    MSG_DBG( "created" );
    current_state( "Unloaded" );
