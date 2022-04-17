@@ -27,7 +27,7 @@ namespace service::onoff::V2_0_0::ipc {
                   }
                   case carpc::service::eType::RESPONSE:
                   {
-                     ptr = std::make_shared< request::TriggerStateData >( );
+                     ptr = std::make_shared< response::TriggerStateData >( );
                      break;
                   }
                   default:
