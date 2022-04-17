@@ -148,7 +148,7 @@ namespace carpc::async {
          const tUserSignature& info( ) const { return mp_signature->user_signature( ); }
          const IAsync::ISignature::tSptr signature( ) const override { return mp_signature; }
       private:
-         typename tSignature::tSptr mp_signature;
+         typename tSignature::tSptr mp_signature = nullptr;
 
       // data
       public:

@@ -4,7 +4,7 @@
 
 namespace carpc {
 
-   struct Dummy final { };
+   struct Dummy;
 
    class IPC;
    class NO_IPC;

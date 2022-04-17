@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/sys/helpers/macros/types.hpp"
 #include "api/sys/comm/async/event/TEvent.hpp"
 #include "api/sys/comm/async/event/TSignature.hpp"
 #include "api/sys/comm/async/event/TConsumer.hpp"
@@ -8,10 +9,11 @@
 
 namespace carpc::async {
 
+   // Base Event Generator
    template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
-   class TGenerator
+   class TGeneratorBase
    {
-      using _Generator = TGenerator< _ServiceType, _EventNamespace, _DataType, _SignatureType >;
+      using _Generator = TGeneratorBase< _ServiceType, _EventNamespace, _DataType, _SignatureType >;
 
       public:
          struct Config
@@ -25,5 +27,56 @@ namespace carpc::async {
             using tUserSignature    = _SignatureType;
          };
    };
+
+
+
+   // Generic Event Generator
+   template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType, typename _Activator = void >
+   class TGenerator
+      : public TGeneratorBase< _ServiceType, _EventNamespace, _DataType, _SignatureType >
+   {
+   };
+
+   namespace generic {
+
+      template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
+         using tGenerator =
+            TGenerator< _ServiceType, _EventNamespace, _DataType, _SignatureType, void >;
+
+   }
+
+
+
+   // Event Generator with user signature type = integral value
+   template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
+   class TGenerator< _ServiceType, _EventNamespace, _DataType, _SignatureType, CARPC_ENABLE_IF_INTEGRAL_TYPE( _SignatureType ) >
+      : public TGeneratorBase< _ServiceType, _EventNamespace, _DataType, _SignatureType >
+   {
+   };
+
+   namespace integral {
+
+      template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
+         using tGenerator =
+            TGenerator< _ServiceType, _EventNamespace, _DataType, _SignatureType, CARPC_ENABLE_IF_INTEGRAL_TYPE( _SignatureType ) >;
+
+   }
+
+
+
+   // Event Generator with user signature type = enum
+   template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
+   class TGenerator< _ServiceType, _EventNamespace, _DataType, _SignatureType, CARPC_ENABLE_IF_ENUM_TYPE( _SignatureType ) >
+      : public TGeneratorBase< _ServiceType, _EventNamespace, _DataType, _SignatureType >
+   {
+   };
+
+   namespace enumeration {
+
+      template< typename _ServiceType, typename _EventNamespace, typename _DataType, typename _SignatureType >
+         using tGenerator =
+            TGenerator< _ServiceType, _EventNamespace, _DataType, _SignatureType, CARPC_ENABLE_IF_ENUM_TYPE( _SignatureType ) >;
+
+   }
 
 } // namespace carpc::async
