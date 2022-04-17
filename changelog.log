@@ -1,3 +1,8 @@
+version 3.8.4
+   - Implemented type traits helper macros.
+   - Created common carpc::IPC and carpc::NO_IPC types for further usage.
+   - Using type traits helper macros in ByteStream class instead of internaly defined macros. 
+
 version 3.8.3
    - Experimental TServer implementation improvement to "secure" level in old service implementation. But one issue still must be solved (marked @TDA-BUG in old TServer secure implementation).
    - Previour service implementations (fast and secure) will be removed in the future.

@@ -9,10 +9,8 @@
 #include <map>
 #include <optional>
 #include <memory>
-#ifdef USE_GPB
-   #include <google/protobuf/message.h>
-#endif
 
+#include "api/sys/helpers/macros/types.hpp"
 #include "api/sys/common/CircularBuffer.hpp"
 
 
@@ -21,20 +19,10 @@ namespace carpc {
 
 
 
-   struct Dummy final { };
-
-   #define __INTEGRAL_TYPE__( TYPE )         std::is_integral_v< TYPE >
-   #define __FLOATING_POINT_TYPE__( TYPE )   std::is_floating_point_v< TYPE >
-   #define __ENUM_TYPE__( TYPE )             std::is_enum_v< TYPE >
-   #ifdef USE_GPB
-      #define __GPB_TYPE__( TYPE )           std::is_base_of_v< ::google::protobuf::Message, TYPE >
-   #else
-      #define __GPB_TYPE__( TYPE )           std::is_base_of_v< TYPE, Dummy >
-   #endif
-   #define __REST_TYPES__( TYPE )            !__INTEGRAL_TYPE__( TYPE ) \
-                                                && !__FLOATING_POINT_TYPE__( TYPE ) \
-                                                && !__ENUM_TYPE__( TYPE ) \
-                                                && !__GPB_TYPE__( TYPE )
+   #define __REST_TYPES__( TYPE )            !CARPC_IS_INTEGRAL_TYPE( TYPE ) \
+                                                && !CARPC_IS_FLOATING_POINT_TYPE( TYPE ) \
+                                                && !CARPC_IS_ENUM_TYPE( TYPE ) \
+                                                && !CARPC_IS_GPB_TYPE( TYPE )
 
    using tBool = char;
 
@@ -122,11 +110,11 @@ namespace carpc {
             bool push( const std::map< TYPE_KEY, TYPE_VALUE >& map );
          // This method is for integral types and types with floating point
          template< typename TYPE >
-            typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
+            typename std::enable_if_t< CARPC_IS_INTEGRAL_TYPE( TYPE ) || CARPC_IS_FLOATING_POINT_TYPE( TYPE ), bool >
                push( const TYPE& value );
          // This method is for enumerations.
          template< typename TYPE >
-            typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
+            typename std::enable_if_t< CARPC_IS_ENUM_TYPE( TYPE ), bool >
                push( const TYPE& value );
          // This method is for user defined types. It calles "to_stream" method of this type, so it should be implemented in it.
          template< typename TYPE >
@@ -134,7 +122,7 @@ namespace carpc {
                push( const TYPE& value );
          // This method is for GPB types
          template< typename TYPE >
-            typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
+            typename std::enable_if_t< CARPC_IS_GPB_TYPE( TYPE ), bool >
                push( const TYPE& value );
 
       private:
@@ -187,11 +175,11 @@ namespace carpc {
             bool pop( std::map< TYPE_KEY, TYPE_VALUE >& map );
          // This method is for integral types and types with floating poing
          template< typename TYPE >
-            typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
+            typename std::enable_if_t< CARPC_IS_INTEGRAL_TYPE( TYPE ) || CARPC_IS_FLOATING_POINT_TYPE( TYPE ), bool >
                pop( TYPE& value );
          // This method is for enumerations.
          template< typename TYPE >
-            typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
+            typename std::enable_if_t< CARPC_IS_ENUM_TYPE( TYPE ), bool >
                pop( TYPE& value );
          // This method is for user defined types. It calles "from_stream" method of this type, so it should be implemented in it.
          template< typename TYPE >
@@ -199,7 +187,7 @@ namespace carpc {
                pop( TYPE& value );
          // This method is for GPB types
          template< typename TYPE >
-            typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
+            typename std::enable_if_t< CARPC_IS_GPB_TYPE( TYPE ), bool >
                pop( TYPE& value );
 
       private:
@@ -362,14 +350,14 @@ namespace carpc {
    }
 
    template< typename TYPE >
-   typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
+   typename std::enable_if_t< CARPC_IS_INTEGRAL_TYPE( TYPE ) || CARPC_IS_FLOATING_POINT_TYPE( TYPE ), bool >
    ByteStream::push( const TYPE& value )
    {
       return push( static_cast< const void* >( &value ), sizeof( TYPE ) );
    }
 
    template< typename TYPE >
-   typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
+   typename std::enable_if_t< CARPC_IS_ENUM_TYPE( TYPE ), bool >
    ByteStream::push( const TYPE& value )
    {
       using ENUM_TYPE = std::underlying_type_t< TYPE >;
@@ -384,7 +372,7 @@ namespace carpc {
    }
 
    template< typename TYPE >
-   typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
+   typename std::enable_if_t< CARPC_IS_GPB_TYPE( TYPE ), bool >
    ByteStream::push( const TYPE& value )
    {
       std::string ss;
@@ -547,14 +535,14 @@ namespace carpc {
    }
 
    template< typename TYPE >
-   typename std::enable_if_t< __INTEGRAL_TYPE__( TYPE ) || __FLOATING_POINT_TYPE__( TYPE ), bool >
+   typename std::enable_if_t< CARPC_IS_INTEGRAL_TYPE( TYPE ) || CARPC_IS_FLOATING_POINT_TYPE( TYPE ), bool >
    ByteStream::pop( TYPE& value )
    {
       return pop( static_cast< const void* >( &value ), sizeof( TYPE ) );
    }
 
    template< typename TYPE >
-   typename std::enable_if_t< __ENUM_TYPE__( TYPE ), bool >
+   typename std::enable_if_t< CARPC_IS_ENUM_TYPE( TYPE ), bool >
    ByteStream::pop( TYPE& value )
    {
       using ENUM_TYPE = std::underlying_type_t< TYPE >;
@@ -574,7 +562,7 @@ namespace carpc {
    }
 
    template< typename TYPE >
-   typename std::enable_if_t< __GPB_TYPE__( TYPE ), bool >
+   typename std::enable_if_t< CARPC_IS_GPB_TYPE( TYPE ), bool >
    ByteStream::pop( TYPE& value )
    {
       std::string ss;
