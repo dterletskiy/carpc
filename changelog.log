@@ -1,3 +1,6 @@
+version 3.8.6
+   - Simplified TAsyncTypeID using partial template specification for std::string and std::size_t instead of enable_if.
+
 version 3.8.5
    - Implemented extended event generator concept. TGenerator specification for user signature enum and integral types. Further this mechanism could be used for any TGenerator specification. Exact TGenerator specification could be detected in TEvent and TSignature to specify specific logic or even implement specific implementation of these template classes for specific user signature types. 
 

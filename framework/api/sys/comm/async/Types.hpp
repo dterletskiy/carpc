@@ -68,14 +68,16 @@ namespace __private_carpc_async_v1__ {
 
 
 
-   template< typename TYPE, typename Enable = void >
+   template< typename TYPE >
    class TAsyncTypeID : public TBaseAsyncTypeID< TYPE > { };
 
 
 
-   template< typename TYPE >
-   class TAsyncTypeID< TYPE, std::enable_if_t< std::is_same_v< TYPE, std::string > > > : public TBaseAsyncTypeID< TYPE >
+   template< >
+   class TAsyncTypeID< std::string > : public TBaseAsyncTypeID< std::string >
    {
+      using TYPE = std::string;
+
       public:
          TAsyncTypeID( ) = default;
          TAsyncTypeID( const TYPE& _value )
@@ -105,9 +107,11 @@ namespace __private_carpc_async_v1__ {
 
 
 
-   template< typename TYPE >
-   class TAsyncTypeID< TYPE, std::enable_if_t< std::is_same_v< TYPE, std::size_t > > > : public TBaseAsyncTypeID< TYPE >
+   template< >
+   class TAsyncTypeID< std::size_t > : public TBaseAsyncTypeID< std::size_t >
    {
+      using TYPE = std::size_t;
+
       public:
          TAsyncTypeID( ) = default;
          TAsyncTypeID( const TYPE& _value )
