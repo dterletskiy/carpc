@@ -1,3 +1,6 @@
+version 3.8.9
+   - Fix: issue #14. Client does not receive attribute value after subscription when it is connected to server. Meanwhile server sets attribute value in constructor.
+
 version 3.8.8
    - Remove deprecated event generating macros from Event.hpp
 

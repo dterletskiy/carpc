@@ -437,13 +437,14 @@ namespace carpc::service::experimental::__private_server__ {
    template< typename tAttributeData, typename... Args >
    void AttributeProcessor< TYPES >::notify( const Args&... args )
    {
-      auto attribute_status_map_iterator = m_attribute_status_map.find( tAttributeData::ID );
-      if( m_attribute_status_map.end( ) == attribute_status_map_iterator )
+      auto emplace_result = m_attribute_status_map.emplace( tAttributeData::ID, tNotificationStatus{ } );
+      if( false == emplace_result.seconf )
       {
-         SYS_WRN( "not a notification ID: %s", tAttributeData::ID.c_str( ) );
+         SYS_WRN( "emplace error: %s", tAttributeData::ID.c_str( ) );
          return;
       }
 
+      auto attribute_status_map_iterator = emplace_result.first;
       auto& notification_status = attribute_status_map_iterator->second;
       notification_status.template notify_subscribers< tAttributeData >( *mp_server, args... );
    }
