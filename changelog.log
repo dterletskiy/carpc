@@ -1,3 +1,6 @@
+version 3.8.11
+   - Fix: build error.
+
 version 3.8.10
    - Remove "ServiceType" and "NoServiceType" types from async stuff and using "carpc::IPC" and "carpc::NO_IPC" types instead.
    - Remove "carpc::service::IPC" and "carpc::service::NO_IPC" types from async stuff and using "carpc::IPC" and "carpc::NO_IPC" types instead.

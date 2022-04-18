@@ -438,7 +438,7 @@ namespace carpc::service::experimental::__private_server__ {
    void AttributeProcessor< TYPES >::notify( const Args&... args )
    {
       auto emplace_result = m_attribute_status_map.emplace( tAttributeData::ID, tNotificationStatus{ } );
-      if( false == emplace_result.seconf )
+      if( false == emplace_result.second )
       {
          SYS_WRN( "emplace error: %s", tAttributeData::ID.c_str( ) );
          return;
