@@ -1,3 +1,6 @@
+version 3.8.8
+   - Remove deprecated event generating macros from Event.hpp
+
 version 3.8.7
    - Fix: issue #13. Crash in MVC example applications (HMI crash) during receiving IPC response or notification event.
 
