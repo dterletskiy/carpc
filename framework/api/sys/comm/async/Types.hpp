@@ -257,10 +257,6 @@ namespace carpc::async {
    using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::size_t >;
    // using tAsyncTypeID = __private_carpc_async_v1__::TAsyncTypeID< std::string >;
 
-   class ServiceType;
-   using NoServiceType = void;
-   #define IS_IPC_EVENT ( false == std::is_same_v< tService, NoServiceType > )
-
    enum class eAsyncType : std::uint8_t { EVENT, RUNNABLE, CALLABLE };
    const char* c_str( const eAsyncType );
 

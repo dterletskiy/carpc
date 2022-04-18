@@ -1,3 +1,8 @@
+version 3.8.10
+   - Remove "ServiceType" and "NoServiceType" types from async stuff and using "carpc::IPC" and "carpc::NO_IPC" types instead.
+   - Remove "carpc::service::IPC" and "carpc::service::NO_IPC" types from async stuff and using "carpc::IPC" and "carpc::NO_IPC" types instead.
+   - Replace some localy defined macros to generic type traits macros.
+
 version 3.8.9
    - Fix: issue #14. Client does not receive attribute value after subscription when it is connected to server. Meanwhile server sets attribute value in constructor.
 

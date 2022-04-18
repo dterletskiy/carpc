@@ -58,7 +58,7 @@ namespace carpc::async {
          }
          const bool to_stream( ipc::tStream& stream ) const override
          {
-            if constexpr( IS_IPC_EVENT )
+            if constexpr( CARPC_IS_IPC_TYPE( tService ) )
             {
                return ipc::serialize( stream, m_user_signature );
             }
@@ -66,7 +66,7 @@ namespace carpc::async {
          }
          const bool from_stream( ipc::tStream& stream ) override
          {
-            if constexpr( IS_IPC_EVENT )
+            if constexpr( CARPC_IS_IPC_TYPE( tService ) )
             {
                return ipc::deserialize( stream, m_user_signature );
             }
@@ -136,6 +136,9 @@ namespace carpc::async::id {
    {
       public:
          TSignature( ) = default;
+         // IMPORTANT!!! This constructor must not be explicite to have a possibility pass enumeration (instead of structure)
+         // as a parameter to "set_notification", "clear_notification", "create" and "create_send" methods in corresponding TEvent.
+         // In this case emuneration will be automatically casted to id::TSignature< eID >.
          TSignature( const _ID id ) : m_id( id ) { }
          TSignature( const TSignature& other ) : m_id( other.m_id ) { }
          ~TSignature( ) = default;

@@ -123,7 +123,7 @@ namespace carpc::async {
       public:
          const bool to_stream_t( ipc::tStream& stream ) const override final
          {
-            if constexpr( IS_IPC_EVENT )
+            if constexpr( CARPC_IS_IPC_TYPE( tService ) )
             {
                return ipc::serialize( stream, mp_signature, m_context, m_priority, mp_data );
             }
@@ -132,7 +132,7 @@ namespace carpc::async {
          }
          const bool from_stream_t( ipc::tStream& stream ) override final
          {
-            if constexpr( IS_IPC_EVENT )
+            if constexpr( CARPC_IS_IPC_TYPE( tService ) )
             {
                return ipc::deserialize( stream, mp_signature, m_context, m_priority, mp_data );
             }
@@ -141,7 +141,7 @@ namespace carpc::async {
          }
 
       public:
-         const bool is_ipc( ) const override { return IS_IPC_EVENT; }
+         const bool is_ipc( ) const override { return CARPC_IS_IPC_TYPE( tService ); }
 
       // signature
       public:

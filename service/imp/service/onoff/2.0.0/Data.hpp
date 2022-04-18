@@ -15,7 +15,6 @@ namespace service::onoff::V2_0_0 {
       DEFINE_ENUMERATION( eID, std::uint8_t
          , TriggerState
          , Start
-         , Undefined // Must present always for all interfaces
       );
 
       inline
@@ -30,7 +29,6 @@ namespace service::onoff::V2_0_0 {
 
       DEFINE_ENUMERATION( eID, std::uint8_t
          , CurrentState
-         , Undefined // Must present always for all interfaces
       );
 
    }
@@ -187,7 +185,7 @@ namespace service::onoff::V2_0_0::ipc {
 
    struct Types
    {
-      using tIPC           = carpc::service::IPC;
+      using tIPC           = carpc::IPC;
 
       struct method
       {
@@ -315,7 +313,7 @@ namespace service::onoff::V2_0_0::no_ipc {
 
    struct Types
    {
-      using tIPC           = carpc::service::NO_IPC;
+      using tIPC           = carpc::NO_IPC;
 
       struct method
       {

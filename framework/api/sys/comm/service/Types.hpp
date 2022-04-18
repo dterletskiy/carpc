@@ -7,9 +7,6 @@
 
 namespace carpc::service {
 
-   class IPC;
-   class NO_IPC;
-
    DEFINE_ENUMERATION( eType, std::uint8_t,
       REQUEST,
       BUSY,

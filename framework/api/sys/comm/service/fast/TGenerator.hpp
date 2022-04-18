@@ -12,8 +12,7 @@ namespace carpc::service::fast {
 
 
 
-   #define IS_IPC_SERVICE std::is_same_v< typename TYPES::tIPC, IPC >
-   #define ENABLE_IF_IPC_SERVICE std::enable_if_t< IS_IPC_SERVICE >
+   #define ENABLE_IF_IPC_SERVICE CARPC_ENABLE_IF_IPC_TYPE( typename TYPES::tIPC )
 
    template< typename TYPES >
    struct TGenerator< TYPES, ENABLE_IF_IPC_SERVICE >
@@ -69,8 +68,7 @@ namespace carpc::service::fast {
 
 
 
-   #define IS_NO_IPC_SERVICE std::is_same_v< typename TYPES::tIPC, NO_IPC >
-   #define ENABVLE_IF_NO_IPC_SERVICE std::enable_if_t< IS_NO_IPC_SERVICE >
+   #define ENABVLE_IF_NO_IPC_SERVICE CARPC_ENABLE_IF_NO_IPC_TYPE( typename TYPES::tIPC )
 
    template< typename TYPES >
    struct TGenerator< TYPES, ENABVLE_IF_NO_IPC_SERVICE >

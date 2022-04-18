@@ -8,7 +8,7 @@ namespace service::onoff::V2_0_0::ipc {
 
       BaseData::tSptr BaseData::create( carpc::ipc::tStream& stream )
       {
-         onoff::V2_0_0::method::eID id = onoff::V2_0_0::method::eID::Undefined;
+         onoff::V2_0_0::method::eID id = onoff::V2_0_0::method::eID::UNDEFINED;
          carpc::service::eType type = carpc::service::eType::UNDEFINED;
          if( false == carpc::ipc::deserialize( stream, id, type ) )
             return nullptr;
@@ -125,7 +125,7 @@ namespace service::onoff::V2_0_0::ipc {
 
       BaseData::tSptr BaseData::create( carpc::ipc::tStream& stream )
       {
-         onoff::V2_0_0::attribute::eID id = onoff::V2_0_0::attribute::eID::Undefined;
+         onoff::V2_0_0::attribute::eID id = onoff::V2_0_0::attribute::eID::UNDEFINED;
          carpc::service::eType type = carpc::service::eType::UNDEFINED;
          if( false == carpc::ipc::deserialize( stream, id, type ) )
             return nullptr;

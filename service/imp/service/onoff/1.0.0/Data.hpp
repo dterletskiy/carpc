@@ -145,7 +145,7 @@ namespace service::onoff::V1_0_0::ipc {
 
    struct Types
    {
-      using tIPC           = carpc::service::IPC;
+      using tIPC           = carpc::IPC;
       using tID            = eOnOff;
       using tBaseData      = BaseData;
 
@@ -241,7 +241,7 @@ namespace service::onoff::V1_0_0::no_ipc {
 
    struct Types
    {
-      using tIPC           = carpc::service::NO_IPC;
+      using tIPC           = carpc::NO_IPC;
       using tID            = eOnOff;
       using tBaseData      = BaseData;
 
