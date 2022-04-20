@@ -1,3 +1,6 @@
+version 3.8.13
+   - Fix: build error with "USE_GPB = OFF".
+
 version 3.8.12
    - Fix: issue #15. Crash in case if tracing massage size more then trace buffer size.
 
