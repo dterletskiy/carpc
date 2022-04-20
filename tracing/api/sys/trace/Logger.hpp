@@ -9,6 +9,8 @@
 namespace carpc::trace {
 
    const std::size_t s_buffer_size = 2 * 1024;
+   const char* const s_build_msg_error = "----- build message error -----\n";
+   const std::size_t s_build_msg_error_len = strlen( s_build_msg_error );
 
 
 
@@ -29,8 +31,20 @@ namespace carpc::trace {
          template< typename... Args >
          void message( const eLogLevel& log_level, const char* const format, Args... args )
          {
-            char p_buffer[ m_buffer_size ];
-            auto size = ::sprintf( p_buffer, format, args... );
+            char message_buffer[ m_buffer_size ];
+            std::size_t size = ::snprintf( message_buffer, m_buffer_size, format, args... );
+            char* p_buffer = const_cast< char* >( message_buffer );
+            if( 0 >= size )
+            {
+               size = s_build_msg_error_len;
+               p_buffer = const_cast< char* >( s_build_msg_error );
+            }
+            else if( size >= m_buffer_size )
+            {
+               size = m_buffer_size;
+               p_buffer[ size - 2 ] = '\n';
+               p_buffer[ size - 1 ] = '\0';
+            }
 
             switch( m_log_strategy )
             {
