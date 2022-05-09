@@ -168,7 +168,7 @@ namespace service::onoff::V2_0_0::ipc {
                CurrentStateData( const std::string& );
                ~CurrentStateData( ) override = default;
 
-               std::string state = "";
+               std::string value = "";
 
             private:
                bool to_stream( carpc::ipc::tStream& ) override;
@@ -302,7 +302,7 @@ namespace service::onoff::V2_0_0::no_ipc {
                CurrentStateData( const std::string& );
                ~CurrentStateData( ) override = default;
 
-               std::string state = "";
+               std::string value = "";
          };
 
       }
@@ -319,6 +319,11 @@ namespace service::onoff::V2_0_0::no_ipc {
       {
          using tID         = service::onoff::V2_0_0::method::eID;
          using tBaseData   = service::onoff::V2_0_0::ipc::method::BaseData;
+
+         static bool has_response( const service::onoff::V2_0_0::method::eID& request_id )
+         {
+            return service::onoff::V2_0_0::method::has_response( request_id );
+         }
       };
 
       struct attribute

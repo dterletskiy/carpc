@@ -12,7 +12,7 @@ namespace service::onoff::V2_0_0 {
    {
       public:
          IClient( const std::string& );
-         virtual ~IClient( ) = default;
+         ~IClient( ) override = default;
 
       private:
          void process_event( const tMethod::Event& ) override;

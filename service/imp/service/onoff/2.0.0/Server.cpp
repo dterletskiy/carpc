@@ -22,9 +22,9 @@ void Server::response_trigger_state( const bool result )
    mp_impl->response_trigger_state( result );
 }
 
-void Server::current_state( const std::string& state )
+void Server::current_state( const std::string& value )
 {
-   mp_impl->current_state( state );
+   mp_impl->current_state( value );
 }
 
 const std::string& Server::current_state( ) const

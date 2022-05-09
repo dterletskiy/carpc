@@ -73,7 +73,7 @@ void IClient::process_event( const tAttribute::Event& event )
             using tAttributeData = data::attribute::notification::CurrentStateData;
 
             if( const tAttributeData* p_event_data = get_event_data< tAttributeData >( event ) )
-               on_current_state( p_event_data->state );
+               on_current_state( p_event_data->value );
          }
          break;
       }

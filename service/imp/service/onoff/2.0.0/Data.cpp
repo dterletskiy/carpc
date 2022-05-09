@@ -35,6 +35,23 @@ namespace service::onoff::V2_0_0::ipc {
                      break;
                   }
                }
+               break;
+            }
+            case onoff::V2_0_0::method::eID::Start:
+            {
+               switch( type )
+               {
+                  case carpc::service::eType::REQUEST:
+                  {
+                     ptr = std::make_shared< request::StartData >( );
+                     break;
+                  }
+                  default:
+                  {
+                     break;
+                  }
+               }
+               break;
             }
             default:
             {
@@ -55,8 +72,6 @@ namespace service::onoff::V2_0_0::ipc {
 
          return to_stream( stream );
       }
-
-
 
       namespace request {
 
@@ -79,8 +94,6 @@ namespace service::onoff::V2_0_0::ipc {
 
       }
 
-
-
       namespace response {
 
          TriggerStateData::TriggerStateData( const bool _result )
@@ -100,8 +113,6 @@ namespace service::onoff::V2_0_0::ipc {
          }
 
       }
-
-
 
       namespace request {
 
@@ -169,24 +180,22 @@ namespace service::onoff::V2_0_0::ipc {
          return to_stream( stream );
       }
 
-
-
       namespace notification {
 
-         CurrentStateData::CurrentStateData( const std::string& _state )
+         CurrentStateData::CurrentStateData( const std::string& _value )
             : BaseData( )
-            , state( _state )
+            , value( _value )
          {
          }
 
          bool CurrentStateData::to_stream( carpc::ipc::tStream& stream )
          {
-            return carpc::ipc::serialize( stream, state );
+            return carpc::ipc::serialize( stream, value );
          }
 
          bool CurrentStateData::from_stream( carpc::ipc::tStream& stream )
          {
-            return carpc::ipc::deserialize( stream, state );
+            return carpc::ipc::deserialize( stream, value );
          }
 
       }
@@ -212,8 +221,6 @@ namespace service::onoff::V2_0_0::no_ipc {
 
       }
 
-
-
       namespace response {
 
          TriggerStateData::TriggerStateData( const bool _result )
@@ -232,9 +239,9 @@ namespace service::onoff::V2_0_0::no_ipc {
 
       namespace notification {
 
-         CurrentStateData::CurrentStateData( const std::string& _state )
+         CurrentStateData::CurrentStateData( const std::string& _value )
             : BaseData( )
-            , state( _state )
+            , value( _value )
          {
          }
 

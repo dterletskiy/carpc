@@ -33,7 +33,7 @@ void ClientImpl::request_trigger_state_failed( const carpc::service::eError& err
    m_client.request_trigger_state_failed( error );
 }
 
-void ClientImpl::on_current_state( const std::string& state )
+void ClientImpl::on_current_state( const std::string& value )
 {
-   m_client.on_current_state( state );
+   m_client.on_current_state( value );
 }
