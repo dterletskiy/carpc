@@ -1,3 +1,6 @@
+version 3.8.16
+   - Fix: issue #16. Service client does not receive notifications about attribute values change.
+
 version 3.8.15
    - Generator implementation.
 
