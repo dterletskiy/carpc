@@ -1,11 +1,7 @@
 #include "ServerImpl.hpp"
 #include "api/service/onoff/2.0.0/Server.hpp"
 
-
-
 using namespace service::onoff::V2_0_0;
-
-
 
 Server::Server( const std::string& role_name )
 {
@@ -17,7 +13,7 @@ Server::~Server( )
    delete mp_impl;
 }
 
-void Server::response_trigger_state( const bool result )
+void Server::response_trigger_state( const bool& result )
 {
    mp_impl->response_trigger_state( result );
 }
@@ -41,3 +37,5 @@ void Server::prepare_response( const carpc::comm::sequence::ID& seq_id )
 {
    mp_impl->prepare_response( seq_id );
 }
+
+

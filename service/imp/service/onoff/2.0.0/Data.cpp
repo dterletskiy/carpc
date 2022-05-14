@@ -1,14 +1,12 @@
 #include "Data.hpp"
 
-
-
-namespace service::onoff::V2_0_0::ipc {
+namespace service::onoff::V2_0_0 {
 
    namespace method {
 
       BaseData::tSptr BaseData::create( carpc::ipc::tStream& stream )
       {
-         onoff::V2_0_0::method::eID id = onoff::V2_0_0::method::eID::UNDEFINED;
+         eID id = eID::UNDEFINED;
          carpc::service::eType type = carpc::service::eType::UNDEFINED;
          if( false == carpc::ipc::deserialize( stream, id, type ) )
             return nullptr;
@@ -16,47 +14,38 @@ namespace service::onoff::V2_0_0::ipc {
          tSptr ptr = nullptr;
          switch( id )
          {
-            case onoff::V2_0_0::method::eID::TriggerState:
+            case eID::trigger_state:
             {
                switch( type )
                {
                   case carpc::service::eType::REQUEST:
                   {
-                     ptr = std::make_shared< request::TriggerStateData >( );
+                     ptr = std::make_shared< request::trigger_stateData >( );
                      break;
                   }
                   case carpc::service::eType::RESPONSE:
                   {
-                     ptr = std::make_shared< response::TriggerStateData >( );
+                     ptr = std::make_shared< response::trigger_stateData >( );
                      break;
                   }
-                  default:
-                  {
-                     break;
-                  }
+                  default: break;
                }
                break;
             }
-            case onoff::V2_0_0::method::eID::Start:
+            case eID::start:
             {
                switch( type )
                {
                   case carpc::service::eType::REQUEST:
                   {
-                     ptr = std::make_shared< request::StartData >( );
+                     ptr = std::make_shared< request::startData >( );
                      break;
                   }
-                  default:
-                  {
-                     break;
-                  }
+                  default: break;
                }
                break;
             }
-            default:
-            {
-               break;
-            }
+            default: break;
          }
 
          if( nullptr != ptr )
@@ -69,74 +58,71 @@ namespace service::onoff::V2_0_0::ipc {
       {
          if( false == carpc::ipc::serialize( stream, id( ), type( ) ) )
             return false;
-
          return to_stream( stream );
       }
 
       namespace request {
 
-         TriggerStateData::TriggerStateData( const std::string& _state, const std::size_t _delay )
+         trigger_stateData::trigger_stateData( const std::string& _state, const std::size_t& _timeout )
             : BaseData( )
-            , state( _state )
-            , delay( _delay )
+            , state( _state)
+            , timeout( _timeout)
          {
          }
 
-         bool TriggerStateData::to_stream( carpc::ipc::tStream& stream )
+         bool trigger_stateData::to_stream( carpc::ipc::tStream& stream )
          {
-            return carpc::ipc::serialize( stream, state, delay );
+            return carpc::ipc::serialize( stream, state, timeout );
          }
 
-         bool TriggerStateData::from_stream( carpc::ipc::tStream& stream )
+         bool trigger_stateData::from_stream( carpc::ipc::tStream& stream )
          {
-            return carpc::ipc::deserialize( stream, state, delay );
+            return carpc::ipc::deserialize( stream, state, timeout );
          }
 
-      }
+      } // namespace request
 
       namespace response {
 
-         TriggerStateData::TriggerStateData( const bool _result )
+         trigger_stateData::trigger_stateData( const bool& _result )
             : BaseData( )
-            , result( _result )
+            , result( _result)
          {
          }
 
-         bool TriggerStateData::to_stream( carpc::ipc::tStream& stream )
+         bool trigger_stateData::to_stream( carpc::ipc::tStream& stream )
          {
             return carpc::ipc::serialize( stream, result );
          }
 
-         bool TriggerStateData::from_stream( carpc::ipc::tStream& stream )
+         bool trigger_stateData::from_stream( carpc::ipc::tStream& stream )
          {
             return carpc::ipc::deserialize( stream, result );
          }
 
-      }
+      } // namespace response
 
       namespace request {
 
-         bool StartData::to_stream( carpc::ipc::tStream& stream )
+         bool startData::to_stream( carpc::ipc::tStream& stream )
          {
-            return true;
+            return carpc::ipc::serialize( stream );
          }
 
-         bool StartData::from_stream( carpc::ipc::tStream& stream )
+         bool startData::from_stream( carpc::ipc::tStream& stream )
          {
-            return true;
+            return carpc::ipc::deserialize( stream );
          }
 
-      }
+      } // namespace request
 
-   }
-
-
+   } // namespace method
 
    namespace attribute {
 
       BaseData::tSptr BaseData::create( carpc::ipc::tStream& stream )
       {
-         onoff::V2_0_0::attribute::eID id = onoff::V2_0_0::attribute::eID::UNDEFINED;
+         eID id = eID::UNDEFINED;
          carpc::service::eType type = carpc::service::eType::UNDEFINED;
          if( false == carpc::ipc::deserialize( stream, id, type ) )
             return nullptr;
@@ -144,26 +130,19 @@ namespace service::onoff::V2_0_0::ipc {
          tSptr ptr = nullptr;
          switch( id )
          {
-            case onoff::V2_0_0::attribute::eID::CurrentState:
+            case eID::current_state:
             {
                switch( type )
                {
                   case carpc::service::eType::NOTIFICATION:
                   {
-                     ptr = std::make_shared< notification::CurrentStateData >( );
+                     ptr = std::make_shared< notification::current_stateData >( );
                      break;
                   }
-                  default:
-                  {
-                     break;
-                  }
+                  default: break;
                }
-
             }
-            default:
-            {
-               break;
-            }
+            default: break;
          }
 
          if( nullptr != ptr )
@@ -176,77 +155,31 @@ namespace service::onoff::V2_0_0::ipc {
       {
          if( false == carpc::ipc::serialize( stream, id( ), type( ) ) )
             return false;
-
          return to_stream( stream );
       }
 
       namespace notification {
 
-         CurrentStateData::CurrentStateData( const std::string& _value )
+         current_stateData::current_stateData( const std::string& _value )
             : BaseData( )
             , value( _value )
          {
          }
 
-         bool CurrentStateData::to_stream( carpc::ipc::tStream& stream )
+         bool current_stateData::to_stream( carpc::ipc::tStream& stream )
          {
             return carpc::ipc::serialize( stream, value );
          }
 
-         bool CurrentStateData::from_stream( carpc::ipc::tStream& stream )
+         bool current_stateData::from_stream( carpc::ipc::tStream& stream )
          {
             return carpc::ipc::deserialize( stream, value );
          }
 
-      }
+      } // namespace notification
 
-   }
+   } // namespace attribute
 
-} // namespace service::onoff::V2_0_0::ipc
-
-
-
-namespace service::onoff::V2_0_0::no_ipc {
-
-   namespace method {
-
-      namespace request {
-
-         TriggerStateData::TriggerStateData( const std::string& _state, const std::size_t _delay )
-            : BaseData( )
-            , state( _state )
-            , delay( _delay )
-         {
-         }
-
-      }
-
-      namespace response {
-
-         TriggerStateData::TriggerStateData( const bool _result )
-            : BaseData( )
-            , result( _result )
-         {
-         }
-
-      }
-
-   }
+} // namespace service::onoff::V2_0_0
 
 
-
-   namespace attribute {
-
-      namespace notification {
-
-         CurrentStateData::CurrentStateData( const std::string& _value )
-            : BaseData( )
-            , value( _value )
-         {
-         }
-
-      }
-
-   }
-
-} // namespace service::onoff::V2_0_0::no_ipc

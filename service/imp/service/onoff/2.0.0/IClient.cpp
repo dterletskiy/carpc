@@ -1,49 +1,44 @@
 #include "IClient.hpp"
 
-
-
 using namespace service::onoff::V2_0_0;
 
-
-
 IClient::IClient( const std::string& role_name )
-   : carpc::service::experimental::TClient< data::Types >( role_name, true )
+   : carpc::service::experimental::TClient< Types >( role_name, true )
 {
+}
+
+carpc::comm::sequence::ID IClient::request_trigger_state( const std::string& state, const std::size_t& timeout )
+{
+   return request< method::request::trigger_stateData >( this, state, timeout );
 }
 
 void IClient::request_start( )
 {
-   request< data::method::request::StartData >( this );
-}
-
-const carpc::comm::sequence::ID IClient::request_trigger_state( const std::string& state, const std::size_t delay )
-{
-   return request< data::method::request::TriggerStateData >( this, state, delay );
+   request< method::request::startData >( this );
 }
 
 void IClient::subscribe_current_state( )
 {
-   subscribe< data::attribute::notification::CurrentStateData >( this );
+   subscribe< attribute::notification::current_stateData >( this );
 }
 
 void IClient::unsubscribe_current_state( )
 {
-   unsubscribe< data::attribute::notification::CurrentStateData >( this );
+   unsubscribe< attribute::notification::current_stateData >( this );
 }
 
 void IClient::process_event( const tMethod::Event& event )
 {
-   onoff::V2_0_0::method::eID event_id = event.info( ).id( );
+   method::eID event_id = event.info( ).id( );
    carpc::service::eType event_type = event.info( ).type( );
 
    switch( event_id )
    {
-      case onoff::V2_0_0::method::eID::TriggerState:
+      case method::eID::trigger_state:
       {
          if( carpc::service::eType::RESPONSE == event_type )
          {
-            using tMethodData = data::method::response::TriggerStateData;
-
+            using tMethodData = method::response::trigger_stateData;
             if( const tMethodData* p_event_data = get_event_data< tMethodData >( event ) )
                response_trigger_state( p_event_data->result );
             else
@@ -61,17 +56,16 @@ void IClient::process_event( const tMethod::Event& event )
 
 void IClient::process_event( const tAttribute::Event& event )
 {
-   onoff::V2_0_0::attribute::eID event_id = event.info( ).id( );
+   attribute::eID event_id = event.info( ).id( );
    carpc::service::eType event_type = event.info( ).type( );
 
    switch( event_id )
    {
-      case onoff::V2_0_0::attribute::eID::CurrentState:
+      case attribute::eID::current_state:
       {
          if( carpc::service::eType::NOTIFICATION == event_type )
          {
-            using tAttributeData = data::attribute::notification::CurrentStateData;
-
+            using tAttributeData = attribute::notification::current_stateData;
             if( const tAttributeData* p_event_data = get_event_data< tAttributeData >( event ) )
                on_current_state( p_event_data->value );
          }
@@ -80,3 +74,5 @@ void IClient::process_event( const tAttribute::Event& event )
       default: break;
    }
 }
+
+

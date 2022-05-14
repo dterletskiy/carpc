@@ -37,7 +37,7 @@ void Server::request_start( )
    MSG_DBG( );
 }
 
-void Server::request_trigger_state( const std::string& state, const size_t delay )
+void Server::request_trigger_state( const std::string& state, const std::size_t& delay )
 {
    MSG_DBG( "state: %s / delay: %zu", state.c_str( ), delay );
    response_trigger_state( true );

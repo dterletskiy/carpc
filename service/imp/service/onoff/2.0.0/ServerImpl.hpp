@@ -2,8 +2,6 @@
 
 #include "IServer.hpp"
 
-
-
 namespace service::onoff::V2_0_0 {
 
    class Server;
@@ -14,7 +12,7 @@ namespace service::onoff::V2_0_0 {
          friend class Server;
 
       public:
-         ServerImpl( Server&, const std::string& );
+         ServerImpl( Server& server, const std::string& role_name );
          ~ServerImpl( ) override = default;
 
       private:
@@ -22,11 +20,13 @@ namespace service::onoff::V2_0_0 {
          void disconnected( ) override;
 
       public:
+         void request_trigger_state( const std::string& _state, const std::size_t& _timeout ) override;
          void request_start( ) override;
-         void request_trigger_state( const std::string&, const size_t ) override;
 
       private:
          Server& m_server;
    };
 
 } // namespace service::onoff::V2_0_0
+
+

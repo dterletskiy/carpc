@@ -3,29 +3,28 @@
 #include "api/sys/comm/service/experimental/TClient.hpp"
 #include "Data.hpp"
 
-
-
 namespace service::onoff::V2_0_0 {
 
    class IClient
-      : public carpc::service::experimental::TClient< data::Types >
+      : public carpc::service::experimental::TClient< Types >
    {
       public:
-         IClient( const std::string& );
+         IClient( const std::string& role_name );
          ~IClient( ) override = default;
 
       private:
-         void process_event( const tMethod::Event& ) override;
-         void process_event( const tAttribute::Event& ) override;
+         void process_event( const tMethod::Event& event ) override;
+         void process_event( const tAttribute::Event& event ) override;
 
       public:
-         const carpc::comm::sequence::ID request_trigger_state( const std::string&, const std::size_t );
+         carpc::comm::sequence::ID request_trigger_state( const std::string& state, const std::size_t& timeout );
       private:
-         virtual void request_trigger_state_failed( const carpc::service::eError& ) = 0;
-         virtual void response_trigger_state( const bool ) = 0;
+         virtual void response_trigger_state( const bool& _result ) = 0;
+         virtual void request_trigger_state_failed( const carpc::service::eError& error ) = 0;
 
       public:
          void request_start( );
+
 
       public:
          void subscribe_current_state( );
@@ -35,3 +34,5 @@ namespace service::onoff::V2_0_0 {
    };
 
 } // namespace service::onoff::V2_0_0
+
+

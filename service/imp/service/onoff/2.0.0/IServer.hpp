@@ -3,25 +3,26 @@
 #include "api/sys/comm/service/experimental/TServer.hpp"
 #include "Data.hpp"
 
-
-
 namespace service::onoff::V2_0_0 {
 
    class IServer
-      : public carpc::service::experimental::TServer< data::Types >
+      : public carpc::service::experimental::TServer< Types >
    {
       public:
-         IServer( const std::string& );
+         IServer( const std::string& role_name );
          ~IServer( ) override = default;
 
       private:
-         void process_request_event( const tMethod::Event& ) override;
+         void process_request_event( const tMethod::Event& event ) override;
 
+      private:
+         virtual void request_trigger_state( const std::string& _state, const std::size_t& _timeout ) = 0;
       public:
-         void response_trigger_state( const bool );
+         void response_trigger_state( const bool& _result );
+
       private:
          virtual void request_start( ) = 0;
-         virtual void request_trigger_state( const std::string&, const std::size_t ) = 0;
+
 
       public:
          void current_state( const std::string& );
@@ -29,3 +30,5 @@ namespace service::onoff::V2_0_0 {
    };
 
 } // namespace service::onoff::V2_0_0
+
+

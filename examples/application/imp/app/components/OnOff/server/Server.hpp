@@ -22,7 +22,7 @@ namespace application::components::onoff {
 
       public:
          void request_start( ) override;
-         void request_trigger_state( const std::string&, const size_t ) override;
+         void request_trigger_state( const std::string&, const std::size_t& ) override;
 
       private:
          const std::string m_name = { };

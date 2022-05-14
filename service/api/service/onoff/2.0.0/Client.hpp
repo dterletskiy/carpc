@@ -1,10 +1,6 @@
 #pragma once
 
-#include <string>
-
 #include "Version.hpp"
-
-
 
 namespace service::onoff::V2_0_0 {
 
@@ -18,21 +14,23 @@ namespace service::onoff::V2_0_0 {
          using tSptr = std::shared_ptr< Client >;
 
       public:
-         Client( const std::string& );
-         ~Client( );
+         Client( const std::string& role_name );
+         virtual ~Client( );
 
       private:
          virtual void connected( ) = 0;
          virtual void disconnected( ) = 0;
 
-      private:
-         virtual void response_trigger_state( const bool ) = 0;
+      public:
+         carpc::comm::sequence::ID request_trigger_state( const std::string& state, const std::size_t& timeout );
+         virtual void response_trigger_state( const bool& result ) = 0;
          virtual void request_trigger_state_failed( const carpc::service::eError& ) = 0;
-         virtual void on_current_state( const std::string& ) = 0;
+
+         void request_start( );
+
 
       public:
-         void request_start( );
-         void request_trigger_state( const std::string&, const size_t );
+         virtual void on_current_state( const std::string& ) = 0;
          void subscribe_current_state( );
          void unsubscribe_current_state( );
 
@@ -41,3 +39,5 @@ namespace service::onoff::V2_0_0 {
    };
 
 } // namespace service::onoff::V2_0_0
+
+
