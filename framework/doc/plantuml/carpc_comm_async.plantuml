@@ -1,0 +1,48 @@
+@startuml carpc_comm_async
+
+!include carpc_comm_async_types.plantuml!async
+
+
+
+' IAsync base
+IAsync +-- IAsync::ISignature
+IAsync +-- IAsync::IConsumer
+
+
+
+' Event
+IEvent +-- IEvent::ISignature
+IEvent +-- IEvent::IConsumer
+
+IAsync <|-- IEvent
+IAsync::ISignature <|-- IEvent::ISignature
+IAsync::IConsumer <|-- IEvent::IConsumer
+
+IEvent::ISignature <|-- TSignature
+IEvent::IConsumer <|-- TConsumer
+IEvent <|-- TEvent
+
+TSignature "1" <--* TEvent
+
+
+
+' Callable
+ICallable +-- ICallable::Signature
+ICallable::Signature "1" <--* ICallable
+
+IAsync <|-- ICallable
+ICallable <|-- TCallable
+
+
+
+' Runnable
+IRunnable +-- IRunnable::Signature
+IRunnable::Signature "1" <--* IRunnable
+
+IAsync <|-- IRunnable
+IRunnable <|-- Runnable
+
+
+
+
+@enduml

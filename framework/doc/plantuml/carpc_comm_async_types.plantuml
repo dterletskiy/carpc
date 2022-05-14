@@ -1,0 +1,106 @@
+@startuml(id=async)
+
+
+
+class IAsync
+{
+   {abstract} virtual void process( IConsumer* ) const = 0
+   {abstract} virtual const ISignature::tSptr signature( ) const = 0
+   {abstract} virtual const tPriority priority( ) const = 0
+   {abstract} virtual const eAsyncType type( ) const = 0
+}
+
+class IAsync::ISignature
+{
+   {abstract} virtual const tAsyncTypeID& type_id( ) const = 0
+}
+
+class IAsync::IConsumer
+{
+}
+
+
+
+class ICallable
+{
+   void process( IConsumer* ) const override
+   {abstract} virtual void call( ) const = 0
+   const ISignature::tSptr signature( ) const override
+   const tPriority priority( ) const override
+   const eAsyncType type( ) const override
+}
+
+class ICallable::Signature
+{
+   const tAsyncTypeID& type_id( ) const override
+}
+
+class TCallable< Args... >
+{
+   void call( ) const override
+}
+
+
+
+class IRunnable
+{
+   void process( IConsumer* ) const override
+   const ISignature::tSptr signature( ) const override
+   const tPriority priority( ) const override
+   const eAsyncType type( ) const override
+}
+
+class IRunnable::Signature
+{
+   const tAsyncTypeID& type_id( ) const override
+   const ISignature::tSptr signature( ) const override
+   const tPriority priority( ) const override
+   const eAsyncType type( ) const override
+}
+
+class Runnable
+{
+   void call( ) const override
+}
+
+
+
+class IEvent
+{
+   void process( IConsumer* ) const override
+   {abstract} virtual void process_event( IConsumer* ) const = 0
+   {abstract} virtual const ISignature::tSptr signature( ) const = 0
+   {abstract} virtual const tPriority priority( ) const = 0
+   {abstract} virtual const eAsyncType type( ) const = 0
+}
+
+class IEvent::ISignature
+{
+   {abstract} virtual const tAsyncTypeID& type_id( ) const = 0
+}
+
+class IEvent::IConsumer
+{
+}
+
+class TConsumer< Generator >
+{
+   {abstract} virtual void process_event( const Generator::tConsumer& ) = 0
+}
+
+class TSignature< Generator >
+{
+   const tAsyncTypeID& type_id( ) const override
+}
+
+class TEvent< Generator >
+{
+   void process_event( IConsumer* ) const override
+   const ISignature::tSptr signature( ) const override
+   const tPriority priority( ) const override
+   const eAsyncType type( ) const override
+}
+
+
+
+@enduml

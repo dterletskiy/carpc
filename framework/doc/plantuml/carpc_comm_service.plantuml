@@ -1,0 +1,18 @@
+@startuml carpc_comm_service
+
+!include carpc_comm_service_types.plantuml!service
+
+
+
+Address "1" <--* Passport
+Signature "1" <--* Passport
+
+
+
+IConnection <|-- IServer
+IConnection <|-- IProxy
+IClient "n" <--* "0" IProxy
+
+
+
+@enduml

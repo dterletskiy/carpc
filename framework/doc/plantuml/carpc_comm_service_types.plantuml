@@ -1,0 +1,75 @@
+@startuml(id=service)
+
+
+
+class Address
+{
+   {field} application::Context  m_context
+   {field} comm::service::ID     m_id
+}
+
+class Signature
+{
+   {field} base::async::tAsyncTypeID   m_type_id
+   {field} std::string                 m_role
+}
+
+class Passport
+{
+   {field} Signature signature
+   {field} Address   address
+}
+
+
+
+class IConnection
+{
+   {abstract} virtual void status( const Address&, const eStatus ) = 0
+   {abstract} virtual void connected( const Address& ) = 0
+   {abstract} virtual void disconnected( const Address& ) = 0
+   {abstract} virtual void connected( ) = 0
+   {abstract} virtual void disconnected( ) = 0
+   {abstract} virtual const bool is_connected( ) const = 0
+
+   const Signature& signature( ) const
+   const application::Context& context( ) const
+   const comm::service::ID& id( ) const
+   bool is_external( ) const
+}
+
+class IServer
+{
+   void status( const Address&, const eStatus ) override final
+   {abstract} void connected( const Address& ) override = 0
+   {abstract} void disconnected( const Address& ) override = 0
+
+   const bool is_connected( ) const override final
+
+   {field} Address::tSet m_proxy_set
+}
+
+class IProxy
+{
+   void status( const Address&, const eStatus ) override final
+   {abstract} void connected( const Address& ) override = 0
+   {abstract} void disconnected( const Address& ) override = 0
+
+   const Address& server( ) const
+   const bool is_connected( ) const override
+
+   void register_client( IClient* )
+   void unregister_client( IClient* )
+
+   {field} Address m_server = { }
+   {field} std::set< IClient* > m_client_set
+}
+
+class IClient
+{
+   {abstract} virtual void connected( ) = 0
+   {abstract} virtual void disconnected( ) = 0
+}
+
+
+
+@enduml

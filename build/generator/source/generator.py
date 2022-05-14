@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import sys
 import io
 import getopt
@@ -8,61 +9,170 @@ import argparse
 from antlr4 import *
 from antlr4.error.ErrorListener import *
 
+import pfw.base
 import pfw.console
-
-import interface
-import builder
+import pfw.shell
 
 
 
-SOURCE_FILE: str = None
-GEN_DIR: str = None
-API_DIR: str = "api/service/"
-IMP_DIR: str = "imp/service/"
+# ./generator.py \
+#    --antlr_jar=/mnt/dev/TDA/rpc/thirdparty/antlr/antlr-4.10.1-complete.jar \
+#    --antlr_lexer=/mnt/dev/TDA/rpc/build/generator/source/grammar/IdlLexer.g4  \
+#    --antlr_parser=/mnt/dev/TDA/rpc/build/generator/source/grammar/IdlParser.g4 \
+#    --antlr_outdir=/mnt/dev/TDA/rpc/build/generator/source/build \
+#    --source=/mnt/dev/TDA/rpc/build/generator/source/idl/onoff.idl \
+#    --gen_outdir=/mnt/dev/TDA/rpc/service \
+#    --api_outdir=api/service \
+#    --imp_outdir=imp/service
 
 
 
-def cmd( argv ):
-   pfw.console.debug.info( "Number of arguments:", len(sys.argv) )
-   pfw.console.debug.info( "Argument List:", str(sys.argv) )
 
+class ApplicationData:
+   def configure( self ):
+      include_count: int = 0
+      for path in self.include_dirs:
+         include_count += 1
+         sys.path.insert( include_count, path )
+
+      os.makedirs( self.antlr_outdir, exist_ok = True )
+      for g4_file in self.antlr_lexer:
+         pfw.shell.run_and_wait_with_status(
+               "java", "-jar", self.antlr_jar, "-Dlanguage=Python3",
+               g4_file,
+               "-o", self.antlr_outdir,
+               "-listener", "-visitor"
+            )
+      for g4_file in self.antlr_parser:
+         pfw.shell.run_and_wait_with_status(
+               "java", "-jar", self.antlr_jar, "-Dlanguage=Python3",
+               g4_file,
+               "-o", self.antlr_outdir,
+               "-listener", "-visitor"
+            )
+   # def configure
+
+   antlr_jar: str = None
+   include_dirs: list = [ ]
+   antlr_lexer: list = [ ]
+   antlr_parser: list = [ ]
+   antlr_outdir: str = None
+   source_file: str = None
+   gen_outdir: str = None
+   api_outdir: str = None
+   imp_outdir: str = None
+# class ApplicationData
+
+
+
+
+class Description:
+   help = "Show this help menu."
+   include = "Additional directory to search import packages"
+   antlr_jar = "Path to antlr jar file"
+   antlr_lexer = "Path to lexer grammer files"
+   antlr_parser = "Path to parser grammer files"
+   antlr_outdir = "Output directory for generated lexer, parser, listener and visitor files."
+   source = "Path to source file for data generation"
+   gen_outdir = "Output directory for generated c++ api files."
+   api_outdir = "Output subdirectory for generated c++ api files."
+   imp_outdir = "Output subdirectory for generated c++ imp files."
+# class Description
+g_description = Description( )
+
+
+
+def cmdline_argparse( argv ):
+   application_data = ApplicationData( )
+
+   parser = argparse.ArgumentParser( description = 'App description' )
+
+   parser.add_argument( "--include", dest = "include", type = str, action = "append",
+      help = g_description.include )
+
+   parser.add_argument( "--antlr_jar", dest = "antlr_jar", type = str, action = "store",
+      help = g_description.antlr_jar )
+
+   parser.add_argument( "--antlr_lexer", dest = "antlr_lexer", type = str, action = "append",
+      help = g_description.antlr_lexer )
+
+   parser.add_argument( "--antlr_parser", dest = "antlr_parser", type = str, action = "append",
+      help = g_description.antlr_parser )
+
+   parser.add_argument( "--antlr_outdir", dest = "antlr_outdir", type = str, action = "store",
+      help = g_description.antlr_outdir )
+
+   parser.add_argument( "--source", dest = "source", type = str, action = "store",
+      help = g_description.source )
+
+   parser.add_argument( "--gen_outdir", dest = "gen_outdir", type = str, action = "store",
+      help = g_description.gen_outdir )
+
+   parser.add_argument( "--api_outdir", dest = "api_outdir", type = str, action = "store",
+      help = g_description.api_outdir )
+
+   parser.add_argument( "--imp_outdir", dest = "imp_outdir", type = str, action = "store",
+      help = g_description.imp_outdir )
+
+   # parser.print_help( )
    try:
-      opts, args = getopt.getopt(
-            argv, "hs:i:g:", [
-               "help",
-               "source=",
-               "import=",
-               "gen="
-            ]
-         )
-      pfw.console.debug.info( "opts: ", opts )
-      pfw.console.debug.info( "args: ", args )
-   except getopt.GetoptError:
-      pfw.console.debug.info( "No options" )
+      argument = parser.parse_args( )
+   except argparse.ArgumentError:
+      pfw.console.debug.error( 'Catching an ArgumentError' )
 
-   for opt, arg in opts:
-      pfw.console.debug.info( "processing: ", opt, " = ", arg )
+   if argument.include:
+      pfw.console.debug.info( "include: ", argument.include )
+      application_data.include_dirs.extend( argument.include )
 
-      if opt in ( "-s", "--source" ):
-         pfw.console.debug.header( "Source file: ", arg )
-         global SOURCE_FILE
-         SOURCE_FILE = arg
-      elif opt in ( "-i", "--import" ):
-         pfw.console.debug.header( "Import directory: ", arg )
-         sys.path.insert( 1, arg )
-      elif opt in ( "-g", "--gen" ):
-         pfw.console.debug.header( "Output directory: ", arg )
-         global GEN_DIR
-         GEN_DIR = arg
-# def cmd
+   if argument.antlr_jar:
+      pfw.console.debug.info( "antlr_jar: ", argument.antlr_jar )
+      application_data.antlr_jar = argument.antlr_jar
 
-cmd( sys.argv[1:] )
+   if argument.antlr_lexer:
+      pfw.console.debug.info( "antlr_lexer: ", argument.antlr_lexer )
+      application_data.antlr_lexer.extend( argument.antlr_lexer )
+
+   if argument.antlr_parser:
+      pfw.console.debug.info( "antlr_parser: ", argument.antlr_parser )
+      application_data.antlr_parser.extend( argument.antlr_parser )
+
+   if argument.antlr_outdir:
+      pfw.console.debug.info( "antlr_outdir: ", argument.antlr_outdir )
+      application_data.include_dirs.append( argument.antlr_outdir )
+      application_data.antlr_outdir = argument.antlr_outdir
+
+   if argument.source:
+      pfw.console.debug.info( "source: ", argument.source )
+      application_data.source_file = argument.source
+
+   if argument.gen_outdir:
+      pfw.console.debug.info( "gen_outdir: ", argument.gen_outdir )
+      application_data.gen_outdir = argument.gen_outdir
+
+   if argument.api_outdir:
+      pfw.console.debug.info( "api_outdir: ", argument.api_outdir )
+      application_data.api_outdir = argument.api_outdir
+
+   if argument.imp_outdir:
+      pfw.console.debug.info( "imp_outdir: ", argument.imp_outdir )
+      application_data.imp_outdir = argument.imp_outdir
+
+   return application_data
+# def cmdline_argparse
+
+
+
+g_application_data = cmdline_argparse( sys.argv[1:] )
+g_application_data.configure( )
 
 
 
 from IdlLexer import IdlLexer
 from IdlParser import IdlParser
 from IdlParserListener import IdlParserListener
+
+import interface
+import builder
 
 
 
@@ -285,7 +395,7 @@ class IdlErrorListener( ErrorListener ):
 
 
 def main( ):
-   input = FileStream( SOURCE_FILE )
+   input = FileStream( g_application_data.source_file )
 
 
    listener = IdlListener( io.StringIO( ) )
@@ -305,7 +415,8 @@ def main( ):
    walker.walk( listener, tree )
 
    onoff_interface.info( )
-   onoff_builder: builder.Builder = builder.Builder( onoff_interface, GEN_DIR, API_DIR, IMP_DIR )
+   onoff_builder: builder.Builder = \
+      builder.Builder( onoff_interface, g_application_data.gen_outdir, g_application_data.api_outdir, g_application_data.imp_outdir )
    onoff_builder.info( )
    onoff_builder.build( )
 

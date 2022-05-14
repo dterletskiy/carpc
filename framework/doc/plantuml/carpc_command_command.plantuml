@@ -1,0 +1,30 @@
+@startuml carpc_command_command
+
+hide empty description
+
+state IDLE #yellow
+state EXECUTING #lightgreen
+state PAUSED #yellow
+state FINISHED #yellow
+state STOPED #yellow
+
+[*] -[#blue]-> IDLE
+IDLE -[#red]-> EXECUTING : execute
+EXECUTING -[#red]-> PAUSING : pause
+PAUSING -[#green]-> PAUSED
+PAUSED -[#red]-> RESUMING : resume
+RESUMING -[#green]-> EXECUTING
+EXECUTING -[#green]-> FINISHED
+
+
+EXECUTING -[#red]-> STOPPING : stop
+PAUSED -[#red]-> STOPPING : stop
+STOPPING -[#green]-> STOPED
+
+FINISHED -[#blue]-> [*]
+STOPED -[#blue]-> [*]
+
+
+
+
+@enduml

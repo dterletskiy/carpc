@@ -1,0 +1,28 @@
+@startuml carpc_command_queue
+
+hide empty description
+
+state IDLE #yellow
+state RUNNING #lightgreen
+state PAUSED #yellow
+state STOPED #yellow
+
+[*] -[#blue]-> IDLE
+IDLE -[#red]-> RUNNING : start
+RUNNING -[#green]-> IDLE : command::eState::finished /\ncommands.size( ) == 0
+RUNNING -[#red]-> PAUSING : pause
+PAUSING -[#green]-> PAUSED : command::eState::paused /\ncommand::eState::finished
+PAUSED -[#red]-> RESUMING : resume
+RESUMING -[#green]-> RUNNING : command::eState::resumed
+RUNNING -[#red]-> STOPPING : stop
+PAUSED -[#red]-> STOPPING : stop
+STOPPING -[#green]-> STOPED : command::eState::stoped /\ncommand::eState::finished
+STOPED -[#blue]-> [*]
+
+' note left of RUNNING
+'    Active state during executing all commands
+' end note
+
+
+
+@enduml

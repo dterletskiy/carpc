@@ -18,7 +18,7 @@ DEBUG: bool = False
 class Builder:
    def __init__( self, interface_: interface.Interface, gen_dir: str, api_dir: str, imp_dir: str ):
       self.__interface = interface_
-      self.__gen_dir = os.path.join( gen_dir )
+      self.__gen_dir = gen_dir
       self.__api_dir = os.path.join( api_dir, self.__interface.name( ), self.__interface.version( ).string( "." ) )
       self.__imp_dir = os.path.join( imp_dir, self.__interface.name( ), self.__interface.version( ).string( "." ) )
    # def __init__
@@ -57,7 +57,7 @@ class Builder:
       file = None
       if False == DEBUG:
          file_directory = os.path.join( self.__gen_dir, directory )
-         os.makedirs( file_directory, exist_ok=True )
+         os.makedirs( file_directory, exist_ok = True )
          file = open( os.path.join( file_directory, file_name ), "w" )
          original_stdout = sys.stdout
          sys.stdout = file
@@ -119,8 +119,7 @@ class Builder:
       code += "#pragma once\n";
       code += "\n"
       code += "#include <memory>\n";
-      code += "#include \"api/sys/comm/service/Types.hpp\"\n";
-      code += "#include \"api/sys/helpers/macros/strings.hpp\"\n";
+      code += "#include \"api/sys/helpers/macros/strings.hpp\"\n"; #@TDA: could be deleted
       code += "#include \"" + self.__api_dir + "/Version.hpp\"\n";
       code += "\n"
 
@@ -900,7 +899,7 @@ class Builder:
          function_arguments = function.arguments( )
          code += "      case method::eID::" + connection.name( ) + ":\n"
          code += "      {\n"
-         code += "         if( carpc::service::eType::RESPONSE != event_type )\n"
+         code += "         if( carpc::service::eType::RESPONSE == event_type )\n"
          code += "         {\n"
          code += "            using tMethodData = method::response::" + function_name + "Data;\n"
          code += "            if( const tMethodData* p_event_data = get_event_data< tMethodData >( event ) )\n"
@@ -913,7 +912,7 @@ class Builder:
          code += "            else\n"
          code += "               request_" + connection.request( ).name( ) + "_failed( carpc::service::eError::EmptyData );\n"
          code += "         }\n"
-         code += "         else if( carpc::service::eType::BUSY != event_type )\n"
+         code += "         else if( carpc::service::eType::BUSY == event_type )\n"
          code += "         {\n"
          code += "            request_" + connection.request( ).name( ) + "_failed( carpc::service::eError::RequestBusy );\n"
          code += "         }\n"
@@ -935,7 +934,7 @@ class Builder:
          attribute_name = attribute.name( )
          code += "      case attribute::eID::" + attribute_name + ":\n"
          code += "      {\n"
-         code += "         if( carpc::service::eType::NOTIFICATION != event_type )\n"
+         code += "         if( carpc::service::eType::NOTIFICATION == event_type )\n"
          code += "         {\n"
          code += "            using tAttributeData = attribute::notification::" + attribute_name + "Data;\n"
          code += "            if( const tAttributeData* p_event_data = get_event_data< tAttributeData >( event ) )\n"
