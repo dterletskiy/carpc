@@ -23,6 +23,7 @@ include_directories( ${PROJECT_SOURCE_DIR} )
 include_directories( ${TRACING_SOURCE_DIR} )
 include_directories( ${FRAMEWORK_SOURCE_DIR} )
 include_directories( ${SERVICE_SOURCE_DIR} )
+include_directories( ${ROOT_GEN_DIR}/service )
 
 
 

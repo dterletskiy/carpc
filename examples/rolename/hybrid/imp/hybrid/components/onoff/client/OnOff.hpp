@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/service/onoff/2.0.0/Client.hpp"
+#include "api/service/onoff/Client.hpp"
 
 
 
