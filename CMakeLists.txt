@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-project( RPC )
+project( CARPC )
 
 option( SYS_TRACE                "Enable framework system tracing"                              ON )
 option( MSG_TRACE                "Enable application tracing"                                   ON )
@@ -11,7 +11,229 @@ option( INSTRUMENTAL             "Enable instrumental functionality"            
 option( USE_DEBUG                "Enable debug information"                                     OFF )
 option( USE_GPB                  "Enable goolgle protobuf"                                      ON )
 option( USE_RTTI                 "Enable RTTI"                                                  ON )
+option( COLOR_CMAKE_MESSAGES
+                                 "Colorize output from the configuration script.
+                                 This comes out all wrong if you use the GUI,
+                                 so make sure to set this to false if you do."
+                                                                                                TRUE )
 
+
+
+###########################################################################################
+#                                                                                         #
+#                              Prind functions and definitions                            #
+#                                                                                         #
+###########################################################################################
+# https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake
+# https://gitlab.kitware.com/cmake/cmake/-/issues/16183
+
+if( WIN32 )
+   set( COLOR_MSG_SUPPORTED FALSE )
+else( )
+   set( COLOR_MSG_SUPPORTED TRUE )
+endif( )
+
+if( COLOR_CMAKE_MESSAGES AND COLOR_MSG_SUPPORTED AND CMAKE_COLOR_MAKEFILE )
+   set( COLOR_CMAKE_MESSAGES TRUE )
+else( )
+   set( COLOR_CMAKE_MESSAGES FALSE )
+endif( )
+
+string( ASCII 27 _escape )
+set( WHITE "29" )
+set( GRAY "30" )
+set( RED "31" )
+set( GREEN "32" )
+set( YELLOW "33" )
+set( BLUE "34" )
+set( MAG "35" )
+set( CYAN "36" )
+
+foreach( color WHITE GRAY RED GREEN YELLOW BLUE MAG CYAN )
+   set( HI${color} "1\;${${color}}" )
+   set( LO${color} "2\;${${color}}" )
+   set( _${color}_ "4\;${${color}}" )
+   set( _HI${color}_ "1\;4\;${${color}}" )
+   set( _LO${color}_ "2\;4\;${${color}}" )
+endforeach()
+
+function( color_message )
+   set( str "" )
+
+   foreach( arg ${ARGV} )
+      if( DEFINED ${arg} AND COLOR_CMAKE_MESSAGES )
+         set( str "${str}${_escape}[${${arg}}m" )
+      else( )
+         set( str "${str}${arg}" )
+         # set( str "${str} " )
+      endif( )
+   endforeach( )
+
+   if( COLOR_CMAKE_MESSAGES )
+      set( str "${str}${_escape}[0m" )
+   endif( )
+
+   message( STATUS ${str} )
+endfunction( )
+
+function( msg_vrb )
+   color_message( WHITE ${ARGV} )
+endfunction( )
+
+
+function( msg_dbg )
+   color_message( GREEN ${ARGV} )
+endfunction( )
+
+
+function( msg_inf )
+   color_message( YELLOW ${ARGV} )
+endfunction( )
+
+
+function( msg_wrn )
+   color_message( BLUE ${ARGV} )
+endfunction( )
+
+
+function( msg_err )
+   color_message( RED ${ARGV} )
+endfunction( )
+
+
+function( msg_ftl )
+   color_message( HIRED ${ARGV} )
+endfunction( )
+
+
+
+function( message_test )
+   message( NOTICE "###########################################################################################" )
+   message( NOTICE "#                                                                                         #" )
+   message( NOTICE "#                                  MESSAGE TEST (BEGIN):                                  #" )
+   message( NOTICE "#                                                                                         #" )
+   message( NOTICE "###########################################################################################" )
+   msg_vrb( "--------------------------- msg_vrb --------------------------- " )
+   msg_dbg( "--------------------------- msg_dbg --------------------------- " )
+   msg_inf( "--------------------------- msg_inf --------------------------- " )
+   msg_wrn( "--------------------------- msg_wrn --------------------------- " )
+   msg_err( "--------------------------- msg_err --------------------------- " )
+   msg_ftl( "--------------------------- msg_ftl --------------------------- " )
+   message( NOTICE "###########################################################################################" )
+   message( NOTICE "#                                                                                         #" )
+   message( NOTICE "#                                   MESSAGE TEST (END):                                   #" )
+   message( NOTICE "#                                                                                         #" )
+   message( NOTICE "###########################################################################################" )
+endfunction( )
+
+function( print_environment_variables )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                       '${PROJECT_NAME}' ENVIRONMENT VARIABLES (BEGIN):                    " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+   execute_process( COMMAND "${CMAKE_COMMAND}" "-E" "environment" )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                        '${PROJECT_NAME}' ENVIRONMENT VARIABLES (END):                     " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+endfunction( )
+
+function( print_cmake_variables )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                           '${PROJECT_NAME}' CMAKE VARIABLES (BEGIN):                      " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+   get_cmake_property( _variableNames VARIABLES )
+   list( SORT _variableNames )
+   foreach (_variableName ${_variableNames})
+      msg_vrb( "${_variableName}=${${_variableName}}" )
+   endforeach( )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                            '${PROJECT_NAME}' CMAKE VARIABLES (END):                       " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+endfunction( )
+
+function( print_project_files )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                            '${PROJECT_NAME}' project files (BEGIN):                      " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+   msg_vrb( "TARGET_NAME = " ${TARGET_NAME} )
+
+   msg_vrb( "CMAKE_HOME_DIRECTORY = " ${CMAKE_HOME_DIRECTORY} )
+   msg_vrb( "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
+
+   msg_vrb( "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
+   msg_vrb( "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
+   msg_vrb( "PROJECT_GEN_DIR = " ${PROJECT_GEN_DIR} )
+   msg_vrb( "PROJECT_SOURCE_FILES = " ${PROJECT_SOURCE_FILES} )
+   msg_vrb( "PROJECT_GEN_FILES = " ${PROJECT_GEN_FILES} )
+
+   msg_vrb( "CARPC_SOURCE_DIR = " ${CARPC_SOURCE_DIR} )
+   msg_vrb( "CARPC_BINARY_DIR = " ${CARPC_BINARY_DIR} )
+
+   msg_vrb( "ROOT_SOURCE_DIR = " ${ROOT_SOURCE_DIR} )
+   msg_vrb( "ROOT_BUILD_DIR = " ${ROOT_BUILD_DIR} )
+   msg_vrb( "ROOT_DELIVERY_DIR = " ${ROOT_DELIVERY_DIR} )
+   msg_vrb( "ROOT_DOCUMENTATION_DIR = " ${ROOT_DOCUMENTATION_DIR} )
+   msg_vrb( "ROOT_GEN_DIR = " ${ROOT_GEN_DIR} )
+
+   msg_vrb( "CMAKE_INSTALL_PREFIX = " ${CMAKE_INSTALL_PREFIX} )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                             '${PROJECT_NAME}' project files (END):                       " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+endfunction( )
+
+function( print_toolchain_config )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                            '${PROJECT_NAME}' toolchain config (BEGIN):                    " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+   msg_vrb( "TOOLCHAIN = $ENV{TOOLCHAIN}" )
+   msg_vrb( "SYSROOT = $ENV{SYSROOT}" )
+   msg_vrb( "ARCH = $ENV{ARCH}" )
+   msg_vrb( "OS = $ENV{OS}" )
+   msg_vrb( "API = $ENV{API}" )
+   msg_vrb( "TARGET = $ENV{TARGET}" )
+   msg_vrb( "SESSION = $ENV{SESSION}" )
+   msg_vrb( "AR = $ENV{AR}" )
+   msg_vrb( "AS = $ENV{AS}" )
+   msg_vrb( "CC = $ENV{CC}" )
+   msg_vrb( "CXX = $ENV{CXX}" )
+   msg_vrb( "LD = $ENV{LD}" )
+   msg_vrb( "RANLIB = $ENV{RANLIB}" )
+   msg_vrb( "STRIP = $ENV{STRIP}" )
+   msg_dbg( "###########################################################################################" )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "                             '${PROJECT_NAME}' toolchain config (END):                     " )
+   msg_dbg( "#                                                                                         #" )
+   msg_dbg( "###########################################################################################" )
+endfunction( )
+
+
+###########################################################################################
+#                                                                                         #
+#                                     Setup functions                                     #
+#                                                                                         #
+###########################################################################################
+macro( setup_target_name )
+   get_filename_component( TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME )
+   string( REPLACE " " "_" TARGET_NAME ${TARGET_NAME} )
+endmacro( )
+
+macro( setup_gen_dir )
+   string( REGEX REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" PROJECT_GEN_DIR ${PROJECT_SOURCE_DIR} )
+   file( MAKE_DIRECTORY ${PROJECT_GEN_DIR} )
+endmacro( )
 
 
 ###########################################################################################
@@ -73,9 +295,9 @@ elseif( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
    add_definitions( -Wno-unused-result )
    add_definitions( -Wno-comment )
 elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Intel" )
-   message( NOTICE "compiler: Intel C++" )
+   msg_vrb( "compiler: Intel C++" )
 elseif( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" )
-   message( NOTICE "compiler: Visual Studio C++" )
+   msg_vrb( "compiler: Visual Studio C++" )
 endif( )
 
 
@@ -126,56 +348,15 @@ endif( )
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
-message( NOTICE "-----------------------------------------------------------------------" )
-message( NOTICE "OS_ANDROID = " ${OS_ANDROID} )
-message( NOTICE "OS_LINUX = " ${OS_LINUX} )
-message( NOTICE "OS_TARGET = " ${OS_TARGET} )
-message( NOTICE "-----------------------------------------------------------------------" )
-message( NOTICE "CMAKE_C_COMPILER = " ${CMAKE_C_COMPILER} )
-message( NOTICE "CMAKE_CXX_COMPILER = " ${CMAKE_CXX_COMPILER} )
-message( NOTICE "-----------------------------------------------------------------------" )
-message( NOTICE "CMAKE_HOME_DIRECTORY = " ${CMAKE_HOME_DIRECTORY} )
-message( NOTICE "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
-message( NOTICE "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
-message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
-message( NOTICE "CMAKE_GENERATOR = " ${CMAKE_GENERATOR} )
-message( NOTICE "RPC_SOURCE_DIR = " ${RPC_SOURCE_DIR} )
-message( NOTICE "RPC_BINARY_DIR = " ${RPC_BINARY_DIR} )
-message( NOTICE "CMAKE_INSTALL_PREFIX = " ${CMAKE_INSTALL_PREFIX} )
-message( NOTICE "ROOT_GEN_DIR = " ${ROOT_GEN_DIR} )
-message( NOTICE "-----------------------------------------------------------------------" )
-message( NOTICE "TOOLCHAIN: $ENV{TOOLCHAIN}" )
-message( NOTICE "SYSROOT: $ENV{SYSROOT}" )
-message( NOTICE "ARCH: $ENV{ARCH}" )
-message( NOTICE "OS: $ENV{OS}" )
-message( NOTICE "API: $ENV{API}" )
-message( NOTICE "TARGET: $ENV{TARGET}" )
-message( NOTICE "SESSION: $ENV{SESSION}" )
-message( NOTICE "AR: $ENV{AR}" )
-message( NOTICE "AS: $ENV{AS}" )
-message( NOTICE "CC: $ENV{CC}" )
-message( NOTICE "CXX: $ENV{CXX}" )
-message( NOTICE "LD: $ENV{LD}" )
-message( NOTICE "RANLIB: $ENV{RANLIB}" )
-message( NOTICE "STRIP: $ENV{STRIP}" )
-message( NOTICE "-----------------------------------------------------------------------" )
-message( NOTICE "ALL VARIABLES (ROOT):" )
-# execute_process( COMMAND "${CMAKE_COMMAND}" "-E" "environment" )
-message( NOTICE "-----------------------------------------------------------------------" )
-message( NOTICE "ALL PROPERTIES (ROOT):" )
-get_cmake_property(_variableNames VARIABLES)
-list (SORT _variableNames)
-# foreach (_variableName ${_variableNames})
-#    message(STATUS "${_variableName}=${${_variableName}}")
-# endforeach()
-message( NOTICE "-----------------------------------------------------------------------" )
+print_project_files( )
+print_toolchain_config( )
 
 
 
 add_subdirectory( tracing )
 add_subdirectory( framework )
-add_subdirectory( servicebrocker )
+# add_subdirectory( servicebrocker )
 add_subdirectory( service )
 # add_subdirectory( hooks )
 # add_subdirectory( instrumental )
-add_subdirectory( examples )
+# add_subdirectory( examples )

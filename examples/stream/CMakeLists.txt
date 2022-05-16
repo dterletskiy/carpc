@@ -9,13 +9,8 @@ project( STREAM )
 #                                Setup common configuration                               #
 #                                                                                         #
 ###########################################################################################
-get_filename_component( TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME )
-string( REPLACE " " "_" TARGET_NAME ${TARGET_NAME} )
-message( NOTICE "TARGET_NAME = " ${TARGET_NAME} )
-
-
-string( REGEX REPLACE "${CMAKE_HOME_DIRECTORY}" "${ROOT_GEN_DIR}" PROJECT_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
-file( MAKE_DIRECTORY ${PROJECT_GEN_DIR} )
+setup_target_name( )
+setup_gen_dir( )
 
 
 
@@ -66,14 +61,13 @@ endforeach( )
 
 
 
-
 ###########################################################################################
 #                                                                                         #
 #                                   Build source file list                                #
 #                                                                                         #
 ###########################################################################################
-file( GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
-file( GLOB_RECURSE GEN_FILES ${PROJECT_GEN_DIR}/*.cc )
+file( GLOB_RECURSE PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
+file( GLOB_RECURSE PROJECT_GEN_FILES ${PROJECT_GEN_DIR}/*.cc )
 
 
 
@@ -82,19 +76,11 @@ file( GLOB_RECURSE GEN_FILES ${PROJECT_GEN_DIR}/*.cc )
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
-message( NOTICE "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
-message( NOTICE "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
-message( NOTICE "PROJECT_GEN_DIR = " ${PROJECT_GEN_DIR} )
-message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
-message( STATUS "SOURCE_FILES = " ${SOURCE_FILES} )
-message( STATUS "GEN_FILES = " ${GEN_FILES} )
-message( STATUS "PROTO_FILES = " ${PROTO_FILES} )
-message( STATUS "PROTO_HDRS = " ${PROTO_HDRS} )
-message( STATUS "PROTO_SRCS = " ${PROTO_SRCS} )
+print_project_files( )
 
 
 
-add_executable( ${TARGET_NAME} ${SOURCE_FILES} ${GEN_FILES} ${PROTO_SRCS} ${PROTO_HDRS} )
+add_executable( ${TARGET_NAME} ${PROJECT_SOURCE_FILES} ${PROJECT_GEN_FILES} ${PROTO_SRCS} ${PROTO_HDRS} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
 target_link_libraries( ${TARGET_NAME} framework )

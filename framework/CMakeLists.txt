@@ -9,9 +9,8 @@ project( FRAMEWORK )
 #                                Setup common configuration                               #
 #                                                                                         #
 ###########################################################################################
-get_filename_component( TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME )
-string( REPLACE " " "_" TARGET_NAME ${TARGET_NAME} )
-message( NOTICE "TARGET_NAME = " ${TARGET_NAME} )
+setup_target_name( )
+setup_gen_dir( )
 
 
 
@@ -47,10 +46,10 @@ link_directories( ${TRACING_BINARY_DIR} )
 #                                   Build source file list                                #
 #                                                                                         #
 ###########################################################################################
-file( GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
+file( GLOB_RECURSE PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
 if( ${OS_TARGET} EQUAL ${OS_ANDROID} )
-   list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
-   list( REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/linux/backtrace.cpp )
+   list( REMOVE_ITEM PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
+   list( REMOVE_ITEM PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/linux/backtrace.cpp )
 endif( )
 
 
@@ -60,14 +59,11 @@ endif( )
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
-message( NOTICE "PROJECT_SOURCE_DIR = " ${PROJECT_SOURCE_DIR} )
-message( NOTICE "PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR} )
-message( NOTICE "CMAKE_CURRENT_LIST_DIR = " ${CMAKE_CURRENT_LIST_DIR} )
-message( STATUS "SOURCE_FILES = " ${SOURCE_FILES} )
+print_project_files( )
 
 
 
-add_library( ${TARGET_NAME} SHARED ${SOURCE_FILES} )
+add_library( ${TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
 if( ${OS_TARGET} EQUAL ${OS_LINUX} )

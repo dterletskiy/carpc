@@ -1,3 +1,12 @@
+version 3.8.20
+   - cmake files update:
+         - impemented color print
+         - implemented debug print function
+         - implemented common macros
+
+version 3.8.19
+   - Generator update.
+
 version 3.8.18
    - Generator update.
    - Documentation update.
