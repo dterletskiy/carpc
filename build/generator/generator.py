@@ -35,7 +35,15 @@ class ApplicationData:
          include_count += 1
          sys.path.insert( include_count, path )
 
+      self.antlr_gen( )
+   # def configure
+
+   def antlr_gen( self ):
+      if None == self.antlr_jar:
+         return
+
       os.makedirs( self.antlr_outdir, exist_ok = True )
+
       for g4_file in self.antlr_lexer:
          pfw.shell.run_and_wait_with_status(
                "java", "-jar", self.antlr_jar, "-Dlanguage=Python3",
@@ -43,6 +51,7 @@ class ApplicationData:
                "-o", self.antlr_outdir,
                "-listener", "-visitor"
             )
+
       for g4_file in self.antlr_parser:
          pfw.shell.run_and_wait_with_status(
                "java", "-jar", self.antlr_jar, "-Dlanguage=Python3",
@@ -50,7 +59,7 @@ class ApplicationData:
                "-o", self.antlr_outdir,
                "-listener", "-visitor"
             )
-   # def configure
+   # def antlr_gen
 
    antlr_jar: str = None
    include_dirs: list = [ ]
@@ -176,38 +185,43 @@ import builder
 
 
 
-class IdlListener( IdlParserListener ) :
+class IdlListener( IdlParserListener ):
    def __init__( self, output ):
       self.output = output
 
    def enterContent( self, ctx: IdlParser.ContentContext ):
-      pfw.console.debug.trace( "enterContent" )
+      # pfw.console.debug.trace( "enterContent" )
+      pass
 
    def exitContent( self, ctx: IdlParser.ContentContext ):
-      pfw.console.debug.trace( "exitContent" )
+      # pfw.console.debug.trace( "exitContent" )
+      pass
 
 
    def enterElement( self, ctx: IdlParser.ElementContext ):
-      pfw.console.debug.trace( "enterElement" )
+      # pfw.console.debug.trace( "enterElement" )
+      pass
 
    def exitElement( self, ctx: IdlParser.ElementContext ):
-      pfw.console.debug.trace( "exitElement" )
+      # pfw.console.debug.trace( "exitElement" )
+      pass
 
 
    def enterInterface( self, ctx: IdlParser.InterfaceContext ):
-      pfw.console.debug.trace( "enterInterface" )
-      pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
+      # pfw.console.debug.trace( "enterInterface" )
+      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       self.__interface.set_name( ctx.IDENTIFIER( ).getText( ) )
 
    def exitInterface( self, ctx: IdlParser.InterfaceContext ):
-      pfw.console.debug.trace( "exitInterface" )
+      # pfw.console.debug.trace( "exitInterface" )
+      pass
 
 
    def enterVersion( self, ctx: IdlParser.VersionContext ):
-      pfw.console.debug.trace( "enterVersion" )
-      pfw.console.debug.info( ctx.DIGIT( )[0].getText( ) )
-      pfw.console.debug.info( ctx.DIGIT( )[1].getText( ) )
-      pfw.console.debug.info( ctx.DIGIT( )[2].getText( ) )
+      # pfw.console.debug.trace( "enterVersion" )
+      # pfw.console.debug.info( ctx.DIGIT( )[0].getText( ) )
+      # pfw.console.debug.info( ctx.DIGIT( )[1].getText( ) )
+      # pfw.console.debug.info( ctx.DIGIT( )[2].getText( ) )
       self.__interface.set_version(
             interface.Version(
                   ctx.DIGIT( )[0].getText( ),
@@ -217,32 +231,37 @@ class IdlListener( IdlParserListener ) :
          )
 
    def exitVersion( self, ctx:IdlParser.VersionContext ):
-      pfw.console.debug.trace( "exitVersion" )
+      # pfw.console.debug.trace( "exitVersion" )
+      pass
 
 
    def enterAuthor( self, ctx: IdlParser.AuthorContext ):
-      pfw.console.debug.trace( "enterAuthor" )
-      pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
+      # pfw.console.debug.trace( "enterAuthor" )
+      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
+      pass
 
    def exitAuthor( self, ctx: IdlParser.AuthorContext ):
-      pfw.console.debug.trace( "exitAuthor" )
+      # pfw.console.debug.trace( "exitAuthor" )
+      pass
 
 
    def enterRequest( self, ctx: IdlParser.RequestContext ):
-      pfw.console.debug.trace( "enterRequest" )
+      # pfw.console.debug.trace( "enterRequest" )
+      pass
 
    def exitRequest( self, ctx: IdlParser.RequestContext ):
-      pfw.console.debug.trace( "exitRequest" )
+      # pfw.console.debug.trace( "exitRequest" )
       self.__function.set_type( interface.Function.eType.REQUEST )
       self.__interface.add_request( self.__function )
       self.__function = None
 
 
    def enterResponse( self, ctx: IdlParser.ResponseContext ):
-      pfw.console.debug.trace( "enterResponse" )
+      # pfw.console.debug.trace( "enterResponse" )
+      pass
 
    def exitResponse( self, ctx: IdlParser.ResponseContext ):
-      pfw.console.debug.trace( "exitResponse" )
+      # pfw.console.debug.trace( "exitResponse" )
       self.__function.set_type( interface.Function.eType.RESPONSE )
       self.__interface.add_response( self.__function, self.__to_request_name )
       self.__function = None
@@ -250,19 +269,21 @@ class IdlListener( IdlParserListener ) :
 
 
    def enterConnection( self, ctx: IdlParser.ConnectionContext ):
-      pfw.console.debug.trace( "enterConnection" )
-      pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
+      # pfw.console.debug.trace( "enterConnection" )
+      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       self.__to_request_name = ctx.IDENTIFIER( ).getText( )
 
    def exitConnection( self, ctx: IdlParser.ConnectionContext ):
-      pfw.console.debug.trace( "exitConnection" )
+      # pfw.console.debug.trace( "exitConnection" )
+      pass
 
 
    def enterMethod( self, ctx: IdlParser.MethodContext ):
-      pfw.console.debug.trace( "enterMethod" )
+      # pfw.console.debug.trace( "enterMethod" )
+      pass
 
    def exitMethod( self, ctx: IdlParser.MethodContext ):
-      pfw.console.debug.trace( "exitMethod" )
+      # pfw.console.debug.trace( "exitMethod" )
       request = self.__function
       request.set_type( interface.Function.eType.REQUEST )
       response = None
@@ -277,73 +298,79 @@ class IdlListener( IdlParserListener ) :
 
 
    def enterCallback( self, ctx: IdlParser.CallbackContext ):
-      pfw.console.debug.trace( "enterCallback" )
+      # pfw.console.debug.trace( "enterCallback" )
+      pass
 
    def exitCallback( self, ctx: IdlParser.CallbackContext ):
-      pfw.console.debug.trace( "exitCallback" )
+      # pfw.console.debug.trace( "exitCallback" )
+      pass
 
 
    def enterAttribute( self, ctx: IdlParser.AttributeContext ):
-      pfw.console.debug.trace( "enterAttribute" )
-      pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
-      pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
+      # pfw.console.debug.trace( "enterAttribute" )
+      # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
+      # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__interface.add_attribute(
             interface.Parameter( ctx.IDENTIFIER( )[0].getText( ),
             ctx.IDENTIFIER( )[1].getText( ) )
          )
 
    def exitAttribute( self, ctx: IdlParser.AttributeContext ):
-      pfw.console.debug.trace( "exitAttribute" )
+      # pfw.console.debug.trace( "exitAttribute" )
+      pass
 
 
    def enterProcedure( self, ctx: IdlParser.ProcedureContext ):
-      pfw.console.debug.trace( "enterProcedure" )
-      pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
+      # pfw.console.debug.trace( "enterProcedure" )
+      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       self.__function = interface.Function(
             None,
             ctx.IDENTIFIER( ).getText( )
          )
 
    def exitProcedure( self, ctx: IdlParser.ProcedureContext ):
-      pfw.console.debug.trace( "exitProcedure" )
+      # pfw.console.debug.trace( "exitProcedure" )
       self.__function.set_arguments( self.__arguments )
       self.__arguments = None
 
 
    def enterFunction( self, ctx: IdlParser.FunctionContext ):
-      pfw.console.debug.trace( "enterFunction" )
-      pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
-      pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
+      # pfw.console.debug.trace( "enterFunction" )
+      # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
+      # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__function = interface.Function(
             ctx.IDENTIFIER( )[0].getText( ),
             ctx.IDENTIFIER( )[1].getText( )
          )
 
    def exitFunction( self, ctx: IdlParser.FunctionContext ):
-      pfw.console.debug.trace( "exitFunction" )
+      # pfw.console.debug.trace( "exitFunction" )
       self.__function.set_arguments( self.__arguments )
       self.__arguments = None
 
 
    def enterArguments_list( self, ctx: IdlParser.Arguments_listContext ):
-      pfw.console.debug.trace( "enterArguments_list" )
+      # pfw.console.debug.trace( "enterArguments_list" )
+      pass
 
    def exitArguments_list( self, ctx: IdlParser.Arguments_listContext ):
-      pfw.console.debug.trace( "exitArguments_list" )
+      # pfw.console.debug.trace( "exitArguments_list" )
+      pass
 
 
    def enterArguments( self, ctx: IdlParser.ArgumentsContext ):
-      pfw.console.debug.trace( "enterArguments" )
+      # pfw.console.debug.trace( "enterArguments" )
       self.__arguments = [ ]
 
    def exitArguments( self, ctx: IdlParser.ArgumentsContext ):
-      pfw.console.debug.trace( "exitArguments" )
+      # pfw.console.debug.trace( "exitArguments" )
+      pass
 
 
    def enterArgument( self, ctx: IdlParser.ArgumentContext ):
-      pfw.console.debug.trace( "enterArgument" )
-      pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
-      pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
+      # pfw.console.debug.trace( "enterArgument" )
+      # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
+      # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__arguments.append(
             interface.Parameter(
                   ctx.IDENTIFIER( )[0].getText( ),
@@ -352,7 +379,8 @@ class IdlListener( IdlParserListener ) :
          )
 
    def exitArgument( self, ctx: IdlParser.ArgumentContext ):
-      pfw.console.debug.trace( "exitArgument" )
+      # pfw.console.debug.trace( "exitArgument" )
+      pass
 
 
 
@@ -414,12 +442,9 @@ def main( ):
    walker = ParseTreeWalker( )
    walker.walk( listener, tree )
 
-   onoff_interface.info( )
    onoff_builder: builder.Builder = \
       builder.Builder( onoff_interface, g_application_data.gen_outdir, g_application_data.api_outdir, g_application_data.imp_outdir )
-   onoff_builder.info( )
    onoff_builder.build( )
-
 
 # def main
 

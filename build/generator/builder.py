@@ -19,8 +19,10 @@ class Builder:
    def __init__( self, interface_: interface.Interface, gen_dir: str, api_dir: str, imp_dir: str ):
       self.__interface = interface_
       self.__gen_dir = gen_dir
-      self.__api_dir = os.path.join( api_dir, self.__interface.name( ), self.__interface.version( ).string( "." ) )
-      self.__imp_dir = os.path.join( imp_dir, self.__interface.name( ), self.__interface.version( ).string( "." ) )
+      self.__api_dir = api_dir
+      self.__imp_dir = imp_dir
+      # self.__api_dir = os.path.join( api_dir, self.__interface.name( ), self.__interface.version( ).string( "." ) )
+      # self.__imp_dir = os.path.join( imp_dir, self.__interface.name( ), self.__interface.version( ).string( "." ) )
    # def __init__
 
    def __del__( self ):
@@ -56,7 +58,7 @@ class Builder:
    def generate( self, code: str, file_name: str, directory: str ):
       file = None
       if False == DEBUG:
-         file_directory = os.path.join( self.__gen_dir, directory )
+         file_directory = os.path.join( self.__gen_dir, directory ) if None != directory else self.__gen_dir
          os.makedirs( file_directory, exist_ok = True )
          file = open( os.path.join( file_directory, file_name ), "w" )
          original_stdout = sys.stdout
@@ -120,7 +122,9 @@ class Builder:
       code += "\n"
       code += "#include <memory>\n";
       code += "#include \"api/sys/helpers/macros/strings.hpp\"\n"; #@TDA: could be deleted
-      code += "#include \"" + self.__api_dir + "/Version.hpp\"\n";
+      code += "#include \""
+      if None != self.__api_dir: code += self.__api_dir + "/"
+      code += "Version.hpp\"\n";
       code += "\n"
 
 
@@ -159,6 +163,7 @@ class Builder:
       # namespace method {
       code += "   namespace method {\n"
       code += "\n"
+
 
       code += "      DEFINE_ENUMERATION( eID, std::uint8_t\n"
       for connection in self.__interface.connections( ):
@@ -1012,7 +1017,9 @@ class Builder:
    def build_server_impl_cpp( self ):
       code: str = "";
 
-      code += "#include \"" + self.__api_dir + "/Server.hpp\"\n";
+      code += "#include \""
+      if None != self.__api_dir: code += self.__api_dir + "/"
+      code += "Server.hpp\"\n";
       code += "#include \"ServerImpl.hpp\"\n";
       code += "\n"
 
@@ -1144,7 +1151,9 @@ class Builder:
    def build_client_impl_cpp( self ):
       code: str = "";
 
-      code += "#include \"" + self.__api_dir + "/Client.hpp\"\n";
+      code += "#include \""
+      if None != self.__api_dir: code += self.__api_dir + "/"
+      code += "Client.hpp\"\n";
       code += "#include \"ClientImpl.hpp\"\n";
       code += "\n"
 
@@ -1198,7 +1207,7 @@ class Builder:
          function_name = function.name( )
          code += "void ClientImpl::request_" + function_name + "_failed( const carpc::service::eError& error )\n"
          code += "{\n"
-         code += "   m_client.request_trigger_state_failed( error );\n"
+         code += "   m_client.request_" + function_name + "_failed( error );\n"
          code += "}\n"
          code += "\n"
 
@@ -1308,7 +1317,9 @@ class Builder:
       code: str = "";
 
       code += "#include \"ServerImpl.hpp\"\n";
-      code += "#include \"" + self.__api_dir + "/Server.hpp\"\n";
+      code += "#include \""
+      if None != self.__api_dir: code += self.__api_dir + "/"
+      code += "Server.hpp\"\n";
       code += "\n"
 
       # using namespace service::onoff::V2_0_0;
@@ -1479,7 +1490,9 @@ class Builder:
       code: str = "";
 
       code += "#include \"ClientImpl.hpp\"\n";
-      code += "#include \"" + self.__api_dir + "/Client.hpp\"\n";
+      code += "#include \""
+      if None != self.__api_dir: code += self.__api_dir + "/"
+      code += "Client.hpp\"\n";
       code += "\n"
 
       # using namespace service::onoff::V2_0_0;
