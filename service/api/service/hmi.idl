@@ -1,0 +1,12 @@
+author dterletskiy
+
+
+
+interface hmi
+{
+   version 1.0.0
+
+   method: init( size_t x, size_t y ) -> ( bool result );
+
+   attribute: string state;
+}

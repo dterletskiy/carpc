@@ -39,6 +39,7 @@ else( )
    set( COLOR_CMAKE_MESSAGES FALSE )
 endif( )
 
+# Color definitions
 string( ASCII 27 _escape )
 set( WHITE "29" )
 set( GRAY "30" )
@@ -48,25 +49,28 @@ set( YELLOW "33" )
 set( BLUE "34" )
 set( MAG "35" )
 set( CYAN "36" )
-
 foreach( color WHITE GRAY RED GREEN YELLOW BLUE MAG CYAN )
    set( HI${color} "1\;${${color}}" )
    set( LO${color} "2\;${${color}}" )
    set( _${color}_ "4\;${${color}}" )
    set( _HI${color}_ "1\;4\;${${color}}" )
    set( _LO${color}_ "2\;4\;${${color}}" )
-endforeach()
+endforeach( )
 
-function( color_message )
-   set( str "" )
+# Function for printing colored message
+# Examples:
+#     color_message( GREEN "...." "..." )
+#     color_message( "...." "..." )
+function( color_message COLOR )
+   if( COLOR_CMAKE_MESSAGES )
+      set( str "${str}${_escape}[${${COLOR}}m" )
+   endif( )
 
-   foreach( arg ${ARGV} )
-      if( DEFINED ${arg} AND COLOR_CMAKE_MESSAGES )
-         set( str "${str}${_escape}[${${arg}}m" )
-      else( )
-         set( str "${str}${arg}" )
-         # set( str "${str} " )
-      endif( )
+   math( EXPR lastIndex "${ARGC}-1" )
+   foreach( index RANGE 1 ${lastIndex} )
+      set( arg ${ARGV${index}} )
+      set( str "${str}${arg}" )
+      # set( str "${str} " )
    endforeach( )
 
    if( COLOR_CMAKE_MESSAGES )
@@ -340,6 +344,110 @@ if( USE_GPB )
    find_package( Protobuf REQUIRED )
    add_compile_definitions( USE_GPB )
 endif( )
+
+
+
+###########################################################################################
+#                                                                                         #
+#                                        Thirdparty                                       #
+#                                                                                         #
+###########################################################################################
+set( ANTLR4_JAR ${ROOT_SOURCE_DIR}/thirdparty/antlr/antlr-4.10.1-complete.jar )
+set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar )
+
+
+
+###########################################################################################
+#                                                                                         #
+#                                        Generator                                        #
+#                                                                                         #
+###########################################################################################
+set( SERVICE_GENERATOR ${ROOT_SOURCE_DIR}/build/generator/generator.py )
+set( IDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlLexer.g4 )
+set( IDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlParser.g4 )
+
+# TEMPLATE_ANTLR4_GEN_FILES - List of Python file names produced by antlr4 generator
+# for idl file base on lexer and parser grammars
+set( TEMPLATE_ANTLR4_GEN_FILES
+      IdlLexer.interp IdlLexer.tokens IdlLexer.py
+      IdlParser.interp IdlParser.tokens IdlParser.py
+      IdlParserListener.py IdlParserVisitor.py
+   )
+set( ANTLR4_GEN_DIR ${ROOT_GEN_DIR}/grammar/ )
+list( TRANSFORM TEMPLATE_ANTLR4_GEN_FILES PREPEND "${ANTLR4_GEN_DIR}" )
+
+# TEMPLATE_IDL_GEN_FILES - List of C++ file names produced by generator for idl file
+set( TEMPLATE_IDL_GEN_FILES
+      Version.hpp
+      Data.hpp Data.cpp
+      IServer.hpp IServer.cpp
+      ServerImpl.hpp ServerImpl.cpp
+      Server.hpp Server.cpp
+      IClient.cpp IClient.hpp
+      ClientImpl.hpp ClientImpl.cpp
+      Client.hpp Client.cpp
+   )
+
+# Function for generating C++ source code for server/client base stuff from idl file
+# Parameters:
+#     IDL_FILE - (in) full path to idl file
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+# Example:
+#     generate_idl( ${IDL_FILE} GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
+function( generate_idl IDL_FILE GENERATED_FILES )
+   add_custom_command(
+         OUTPUT ${TEMPLATE_ANTLR4_GEN_FILES}
+         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_GEN_FILES}"
+         COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${IDL_LEXER} ${IDL_PARSER}
+         DEPENDS ${IDL_LEXER} ${IDL_PARSER}
+         VERBATIM
+      )
+
+   string( REPLACE ".idl" "/" IDL_GEN_DIR ${IDL_FILE} )
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" IDL_GEN_DIR ${IDL_GEN_DIR} )
+   set( IDL_GEN_FILES ${TEMPLATE_IDL_GEN_FILES} )
+   list( TRANSFORM IDL_GEN_FILES PREPEND "${IDL_GEN_DIR}" )
+   list( APPEND PROJECT_GEN_FILES ${IDL_GEN_FILES} )
+   set( ${GENERATED_FILES} ${IDL_GEN_FILES} PARENT_SCOPE )
+
+   msg_inf( "Generating C++ files from '" ${IDL_FILE} "':" )
+   foreach( FILE ${IDL_GEN_FILES} )
+      msg_vrb( "   " ${FILE} )
+   endforeach( )
+
+   add_custom_command(
+         OUTPUT ${IDL_GEN_FILES}
+         COMMENT "CODE GENERATION: ${IDL_GEN_FILES}"
+         COMMAND ${SERVICE_GENERATOR}
+               # --antlr_jar=${ANTLR4_JAR}
+               # --antlr_lexer=${IDL_LEXER}
+               # --antlr_parser=${IDL_PARSER}
+               --antlr_outdir=${ANTLR4_GEN_DIR}
+               --source=${IDL_FILE}
+               --gen_outdir=${IDL_GEN_DIR}
+         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_GEN_FILES}
+         VERBATIM
+      )
+endfunction( )
+
+# Function for generating C++ source code for server/client base stuff from several idl files
+# Parameters:
+#     IDL_FILES - (in) list of full pathes to idl files
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+#                       from all idls
+# Example:
+#     generate_idls( "${IDL_FILES}" GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
+function( generate_idls IDL_FILES GENERATED_FILES )
+   set( IDLS_GENERATED_FILES "" )
+   foreach( IDL_FILE ${IDL_FILES} )
+      generate_idl( ${IDL_FILE} IDL_GENERATED_FILES )
+      list( APPEND IDLS_GENERATED_FILES ${IDL_GENERATED_FILES} )
+   endforeach( )
+   set( ${GENERATED_FILES} ${IDLS_GENERATED_FILES} PARENT_SCOPE )
+endfunction( )
+
 
 
 
