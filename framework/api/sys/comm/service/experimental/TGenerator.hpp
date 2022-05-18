@@ -105,6 +105,7 @@ namespace carpc::service::experimental {
    struct TGenerator< TYPES, ENABVLE_IF_NO_IPC_SERVICE >
    {
       // Methods (request/response) types definitions
+      using T = TYPES;
       using tMethodBaseData      = typename TYPES::method::tBaseData;
       using tMethodBaseDataPtr   = std::shared_ptr< tMethodBaseData >;
 
@@ -115,7 +116,7 @@ namespace carpc::service::experimental {
 
          tMethodBaseDataPtr ptr = nullptr;
       };
-      DEFINE_IPC_EVENT_S( Method, MethodData, TSignature< typename TYPES::method::tID > );
+      DEFINE_EVENT_S( Method, MethodData, TSignature< typename TYPES::method::tID > );
 
       struct method
       {
@@ -139,7 +140,7 @@ namespace carpc::service::experimental {
 
          tAttributeBaseDataPtr ptr = nullptr;
       };
-      DEFINE_IPC_EVENT_S( Attribute, AttributeData, TSignature< typename TYPES::attribute::tID > );
+      DEFINE_EVENT_S( Attribute, AttributeData, TSignature< typename TYPES::attribute::tID > );
 
       struct attribute
       {
