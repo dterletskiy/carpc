@@ -327,6 +327,7 @@ class Interface:
       tabulations: int = kwargs.get( "tabulations", 0 )
       pfw.console.debug.info( self.__class__.__name__, ":", tabs = ( tabulations + 0 ) )
       pfw.console.debug.info( "name:         \'", self.__name, "\'", tabs = ( tabulations + 1 ) )
+      pfw.console.debug.info( "is_ipc:       \'", self.__is_ipc, "\'", tabs = ( tabulations + 1 ) )
       self.__version.info( );
       for connection in self.__connections: connection.info( tabulations = tabulations + 1 )
       for attribute in self.__attributes: attribute.info( tabulations = tabulations + 1 )
@@ -339,6 +340,10 @@ class Interface:
    def set_name( self, name: str ):
       self.__name = name
    # def set_name
+
+   def set_is_ipc( self, is_ipc: str ):
+      self.__is_ipc = is_ipc
+   # def set_is_ipc
 
    def add_connection( self, connection: Connection ):
       self.__connections.append( connection )
@@ -369,6 +374,10 @@ class Interface:
       return self.__name
    # def name
 
+   def is_ipc( self ):
+      return self.__is_ipc
+   # def is_ipc
+
    def connections( self ):
       return self.__connections
    # def connections
@@ -381,6 +390,7 @@ class Interface:
 
    __version: Version = None
    __name: str = None
+   __is_ipc: bool = False
    __connections: list = [ ]
    __attributes: list = [ ]
 # class Interface

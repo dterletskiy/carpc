@@ -10,9 +10,11 @@ element              : ( author | interface ) ;
 
 author               : AUTHOR IDENTIFIER ;
 
-interface            : INTERFACE IDENTIFIER LEFT_CURLY_BRACKET ( version | request | response | attribute | method )* RIGHT_CURLY_BRACKET ;
+interface            : INTERFACE IDENTIFIER LEFT_CURLY_BRACKET ( version | ipc | request | response | attribute | method )* RIGHT_CURLY_BRACKET ;
 
 version              : VERSION DIGIT+ DOT DIGIT+ DOT DIGIT+ ;
+
+ipc                  : IPC COLON (TRUE|FALSE) SEMICOLON ;
 
 /* request: int trigger_state( string state, size_t timeout ); */
 request              : REQUEST COLON function SEMICOLON ;

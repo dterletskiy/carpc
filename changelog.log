@@ -1,3 +1,7 @@
+version 3.8.24
+   - Extend service code generator for case ipc and non ipc services.
+   - Fix: issue #17. Error code generation for interface witout requests or attributes.
+
 version 3.8.23
    - Fix: error for non ipc service.
 

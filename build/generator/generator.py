@@ -230,8 +230,22 @@ class IdlListener( IdlParserListener ):
                )
          )
 
-   def exitVersion( self, ctx:IdlParser.VersionContext ):
+   def exitVersion( self, ctx: IdlParser.VersionContext ):
       # pfw.console.debug.trace( "exitVersion" )
+      pass
+
+
+   def enterIpc( self, ctx: IdlParser.IpcContext ):
+      # pfw.console.debug.trace( "enterIpc" )
+      # pfw.console.debug.trace( ctx.TRUE( ) )
+      # pfw.console.debug.trace( ctx.FALSE( ) )
+      if None != ctx.TRUE( ):
+         self.__interface.set_is_ipc( True )
+      elif None != ctx.FALSE( ):
+         self.__interface.set_is_ipc( False )
+
+   def exitIpc( self, ctx: IdlParser.IpcContext ):
+      # pfw.console.debug.trace( "exitIpc" )
       pass
 
 

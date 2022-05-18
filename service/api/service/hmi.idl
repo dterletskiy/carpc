@@ -6,7 +6,7 @@ interface hmi
 {
    version 1.0.0
 
-   method: init( size_t x, size_t y ) -> ( bool result );
+   ipc: false;
 
-   attribute: string state;
+   method: init( size_t x, size_t y ) -> ( bool result );
 }

@@ -11,6 +11,10 @@ METHOD                        : 'method' ;
 REQUEST                       : 'request' ;
 RESPONSE                      : 'response' ;
 ATTRIBUTE                     : 'attribute' ;
+IPC                           : 'ipc' ;
+
+TRUE                          : F_TRUE ;
+FALSE                         : F_FALSE ;
 
 LEFT_ROUND_BRACKET            : F_LEFT_ROUND_BRACKET ;
 RIGHT_ROUND_BRACKET           : F_RIGHT_ROUND_BRACKET ;
