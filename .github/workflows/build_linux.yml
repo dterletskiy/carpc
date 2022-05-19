@@ -21,7 +21,16 @@ jobs:
 
     # Install google protobuf
     - name: Setup protoc
-      run: sudo apt install libprotobuf-dev protobuf-compiler python3-pip
+      run: sudo apt install libprotobuf-dev protobuf-compiler
+      shell: bash
+
+    # Install python pip
+    - name: Setup protoc
+      run: sudo apt install python3-pip
+      shell: bash
+
+    # Install python antlr4 runtime
+    - name: Setup protoc
       run: pip install antlr4-python3-runtime
       shell: bash
 
