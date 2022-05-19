@@ -97,18 +97,12 @@ class Builder:
       code += "#include \"api/sys/comm/service/Types.hpp\"\n";
       code += "\n"
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
       code += "   const carpc::comm::service::Version version{ " + self.__interface.version( ).string( ", " ) + " };\n"
       code += "\n"
 
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "Version.hpp", self.__api_dir )
@@ -128,10 +122,7 @@ class Builder:
       code += "\n"
 
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
 
 
@@ -352,10 +343,7 @@ class Builder:
       code += "\n"
 
 
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "Data.hpp", self.__imp_dir )
@@ -369,10 +357,7 @@ class Builder:
       code += "\n"
 
 
-      # namespace service::onoff::v2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
 
 
@@ -587,10 +572,7 @@ class Builder:
 
 
 
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "Data.cpp", self.__imp_dir )
@@ -606,10 +588,7 @@ class Builder:
       code += "#include \"Data.hpp\"\n";
       code += "\n"
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
 
       code += "   class IServer\n"
@@ -662,10 +641,7 @@ class Builder:
       code += "   };\n"
 
       code += "\n"
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "IServer.hpp", self.__imp_dir )
@@ -678,10 +654,7 @@ class Builder:
       code += "#include \"IServer.hpp\"\n";
       code += "\n"
 
-      # using namespace service::onoff::V2_0_0;
-      code += "using namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + ";\n"
+      code += "using namespace " + self.__interface.namespace( ) + ";\n"
       code += "\n"
 
       code += "IServer::IServer( const std::string& role_name )\n"
@@ -776,10 +749,7 @@ class Builder:
       code += "#include \"Data.hpp\"\n";
       code += "\n"
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
 
       code += "   class IClient\n"
@@ -843,10 +813,7 @@ class Builder:
       code += "   };\n"
 
       code += "\n"
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "IClient.hpp", self.__imp_dir )
@@ -859,10 +826,7 @@ class Builder:
       code += "#include \"IClient.hpp\"\n";
       code += "\n"
 
-      # using namespace service::onoff::V2_0_0;
-      code += "using namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + ";\n"
+      code += "using namespace " + self.__interface.namespace( ) + ";\n"
       code += "\n"
 
       code += "IClient::IClient( const std::string& role_name )\n"
@@ -983,10 +947,7 @@ class Builder:
       code += "#include \"IServer.hpp\"\n";
       code += "\n"
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
       code += "   class Server;\n"
       code += "\n"
@@ -1023,10 +984,7 @@ class Builder:
       code += "   };\n"
 
       code += "\n"
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "ServerImpl.hpp", self.__imp_dir )
@@ -1042,10 +1000,7 @@ class Builder:
       code += "#include \"ServerImpl.hpp\"\n";
       code += "\n"
 
-      # using namespace service::onoff::V2_0_0;
-      code += "using namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + ";\n"
+      code += "using namespace " + self.__interface.namespace( ) + ";\n"
       code += "\n"
 
       code += "ServerImpl::ServerImpl( Server& server, const std::string& role_name )\n"
@@ -1100,10 +1055,7 @@ class Builder:
       code += "#include \"IClient.hpp\"\n";
       code += "\n"
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
       code += "   class Client;\n"
       code += "\n"
@@ -1157,10 +1109,7 @@ class Builder:
       code += "   };\n"
 
       code += "\n"
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "ClientImpl.hpp", self.__imp_dir )
@@ -1176,10 +1125,7 @@ class Builder:
       code += "#include \"ClientImpl.hpp\"\n";
       code += "\n"
 
-      # using namespace service::onoff::V2_0_0;
-      code += "using namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + ";\n"
+      code += "using namespace " + self.__interface.namespace( ) + ";\n"
       code += "\n"
 
       code += "ClientImpl::ClientImpl( Client& client, const std::string& role_name )\n"
@@ -1251,10 +1197,7 @@ class Builder:
       code += "#include \"Version.hpp\"\n";
       code += "\n"
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
       code += "   class ServerImpl;\n"
       code += "\n"
@@ -1322,10 +1265,7 @@ class Builder:
       code += "   };\n"
 
       code += "\n"
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "Server.hpp", self.__api_dir )
@@ -1341,10 +1281,7 @@ class Builder:
       code += "Server.hpp\"\n";
       code += "\n"
 
-      # using namespace service::onoff::V2_0_0;
-      code += "using namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + ";\n"
+      code += "using namespace " + self.__interface.namespace( ) + ";\n"
       code += "\n"
 
       code += "Server::Server( const std::string& role_name )\n"
@@ -1419,10 +1356,7 @@ class Builder:
       code += "#include \"Version.hpp\"\n";
       code += "\n"
 
-      # namespace service::onoff::V2_0_0 {
-      code += "namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + " {\n"
+      code += "namespace " + self.__interface.namespace( ) + " {\n"
       code += "\n"
       code += "   class ClientImpl;\n"
       code += "\n"
@@ -1495,10 +1429,7 @@ class Builder:
       code += "   };\n"
 
       code += "\n"
-      # } // namespace service::onoff::V2_0_0
-      code += "} // namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + "\n"
+      code += "} // namespace " + self.__interface.namespace( ) + "\n"
       code += "\n"
 
       self.generate( code, "Client.hpp", self.__api_dir )
@@ -1514,10 +1445,7 @@ class Builder:
       code += "Client.hpp\"\n";
       code += "\n"
 
-      # using namespace service::onoff::V2_0_0;
-      code += "using namespace service::" \
-                     + self.__interface.name( ) + "::V" + self.__interface.version( ).string( "_" ) \
-                     + ";\n"
+      code += "using namespace " + self.__interface.namespace( ) + ";\n"
       code += "\n"
 
       code += "Client::Client( const std::string& role_name )\n"

@@ -1,21 +1,77 @@
 #!/bin/bash
 
 # used commands:
-# ./build.sh --arch=x86_64 --os=linux --action=clean_build
-# ./build.sh --arch=x86_64 --os=linux --action=start --target=service_version
-
-readonly CARPC_FW=./build
-source ${CARPC_FW}/base.sh
-source ${CARPC_FW}/constants.sh
-source ${CARPC_FW}/build.sh
-source ${CARPC_FW}/run.sh
-source ${CARPC_FW}/tools.sh
+# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=clean_build
+# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=clean_build --target=application
 
 
 
 declare -A PROJECT_CONFIG
 declare -A TARGET_CONFIG
 declare -A ACTION
+
+
+
+# Processing parameter "--sfw" and source its value for using shell framework scripts in current build system
+function setub_build_system( )
+{
+   echo "----- Setup build system -----"
+
+   for option in "$@"; do
+      case ${option} in
+         --sfw=*)
+            PROJECT_CONFIG[SFW]="${option#*=}"
+            shift # past argument=value
+         ;;
+         --pfw=*)
+            PROJECT_CONFIG[PFW]="${option#*=}"
+            shift # past argument=value
+         ;;
+      esac
+   done
+
+   if [ -z ${PROJECT_CONFIG[SFW]+x} ]; then
+      echo --- "Shell framework is unset";
+      exit 1
+   elif [ -z ${PROJECT_CONFIG[SFW]} ]; then
+      echo --- "Shell framework is empty";
+      exit 1
+   elif [ ! -d ${PROJECT_CONFIG[SFW]} ]; then
+      echo "Shell framework does not exists '${PROJECT_CONFIG[SFW]}'";
+      exit 1
+   else
+      echo "Shell framework is set to '${PROJECT_CONFIG[SFW]}'";
+   fi
+
+   source ${PROJECT_CONFIG[SFW]}/constants/console.sh
+   source ${PROJECT_CONFIG[SFW]}/constants/constants.sh
+   source ${PROJECT_CONFIG[SFW]}/base.sh
+   source ${PROJECT_CONFIG[SFW]}/print.sh
+
+   if [ -z ${PROJECT_CONFIG[PFW]+x} ]; then
+      echo --- "Python framework is unset";
+      exit 1
+   elif [ -z ${PROJECT_CONFIG[PFW]} ]; then
+      echo --- "Python framework is empty";
+      exit 1
+   elif [ ! -d ${PROJECT_CONFIG[PFW]} ]; then
+      echo "Shell framework does not exists '${PROJECT_CONFIG[PFW]}'";
+      exit 1
+   else
+      echo "Python framework is set to '${PROJECT_CONFIG[PFW]}'";
+   fi
+}
+
+reset
+setub_build_system $@
+
+
+
+readonly CARPC_FW=./build
+source ${CARPC_FW}/constants.sh
+source ${CARPC_FW}/build.sh
+source ${CARPC_FW}/run.sh
+source ${CARPC_FW}/tools.sh
 
 
 
@@ -154,5 +210,4 @@ function main( )
 
 
 
-reset
 main $@

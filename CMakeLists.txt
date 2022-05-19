@@ -419,7 +419,9 @@ function( generate_idl IDL_FILE GENERATED_FILES )
    add_custom_command(
          OUTPUT ${IDL_GEN_FILES}
          COMMENT "CODE GENERATION: ${IDL_GEN_FILES}"
+         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_GEN_FILES}
          COMMAND ${SERVICE_GENERATOR}
+               --include=${PFW}
                # --antlr_jar=${ANTLR4_JAR}
                # --antlr_lexer=${IDL_LEXER}
                # --antlr_parser=${IDL_PARSER}

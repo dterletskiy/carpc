@@ -9,13 +9,10 @@ import argparse
 from antlr4 import *
 from antlr4.error.ErrorListener import *
 
-import pfw.base
-import pfw.console
-import pfw.shell
-
 
 
 # ./generator.py \
+#    --include=/mnt/dev/TDA \
 #    --antlr_jar=/mnt/dev/TDA/rpc/thirdparty/antlr/antlr-4.10.1-complete.jar \
 #    --antlr_lexer=/mnt/dev/TDA/rpc/build/generator/source/grammar/IdlLexer.g4  \
 #    --antlr_parser=/mnt/dev/TDA/rpc/build/generator/source/grammar/IdlParser.g4 \
@@ -29,38 +26,6 @@ import pfw.shell
 
 
 class ApplicationData:
-   def configure( self ):
-      include_count: int = 0
-      for path in self.include_dirs:
-         include_count += 1
-         sys.path.insert( include_count, path )
-
-      self.antlr_gen( )
-   # def configure
-
-   def antlr_gen( self ):
-      if None == self.antlr_jar:
-         return
-
-      os.makedirs( self.antlr_outdir, exist_ok = True )
-
-      for g4_file in self.antlr_lexer:
-         pfw.shell.run_and_wait_with_status(
-               "java", "-jar", self.antlr_jar, "-Dlanguage=Python3",
-               g4_file,
-               "-o", self.antlr_outdir,
-               "-listener", "-visitor"
-            )
-
-      for g4_file in self.antlr_parser:
-         pfw.shell.run_and_wait_with_status(
-               "java", "-jar", self.antlr_jar, "-Dlanguage=Python3",
-               g4_file,
-               "-o", self.antlr_outdir,
-               "-listener", "-visitor"
-            )
-   # def antlr_gen
-
    antlr_jar: str = None
    include_dirs: list = [ ]
    antlr_lexer: list = [ ]
@@ -127,52 +92,93 @@ def cmdline_argparse( argv ):
    try:
       argument = parser.parse_args( )
    except argparse.ArgumentError:
-      pfw.console.debug.error( 'Catching an ArgumentError' )
+      print( 'Catching an ArgumentError' )
 
    if argument.include:
-      pfw.console.debug.info( "include: ", argument.include )
+      print( "include: ", argument.include )
       application_data.include_dirs.extend( argument.include )
 
    if argument.antlr_jar:
-      pfw.console.debug.info( "antlr_jar: ", argument.antlr_jar )
+      print( "antlr_jar: ", argument.antlr_jar )
       application_data.antlr_jar = argument.antlr_jar
 
    if argument.antlr_lexer:
-      pfw.console.debug.info( "antlr_lexer: ", argument.antlr_lexer )
+      print( "antlr_lexer: ", argument.antlr_lexer )
       application_data.antlr_lexer.extend( argument.antlr_lexer )
 
    if argument.antlr_parser:
-      pfw.console.debug.info( "antlr_parser: ", argument.antlr_parser )
+      print( "antlr_parser: ", argument.antlr_parser )
       application_data.antlr_parser.extend( argument.antlr_parser )
 
    if argument.antlr_outdir:
-      pfw.console.debug.info( "antlr_outdir: ", argument.antlr_outdir )
+      print( "antlr_outdir: ", argument.antlr_outdir )
       application_data.include_dirs.append( argument.antlr_outdir )
       application_data.antlr_outdir = argument.antlr_outdir
 
    if argument.source:
-      pfw.console.debug.info( "source: ", argument.source )
+      print( "source: ", argument.source )
       application_data.source_file = argument.source
 
    if argument.gen_outdir:
-      pfw.console.debug.info( "gen_outdir: ", argument.gen_outdir )
+      print( "gen_outdir: ", argument.gen_outdir )
       application_data.gen_outdir = argument.gen_outdir
 
    if argument.api_outdir:
-      pfw.console.debug.info( "api_outdir: ", argument.api_outdir )
+      print( "api_outdir: ", argument.api_outdir )
       application_data.api_outdir = argument.api_outdir
 
    if argument.imp_outdir:
-      pfw.console.debug.info( "imp_outdir: ", argument.imp_outdir )
+      print( "imp_outdir: ", argument.imp_outdir )
       application_data.imp_outdir = argument.imp_outdir
 
    return application_data
 # def cmdline_argparse
 
-
-
 g_application_data = cmdline_argparse( sys.argv[1:] )
-g_application_data.configure( )
+
+
+
+def configure( app_data ):
+   include_count: int = 0
+   for path in app_data.include_dirs:
+      include_count += 1
+      sys.path.insert( include_count, path )
+# def configure
+
+configure( g_application_data )
+
+
+
+import pfw.base
+import pfw.console
+import pfw.shell
+
+
+
+def antlr_gen( app_data ):
+   if None == app_data.antlr_jar:
+      return
+
+   os.makedirs( app_data.antlr_outdir, exist_ok = True )
+
+   for g4_file in app_data.antlr_lexer:
+      pfw.shell.run_and_wait_with_status(
+            "java", "-jar", app_data.antlr_jar, "-Dlanguage=Python3",
+            g4_file,
+            "-o", app_data.antlr_outdir,
+            "-listener", "-visitor"
+         )
+
+   for g4_file in app_data.antlr_parser:
+      pfw.shell.run_and_wait_with_status(
+            "java", "-jar", app_data.antlr_jar, "-Dlanguage=Python3",
+            g4_file,
+            "-o", app_data.antlr_outdir,
+            "-listener", "-visitor"
+         )
+# def antlr_gen
+
+antlr_gen( g_application_data )
 
 
 

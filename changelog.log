@@ -1,3 +1,10 @@
+version 3.8.25
+   - Update generating "namespace" for service in generator (/build/generator/builder.py and /build/generator/interface.py).
+   - Processing "--include" in generator and import "pfw" based on this parameter.
+   - Remove hardcoded path to "sfw" (/build/base.sh).
+   - Processing parameter "--sfw" as path to shell framework and source it in "build.sh". 
+   - Processing parameter "--pfw" as path to python framework and path it to cmake as variable "PFW" for calling /build/generator/generator.py with parameter "--include=${PFW}". 
+
 version 3.8.24
    - Extend service code generator for case ipc and non ipc services.
    - Fix: issue #17. Error code generation for interface witout requests or attributes.

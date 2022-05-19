@@ -386,6 +386,10 @@ class Interface:
       return self.__attributes
    # def attributes
 
+   def namespace( self ):
+      return "service::" + self.__name + "::V" + self.__version.string( "_" )
+   # def namespace
+
 
 
    __version: Version = None
