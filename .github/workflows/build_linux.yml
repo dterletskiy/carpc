@@ -32,6 +32,14 @@ jobs:
         path: ./shell_fw
         ref: ${{ github.ref }}
 
+    # Checkout python framework project
+    - name: Checkout python framework
+      uses: actions/checkout@v2
+      with:
+        repository: dterletskiy/python_fw
+        path: ./pfw
+        ref: ${{ github.ref }}
+
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
       uses: actions/checkout@v2
@@ -42,32 +50,6 @@ jobs:
 
     # CMake execution
     - name: Build
-      run: ./build.sh --arch=x86_64 --os=linux --action=clean_build
+      run: ./build.sh --sfw=${PWD}/../shell_fw --pfw=${PWD}/../ --arch=x86_64 --os=linux --action=clean_build
       shell: bash
       working-directory: ./${{ github.event.repository.name }}
-
-
-
-    # # Create build directory
-    # - name: Creation of the "../build" directory
-    #   run: mkdir ../build
-    #   shell: bash
-    #   working-directory: ./
-
-    # # CMake execution
-    # - name: CMake
-    #   run: cmake ../${{ github.event.repository.name }}/dma_framework
-    #   shell: bash
-    #   working-directory: ../build
-    
-    # # Build of the project
-    # - name: Make
-    #   run: make -j8
-    #   shell: bash
-    #   working-directory: ../build
-
-    # # Unit-tests execution
-    # - name: unit-tests
-    #   run: make -j8 test
-    #   shell: bash
-    #   working-directory: ../build
