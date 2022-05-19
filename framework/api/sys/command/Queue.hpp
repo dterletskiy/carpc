@@ -13,9 +13,6 @@ namespace carpc::command {
       : public ICommand::Signal::Consumer
    {
       public:
-         enum class eState { IDLE, RUNNING, PAUSED, STOPPING, STOPPED };
-
-      public:
          Queue( const std::string& );
          Queue( const Queue& ) = delete;
          ~Queue( );
@@ -25,8 +22,6 @@ namespace carpc::command {
          bool stop( );
          bool pause( );
          bool resume( );
-      private:
-         eState m_state;
 
       private:
          void process_event( const typename ICommand::Signal::Event& ) override;
@@ -42,12 +37,23 @@ namespace carpc::command {
          queue::Name m_name;
 
       public:
+         const queue::eState& state( ) const;
+      private:
+         bool state( const queue::eState& );
+         queue::eState m_state = queue::eState::IDLE;
+
+      public:
+         const application::Context& context( ) const;
+      private:
+         application::Context m_context = application::Context::current( );
+
+      public:
          template< typename T, typename... Args >
             const command::ID& create_command( const Args&... );
       private:
          bool execute_next( );
       private:
-         std::list< ICommand::tUptr > m_commands;
+         std::list< ICommand::tSptr > m_commands;
    };
 
 
@@ -64,10 +70,22 @@ namespace carpc::command {
       return m_name;
    }
 
+   inline
+   const queue::eState& Queue::state( ) const
+   {
+      return m_state;
+   }
+
+   inline
+   const application::Context& Queue::context( ) const
+   {
+      return m_context;
+   }
+
    template< typename T, typename... Args >
    const command::ID& Queue::create_command( const Args&... args )
    {
-      ICommand::tUptr p_command = std::make_unique< T >( args... );
+      ICommand::tSptr p_command = std::make_shared< T >( args... );
       p_command->parent_id( m_id );
       m_commands.push_back( p_command );
 
@@ -76,7 +94,7 @@ namespace carpc::command {
       return p_command->id( );
    }
 
-} // namespace carpc::events
+} // namespace carpc::command
 
 
 

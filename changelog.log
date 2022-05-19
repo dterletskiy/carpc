@@ -1,3 +1,6 @@
+version 3.8.26
+   - Command implementation redesign initial implementation.
+
 version 3.8.25
    - Update generating "namespace" for service in generator (/build/generator/builder.py and /build/generator/interface.py).
    - Processing "--include" in generator and import "pfw" based on this parameter.
