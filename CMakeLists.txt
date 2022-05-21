@@ -365,16 +365,19 @@ set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar 
 set( SERVICE_GENERATOR ${ROOT_SOURCE_DIR}/build/generator/generator.py )
 set( IDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlLexer.g4 )
 set( IDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlParser.g4 )
+set( ADL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/AdlLexer.g4 )
+set( ADL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/AdlParser.g4 )
 
-# TEMPLATE_ANTLR4_GEN_FILES - List of Python file names produced by antlr4 generator
+set( ANTLR4_GEN_DIR ${ROOT_GEN_DIR}/grammar/ )
+
+# TEMPLATE_ANTLR4_IDL_GEN_FILES - List of Python file names produced by antlr4 generator
 # for idl file base on lexer and parser grammars
-set( TEMPLATE_ANTLR4_GEN_FILES
+set( TEMPLATE_ANTLR4_IDL_GEN_FILES
       IdlLexer.interp IdlLexer.tokens IdlLexer.py
       IdlParser.interp IdlParser.tokens IdlParser.py
       IdlParserListener.py IdlParserVisitor.py
    )
-set( ANTLR4_GEN_DIR ${ROOT_GEN_DIR}/grammar/ )
-list( TRANSFORM TEMPLATE_ANTLR4_GEN_FILES PREPEND "${ANTLR4_GEN_DIR}" )
+list( TRANSFORM TEMPLATE_ANTLR4_IDL_GEN_FILES PREPEND "${ANTLR4_GEN_DIR}" )
 
 # TEMPLATE_IDL_GEN_FILES - List of C++ file names produced by generator for idl file
 set( TEMPLATE_IDL_GEN_FILES
@@ -397,8 +400,8 @@ set( TEMPLATE_IDL_GEN_FILES
 #     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
 function( generate_idl IDL_FILE GENERATED_FILES )
    add_custom_command(
-         OUTPUT ${TEMPLATE_ANTLR4_GEN_FILES}
-         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_GEN_FILES}"
+         OUTPUT ${TEMPLATE_ANTLR4_IDL_GEN_FILES}
+         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_IDL_GEN_FILES}"
          COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${IDL_LEXER} ${IDL_PARSER}
          DEPENDS ${IDL_LEXER} ${IDL_PARSER}
          VERBATIM
@@ -419,7 +422,7 @@ function( generate_idl IDL_FILE GENERATED_FILES )
    add_custom_command(
          OUTPUT ${IDL_GEN_FILES}
          COMMENT "CODE GENERATION: ${IDL_GEN_FILES}"
-         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_GEN_FILES}
+         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_IDL_GEN_FILES}
          COMMAND ${SERVICE_GENERATOR}
                --include=${PFW}
                # --antlr_jar=${ANTLR4_JAR}
@@ -428,7 +431,7 @@ function( generate_idl IDL_FILE GENERATED_FILES )
                --antlr_outdir=${ANTLR4_GEN_DIR}
                --source=${IDL_FILE}
                --gen_outdir=${IDL_GEN_DIR}
-         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_GEN_FILES}
+         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_IDL_GEN_FILES}
          VERBATIM
       )
 endfunction( )
@@ -448,6 +451,74 @@ function( generate_idls IDL_FILES GENERATED_FILES )
       list( APPEND IDLS_GENERATED_FILES ${IDL_GENERATED_FILES} )
    endforeach( )
    set( ${GENERATED_FILES} ${IDLS_GENERATED_FILES} PARENT_SCOPE )
+endfunction( )
+
+
+
+
+
+
+
+
+# TEMPLATE_ANTLR4_ADL_GEN_FILES - List of Python file names produced by antlr4 generator
+# for adl file base on lexer and parser grammars
+set( TEMPLATE_ANTLR4_ADL_GEN_FILES
+      AdlLexer.interp AdlLexer.tokens AdlLexer.py
+      AdlParser.interp AdlParser.tokens AdlParser.py
+      AdlParserListener.py AdlParserVisitor.py
+   )
+list( TRANSFORM TEMPLATE_ANTLR4_ADL_GEN_FILES PREPEND "${ANTLR4_GEN_DIR}" )
+
+# TEMPLATE_ADL_GEN_FILES - List of C++ file names produced by generator for adl file
+set( TEMPLATE_ADL_GEN_FILES
+      main.cpp
+   )
+
+function( generate_adl ADL_FILE GENERATED_FILES )
+   add_custom_command(
+         OUTPUT ${TEMPLATE_ANTLR4_ADL_GEN_FILES}
+         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_ADL_GEN_FILES}"
+         COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${ADL_LEXER} ${ADL_PARSER}
+         DEPENDS ${ADL_LEXER} ${ADL_PARSER}
+         VERBATIM
+      )
+
+   string( REPLACE ".adl" "/" ADL_GEN_DIR ${ADL_FILE} )
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" ADL_GEN_DIR ${ADL_GEN_DIR} )
+   set( ADL_GEN_FILES ${TEMPLATE_ADL_GEN_FILES} )
+   list( TRANSFORM ADL_GEN_FILES PREPEND "${ADL_GEN_DIR}" )
+   list( APPEND PROJECT_GEN_FILES ${ADL_GEN_FILES} )
+   set( ${GENERATED_FILES} ${ADL_GEN_FILES} PARENT_SCOPE )
+
+   msg_inf( "Generating C++ files from '" ${ADL_FILE} "':" )
+   foreach( FILE ${ADL_GEN_FILES} )
+      msg_vrb( "   " ${FILE} )
+   endforeach( )
+
+   add_custom_command(
+         OUTPUT ${ADL_GEN_FILES}
+         COMMENT "CODE GENERATION: ${ADL_GEN_FILES}"
+         DEPENDS ${ADL_FILE} ${TEMPLATE_ANTLR4_ADL_GEN_FILES}
+         COMMAND ${SERVICE_GENERATOR}
+               --include=${PFW}
+               # --antlr_jar=${ANTLR4_JAR}
+               # --antlr_lexer=${ADL_LEXER}
+               # --antlr_parser=${ADL_PARSER}
+               --antlr_outdir=${ANTLR4_GEN_DIR}
+               --source=${ADL_FILE}
+               --gen_outdir=${ADL_GEN_DIR}
+         DEPENDS ${ADL_FILE} ${TEMPLATE_ANTLR4_ADL_GEN_FILES}
+         VERBATIM
+      )
+endfunction( )
+
+function( generate_adls ADL_FILES GENERATED_FILES )
+   set( ADLS_GENERATED_FILES "" )
+   foreach( ADL_FILE ${ADL_FILES} )
+      generate_adl( ${ADL_FILE} ADL_GENERATED_FILES )
+      list( APPEND ADLS_GENERATED_FILES ${ADL_GENERATED_FILES} )
+   endforeach( )
+   set( ${GENERATED_FILES} ${ADLS_GENERATED_FILES} PARENT_SCOPE )
 endfunction( )
 
 

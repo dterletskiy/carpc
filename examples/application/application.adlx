@@ -1,0 +1,42 @@
+
+application controller
+{
+   thread OnOff_Service
+   {
+      watchdog: 5
+
+      component OnOff
+      {
+         include: "imp/app/components/OnOff/Component.hpp"
+         creator: application::components::onoff::Component::creator
+      }
+   }
+
+   thread Driver_Service
+   {
+      watchdog: 10
+
+      component Driver
+      {
+         include: "imp/app/components/Driver/Component.hpp"
+         creator: application::components::driver::Component::creator
+      }
+   }
+
+   thread Device_Service
+   {
+      watchdog: 10
+
+      component Master
+      {
+         include: "imp/app/components/Master/Component.hpp"
+         creator: application::components::master::Component::creator
+      }
+
+      component Slave
+      {
+         include: "imp/app/components/Slave/Component.hpp"
+         creator: application::components::slave::Component::creator
+      }
+   }
+}

@@ -48,6 +48,16 @@ link_directories( ${SERVICE_BINARY_DIR} )
 
 ###########################################################################################
 #                                                                                         #
+#                                      Code generation                                    #
+#                                                                                         #
+###########################################################################################
+file( GLOB_RECURSE ADL_FILES ${PROJECT_SOURCE_DIR}/*.adl )
+generate_adls( "${ADL_FILES}" PROJECT_GEN_FILES )
+
+
+
+###########################################################################################
+#                                                                                         #
 #                                   Build source file list                                #
 #                                                                                         #
 ###########################################################################################
@@ -64,7 +74,7 @@ print_project_files( )
 
 
 
-add_executable( ${TARGET_NAME} ${PROJECT_SOURCE_FILES} )
+add_executable( ${TARGET_NAME} ${PROJECT_SOURCE_FILES} ${PROJECT_GEN_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
 target_link_libraries( ${TARGET_NAME} framework )

@@ -1,0 +1,20 @@
+author dterletskiy
+
+
+
+component OnOff
+{
+   include: "imp/hybrid/components/onoff/Component.hpp"
+   creator: hybrid::components::onoff::Component::creator
+}
+
+thread OnOff_Service
+{
+   components: OnOff
+   watchdog: 5
+}
+
+application hybrid
+{
+   threads: OnOff_Service
+}

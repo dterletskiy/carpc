@@ -7,7 +7,7 @@ import sys
 import pfw.base
 import pfw.console
 
-import interface
+import idl.interface
 
 
 
@@ -55,10 +55,10 @@ class Builder:
       pfw.console.debug.info( "imp_dir:      \'", self.__imp_dir, "\'", tabs = ( tabulations + 1 ) )
    # def info
 
-   def generate( self, code: str, file_name: str, directory: str ):
+   def generate( self, code: str, file_name: str, subdirectory: str ):
       file = None
       if False == DEBUG:
-         file_directory = os.path.join( self.__gen_dir, directory ) if None != directory else self.__gen_dir
+         file_directory = os.path.join( self.__gen_dir, subdirectory ) if None != subdirectory else self.__gen_dir
          os.makedirs( file_directory, exist_ok = True )
          file = open( os.path.join( file_directory, file_name ), "w" )
          original_stdout = sys.stdout

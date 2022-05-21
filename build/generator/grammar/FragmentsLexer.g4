@@ -45,12 +45,16 @@ fragment F_DOT                   : '.' ;
 fragment F_COMMA                 : ',' ;
 fragment F_SEMICOLON             : ';' ;
 fragment F_COLON                 : ':' ;
+fragment F_QUOTES                : '"' ;
+fragment F_APOSTROPHE            : '\'' ;
+fragment F_BACK_APOSTROPHE       : '`' ;
 fragment F_ASTERISK              : '*' ;
 fragment F_SLASH                 : '/' ;
 fragment F_BACK_SLASH            : '\\' ;
 fragment F_PIPE                  : '|' ;
 fragment F_PLUS                  : '+' ;
 fragment F_MINUS                 : '-' ;
+fragment F_UNDERSCORE            : '_' ;
 
 fragment F_LETTER_LOWERCASE      : [a-z] ;
 fragment F_LETTER_UPPERCASE      : [A-Z] ;

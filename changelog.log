@@ -1,3 +1,9 @@
+version 3.8.27
+   - Changes in idl generator.
+   - adl generator implemented.
+   - Extend generator by adl generator.
+   - Replace examples projects by adl files instead of manually written main.cpp.
+
 version 3.8.26
    - Command implementation redesign initial implementation.
 
