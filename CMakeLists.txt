@@ -455,11 +455,6 @@ endfunction( )
 
 
 
-
-
-
-
-
 # TEMPLATE_ANTLR4_ADL_GEN_FILES - List of Python file names produced by antlr4 generator
 # for adl file base on lexer and parser grammars
 set( TEMPLATE_ANTLR4_ADL_GEN_FILES
