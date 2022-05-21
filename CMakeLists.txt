@@ -362,7 +362,7 @@ set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar 
 #                                        Generator                                        #
 #                                                                                         #
 ###########################################################################################
-set( SERVICE_GENERATOR ${ROOT_SOURCE_DIR}/build/generator/generator.py )
+set( CARPC_GENERATOR ${ROOT_SOURCE_DIR}/build/generator/generator.py )
 set( IDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlLexer.g4 )
 set( IDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlParser.g4 )
 set( ADL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/AdlLexer.g4 )
@@ -423,7 +423,7 @@ function( generate_idl IDL_FILE GENERATED_FILES )
          OUTPUT ${IDL_GEN_FILES}
          COMMENT "CODE GENERATION: ${IDL_GEN_FILES}"
          DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_IDL_GEN_FILES}
-         COMMAND ${SERVICE_GENERATOR}
+         COMMAND ${CARPC_GENERATOR}
                --include=${PFW}
                # --antlr_jar=${ANTLR4_JAR}
                # --antlr_lexer=${IDL_LEXER}
@@ -494,7 +494,7 @@ function( generate_adl ADL_FILE GENERATED_FILES )
          OUTPUT ${ADL_GEN_FILES}
          COMMENT "CODE GENERATION: ${ADL_GEN_FILES}"
          DEPENDS ${ADL_FILE} ${TEMPLATE_ANTLR4_ADL_GEN_FILES}
-         COMMAND ${SERVICE_GENERATOR}
+         COMMAND ${CARPC_GENERATOR}
                --include=${PFW}
                # --antlr_jar=${ANTLR4_JAR}
                # --antlr_lexer=${ADL_LEXER}
