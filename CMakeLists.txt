@@ -411,7 +411,7 @@ function( generate_idl IDL_FILE GENERATED_FILES )
    string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" IDL_GEN_DIR ${IDL_GEN_DIR} )
    set( IDL_GEN_FILES ${TEMPLATE_IDL_GEN_FILES} )
    list( TRANSFORM IDL_GEN_FILES PREPEND "${IDL_GEN_DIR}" )
-   list( APPEND PROJECT_GEN_FILES ${IDL_GEN_FILES} )
+   # list( APPEND PROJECT_GEN_FILES ${IDL_GEN_FILES} )
    set( ${GENERATED_FILES} ${IDL_GEN_FILES} PARENT_SCOPE )
 
    msg_inf( "Generating C++ files from '" ${IDL_FILE} "':" )
@@ -482,7 +482,7 @@ function( generate_adl ADL_FILE GENERATED_FILES )
    string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" ADL_GEN_DIR ${ADL_GEN_DIR} )
    set( ADL_GEN_FILES ${TEMPLATE_ADL_GEN_FILES} )
    list( TRANSFORM ADL_GEN_FILES PREPEND "${ADL_GEN_DIR}" )
-   list( APPEND PROJECT_GEN_FILES ${ADL_GEN_FILES} )
+   # list( APPEND PROJECT_GEN_FILES ${ADL_GEN_FILES} )
    set( ${GENERATED_FILES} ${ADL_GEN_FILES} PARENT_SCOPE )
 
    msg_inf( "Generating C++ files from '" ${ADL_FILE} "':" )
@@ -514,6 +514,58 @@ function( generate_adls ADL_FILES GENERATED_FILES )
       list( APPEND ADLS_GENERATED_FILES ${ADL_GENERATED_FILES} )
    endforeach( )
    set( ${GENERATED_FILES} ${ADLS_GENERATED_FILES} PARENT_SCOPE )
+endfunction( )
+
+
+
+# TEMPLATE_GPB_GEN_FILES - List of C++ file names produced by generator for proto file
+set( TEMPLATE_GPB_GEN_FILES
+      .pb.cc
+      .pb.h
+   )
+
+# Function for generating C++ source code base on proto file
+# Parameters:
+#     PROTO_FILE - (in) full path to idl file
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+# Example:
+#     generate_gpb( ${PROTO_FILE} GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
+function( generate_gpb PROTO_FILE GENERATED_FILES )
+   # Get file name with extension
+   get_filename_component( PROTO_FILE_NAME ${PROTO_FILE} NAME )
+   # Remove extension
+   # get_filename_component could not be used because of it removes longest extention and could remove part
+   # of the file name in case last one contains '.'
+   string( REGEX REPLACE "[.]proto$" "" PROTO_FILE_NAME ${PROTO_FILE_NAME} )
+   # Get file directory location
+   get_filename_component( PROTO_FILE_DIR ${PROTO_FILE} DIRECTORY )
+
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" PROTO_GEN_DIR ${PROTO_FILE_DIR} )
+   file( MAKE_DIRECTORY ${PROTO_GEN_DIR} )
+
+   set( PROTO_GEN_FILES ${TEMPLATE_GPB_GEN_FILES} )
+   list( TRANSFORM PROTO_GEN_FILES PREPEND "${PROTO_FILE_NAME}" )
+   list( TRANSFORM PROTO_GEN_FILES PREPEND "${PROTO_GEN_DIR}/" )
+   # list( APPEND PROJECT_GEN_FILES ${PROTO_GEN_FILES} )
+   set( ${GENERATED_FILES} ${PROTO_GEN_FILES} PARENT_SCOPE )
+
+   add_custom_command(
+         OUTPUT ${PROTO_GEN_FILES}
+         COMMENT "GPB GENERATION: ${PROTO_GEN_FILES}"
+         COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_FLAGS} -I${PROTO_FILE_DIR} --cpp_out=${PROTO_GEN_DIR} ${PROTO_FILE}
+         DEPENDS ${PROTO_FILE}
+         VERBATIM
+      )
+endfunction( )
+
+function( generate_gpbs PROTO_FILES GENERATED_FILES )
+   set( PROTOS_GENERATED_FILES "" )
+   foreach( PROTO_FILE ${PROTO_FILES} )
+      generate_gpb( ${PROTO_FILE} PROTO_GENERATED_FILES )
+      list( APPEND PROTOS_GENERATED_FILES ${PROTO_GENERATED_FILES} )
+   endforeach( )
+   set( ${GENERATED_FILES} ${PROTOS_GENERATED_FILES} PARENT_SCOPE )
 endfunction( )
 
 

@@ -50,14 +50,7 @@ link_directories( ${FRAMEWORK_BINARY_DIR} )
 #                                                                                         #
 ###########################################################################################
 file( GLOB_RECURSE PROTO_FILES ${PROJECT_SOURCE_DIR}/*.proto )
-# protobuf_generate_cpp( PROTO_SRCS PROTO_HDRS ${PROTO_FILES} )
-
-list( APPEND PROTO_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR} )
-foreach( PROTO_FILE ${PROTO_FILES} )
-   execute_process(
-         COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_FLAGS} --cpp_out=${PROJECT_GEN_DIR} ${PROTO_FILE}
-      )
-endforeach( )
+generate_gpbs( "${PROTO_FILES}" PROJECT_GEN_FILES )
 
 
 
@@ -67,7 +60,6 @@ endforeach( )
 #                                                                                         #
 ###########################################################################################
 file( GLOB_RECURSE PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
-file( GLOB_RECURSE PROJECT_GEN_FILES ${PROJECT_GEN_DIR}/*.cc )
 
 
 
@@ -80,7 +72,7 @@ print_project_files( )
 
 
 
-add_executable( ${TARGET_NAME} ${PROJECT_SOURCE_FILES} ${PROJECT_GEN_FILES} ${PROTO_SRCS} ${PROTO_HDRS} )
+add_executable( ${TARGET_NAME} ${PROJECT_SOURCE_FILES} ${PROJECT_GEN_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
 target_link_libraries( ${TARGET_NAME} framework )

@@ -1,3 +1,7 @@
+version 3.8.28
+   - Implement generate_gpb function in root cmake file to use in other projects.
+   - Adapt "stream" example project according to new functionality in root cmake file.
+
 version 3.8.27
    - Changes in idl generator.
    - adl generator implemented.
