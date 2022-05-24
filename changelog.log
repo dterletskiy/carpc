@@ -1,3 +1,6 @@
+version 3.8.30
+   - Remove "examples" and "service" projects, because of migrating them to "carps-examples" git repository.
+
 version 3.8.29
    - Changes in build system.
    - Build system is a part of delivery during installation.
