@@ -6,11 +6,11 @@
 #include <malloc.h>
 #include <cstddef>
 
-#include "api/sys/helpers/functions/print.hpp"
-#include "api/sys/oswrappers/Mutex.hpp"
-#include "imp/hooks/MemoryMap.hpp"
+#include "carpc/helpers/functions/print.hpp"
+#include "carpc/oswrappers/Mutex.hpp"
+#include "MemoryMap.hpp"
 
-#include "api/sys/trace/Trace.hpp"
+#include "carpc/trace/Trace.hpp"
 #define CLASS_ABBR "MEMORY"
 
 

@@ -73,7 +73,7 @@ class Builder:
          for component in thread.components( ):
             code += "#include \"" + component.location( ) + "\"\n"
       code += "// Framework\n"
-      code += "#include \"api/sys/application/main.hpp\"\n"
+      code += "#include \"carpc/application/main.hpp\"\n"
       code += "\n"
 
       code += "const carpc::application::Thread::Configuration::tVector services =\n"

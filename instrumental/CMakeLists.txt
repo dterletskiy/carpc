@@ -19,8 +19,8 @@ setup_gen_dir( )
 #                             Compilation include directories                             #
 #                                                                                         #
 ###########################################################################################
-include_directories( ${PROJECT_SOURCE_DIR} )
-include_directories( ${TRACING_SOURCE_DIR} )
+include_directories( ${PROJECT_SOURCE_DIR}/api )
+include_directories( ${TRACING_SOURCE_DIR}/api )
 
 
 

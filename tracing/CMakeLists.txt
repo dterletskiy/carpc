@@ -19,7 +19,7 @@ setup_gen_dir( )
 #                             Compilation include directories                             #
 #                                                                                         #
 ###########################################################################################
-include_directories( ${PROJECT_SOURCE_DIR} )
+include_directories( ${PROJECT_SOURCE_DIR}/api )
 
 
 
@@ -67,7 +67,7 @@ if( ${OS_TARGET} EQUAL ${OS_ANDROID} )
 endif( )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )
-install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION include )
+install( DIRECTORY ${PROJECT_SOURCE_DIR}/api/ DESTINATION include )
 if( DLT_TRACE )
    install( FILES ${PROJECT_SOURCE_DIR}/dlt.conf DESTINATION etc )
 endif( )

@@ -19,8 +19,8 @@ setup_gen_dir( )
 #                             Compilation include directories                             #
 #                                                                                         #
 ###########################################################################################
-include_directories( ${PROJECT_SOURCE_DIR} )
-include_directories( ${TRACING_SOURCE_DIR} )
+include_directories( ${PROJECT_SOURCE_DIR}/api )
+include_directories( ${TRACING_SOURCE_DIR}/api )
 
 
 
@@ -48,8 +48,8 @@ link_directories( ${TRACING_BINARY_DIR} )
 ###########################################################################################
 file( GLOB_RECURSE PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
 if( ${OS_TARGET} EQUAL ${OS_ANDROID} )
-   list( REMOVE_ITEM PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/Spinlock.cpp )
-   list( REMOVE_ITEM PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/sys/oswrappers/linux/backtrace.cpp )
+   list( REMOVE_ITEM PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/carpc/oswrappers/Spinlock.cpp )
+   list( REMOVE_ITEM PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/imp/carpc/oswrappers/linux/backtrace.cpp )
 endif( )
 
 
@@ -75,4 +75,4 @@ if( USE_GPB )
 endif( )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )
-install( DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION include )
+install( DIRECTORY ${PROJECT_SOURCE_DIR}/api/ DESTINATION include )

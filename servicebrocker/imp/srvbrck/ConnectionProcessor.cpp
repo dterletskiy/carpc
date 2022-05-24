@@ -1,9 +1,9 @@
-#include "api/sys/oswrappers/linux/kernel.hpp"
-#include "api/sys/helpers/macros/strings.hpp"
-#include "api/sys/tools/Tools.hpp"
+#include "carpc/oswrappers/linux/kernel.hpp"
+#include "carpc/helpers/macros/strings.hpp"
+#include "carpc/tools/Tools.hpp"
 #include "ConnectionProcessor.hpp"
 
-#include "api/sys/trace/Trace.hpp"
+#include "carpc/trace/Trace.hpp"
 #define CLASS_ABBR "ConnProc"
 
 

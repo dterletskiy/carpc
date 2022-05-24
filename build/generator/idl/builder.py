@@ -94,7 +94,7 @@ class Builder:
 
       code += "#pragma once\n";
       code += "\n"
-      code += "#include \"api/sys/comm/service/Types.hpp\"\n";
+      code += "#include \"carpc/comm/service/Types.hpp\"\n";
       code += "\n"
 
       code += "namespace " + self.__interface.namespace( ) + " {\n"
@@ -115,7 +115,7 @@ class Builder:
       code += "#pragma once\n";
       code += "\n"
       code += "#include <memory>\n";
-      code += "#include \"api/sys/helpers/macros/strings.hpp\"\n"; #@TDA: could be deleted
+      code += "#include \"carpc/helpers/macros/strings.hpp\"\n"; #@TDA: could be deleted
       code += "#include \""
       if None != self.__api_dir: code += self.__api_dir + "/"
       code += "Version.hpp\"\n";
@@ -584,7 +584,7 @@ class Builder:
 
       code += "#pragma once\n";
       code += "\n"
-      code += "#include \"api/sys/comm/service/experimental/TServer.hpp\"\n";
+      code += "#include \"carpc/comm/service/experimental/TServer.hpp\"\n";
       code += "#include \"Data.hpp\"\n";
       code += "\n"
 
@@ -745,7 +745,7 @@ class Builder:
 
       code += "#pragma once\n";
       code += "\n"
-      code += "#include \"api/sys/comm/service/experimental/TClient.hpp\"\n";
+      code += "#include \"carpc/comm/service/experimental/TClient.hpp\"\n";
       code += "#include \"Data.hpp\"\n";
       code += "\n"
 

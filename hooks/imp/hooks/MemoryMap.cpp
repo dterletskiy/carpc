@@ -7,12 +7,12 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 
-#include "api/sys/helpers/functions/print.hpp"
-#include "api/sys/oswrappers/linux/backtrace.hpp"
-#include "api/sys/oswrappers/linux/time.hpp"
-#include "imp/hooks/MemoryMap.hpp"
+#include "carpc/helpers/functions/print.hpp"
+#include "carpc/oswrappers/linux/backtrace.hpp"
+#include "carpc/oswrappers/linux/time.hpp"
+#include "MemoryMap.hpp"
 
-#include "api/sys/trace/Trace.hpp"
+#include "carpc/trace/Trace.hpp"
 #define CLASS_ABBR "MEMORY"
 
 

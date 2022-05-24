@@ -105,8 +105,8 @@ cc_library_shared {
         "framework/**/*.cpp"
     ],
     exclude_srcs: [
-        "framework/imp/sys/oswrappers/linux/backtrace.cpp",
-        "framework/imp/sys/oswrappers/Spinlock.cpp"
+        "framework/imp/carpc/oswrappers/linux/backtrace.cpp",
+        "framework/imp/carpc/oswrappers/Spinlock.cpp"
     ],
     local_include_dirs: [
         "framework/"
