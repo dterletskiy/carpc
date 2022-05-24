@@ -3,9 +3,9 @@ function start_process_blocking( )
    local LOCAL_PROCESS_NAME=${1}
    local LOCAL_TRACE="CONSOLE"
 
-   echo export VSOMEIP_APPLICATION_NAME=${LOCAL_PROCESS_NAME}
+   print_info export VSOMEIP_APPLICATION_NAME=${LOCAL_PROCESS_NAME}
    export VSOMEIP_APPLICATION_NAME=${LOCAL_PROCESS_NAME}
-   echo export VSOMEIP_CONFIGURATION=${PROJECT_CONFIG[DELIVERY_DIR]}/etc/vsomeip-${LOCAL_PROCESS_NAME}.json
+   print_info export VSOMEIP_CONFIGURATION=${PROJECT_CONFIG[DELIVERY_DIR]}/etc/vsomeip-${LOCAL_PROCESS_NAME}.json
    export VSOMEIP_CONFIGURATION=${PROJECT_CONFIG[DELIVERY_DIR]}/etc/vsomeip-${LOCAL_PROCESS_NAME}.json
 
    local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
@@ -106,8 +106,8 @@ function start_dlt_daemon( )
    local LOCAL_PROCESS_PID=$(pgrep -x ${LOCAL_PROCESS_NAME})
    if [ -z "${LOCAL_PROCESS_PID}" ]; then
       echo "starting" ${LOCAL_PROCESS_NAME}
-      echo ${LOCAL_PROCESS_NAME} -d -c ${PROJECT_CONFIG[DELIVERI_DIR]}/etc/dlt.conf
-      ${LOCAL_PROCESS_NAME} -d -c ${PROJECT_CONFIG[DELIVERI_DIR]}/etc/dlt.conf
+      echo ${LOCAL_PROCESS_NAME} -d -c ${PROJECT_CONFIG[DELIVERY_DIR]}/etc/dlt.conf
+      ${LOCAL_PROCESS_NAME} -d -c ${PROJECT_CONFIG[DELIVERY_DIR]}/etc/dlt.conf
       echo ${LOCAL_PROCESS_NAME} "started successfully with PID" $!
    else
       echo ${LOCAL_PROCESS_NAME} "has been started with PID" ${LOCAL_PROCESS_PID}
@@ -123,13 +123,14 @@ function stop_dlt_daemon( )
 
 function start( )
 {
-   _LD_LIBRARY_PATH_=${LD_LIBRARY_PATH}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib:/usr/lib/:/usr/local/lib/:/mnt/dev/COVESA/build/vsomeip
-   echo export LD_LIBRARY_PATH=${_LD_LIBRARY_PATH_}
-   export LD_LIBRARY_PATH=${_LD_LIBRARY_PATH_}
+   print_info export PATH=${PATH}:${PROJECT_CONFIG[DELIVERY_DIR]}/bin:${PROJECT_CONFIG[CARPC]}/bin
+   export PATH=${PATH}:${PROJECT_CONFIG[DELIVERY_DIR]}/bin:${PROJECT_CONFIG[CARPC]}/bin
 
-   # _LD_PRELOAD_=${LD_PRELOAD}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib/libhooks.so
-   # echo export LD_PRELOAD=${_LD_PRELOAD_}
-   # export LD_PRELOAD=${_LD_PRELOAD_}
+   print_info export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib:${PROJECT_CONFIG[CARPC]}/lib:/usr/lib/:/usr/local/lib/:/mnt/dev/COVESA/build/vsomeip
+   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib:${PROJECT_CONFIG[CARPC]}/lib:/usr/lib/:/usr/local/lib/:/mnt/dev/COVESA/build/vsomeip
+
+   # print_info export LD_PRELOAD=${LD_PRELOAD}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib/libhooks.so
+   # export LD_PRELOAD=${LD_PRELOAD}:${PROJECT_CONFIG[DELIVERY_DIR]}/lib/libhooks.so
 
    case ${ACTION[TARGET]} in
       test_application)

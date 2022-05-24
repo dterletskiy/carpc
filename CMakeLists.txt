@@ -178,9 +178,13 @@ function( print_project_files )
    msg_vrb( "PROJECT_GEN_DIR = " ${PROJECT_GEN_DIR} )
    msg_vrb( "PROJECT_SOURCE_FILES = " ${PROJECT_SOURCE_FILES} )
    msg_vrb( "PROJECT_GEN_FILES = " ${PROJECT_GEN_FILES} )
+   msg_vrb( "PROJECT_GEN_ADL_FILES = " ${PROJECT_GEN_ADL_FILES} )
+   msg_vrb( "PROJECT_GEN_IDL_FILES = " ${PROJECT_GEN_IDL_FILES} )
+   msg_vrb( "PROJECT_GEN_PROTO_FILES = " ${PROJECT_GEN_PROTO_FILES} )
 
    msg_vrb( "CARPC_SOURCE_DIR = " ${CARPC_SOURCE_DIR} )
    msg_vrb( "CARPC_BINARY_DIR = " ${CARPC_BINARY_DIR} )
+   msg_vrb( "CARPC_LIB_DIR = " ${CARPC_LIB_DIR} )
 
    msg_vrb( "ROOT_SOURCE_DIR = " ${ROOT_SOURCE_DIR} )
    msg_vrb( "ROOT_BUILD_DIR = " ${ROOT_BUILD_DIR} )
@@ -578,10 +582,11 @@ print_toolchain_config( )
 
 
 
+add_subdirectory( build )
 add_subdirectory( tracing )
 add_subdirectory( framework )
 add_subdirectory( servicebrocker )
-add_subdirectory( service )
 add_subdirectory( hooks )
 add_subdirectory( instrumental )
+add_subdirectory( service )
 add_subdirectory( examples )

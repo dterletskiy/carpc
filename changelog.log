@@ -1,3 +1,7 @@
+version 3.8.29
+   - Changes in build system.
+   - Build system is a part of delivery during installation.
+
 version 3.8.28
    - Implement generate_gpb function in root cmake file to use in other projects.
    - Adapt "stream" example project according to new functionality in root cmake file.

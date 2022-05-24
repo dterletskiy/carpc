@@ -81,4 +81,12 @@ In case if **Context** was defined during sending by event sender this event wil
 
 ## ***Service***
 
+**Service** is a client-server architecture pattern what uses (implements) user predefined interfaces. Interfaces could be defined by **idl** file what is used for required base code generation for clients and server implementations. Each interface could provide the set of:
+   - simple request
+   - request with connected response
+   - attribute and notification
+Each interfaces instance implementation has its unique **service name** what consists of **interface name** (permanent for each interface definition) and **role name** (what must be defined in each specific implementation).
+
+For each interface could be implemented any number of servers but each server must have unique **role name**. Each server registers itself in the **CARPC runtime**. Since this time any client with the same **role name** could be connected to this server and use interface functionality what it implements. There could be any amount of clients for each interface with the same **role name**.
+
 ----
