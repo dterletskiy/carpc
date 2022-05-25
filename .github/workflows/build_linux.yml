@@ -20,22 +20,22 @@ jobs:
     steps:
 
     # Install dlt
-    - name: Setup dlt
+    - name: Install dlt
       run: sudo apt install libdlt-dev
       shell: bash
 
     # Install google protobuf
-    - name: Setup protoc
+    - name: Install google protobuf
       run: sudo apt install libprotobuf-dev protobuf-compiler
       shell: bash
 
-    # Install python pip
-    - name: Setup protoc
-      run: sudo apt install python3-pip
+    # Install python and pip
+    - name: Install python and python-pip
+      run: sudo apt install python3 python3-pip
       shell: bash
 
     # Install python antlr4 runtime
-    - name: Setup protoc
+    - name: Install python-antlr4
       run: pip install antlr4-python3-runtime
       shell: bash
 

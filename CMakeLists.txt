@@ -11,11 +11,9 @@ option( INSTRUMENTAL             "Enable instrumental functionality"            
 option( USE_DEBUG                "Enable debug information"                                     OFF )
 option( USE_GPB                  "Enable goolgle protobuf"                                      ON )
 option( USE_RTTI                 "Enable RTTI"                                                  ON )
-option( COLOR_CMAKE_MESSAGES
-                                 "Colorize output from the configuration script.
+option( COLOR_CMAKE_MESSAGES     "Colorize output from the configuration script.
                                  This comes out all wrong if you use the GUI,
-                                 so make sure to set this to false if you do."
-                                                                                                TRUE )
+                                 so make sure to set this to false if you do."                  TRUE )
 
 
 
