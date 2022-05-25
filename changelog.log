@@ -1,3 +1,7 @@
+version 3.9.2
+   - Fix dlt tracing for older dlt headers.
+   - Minor changes.
+
 version 3.9.1
    - Rename folder "api/sys" to "api/carpc".
    - Rename folder "imp/sys" to "imp/carpc".

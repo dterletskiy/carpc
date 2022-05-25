@@ -57,7 +57,8 @@ namespace carpc::trace {
                case eLogStrategy::DLT:
                {
                   #ifdef USE_DLT
-                     DLT_LOG( dlt_context( ), to_dlt( log_level ), DLT_SIZED_CSTRING( p_buffer, size ) );
+                     // DLT_LOG( dlt_context( ), to_dlt( log_level ), DLT_SIZED_CSTRING( p_buffer, size ) );
+                     DLT_LOG( dlt_context( ), to_dlt( log_level ), DLT_STRING( p_buffer ) );
                   #endif // USE_DLT
                   break;
                }
