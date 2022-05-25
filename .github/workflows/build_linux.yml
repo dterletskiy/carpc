@@ -19,6 +19,11 @@ jobs:
 
     steps:
 
+    # Install dlt
+    - name: Setup dlt
+      run: sudo apt install libdlt-dev
+      shell: bash
+
     # Install google protobuf
     - name: Setup protoc
       run: sudo apt install libprotobuf-dev protobuf-compiler
