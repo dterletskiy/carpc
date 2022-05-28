@@ -56,7 +56,7 @@ class IdlListener( IdlParserListener ):
       # pfw.console.debug.info( ctx.DIGIT( )[1].getText( ) )
       # pfw.console.debug.info( ctx.DIGIT( )[2].getText( ) )
       self.__interface.set_version(
-            interface.Version(
+            pfw.code.Version(
                   ctx.DIGIT( )[0].getText( ),
                   ctx.DIGIT( )[1].getText( ),
                   ctx.DIGIT( )[2].getText( )
@@ -98,7 +98,7 @@ class IdlListener( IdlParserListener ):
 
    def exitRequest( self, ctx: IdlParser.RequestContext ):
       # pfw.console.debug.trace( "exitRequest" )
-      self.__function.set_type( interface.Function.eType.REQUEST )
+      self.__function.set_type( pfw.code.Function.eType.REQUEST )
       self.__interface.add_request( self.__function )
       self.__function = None
 
@@ -109,7 +109,7 @@ class IdlListener( IdlParserListener ):
 
    def exitResponse( self, ctx: IdlParser.ResponseContext ):
       # pfw.console.debug.trace( "exitResponse" )
-      self.__function.set_type( interface.Function.eType.RESPONSE )
+      self.__function.set_type( pfw.code.Function.eType.RESPONSE )
       self.__interface.add_response( self.__function, self.__to_request_name )
       self.__function = None
       self.__to_request_name = None
@@ -132,10 +132,10 @@ class IdlListener( IdlParserListener ):
    def exitMethod( self, ctx: IdlParser.MethodContext ):
       # pfw.console.debug.trace( "exitMethod" )
       request = self.__function
-      request.set_type( interface.Function.eType.REQUEST )
+      request.set_type( pfw.code.Function.eType.REQUEST )
       response = None
       if None != self.__arguments:
-         response = interface.Function( None, request.name( ), interface.Function.eType.RESPONSE )
+         response = pfw.code.Function( None, request.name( ), pfw.code.Function.eType.RESPONSE )
          response.set_arguments( self.__arguments )
       connection = interface.Connection( request, response )
       self.__interface.add_connection( connection )
@@ -158,7 +158,7 @@ class IdlListener( IdlParserListener ):
       # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
       # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__interface.add_attribute(
-            interface.Parameter( ctx.IDENTIFIER( )[0].getText( ),
+            pfw.code.Parameter( ctx.IDENTIFIER( )[0].getText( ),
             ctx.IDENTIFIER( )[1].getText( ) )
          )
 
@@ -170,7 +170,7 @@ class IdlListener( IdlParserListener ):
    def enterProcedure( self, ctx: IdlParser.ProcedureContext ):
       # pfw.console.debug.trace( "enterProcedure" )
       # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
-      self.__function = interface.Function(
+      self.__function = pfw.code.Function(
             None,
             ctx.IDENTIFIER( ).getText( )
          )
@@ -185,7 +185,7 @@ class IdlListener( IdlParserListener ):
       # pfw.console.debug.trace( "enterFunction" )
       # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
       # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
-      self.__function = interface.Function(
+      self.__function = pfw.code.Function(
             ctx.IDENTIFIER( )[0].getText( ),
             ctx.IDENTIFIER( )[1].getText( )
          )
@@ -219,7 +219,7 @@ class IdlListener( IdlParserListener ):
       # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
       # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__arguments.append(
-            interface.Parameter(
+            pfw.code.Parameter(
                   ctx.IDENTIFIER( )[0].getText( ),
                   ctx.IDENTIFIER( )[1].getText( )
                )
@@ -238,7 +238,7 @@ class IdlListener( IdlParserListener ):
 
 
    __interface: interface.Interface = None
-   __function: interface.Function = None
+   __function: pfw.code.Function = None
    __arguments: list = [ ]
    __to_request_name: str = None
 
