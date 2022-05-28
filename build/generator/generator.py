@@ -182,6 +182,9 @@ antlr_gen( g_app_data )
 if ".idl" == file_extension:
    pfw.console.debug.header( "IDL generation" )
    import idl.parser
+elif ".ddl" == file_extension:
+   pfw.console.debug.header( "DDL generation" )
+   import ddl.parser
 elif ".adl" == file_extension:
    pfw.console.debug.header( "ADL generation" )
    import adl.parser
@@ -191,6 +194,8 @@ elif ".adl" == file_extension:
 def main( ):
    if ".idl" == file_extension:
       idl.parser.generate( g_app_data.source_file, g_app_data.gen_outdir, g_app_data.api_outdir, g_app_data.imp_outdir )
+   elif ".ddl" == file_extension:
+      ddl.parser.generate( g_app_data.source_file, g_app_data.gen_outdir, g_app_data.api_outdir, g_app_data.imp_outdir )
    elif ".adl" == file_extension:
       adl.parser.generate( g_app_data.source_file, g_app_data.gen_outdir, g_app_data.api_outdir, g_app_data.imp_outdir )
 # def main

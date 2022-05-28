@@ -173,7 +173,6 @@ class Application:
       tabulations: int = kwargs.get( "tabulations", 0 )
       pfw.console.debug.info( self.__class__.__name__, ":", tabs = ( tabulations + 0 ) )
       pfw.console.debug.info( "name:      \'", self.__name, "\'", tabs = ( tabulations + 1 ) )
-      pfw.console.debug.info( "watchdog:  \'", self.__watchdog, "\'", tabs = ( tabulations + 1 ) )
       for thread in self.__threads: thread.info( tabulations = tabulations + 1 )
    # def info
 

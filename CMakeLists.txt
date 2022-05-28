@@ -367,6 +367,8 @@ set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar 
 set( CARPC_GENERATOR ${ROOT_SOURCE_DIR}/build/generator/generator.py )
 set( IDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlLexer.g4 )
 set( IDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlParser.g4 )
+set( DDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/DdlLexer.g4 )
+set( DDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/DdlParser.g4 )
 set( ADL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/AdlLexer.g4 )
 set( ADL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/AdlParser.g4 )
 
@@ -452,6 +454,68 @@ function( generate_idls IDL_FILES GENERATED_FILES )
       list( APPEND IDLS_GENERATED_FILES ${IDL_GENERATED_FILES} )
    endforeach( )
    set( ${GENERATED_FILES} ${IDLS_GENERATED_FILES} PARENT_SCOPE )
+endfunction( )
+
+
+
+# TEMPLATE_ANTLR4_DDL_GEN_FILES - List of Python file names produced by antlr4 generator
+# for ddl file base on lexer and parser grammars
+set( TEMPLATE_ANTLR4_DDL_GEN_FILES
+      DdlLexer.interp DdlLexer.tokens DdlLexer.py
+      DdlParser.interp DdlParser.tokens DdlParser.py
+      DdlParserListener.py DdlParserVisitor.py
+   )
+list( TRANSFORM TEMPLATE_ANTLR4_DDL_GEN_FILES PREPEND "${ANTLR4_GEN_DIR}" )
+
+# TEMPLATE_DDL_GEN_FILES - List of C++ file names produced by generator for ddl file
+set( TEMPLATE_DDL_GEN_FILES
+      Data.hpp Data.cpp
+   )
+
+function( generate_ddl DDL_FILE GENERATED_FILES )
+   add_custom_command(
+         OUTPUT ${TEMPLATE_ANTLR4_DDL_GEN_FILES}
+         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_DDL_GEN_FILES}"
+         COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${DDL_LEXER} ${DDL_PARSER}
+         DEPENDS ${DDL_LEXER} ${DDL_PARSER}
+         VERBATIM
+      )
+
+   string( REPLACE ".ddl" "/" DDL_GEN_DIR ${DDL_FILE} )
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" DDL_GEN_DIR ${DDL_GEN_DIR} )
+   set( DDL_GEN_FILES ${TEMPLATE_DDL_GEN_FILES} )
+   list( TRANSFORM DDL_GEN_FILES PREPEND "${DDL_GEN_DIR}" )
+   set( ${GENERATED_FILES} ${DDL_GEN_FILES} PARENT_SCOPE )
+
+   msg_inf( "Generating C++ files from '" ${DDL_FILE} "':" )
+   foreach( FILE ${DDL_GEN_FILES} )
+      msg_vrb( "   " ${FILE} )
+   endforeach( )
+
+   add_custom_command(
+         OUTPUT ${DDL_GEN_FILES}
+         COMMENT "CODE GENERATION: ${DDL_GEN_FILES}"
+         DEPENDS ${DDL_FILE} ${TEMPLATE_ANTLR4_DDL_GEN_FILES}
+         COMMAND ${CARPC_GENERATOR}
+               --include=${PFW}
+               # --antlr_jar=${ANTLR4_JAR}
+               # --antlr_lexer=${DDL_LEXER}
+               # --antlr_parser=${DDL_PARSER}
+               --antlr_outdir=${ANTLR4_GEN_DIR}
+               --source=${DDL_FILE}
+               --gen_outdir=${DDL_GEN_DIR}
+         DEPENDS ${DDL_FILE} ${TEMPLATE_ANTLR4_DDL_GEN_FILES}
+         VERBATIM
+      )
+endfunction( )
+
+function( generate_ddls DDL_FILES GENERATED_FILES )
+   set( DDLS_GENERATED_FILES "" )
+   foreach( DDL_FILE ${DDL_FILES} )
+      generate_ddl( ${DDL_FILE} DDL_GENERATED_FILES )
+      list( APPEND DDLS_GENERATED_FILES ${DDL_GENERATED_FILES} )
+   endforeach( )
+   set( ${GENERATED_FILES} ${DDLS_GENERATED_FILES} PARENT_SCOPE )
 endfunction( )
 
 

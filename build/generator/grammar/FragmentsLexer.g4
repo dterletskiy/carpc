@@ -55,6 +55,13 @@ fragment F_PIPE                  : '|' ;
 fragment F_PLUS                  : '+' ;
 fragment F_MINUS                 : '-' ;
 fragment F_UNDERSCORE            : '_' ;
+fragment F_EQUAL                 : '=' ;
+fragment F_LESS                  : '<' ;
+fragment F_GREATER               : '>' ;
+fragment F_AMPERSAND             : '&' ;
+fragment F_BLOCK                 : '█' ;
+fragment F_TOP_HALF_BLOCK        : '▀' ;
+fragment F_BOTTOM_HALF_BLOCK     : '▄' ;
 
 fragment F_LETTER_LOWERCASE      : [a-z] ;
 fragment F_LETTER_UPPERCASE      : [A-Z] ;

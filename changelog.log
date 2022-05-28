@@ -1,3 +1,7 @@
+version 3.9.3
+   - carpc generator implementation extended by ddl files.
+   - cmake build system extended.
+
 version 3.9.2
    - Fix dlt tracing for older dlt headers.
    - Minor changes.
