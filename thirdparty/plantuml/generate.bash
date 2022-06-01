@@ -6,7 +6,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 PLANT_UML_JAR=${SCRIPT_DIR}/"plantuml-1.2021.14.jar"
-PLANT_UML_OPTIONS="-tsvg -progress -V -debugsvek"
+PLANT_UML_OPTIONS="-tsvg -tpng -progress -V -debugsvek"
 PLANT_UML="java -jar ${PLANT_UML_JAR} ${PLANT_UML_OPTIONS}"
 
 

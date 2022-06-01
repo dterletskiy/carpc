@@ -5,17 +5,20 @@
 **CARPC** framework consists of next core entities:
    1. [Application Process](#application-process)
    2. [Application Thread](#application-thread)
-   3. [Application Component](#application-component)
-   4. [Event](#event)
-   5. [Service](#service)
+   3. [IPC Application Thread](#ipc-application-thread)
+   4. [Application Component](#application-component)
+   5. [Event](#event)
+   6. [Service](#service)
 
 ----
 
 ## ***Application Process***
 
-**Application Process** is a singletone object what is created in generated main function, contains other lower level by hierarchy objects (such as **Application Threads**, **Service Registry** and **Application configuration data**) and is responcible for creation, initialization, deinitialization and deletion of this objects during booting and shutting down application.
+**Application Process** is a singletone object what is created in generated main function (based on *.adl file), contains other lower level by hierarchy objects (such as **IPC Application Thread**, **Application Threads**, **Service Registry** and **Application configuration data**) and is responcible for creation, initialization, deinitialization and deletion of this objects during booting and shutting down application.
 
-**Application Process** is not implemented by application developer. It just could be configured and used as a part of framework runtime.
+**Application Process** also responsible for processing command line arguments, environment variables and application configuration file. Based on all these stuff **Application Process** build common configuration what will be used for application.
+
+**Application Process** is not implemented by application developer. It just could be configured and used as a part of framework runtime. All code related to creating and strating **Application Process** object and general **main** function are generated from **ADL** (Application Description Language) file. This file is used for describing **Application Threads**, **Application Components**, **Watchdog timeouts** and other stuff for current application.
 
 ----
 
@@ -29,30 +32,46 @@ Similar to **Application Process** **Application Thread** is not implemented by 
 
 ----
 
+## ***IPC Application Thread***
+
+This is **CARPC** object similar to **Application Thread** but has another one perpose. It is responsible for IPC communication between different processes what are implemented using **CARPC** framework and according **CARPC** communication protocol, regestering clients and servers located in different applications and establishing connection between them.
+
+**IPC Application Thread** could not be configured by developer as usual **Application Thread** and as a result does not contain any **Application Component**.
+
+----
+
 ## ***Application Component***
 
 **Application Component** is the **CARPC** entity that is an entry point and sanbox for implemention application code by developer.
 
 Each application could contain any quantity of **Application Components**.
 
-In contrast with **Application Process** and **Application Thread** each **Application Component** is designed and implemented by application developer. But at the same time all implemented **Components** should be a part of configuration for **Application Process**.
+In contrast with **Application Process** and **Application Thread** each **Application Component** is designed and implemented by application developer. But at the same time all implemented **Components** must be a part of configuration for **Application Process** and described in **ADL** file.
 
 During startup all **Application Components** will be created automatically and in predefined context (**Application Thread**) by framework runtime according to user's defined configuration.
+
+All **Application Components** are equal in the system excapt one - **Application Root Component**.
+Each **CARPC** application must has one **Application Root Component**. In contradistinction to simple **Components** **Root Component** has few differences:
+   - Virtual function **process_boot** what must be implemented in this component. This function acts as an entry point for developers code execution when **CARPC runtime** configured and initialized.
+   - Built-in **shutdown** function what could be called from **Root Component** to initialize shutdown system, stop **CARPC runtime** and exit process.
+In other respects **Root Component** is the same as other **Components**.
 
 ----
 
 ## ***Event***
 
-**Event** is the **CARPC** entity what is recponsible for communication and transfering data between different entities (components or other objects created by components) what are running in the same or different (ITC) threads and in the same or different (IPC) processes.
+**Event** is the **CARPC** entity what is recponsible for communication and transfering data between different entities (**Consumers** and **Senders**) what are represented by **Components** or other objects created by **Components**.
 
-**Event** could be created and sent from any context (OS thread), but the destination context must be always a **CARPC Application Thread**.
+**Consumer** and **Sender** could be running (created) in the same or different (ITC) threads and in the same or different (IPC) processes.
+
+**Event** could be created and sent from any OS context (OS thread), but the destination context must be always a **CARPC Application Thread**. This means that **Sender** entity could be created out of **CARPC** scope and in any OS thread, but **Consumer** must be a part of **CARPC** scope and must be created in context of **CARPC Application Thread**.
 
 Destination context could be set during sending **Event**. If destination context was not set, **Event** would be delivered to the same context where it was sent from. But in this case it **must** be sent from **CARPC Application Thread**
 
 **Event** could contain any data for transfering. The data type is declared during the **Event** definition. The data content is defined during the **Event** creation.
 
 
-<!-- Each **Event** consists of next parts:
+Each **Event** consists of next parts:
    - **Signature**
    - **Data**
    - **Context**
@@ -69,13 +88,16 @@ Each event sender must create concrete event with specifying addition field befo
 **Data** is an **Event** payload what has specified type and any value. This value is a data what will be transfered from event sender to event consumer.
 
 ### **Context**
-**Context** containes PID and TID what are specify the destination context where event consumer has been created. It could be defined during sending event by event sender. **PID** and **TID** are identifiers of process in the system and thread in the process but not assigned by **OS** but assgned by **CARPC** framework.
-
-By default
+**Context** containes PID and TID what are specify the destination context where event consumer has been created. It could be defined during sending event by event sender. **PID** and **TID** are identifiers of process in the system and thread in the process and assgned by **CARPC runtime**. They are not equivalent to **OS** process and thread IDs.
 
 In case if **Context** was defined during sending by event sender this event will be delivered only to consumers what are created in specified context. All other consumers what are subscribed on this event but have been created in other contexts will be ignored.
 
-### **Priority** -->
+By default **Context** (when it is not set) will be set to current **PID** and **Broadcast TID** what means that **Event** will be delivered to all **Consumers** in all **Application Threads** of current application.
+
+### **Priority**
+This part specifies the priority what will be used by **Application Thread** in comparison to other events from **Event Queue**. **Event** with higher **Priority** will be process before **Events** with lower **Priority** event if it was added to **Event Queue** later.
+
+By default all **Events** have equal **Priority** and it could be changed during **Event** creation.
 
 ----
 

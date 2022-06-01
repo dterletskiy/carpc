@@ -1,0 +1,16 @@
+@startuml carpc_application
+
+
+
+Process *--> "1" ThreadIPC
+Process "0" *--> "i" Thread
+
+Thread *--> "1" RootComponent
+Thread "0" *--> "j" Component
+
+Server "m" <--* "0" Component
+Client "n" <--* "0" Component
+
+
+
+@enduml

@@ -2,7 +2,7 @@
 
 # ***CARPC***
 
-![DMA_Framework logo](./.md/logo/01.png)
+![CARPC Framework logo](./.md/logo/01.png)
 
 ----
 
