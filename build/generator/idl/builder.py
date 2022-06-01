@@ -178,7 +178,7 @@ class Builder:
 
       code += build_base_data( )
 
-      def buil_function_class( function: interface.Function, event: str ):
+      def build_function_class( function: interface.Function, event: str ):
          code: str = "";
          if None == function:
             return code
@@ -231,11 +231,11 @@ class Builder:
          code += "\n"
 
          return code
-      # def buil_function_class
+      # def build_function_class
 
       for connection in self.__interface.connections( ):
-         code += buil_function_class( connection.request( ), connection.name( ) )
-         code += buil_function_class( connection.response( ), connection.name( ) )
+         code += build_function_class( connection.request( ), connection.name( ) )
+         code += build_function_class( connection.response( ), connection.name( ) )
 
 
       # } // namespace method
@@ -417,7 +417,7 @@ class Builder:
          code += "      }\n"
          code += "\n"
 
-      def buil_function_class( function: interface.Function ):
+      def build_function_class( function: interface.Function ):
          code: str = "";
          if None == function:
             return code
@@ -466,11 +466,11 @@ class Builder:
          code += "\n"
 
          return code
-      # def buil_function_class
+      # def build_function_class
 
       for connection in self.__interface.connections( ):
-         code += buil_function_class( connection.request( ) )
-         code += buil_function_class( connection.response( ) )
+         code += build_function_class( connection.request( ) )
+         code += build_function_class( connection.response( ) )
 
       # } // namespace method
       code += "   } // namespace method\n"
@@ -561,7 +561,7 @@ class Builder:
          code += "\n"
 
          return code
-      # def buil_function_class
+      # def build_attribute_class
 
       for attribute in self.__interface.attributes( ):
          code += build_attribute_class( attribute, "notification" )

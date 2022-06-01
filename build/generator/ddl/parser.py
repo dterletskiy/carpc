@@ -103,8 +103,6 @@ class DdlListener( DdlParserListener ):
 
       if None != self.__struct:
          self.__struct.add_method( method )
-      elif None != self.__data:
-         self.__data.add_method( method )
 
    def exitMethod( self, ctx: DdlParser.MethodContext ):
       # pfw.console.debug.trace( "exitMethod" )
@@ -120,8 +118,6 @@ class DdlListener( DdlParserListener ):
 
       if None != self.__struct:
          self.__struct.add_field( field )
-      elif None != self.__data:
-         self.__data.add_field( field )
 
    def exitField( self, ctx: DdlParser.FieldContext ):
       # pfw.console.debug.trace( "exitField" )
@@ -191,7 +187,6 @@ def parse( source_file: str ):
 
 def generate( source_file: str, gen_outdir: str, api_outdir: str, imp_outdir: str ):
    _data = parse( source_file )
-   _data.info( )
 
    _builder: builder.Builder = builder.Builder( _data, gen_outdir )
    _builder.build( )

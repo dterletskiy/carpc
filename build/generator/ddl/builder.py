@@ -75,6 +75,8 @@ class Builder:
 
       code += "#pragma once\n";
       code += "\n"
+      code += "#include \"carpc/common/IPC.hpp\"\n"
+      code += "\n"
 
 
       code += "namespace " + self.__data.namespace( ) + " {\n"
@@ -98,21 +100,11 @@ class Builder:
             code += "      " + field.type( ) + " " + field.name( ) + ";\n"
             code += "\n"
 
+
+         code += "      bool to_stream( carpc::ipc::tStream& ) const;\n"
+         code += "      bool from_stream( carpc::ipc::tStream& );\n"
+
          code += "   }; // struct " + struct.name( ) + "\n"
-         code += "\n"
-
-      for method in self.__data.methods( ):
-         code += "   " + method.return_type( ) + " " + method.name( ) + "( "
-         function_arguments = method.arguments( )
-         for count in range( len( function_arguments ) ):
-            argument = function_arguments[count]
-            code += argument.type( ) + "& " + argument.name( )
-            code += ", " if len( function_arguments ) > ( count + 1 ) else " "
-         code += ");\n"
-         code += "\n"
-
-      for field in self.__data.fields( ):
-         code += "   " + field.type( ) + " " + field.name( ) + ";\n"
          code += "\n"
 
       code += "} // namespace " + self.__data.namespace( ) + "\n"
@@ -123,6 +115,30 @@ class Builder:
 
    def build_data_cpp( self ):
       code: str = "";
+
+      code += "#include \"Data.hpp\"\n";
+      code += "\n"
+      code += "using namespace " + self.__data.namespace( ) + ";\n"
+      code += "\n"
+
+      for struct in self.__data.structs( ):
+         code += "bool " + struct.name( ) + "::to_stream( carpc::ipc::tStream& stream ) const\n"
+         code += "{\n"
+         code += "   return carpc::ipc::serialize( stream"
+         for field in struct.fields( ):
+            code += ", " + field.name( )
+         code += " );\n"
+         code += "}\n"
+         code += "\n"
+
+         code += "bool " + struct.name( ) + "::from_stream( carpc::ipc::tStream& stream )\n"
+         code += "{\n"
+         code += "   return carpc::ipc::deserialize( stream"
+         for field in struct.fields( ):
+            code += ", " + field.name( )
+         code += " );\n"
+         code += "}\n"
+         code += "\n"
 
       self.generate( code, "Data.cpp" )
    # def build_data_cpp

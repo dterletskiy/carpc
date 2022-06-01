@@ -3,8 +3,8 @@
 # used commands:
 # ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=clean_build
 # ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=start --target=application
-# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=clean_build --carpc=/mnt/dev/TDA/rpc_product/linux-x86_64/delivery
-# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=start --target=application --carpc=/mnt/dev/TDA/rpc_product/linux-x86_64/delivery
+# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=clean_build --carpc=/mnt/dev/TDA/carpc_product/linux-x86_64/delivery
+# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA --arch=x86_64 --os=linux --action=start --target=application --carpc=/mnt/dev/TDA/carpc_product/linux-x86_64/delivery
 
 
 

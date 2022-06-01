@@ -7,8 +7,6 @@ import pfw.code
 class Data:
    def __init__( self, name: str = None ):
       self.__name = name
-      self.__fields = [ ]
-      self.__methods = [ ]
       self.__structs = [ ]
    # def __init__
 
@@ -37,8 +35,6 @@ class Data:
       pfw.console.debug.info( self.__class__.__name__, ":", tabs = ( tabulations + 0 ) )
       pfw.console.debug.info( "name:      \'", self.__name, "\'", tabs = ( tabulations + 1 ) )
       self.__version.info( tabulations = tabulations + 1 )
-      for field in self.__fields: field.info( tabulations = tabulations + 1 )
-      for method in self.__methods: method.info( tabulations = tabulations + 1 )
       for struct in self.__structs: struct.info( tabulations = tabulations + 1 )
    # def info
 
@@ -58,22 +54,6 @@ class Data:
       return self.__version
    # def version
 
-   def add_field( self, field: pfw.code.Parameter ):
-      self.__fields.append( field )
-   # def add_field
-
-   def fields( self ):
-      return self.__fields
-   # def fields
-
-   def add_method( self, method: pfw.code.Function ):
-      self.__methods.append( method )
-   # def add_method
-
-   def methods( self ):
-      return self.__methods
-   # def methods
-
    def add_struct( self, struct: pfw.code.Struct ):
       self.__structs.append( struct )
    # def add_struct
@@ -90,7 +70,5 @@ class Data:
 
    __name: str = None
    __version: pfw.code.Version = None
-   __fields: list = [ ]
-   __methods: list = [ ]
    __structs: list = [ ]
 # class Data
