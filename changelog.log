@@ -1,3 +1,9 @@
+version 3.9.6
+   - carpc build system update:
+      - substitute functions "generate_adl", "generate_idl" and "generate_ddl" by function "generate_xdl"
+      - substitute functions "generate_adls", "generate_idls" and "generate_ddls" by function "generate_xdls"
+      - all mentioned functions detect generation type by file extentions
+
 version 3.9.5
    - carpc generator update.
 

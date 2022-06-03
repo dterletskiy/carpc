@@ -374,6 +374,8 @@ set( ADL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/AdlParser.g4 )
 
 set( ANTLR4_GEN_DIR ${ROOT_GEN_DIR}/grammar/ )
 
+
+
 # TEMPLATE_ANTLR4_IDL_GEN_FILES - List of Python file names produced by antlr4 generator
 # for idl file base on lexer and parser grammars
 set( TEMPLATE_ANTLR4_IDL_GEN_FILES
@@ -395,67 +397,6 @@ set( TEMPLATE_IDL_GEN_FILES
       Client.hpp Client.cpp
    )
 
-# Function for generating C++ source code for server/client base stuff from idl file
-# Parameters:
-#     IDL_FILE - (in) full path to idl file
-#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
-# Example:
-#     generate_idl( ${IDL_FILE} GEN_FILES )
-#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
-function( generate_idl IDL_FILE GENERATED_FILES )
-   add_custom_command(
-         OUTPUT ${TEMPLATE_ANTLR4_IDL_GEN_FILES}
-         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_IDL_GEN_FILES}"
-         COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${IDL_LEXER} ${IDL_PARSER}
-         DEPENDS ${IDL_LEXER} ${IDL_PARSER}
-         VERBATIM
-      )
-
-   string( REPLACE ".idl" "/" IDL_GEN_DIR ${IDL_FILE} )
-   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" IDL_GEN_DIR ${IDL_GEN_DIR} )
-   set( IDL_GEN_FILES ${TEMPLATE_IDL_GEN_FILES} )
-   list( TRANSFORM IDL_GEN_FILES PREPEND "${IDL_GEN_DIR}" )
-   set( ${GENERATED_FILES} ${IDL_GEN_FILES} PARENT_SCOPE )
-
-   msg_inf( "Generating C++ files from '" ${IDL_FILE} "':" )
-   foreach( FILE ${IDL_GEN_FILES} )
-      msg_vrb( "   " ${FILE} )
-   endforeach( )
-
-   add_custom_command(
-         OUTPUT ${IDL_GEN_FILES}
-         COMMENT "CODE GENERATION: ${IDL_GEN_FILES}"
-         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_IDL_GEN_FILES}
-         COMMAND ${CARPC_GENERATOR}
-               --include=${PFW}
-               # --antlr_jar=${ANTLR4_JAR}
-               # --antlr_lexer=${IDL_LEXER}
-               # --antlr_parser=${IDL_PARSER}
-               --antlr_outdir=${ANTLR4_GEN_DIR}
-               --source=${IDL_FILE}
-               --gen_outdir=${IDL_GEN_DIR}
-         DEPENDS ${IDL_FILE} ${TEMPLATE_ANTLR4_IDL_GEN_FILES}
-         VERBATIM
-      )
-endfunction( )
-
-# Function for generating C++ source code for server/client base stuff from several idl files
-# Parameters:
-#     IDL_FILES - (in) list of full pathes to idl files
-#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
-#                       from all idls
-# Example:
-#     generate_idls( "${IDL_FILES}" GEN_FILES )
-#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
-function( generate_idls IDL_FILES GENERATED_FILES )
-   set( IDLS_GENERATED_FILES "" )
-   foreach( IDL_FILE ${IDL_FILES} )
-      generate_idl( ${IDL_FILE} IDL_GENERATED_FILES )
-      list( APPEND IDLS_GENERATED_FILES ${IDL_GENERATED_FILES} )
-   endforeach( )
-   set( ${GENERATED_FILES} ${IDLS_GENERATED_FILES} PARENT_SCOPE )
-endfunction( )
-
 
 
 # TEMPLATE_ANTLR4_DDL_GEN_FILES - List of Python file names produced by antlr4 generator
@@ -471,52 +412,6 @@ list( TRANSFORM TEMPLATE_ANTLR4_DDL_GEN_FILES PREPEND "${ANTLR4_GEN_DIR}" )
 set( TEMPLATE_DDL_GEN_FILES
       Data.hpp Data.cpp
    )
-
-function( generate_ddl DDL_FILE GENERATED_FILES )
-   add_custom_command(
-         OUTPUT ${TEMPLATE_ANTLR4_DDL_GEN_FILES}
-         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_DDL_GEN_FILES}"
-         COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${DDL_LEXER} ${DDL_PARSER}
-         DEPENDS ${DDL_LEXER} ${DDL_PARSER}
-         VERBATIM
-      )
-
-   string( REPLACE ".ddl" "/" DDL_GEN_DIR ${DDL_FILE} )
-   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" DDL_GEN_DIR ${DDL_GEN_DIR} )
-   set( DDL_GEN_FILES ${TEMPLATE_DDL_GEN_FILES} )
-   list( TRANSFORM DDL_GEN_FILES PREPEND "${DDL_GEN_DIR}" )
-   set( ${GENERATED_FILES} ${DDL_GEN_FILES} PARENT_SCOPE )
-
-   msg_inf( "Generating C++ files from '" ${DDL_FILE} "':" )
-   foreach( FILE ${DDL_GEN_FILES} )
-      msg_vrb( "   " ${FILE} )
-   endforeach( )
-
-   add_custom_command(
-         OUTPUT ${DDL_GEN_FILES}
-         COMMENT "CODE GENERATION: ${DDL_GEN_FILES}"
-         DEPENDS ${DDL_FILE} ${TEMPLATE_ANTLR4_DDL_GEN_FILES}
-         COMMAND ${CARPC_GENERATOR}
-               --include=${PFW}
-               # --antlr_jar=${ANTLR4_JAR}
-               # --antlr_lexer=${DDL_LEXER}
-               # --antlr_parser=${DDL_PARSER}
-               --antlr_outdir=${ANTLR4_GEN_DIR}
-               --source=${DDL_FILE}
-               --gen_outdir=${DDL_GEN_DIR}
-         DEPENDS ${DDL_FILE} ${TEMPLATE_ANTLR4_DDL_GEN_FILES}
-         VERBATIM
-      )
-endfunction( )
-
-function( generate_ddls DDL_FILES GENERATED_FILES )
-   set( DDLS_GENERATED_FILES "" )
-   foreach( DDL_FILE ${DDL_FILES} )
-      generate_ddl( ${DDL_FILE} DDL_GENERATED_FILES )
-      list( APPEND DDLS_GENERATED_FILES ${DDL_GENERATED_FILES} )
-   endforeach( )
-   set( ${GENERATED_FILES} ${DDLS_GENERATED_FILES} PARENT_SCOPE )
-endfunction( )
 
 
 
@@ -534,50 +429,92 @@ set( TEMPLATE_ADL_GEN_FILES
       main.cpp
    )
 
-function( generate_adl ADL_FILE GENERATED_FILES )
+
+
+# Function for generating C++ source code for server/client base stuff from xdl file
+# Parameters:
+#     XDL_FILE - (in) full path to xdl file
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+# Example:
+#     generate_xdl( ${XDL_FILE} GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
+function( generate_xdl XDL_FILE GENERATED_FILES )
+   get_filename_component( XDL_FILE_NAME ${XDL_FILE} NAME )
+   string( REGEX MATCH "^(.*)(\\.[^.]*)$" dummy ${XDL_FILE_NAME} )
+   # *.xdl file name witout path and file extension
+   set( XDL_NAME        ${CMAKE_MATCH_1} )
+   # *.xdl file extension
+   set( XDL_EXTENTION   ${CMAKE_MATCH_2} )
+
+   msg_inf( "processing xdl type: " ${XDL_EXTENTION} )
+
+   if( ".adl" STREQUAL ${XDL_EXTENTION} )
+      set( TEMPLATE_ANTLR4_GEN_FILES      ${TEMPLATE_ANTLR4_ADL_GEN_FILES} )
+      set( TEMPLATE_CPP_GEN_FILES         ${TEMPLATE_ADL_GEN_FILES}        )
+      set( XDL_LEXER                      ${ADL_LEXER}                     )
+      set( XDL_PARSER                     ${ADL_PARSER}                    )
+   elseif( ".idl" STREQUAL ${XDL_EXTENTION} )
+      set( TEMPLATE_ANTLR4_GEN_FILES      ${TEMPLATE_ANTLR4_IDL_GEN_FILES} )
+      set( TEMPLATE_CPP_GEN_FILES         ${TEMPLATE_IDL_GEN_FILES}        )
+      set( XDL_LEXER                      ${IDL_LEXER}                     )
+      set( XDL_PARSER                     ${IDL_PARSER}                    )
+   elseif( ".ddl" STREQUAL ${XDL_EXTENTION} )
+      set( TEMPLATE_ANTLR4_GEN_FILES      ${TEMPLATE_ANTLR4_DDL_GEN_FILES} )
+      set( TEMPLATE_CPP_GEN_FILES         ${TEMPLATE_DDL_GEN_FILES}        )
+      set( XDL_LEXER                      ${DDL_LEXER}                     )
+      set( XDL_PARSER                     ${DDL_PARSER}                    )
+   else( )
+      msg_err( "undefined xdl type" )
+   endif( )
+
    add_custom_command(
-         OUTPUT ${TEMPLATE_ANTLR4_ADL_GEN_FILES}
-         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_ADL_GEN_FILES}"
-         COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${ADL_LEXER} ${ADL_PARSER}
-         DEPENDS ${ADL_LEXER} ${ADL_PARSER}
+         OUTPUT ${TEMPLATE_ANTLR4_GEN_FILES}
+         COMMENT "ANTLR4 GENERATION: ${TEMPLATE_ANTLR4_GEN_FILES}"
+         COMMAND java -jar ${ANTLR4_JAR} -Dlanguage=Python3 -listener -visitor -o ${ANTLR4_GEN_DIR} ${XDL_LEXER} ${XDL_PARSER}
+         DEPENDS ${XDL_LEXER} ${XDL_PARSER}
          VERBATIM
       )
 
-   string( REPLACE ".adl" "/" ADL_GEN_DIR ${ADL_FILE} )
-   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" ADL_GEN_DIR ${ADL_GEN_DIR} )
-   set( ADL_GEN_FILES ${TEMPLATE_ADL_GEN_FILES} )
-   list( TRANSFORM ADL_GEN_FILES PREPEND "${ADL_GEN_DIR}" )
-   set( ${GENERATED_FILES} ${ADL_GEN_FILES} PARENT_SCOPE )
+   string( REPLACE ${XDL_EXTENTION} "/" XDL_GEN_DIR ${XDL_FILE} )
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" XDL_GEN_DIR ${XDL_GEN_DIR} )
+   set( XDL_GEN_FILES ${TEMPLATE_CPP_GEN_FILES} )
+   list( TRANSFORM XDL_GEN_FILES PREPEND "${XDL_GEN_DIR}" )
+   set( ${GENERATED_FILES} ${XDL_GEN_FILES} PARENT_SCOPE )
 
-   msg_inf( "Generating C++ files from '" ${ADL_FILE} "':" )
-   foreach( FILE ${ADL_GEN_FILES} )
+   msg_inf( "Generating C++ files from '" ${XDL_FILE} "':" )
+   foreach( FILE ${XDL_GEN_FILES} )
       msg_vrb( "   " ${FILE} )
    endforeach( )
 
    add_custom_command(
-         OUTPUT ${ADL_GEN_FILES}
-         COMMENT "CODE GENERATION: ${ADL_GEN_FILES}"
-         DEPENDS ${ADL_FILE} ${TEMPLATE_ANTLR4_ADL_GEN_FILES}
+         OUTPUT ${XDL_GEN_FILES}
+         COMMENT "CODE GENERATION: ${XDL_GEN_FILES}"
+         DEPENDS ${XDL_FILE} ${TEMPLATE_ANTLR4_GEN_FILES}
          COMMAND ${CARPC_GENERATOR}
                --include=${PFW}
-               # --antlr_jar=${ANTLR4_JAR}
-               # --antlr_lexer=${ADL_LEXER}
-               # --antlr_parser=${ADL_PARSER}
                --antlr_outdir=${ANTLR4_GEN_DIR}
-               --source=${ADL_FILE}
-               --gen_outdir=${ADL_GEN_DIR}
-         DEPENDS ${ADL_FILE} ${TEMPLATE_ANTLR4_ADL_GEN_FILES}
+               --source=${XDL_FILE}
+               --gen_outdir=${XDL_GEN_DIR}
+         DEPENDS ${XDL_FILE} ${TEMPLATE_ANTLR4_GEN_FILES}
          VERBATIM
       )
 endfunction( )
 
-function( generate_adls ADL_FILES GENERATED_FILES )
-   set( ADLS_GENERATED_FILES "" )
-   foreach( ADL_FILE ${ADL_FILES} )
-      generate_adl( ${ADL_FILE} ADL_GENERATED_FILES )
-      list( APPEND ADLS_GENERATED_FILES ${ADL_GENERATED_FILES} )
+# Function for generating C++ source code for server/client base stuff from several xdl files
+# Parameters:
+#     XDL_FILES - (in) list of full pathes to xdl files
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+#                       from all xdls
+# Example:
+#     generate_xdls( "${XDL_FILES}" GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
+function( generate_xdls XDL_FILES GENERATED_FILES )
+   set( XDLS_GENERATED_FILES "" )
+   foreach( XDL_FILE ${XDL_FILES} )
+      generate_xdl( ${XDL_FILE} XDL_GENERATED_FILES )
+      list( APPEND XDLS_GENERATED_FILES ${XDL_GENERATED_FILES} )
    endforeach( )
-   set( ${GENERATED_FILES} ${ADLS_GENERATED_FILES} PARENT_SCOPE )
+   set( ${GENERATED_FILES} ${XDLS_GENERATED_FILES} PARENT_SCOPE )
 endfunction( )
 
 
@@ -588,9 +525,9 @@ set( TEMPLATE_GPB_GEN_FILES
       .pb.h
    )
 
-# Function for generating C++ source code base on proto file
+# Function for generating C++ source code base from proto file
 # Parameters:
-#     PROTO_FILE - (in) full path to idl file
+#     PROTO_FILE - (in) full path to proto file
 #     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
 # Example:
 #     generate_gpb( ${PROTO_FILE} GEN_FILES )
@@ -622,6 +559,13 @@ function( generate_gpb PROTO_FILE GENERATED_FILES )
       )
 endfunction( )
 
+# Function for generating C++ source code base from several proto files
+# Parameters:
+#     PROTO_FILES - (in) list of full pathes to proto files
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+# Example:
+#     generate_gpbs( ${PROTO_FILES} GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
 function( generate_gpbs PROTO_FILES GENERATED_FILES )
    set( PROTOS_GENERATED_FILES "" )
    foreach( PROTO_FILE ${PROTO_FILES} )
@@ -630,7 +574,6 @@ function( generate_gpbs PROTO_FILES GENERATED_FILES )
    endforeach( )
    set( ${GENERATED_FILES} ${PROTOS_GENERATED_FILES} PARENT_SCOPE )
 endfunction( )
-
 
 
 

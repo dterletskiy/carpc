@@ -48,13 +48,13 @@ link_directories( ${CARPC_LIB_DIR} )
 #                                                                                         #
 ###########################################################################################
 file( GLOB_RECURSE ADL_FILES ${PROJECT_SOURCE_DIR}/*.adl )
-generate_adls( "${ADL_FILES}" PROJECT_GEN_ADL_FILES )
+generate_xdls( "${ADL_FILES}" PROJECT_GEN_ADL_FILES )
 
 file( GLOB_RECURSE IDL_FILES ${PROJECT_SOURCE_DIR}/*.idl )
-generate_idls( "${IDL_FILES}" PROJECT_GEN_IDL_FILES )
+generate_xdls( "${IDL_FILES}" PROJECT_GEN_IDL_FILES )
 
 file( GLOB_RECURSE DDL_FILES ${PROJECT_SOURCE_DIR}/*.ddl )
-generate_ddls( "${DDL_FILES}" PROJECT_GEN_DDL_FILES )
+generate_xdls( "${DDL_FILES}" PROJECT_GEN_DDL_FILES )
 
 file( GLOB_RECURSE PROTO_FILES ${PROJECT_SOURCE_DIR}/*.proto )
 generate_gpbs( "${PROTO_FILES}" PROJECT_GEN_PROTO_FILES )
