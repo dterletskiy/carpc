@@ -16,9 +16,11 @@ DEBUG: bool = False
 
 
 class Builder:
-   def __init__( self, application_: application.Application, gen_dir: str ):
+   def __init__( self, application_: application.Application, gen_dir: str, api_dir: str, imp_dir: str ):
       self.__application = application_
       self.__gen_dir = gen_dir
+      self.__api_dir = api_dir
+      self.__imp_dir = imp_dir
    # def __init__
 
    def __del__( self ):
@@ -108,7 +110,8 @@ class Builder:
 
 
 
-
    __application: Application = None
    __gen_dir: str = None
+   __api_dir: str = None
+   __imp_dir: str = None
 # class Builder

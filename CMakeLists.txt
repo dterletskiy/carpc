@@ -366,6 +366,9 @@ set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar 
 ###########################################################################################
 set( CARPC_GENERATOR ${ROOT_SOURCE_DIR}/build/generator/generator.py )
 set( IDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlLexer.g4 )
+
+set( BASE_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/XdlLexer.g4 )
+set( BASE_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/XdlParser.g4 )
 set( IDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlParser.g4 )
 set( DDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/DdlLexer.g4 )
 set( DDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/DdlParser.g4 )
@@ -587,9 +590,4 @@ print_toolchain_config( )
 
 
 
-add_subdirectory( build )
-add_subdirectory( tracing )
-add_subdirectory( framework )
-add_subdirectory( servicebrocker )
-add_subdirectory( hooks )
-add_subdirectory( instrumental )
+add_subdirectory( examples )

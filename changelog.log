@@ -1,3 +1,6 @@
+version 3.9.7
+   - carpc generator implementation update.
+
 version 3.9.6
    - carpc build system update:
       - substitute functions "generate_adl", "generate_idl" and "generate_ddl" by function "generate_xdl"

@@ -1,20 +1,22 @@
-parser grammar Parser;
+parser grammar XdlParser;
 
-options { tokenVocab=DdlLexer; }
-
-
-
-author               : AUTHOR IDENTIFIER ;
-
-version              : VERSION DIGIT+ DOT DIGIT+ DOT DIGIT+ SEMICOLON ;
+options { tokenVocab=XdlLexer; }
 
 
 
-procedure            : IDENTIFIER arguments_list ;
-function             : IDENTIFIER IDENTIFIER arguments_list ;
+author               : DEF_AUTHOR IDENTIFIER SEMICOLON ;
+
+version              : DEF_VERSION version_number SEMICOLON ;
+version_number       : NUMBER DOT NUMBER DOT NUMBER ;
+
+
+
+procedure            : name arguments_list ;
+function             : type name arguments_list ;
 arguments_list       : LEFT_ROUND_BRACKET arguments? RIGHT_ROUND_BRACKET ;
 arguments_tuple      : LEFT_SQUARE_BRACKET arguments? RIGHT_SQUARE_BRACKET ;
 arguments            : argument ( COMMA argument )* ;
 argument             : type name ;
 type                 : ( IDENTIFIER | IDENTIFIER LESS IDENTIFIER GREATER ) AMPERSAND? ;
+names                : name ( COMMA name )* ;
 name                 : IDENTIFIER ;

@@ -42,7 +42,6 @@ class DdlListener( DdlParserListener ):
 
    def enterAuthor( self, ctx: DdlParser.AuthorContext ):
       # pfw.console.debug.trace( "enterAuthor" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       pass
 
    def exitAuthor( self, ctx: DdlParser.AuthorContext ):
@@ -51,39 +50,37 @@ class DdlListener( DdlParserListener ):
 
 
    def enterVersion( self, ctx: DdlParser.VersionContext ):
-      pfw.console.debug.trace( "enterVersion" )
+      # pfw.console.debug.trace( "enterVersion" )
       self.__data.set_version(
             pfw.code.Version(
-                  ctx.DIGIT( 0 ).getText( ),
-                  ctx.DIGIT( 1 ).getText( ),
-                  ctx.DIGIT( 2 ).getText( )
+                  ctx.version_number( ).NUMBER( 0 ).getText( ),
+                  ctx.version_number( ).NUMBER( 1 ).getText( ),
+                  ctx.version_number( ).NUMBER( 2 ).getText( )
                )
          )
 
    def exitVersion( self, ctx: DdlParser.VersionContext ):
-      pfw.console.debug.trace( "exitVersion" )
+      # pfw.console.debug.trace( "exitVersion" )
       pass
 
 
    def enterData( self, ctx: DdlParser.DataContext ):
-      pfw.console.debug.trace( "enterData" )
-      self.__data.set_name( ctx.IDENTIFIER( ).getText( ) )
+      # pfw.console.debug.trace( "enterData" )
+      self.__data = data.Data( ctx.IDENTIFIER( ).getText( ) )
 
    def exitData( self, ctx: DdlParser.DataContext ):
-      pfw.console.debug.trace( "exitData" )
-      self.__data = None
+      # pfw.console.debug.trace( "exitData" )
+      pass
 
 
    def enterStruct( self, ctx: DdlParser.StructContext ):
       # pfw.console.debug.trace( "enterStruct" )
       self.__struct = pfw.code.Struct( ctx.IDENTIFIER( ).getText( ) )
-      pass
 
    def exitStruct( self, ctx: DdlParser.StructContext ):
       # pfw.console.debug.trace( "exitStruct" )
       self.__data.add_struct( self.__struct )
       self.__struct = None
-      pass
 
 
    def enterMethod( self, ctx: DdlParser.MethodContext ):
@@ -125,8 +122,9 @@ class DdlListener( DdlParserListener ):
 
 
 
-   def set_data( self, _data: data.Data ):
-      self.__data = _data
+   def get_data( self ):
+      return self.__data
+   # def get_data
 
 
 
@@ -143,19 +141,19 @@ class DdlErrorListener( ErrorListener ):
       self._symbol = ''
 
    def syntaxError( self, recognizer, offendingSymbol, line, column, msg, e ):
-      print( "syntaxError -->" )
-      print( "   ", line, ":", column, "->" )
-      print( "   ", "msg: ", msg )
-      print( "   ", "recognizer: ", recognizer )
-      print( "   ", "offendingSymbol: ", offendingSymbol )
-      print( "   ", "e: ", e )
+      pfw.console.debug.error( "syntaxError -->" )
+      pfw.console.debug.error( "   ", line, ":", column, "->" )
+      pfw.console.debug.error( "   ", "msg: ", msg )
+      pfw.console.debug.error( "   ", "recognizer: ", recognizer )
+      pfw.console.debug.error( "   ", "offendingSymbol: ", offendingSymbol )
+      pfw.console.debug.error( "   ", "e: ", e )
       self.output.write( msg )
       self._symbol = offendingSymbol.text
-      print( "syntaxError <--" )
+      pfw.console.debug.error( "syntaxError <--" )
 
    @property        
    def symbol( self ):
-      print( "symbol" )
+      pfw.console.debug.error( "symbol" )
       return self._symbol
 
 # class DdlErrorListener
@@ -176,18 +174,15 @@ def parse( source_file: str ):
    parser.addErrorListener( error_listener )
    tree = parser.content( )
 
-   _data: data.Data = data.Data( )
-   listener.set_data( _data )
-
    walker = ParseTreeWalker( )
    walker.walk( listener, tree )
 
-   return _data
+   return listener.get_data( )
 # def parse
 
 def generate( source_file: str, gen_outdir: str, api_outdir: str, imp_outdir: str ):
    _data = parse( source_file )
 
-   _builder: builder.Builder = builder.Builder( _data, gen_outdir )
+   _builder: builder.Builder = builder.Builder( _data, gen_outdir, api_outdir, imp_outdir )
    _builder.build( )
 # def generate

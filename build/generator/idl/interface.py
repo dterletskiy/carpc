@@ -76,7 +76,9 @@ class Connection:
 
 
 class Interface:
-   def __init__( self ):
+   def __init__( self, name: str = None ):
+      self.__includes = [ ]
+      self.__name = name
       self.__connections = [ ]
       self.__attributes = [ ]
    # def __init__
@@ -108,9 +110,14 @@ class Interface:
       pfw.console.debug.info( "name:         \'", self.__name, "\'", tabs = ( tabulations + 1 ) )
       pfw.console.debug.info( "is_ipc:       \'", self.__is_ipc, "\'", tabs = ( tabulations + 1 ) )
       self.__version.info( );
+      pfw.console.debug.info( "includes:     \'", self.__includes, "\'", tabs = ( tabulations + 1 ) )
       for connection in self.__connections: connection.info( tabulations = tabulations + 1 )
       for attribute in self.__attributes: attribute.info( tabulations = tabulations + 1 )
    # def info
+
+   def add_include( self, include: str ):
+      self.__includes.append( include )
+   # def add_include
 
    def set_version( self, version: pfw.code.Version ):
       self.__version = version
@@ -145,6 +152,10 @@ class Interface:
       self.__attributes.append( attribute )
    # def add_attribute
 
+   def includes( self ):
+      return self.__includes
+   # def includes
+
    def version( self ):
       return self.__version
    # def version
@@ -171,6 +182,7 @@ class Interface:
 
 
 
+   __includes: list = [ ]
    __version: pfw.code.Version = None
    __name: str = None
    __is_ipc: bool = False

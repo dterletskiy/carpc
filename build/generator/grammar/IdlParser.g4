@@ -1,40 +1,29 @@
 parser grammar IdlParser;
 
+import XdlParser;
 options { tokenVocab=IdlLexer; }
 
 
 
 content              : element+ EOF ;
 
-element              : ( author | interface ) ;
+element              : ( author | version | import_xdl | interface | ipc | request | response | attribute | method ) ;
 
-author               : AUTHOR IDENTIFIER ;
+import_xdl           : DEF_IMPORT MODE_IMPORT_QUOTES MODE_IMPORT_PATH MODE_IMPORT_QUOTES MODE_IMPORT_SEMICOLON ;
 
-interface            : INTERFACE IDENTIFIER LEFT_CURLY_BRACKET ( version | ipc | request | response | attribute | method )* RIGHT_CURLY_BRACKET ;
+interface            : DEF_INTERFACE IDENTIFIER SEMICOLON ;
 
-version              : VERSION DIGIT+ DOT DIGIT+ DOT DIGIT+ ;
+ipc                  : DEF_IPC (TRUE|FALSE) SEMICOLON ;
 
-ipc                  : IPC COLON (TRUE|FALSE) SEMICOLON ;
-
-/* request: int trigger_state( string state, size_t timeout ); */
-request              : REQUEST COLON function SEMICOLON ;
-/* response: int trigger_state( bool result ) -> trigger_state; */
-response             : RESPONSE COLON function connection? SEMICOLON ;
+// request: int trigger_state( string state, size_t timeout );
+request              : DEF_REQUEST function SEMICOLON ;
+// response: int trigger_state( bool result ) -> trigger_state;
+response             : DEF_RESPONSE function connection? SEMICOLON ;
 connection           : SELECTOR IDENTIFIER ;
 
-/* method: init( string command, size_t watchdog ) -> ( bool result ); */
-method               : METHOD COLON procedure callback? SEMICOLON ;
+// method: init( string command, size_t watchdog ) -> ( bool result );
+method               : DEF_METHOD procedure callback? SEMICOLON ;
 callback             : SELECTOR arguments_list ;
 
-/* attribute: string current_state; */
-attribute            : ATTRIBUTE COLON IDENTIFIER IDENTIFIER SEMICOLON ;
-
-
-
-
-procedure            : IDENTIFIER arguments_list ;
-function             : IDENTIFIER IDENTIFIER arguments_list ;
-arguments_list       : LEFT_ROUND_BRACKET arguments? RIGHT_ROUND_BRACKET ;
-arguments_tuple      : LEFT_SQUARE_BRACKET arguments? RIGHT_SQUARE_BRACKET ;
-arguments            : argument ( COMMA argument )* ;
-argument             : IDENTIFIER IDENTIFIER ;
+// attribute: string current_state;
+attribute            : DEF_ATTRIBUTE IDENTIFIER IDENTIFIER SEMICOLON ;

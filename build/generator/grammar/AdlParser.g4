@@ -1,6 +1,37 @@
 parser grammar AdlParser;
 
+import XdlParser;
 options { tokenVocab=AdlLexer; }
+
+
+
+content              : element+ EOF ;
+
+element              : ( author | version | component | thread | application ) ;
+
+component            : DEF_COMPONENT IDENTIFIER LEFT_CURLY_BRACKET ( include | creator )* RIGHT_CURLY_BRACKET SEMICOLON ;
+include              : DEF_INCLUDE MODE_INCLUDE_QUOTES MODE_INCLUDE_PATH MODE_INCLUDE_QUOTES MODE_INCLUDE_SEMICOLON ;
+creator              : DEF_CREATOR NAMESPACE_NAME SEMICOLON ;
+
+thread               : DEF_THREAD IDENTIFIER LEFT_CURLY_BRACKET ( components | watchdog )* RIGHT_CURLY_BRACKET SEMICOLON ;
+components           : DEF_COMPONENTS names SEMICOLON ;
+watchdog             : DEF_WATCHDOG NUMBER SEMICOLON ;
+
+application          : DEF_APPLICATION IDENTIFIER LEFT_CURLY_BRACKET ( threads ) RIGHT_CURLY_BRACKET SEMICOLON ;
+threads              : DEF_THREADS names SEMICOLON ;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -9,7 +40,9 @@ content              : element+ EOF ;
 
 element              : ( author | application ) ;
 
-author               : AUTHOR IDENTIFIER ;
+author               : AUTHOR COLON IDENTIFIER SEMICOLON ;
+
+version              : VERSION COLON NUMBER DOT NUMBER DOT NUMBER SEMICOLON ;
 
 application          : APPLICATION IDENTIFIER LEFT_CURLY_BRACKET ( thread )* RIGHT_CURLY_BRACKET ;
 
@@ -26,29 +59,3 @@ creator              : CREATOR COLON function_name ;
 function_name        : namespace_part? IDENTIFIER ;
 namespace_part       : IDENTIFIER COLON COLON ;
 */
-
-
-
-content              : element+ EOF ;
-
-element              : ( author | component | thread | application ) ;
-
-author               : AUTHOR IDENTIFIER ;
-
-component            : COMPONENT IDENTIFIER LEFT_CURLY_BRACKET ( include | creator )* RIGHT_CURLY_BRACKET ;
-include              : INCLUDE COLON QUOTES PATH QUOTES ;
-creator              : CREATOR COLON NAMESPACE_IDENTIFIER ;
-
-thread               : THREAD IDENTIFIER LEFT_CURLY_BRACKET ( components | watchdog )* RIGHT_CURLY_BRACKET ;
-components           : COMPONENTS COLON arguments ;
-watchdog             : WATCHDOG COLON NUMBER ;
-
-application          : APPLICATION IDENTIFIER LEFT_CURLY_BRACKET ( threads ) RIGHT_CURLY_BRACKET ;
-threads              : THREADS COLON arguments ;
-
-
-
-function_name        : namespace_part? IDENTIFIER ;
-namespace_part       : IDENTIFIER COLON COLON ;
-arguments            : argument ( COMMA argument )* ;
-argument             : IDENTIFIER ;

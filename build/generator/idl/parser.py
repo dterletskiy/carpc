@@ -40,26 +40,22 @@ class IdlListener( IdlParserListener ):
       pass
 
 
-   def enterInterface( self, ctx: IdlParser.InterfaceContext ):
-      # pfw.console.debug.trace( "enterInterface" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
-      self.__interface.set_name( ctx.IDENTIFIER( ).getText( ) )
+   def enterAuthor( self, ctx: IdlParser.AuthorContext ):
+      # pfw.console.debug.trace( "enterAuthor" )
+      pass
 
-   def exitInterface( self, ctx: IdlParser.InterfaceContext ):
-      # pfw.console.debug.trace( "exitInterface" )
+   def exitAuthor( self, ctx: IdlParser.AuthorContext ):
+      # pfw.console.debug.trace( "exitAuthor" )
       pass
 
 
    def enterVersion( self, ctx: IdlParser.VersionContext ):
       # pfw.console.debug.trace( "enterVersion" )
-      # pfw.console.debug.info( ctx.DIGIT( )[0].getText( ) )
-      # pfw.console.debug.info( ctx.DIGIT( )[1].getText( ) )
-      # pfw.console.debug.info( ctx.DIGIT( )[2].getText( ) )
       self.__interface.set_version(
             pfw.code.Version(
-                  ctx.DIGIT( )[0].getText( ),
-                  ctx.DIGIT( )[1].getText( ),
-                  ctx.DIGIT( )[2].getText( )
+                  ctx.version_number( ).NUMBER( 0 ).getText( ),
+                  ctx.version_number( ).NUMBER( 1 ).getText( ),
+                  ctx.version_number( ).NUMBER( 2 ).getText( )
                )
          )
 
@@ -68,10 +64,31 @@ class IdlListener( IdlParserListener ):
       pass
 
 
+   def enterImport_xdl( self, ctx: IdlParser.Import_xdlContext ):
+      # pfw.console.debug.trace( "enterImport_xdl" )
+      self.__interface.add_include( ctx.MODE_IMPORT_PATH( ).getText( ) )
+      pass
+
+   def exitImport_xdl( self, ctx: IdlParser.Import_xdlContext ):
+      # pfw.console.debug.trace( "exitImport_xdl" )
+      pass
+
+
+   def enterInterface( self, ctx: IdlParser.InterfaceContext ):
+      # pfw.console.debug.trace( "enterInterface" )
+      self.__interface = interface.Interface( ctx.IDENTIFIER( ).getText( ) )
+
+   def exitInterface( self, ctx: IdlParser.InterfaceContext ):
+      # pfw.console.debug.trace( "exitInterface" )
+      pass
+
+   def exitVersion( self, ctx: IdlParser.VersionContext ):
+      # pfw.console.debug.trace( "exitVersion" )
+      pass
+
+
    def enterIpc( self, ctx: IdlParser.IpcContext ):
       # pfw.console.debug.trace( "enterIpc" )
-      # pfw.console.debug.trace( ctx.TRUE( ) )
-      # pfw.console.debug.trace( ctx.FALSE( ) )
       if None != ctx.TRUE( ):
          self.__interface.set_is_ipc( True )
       elif None != ctx.FALSE( ):
@@ -79,16 +96,6 @@ class IdlListener( IdlParserListener ):
 
    def exitIpc( self, ctx: IdlParser.IpcContext ):
       # pfw.console.debug.trace( "exitIpc" )
-      pass
-
-
-   def enterAuthor( self, ctx: IdlParser.AuthorContext ):
-      # pfw.console.debug.trace( "enterAuthor" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
-      pass
-
-   def exitAuthor( self, ctx: IdlParser.AuthorContext ):
-      # pfw.console.debug.trace( "exitAuthor" )
       pass
 
 
@@ -117,7 +124,6 @@ class IdlListener( IdlParserListener ):
 
    def enterConnection( self, ctx: IdlParser.ConnectionContext ):
       # pfw.console.debug.trace( "enterConnection" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       self.__to_request_name = ctx.IDENTIFIER( ).getText( )
 
    def exitConnection( self, ctx: IdlParser.ConnectionContext ):
@@ -155,8 +161,6 @@ class IdlListener( IdlParserListener ):
 
    def enterAttribute( self, ctx: IdlParser.AttributeContext ):
       # pfw.console.debug.trace( "enterAttribute" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
-      # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__interface.add_attribute(
             pfw.code.Parameter( ctx.IDENTIFIER( )[0].getText( ),
             ctx.IDENTIFIER( )[1].getText( ) )
@@ -169,10 +173,9 @@ class IdlListener( IdlParserListener ):
 
    def enterProcedure( self, ctx: IdlParser.ProcedureContext ):
       # pfw.console.debug.trace( "enterProcedure" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       self.__function = pfw.code.Function(
             None,
-            ctx.IDENTIFIER( ).getText( )
+            ctx.name( ).getText( )
          )
 
    def exitProcedure( self, ctx: IdlParser.ProcedureContext ):
@@ -183,11 +186,9 @@ class IdlListener( IdlParserListener ):
 
    def enterFunction( self, ctx: IdlParser.FunctionContext ):
       # pfw.console.debug.trace( "enterFunction" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
-      # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__function = pfw.code.Function(
-            ctx.IDENTIFIER( )[0].getText( ),
-            ctx.IDENTIFIER( )[1].getText( )
+            ctx.type_( ).getText( ),
+            ctx.name( ).getText( )
          )
 
    def exitFunction( self, ctx: IdlParser.FunctionContext ):
@@ -216,12 +217,10 @@ class IdlListener( IdlParserListener ):
 
    def enterArgument( self, ctx: IdlParser.ArgumentContext ):
       # pfw.console.debug.trace( "enterArgument" )
-      # pfw.console.debug.info( ctx.IDENTIFIER( )[0].getText( ) )
-      # pfw.console.debug.info( ctx.IDENTIFIER( )[1].getText( ) )
       self.__arguments.append(
             pfw.code.Parameter(
-                  ctx.IDENTIFIER( )[0].getText( ),
-                  ctx.IDENTIFIER( )[1].getText( )
+                  ctx.type_( ).getText( ),
+                  ctx.name( ).getText( )
                )
          )
 
@@ -231,9 +230,9 @@ class IdlListener( IdlParserListener ):
 
 
 
-   def set_interface( self, interface: interface.Interface ):
-      self.__interface = interface
-   # def set_interface
+   def get_interface( self ):
+      return self.__interface
+   # def get_interface
 
 
 
@@ -252,19 +251,19 @@ class IdlErrorListener( ErrorListener ):
       self._symbol = ''
 
    def syntaxError( self, recognizer, offendingSymbol, line, column, msg, e ):
-      print( "syntaxError -->" )
-      print( "   ", line, ":", column, "->" )
-      print( "   ", "msg: ", msg )
-      print( "   ", "recognizer: ", recognizer )
-      print( "   ", "offendingSymbol: ", offendingSymbol )
-      print( "   ", "e: ", e )
+      pfw.console.debug.error( "syntaxError -->" )
+      pfw.console.debug.error( "   ", line, ":", column, "->" )
+      pfw.console.debug.error( "   ", "msg: ", msg )
+      pfw.console.debug.error( "   ", "recognizer: ", recognizer )
+      pfw.console.debug.error( "   ", "offendingSymbol: ", offendingSymbol )
+      pfw.console.debug.error( "   ", "e: ", e )
       self.output.write( msg )
       self._symbol = offendingSymbol.text
-      print( "syntaxError <--" )
+      pfw.console.debug.error( "syntaxError <--" )
 
    @property        
    def symbol( self ):
-      print( "symbol" )
+      pfw.console.debug.error( "symbol" )
       return self._symbol
 
 # class IdlErrorListener
@@ -285,13 +284,10 @@ def parse( source_file: str ):
    parser.addErrorListener( error_listener )
    tree = parser.content( )
 
-   _interface: interface.Interface = interface.Interface( )
-   listener.set_interface( _interface )
-
    walker = ParseTreeWalker( )
    walker.walk( listener, tree )
 
-   return _interface
+   return listener.get_interface( )
 # def parse
 
 def generate( source_file: str, gen_outdir: str, api_outdir: str, imp_outdir: str ):

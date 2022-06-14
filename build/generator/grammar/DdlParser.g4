@@ -1,20 +1,19 @@
 parser grammar DdlParser;
 
-import Parser;
+import XdlParser;
 options { tokenVocab=DdlLexer; }
 
 
 
 content              : element+ EOF ;
 
-element              : ( author | data ) ;
+element              : ( author | version | data | struct ) ;
 
-data                 : DATA IDENTIFIER LEFT_CURLY_BRACKET ( version | struct )* RIGHT_CURLY_BRACKET ;
+data                 : DEF_DATA IDENTIFIER SEMICOLON ;
 
+struct               : DEF_STRUCT IDENTIFIER LEFT_CURLY_BRACKET ( field )* RIGHT_CURLY_BRACKET SEMICOLON ;
 
-struct               : STRUCT IDENTIFIER LEFT_CURLY_BRACKET ( field )* RIGHT_CURLY_BRACKET SEMICOLON ;
+method               : DEF_METHOD function SEMICOLON ;
 
-method               : METHOD COLON function SEMICOLON ;
-
-field                : FIELD COLON argument SEMICOLON ;
+field                : DEF_FIELD argument SEMICOLON ;
 
