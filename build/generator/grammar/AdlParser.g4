@@ -11,7 +11,7 @@ element              : ( author | version | component | thread | application ) ;
 
 component            : DEF_COMPONENT IDENTIFIER LEFT_CURLY_BRACKET ( include | creator )* RIGHT_CURLY_BRACKET SEMICOLON ;
 include              : DEF_INCLUDE MODE_INCLUDE_QUOTES MODE_INCLUDE_PATH MODE_INCLUDE_QUOTES MODE_INCLUDE_SEMICOLON ;
-creator              : DEF_CREATOR NAMESPACE_NAME SEMICOLON ;
+creator              : DEF_CREATOR type SEMICOLON ;
 
 thread               : DEF_THREAD IDENTIFIER LEFT_CURLY_BRACKET ( components | watchdog )* RIGHT_CURLY_BRACKET SEMICOLON ;
 components           : DEF_COMPONENTS names SEMICOLON ;

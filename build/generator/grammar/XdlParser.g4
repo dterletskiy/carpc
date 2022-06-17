@@ -17,6 +17,6 @@ arguments_list       : LEFT_ROUND_BRACKET arguments? RIGHT_ROUND_BRACKET ;
 arguments_tuple      : LEFT_SQUARE_BRACKET arguments? RIGHT_SQUARE_BRACKET ;
 arguments            : argument ( COMMA argument )* ;
 argument             : type name ;
-type                 : ( IDENTIFIER | IDENTIFIER LESS IDENTIFIER GREATER ) AMPERSAND? ;
+type                 : NAMESPACE? ( IDENTIFIER | IDENTIFIER LESS IDENTIFIER GREATER ) AMPERSAND? ;
 names                : name ( COMMA name )* ;
 name                 : IDENTIFIER ;

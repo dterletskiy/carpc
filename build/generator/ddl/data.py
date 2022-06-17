@@ -63,7 +63,8 @@ class Data:
    # def structs
 
    def namespace( self ):
-      return "service::" + self.__name + "::V" + self.__version.string( "_" )
+      # return "service::" + self.__name + "::V" + self.__version.string( "_" )
+      return "service::" + self.__name
    # def namespace
 
 

@@ -112,13 +112,13 @@ class Builder:
       code += "} // namespace " + self.__data.namespace( ) + "\n"
       code += "\n"
 
-      self.generate( code, "Data.hpp" )
+      self.generate( code, "Types.hpp" )
    # def build_data_hpp
 
    def build_data_cpp( self ):
       code: str = "";
 
-      code += "#include \"Data.hpp\"\n";
+      code += "#include \"Types.hpp\"\n";
       code += "\n"
       code += "using namespace " + self.__data.namespace( ) + ";\n"
       code += "\n"
@@ -142,7 +142,7 @@ class Builder:
          code += "}\n"
          code += "\n"
 
-      self.generate( code, "Data.cpp" )
+      self.generate( code, "Types.cpp" )
    # def build_data_cpp
 
 

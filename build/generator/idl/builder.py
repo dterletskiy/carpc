@@ -95,6 +95,9 @@ class Builder:
       code += "#pragma once\n";
       code += "\n"
       code += "#include \"carpc/comm/service/Types.hpp\"\n";
+      for include in self.__interface.includes( ):
+         code += "#include \"" + include + "\"\n";
+
       code += "\n"
 
       code += "namespace " + self.__interface.namespace( ) + " {\n"
@@ -115,7 +118,6 @@ class Builder:
       code += "#pragma once\n";
       code += "\n"
       code += "#include <memory>\n";
-      code += "#include \"carpc/helpers/macros/strings.hpp\"\n"; #@TDA: could be deleted
       code += "#include \""
       if None != self.__api_dir: code += self.__api_dir + "/"
       code += "Version.hpp\"\n";

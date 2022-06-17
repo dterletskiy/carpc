@@ -2,6 +2,8 @@
 from __future__ import annotations
 from enum import Enum
 
+import os
+
 import pfw.base
 import pfw.console
 import pfw.code
@@ -116,7 +118,9 @@ class Interface:
    # def info
 
    def add_include( self, include: str ):
-      self.__includes.append( include )
+      ( file_name, file_extension ) = os.path.splitext( os.path.basename( include ) )
+      file_dir = os.path.dirname( include )
+      self.__includes.append( os.path.join( file_dir, file_name, "Types.hpp" ) )
    # def add_include
 
    def set_version( self, version: pfw.code.Version ):

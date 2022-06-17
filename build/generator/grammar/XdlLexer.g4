@@ -67,7 +67,8 @@ COMMENT                       : (BLOCK_COMMENT | LINE_COMMENT) -> channel(HIDDEN
 
 IDENTIFIER                    : (F_LETTER | F_UNDERSCORE) (F_LETTER | F_DIGIT | F_UNDERSCORE)* ;
 
-NAMESPACE_NAME                : '::'? (IDENTIFIER '::')* IDENTIFIER ;
+// NAMESPACE_NAME                : '::'? (IDENTIFIER '::')* IDENTIFIER ;
+NAMESPACE                     : '::'? (IDENTIFIER '::')+ ;
 
 
 

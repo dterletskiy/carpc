@@ -64,12 +64,12 @@ class AdlListener( AdlParserListener ):
    def enterComponent( self, ctx: AdlParser.ComponentContext ):
       # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       # pfw.console.debug.info( ctx.include( )[-1].MODE_INCLUDE_PATH( ).getText( ) )
-      # pfw.console.debug.info( ctx.creator( )[-1].NAMESPACE_NAME( ).getText( ) )
+      # pfw.console.debug.info( ctx.creator( )[-1].type( ).getText( ) )
       self.__components.append(
             application.Component(
                   ctx.IDENTIFIER( ).getText( ),
                   ctx.include( )[-1].MODE_INCLUDE_PATH( ).getText( ),
-                  ctx.creator( )[-1].NAMESPACE_NAME( ).getText( )
+                  ctx.creator( )[-1].type_( ).getText( )
                )
          )
       pass

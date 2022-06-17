@@ -413,7 +413,7 @@ list( TRANSFORM TEMPLATE_ANTLR4_DDL_GEN_FILES PREPEND "${ANTLR4_GEN_DIR}" )
 
 # TEMPLATE_DDL_GEN_FILES - List of C++ file names produced by generator for ddl file
 set( TEMPLATE_DDL_GEN_FILES
-      Data.hpp Data.cpp
+      Types.hpp Types.cpp
    )
 
 
@@ -590,9 +590,4 @@ print_toolchain_config( )
 
 
 
-add_subdirectory( build )
-add_subdirectory( tracing )
-add_subdirectory( framework )
-add_subdirectory( servicebrocker )
-add_subdirectory( hooks )
-add_subdirectory( instrumental )
+add_subdirectory( examples )
