@@ -8,13 +8,13 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Target branch'     
+        description: 'Target branch'
         required: true
         default: 'main'
 
 jobs:
   build_linux:
-    
+
     runs-on: ubuntu-latest
 
     steps:
@@ -52,7 +52,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: dterletskiy/python_fw
-        path: ./pfw
+        path: ./shell_fw
         ref: ${{ github.ref }}
 
     # Checkout project's revision, which is pushed
@@ -65,6 +65,6 @@ jobs:
 
     # CMake execution
     - name: Build
-      run: ./build.sh --sfw=${PWD}/../shell_fw --pfw=${PWD}/../ --arch=x86_64 --os=linux --action=clean_build
+      run: ./build.sh --sfw=${PWD}/../shell_fw --pfw=${PWD}/../shell_fw --arch=x86_64 --os=linux --action=clean_build
       shell: bash
       working-directory: ./${{ github.event.repository.name }}
