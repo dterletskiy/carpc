@@ -52,7 +52,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: dterletskiy/python_fw
-        path: ./shell_fw
+        path: ./python_fw
         ref: ${{ github.ref }}
 
     # Checkout project's revision, which is pushed
@@ -65,6 +65,6 @@ jobs:
 
     # CMake execution
     - name: Build
-      run: ./build.sh --sfw=${PWD}/../shell_fw --pfw=${PWD}/../shell_fw --arch=x86_64 --os=linux --action=clean_build
+      run: ./build.sh --sfw=${PWD}/../shell_fw --pfw=${PWD}/../python_fw --arch=x86_64 --os=linux --action=clean_build
       shell: bash
       working-directory: ./${{ github.event.repository.name }}
