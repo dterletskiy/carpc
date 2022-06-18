@@ -590,4 +590,9 @@ print_toolchain_config( )
 
 
 
-add_subdirectory( examples )
+add_subdirectory( build )
+add_subdirectory( tracing )
+add_subdirectory( framework )
+add_subdirectory( servicebrocker )
+add_subdirectory( hooks )
+add_subdirectory( instrumental ) 
