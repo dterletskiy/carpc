@@ -15,7 +15,7 @@ declare -A ACTION
 
 
 # Processing parameter "--sfw" and source its value for using shell framework scripts in current build system
-function setub_build_system( )
+function setup_build_system( )
 {
    echo "----- Setup build system -----"
 
@@ -69,7 +69,7 @@ function setub_build_system( )
 }
 
 reset
-setub_build_system $@
+setup_build_system $@
 
 
 
@@ -109,6 +109,11 @@ function pre_main( )
          ;;
          --compiler=*)
             print_info "compiler"
+            set_compiler ${option#*=}
+            shift # past argument=value
+         ;;
+         --sdk=*)
+            print_info "sdk"
             set_compiler ${option#*=}
             shift # past argument=value
          ;;
