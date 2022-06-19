@@ -16,7 +16,11 @@ There are 6 log levels supported by **CARPC** tracing system using different tra
 
 Each **CARPC** log message contains user message and some additional message header. By default message header has:
 
+-----
+<pre>
 MICROSECONDS | PID TID |   [CLASS_ABBR:FUNCTION:LINE] ->
+</pre>
+-----
 
 Where:
    - MICROSECONDS - timestamp represented in nanoseconds since the Epoch

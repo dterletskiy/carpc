@@ -10,7 +10,7 @@
 
 - [What is CARPC](./.md/what_is_carpc.md#what-is-carpc)
 - [Why is CARPC]
-- [How to build]
+- [How to build](./.md/how_to_build.md#how-to-build)
 - [CARPC entities description](./.md/carpc_entities_description.md#carpc-entities-description)
 - [Application structure](./.md/application_structure.md#application-structure)
 - [Tracing](./.md/tracing.md#tracing)
