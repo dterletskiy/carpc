@@ -58,6 +58,21 @@ This part specifies the priority what will be used by **Application Thread** in 
 
 By default all **Events** have equal **Priority** and it could be changed during **Event** creation.
 
+
+### ***Runnable***
+
+**Runnable** is the **CARPC** entity what is recponsible for executing defined operation (function) in the same or in other **Service Application Thread** asynchronously. User can define some operation (function with signature void(void)), attach it to created **Runnable** object and send it for asynchronous executions to some service thread.
+
+**Runnable** object could be sent from any thread to some defined **CARPC Contex**, but in case of sending it to the same **Context** it must be done from **Service Application Thread**.
+
+Optionally **Runnable** object could be sent as blocked. This means that current thread will be blocked (suspended) untill **Runnable** object will be processed by consumer thread and will be released afterward. But in this case sender and receiver threads must be different.
+
+### ***Callable***
+
+**Callable** object has the same perposes as **Runnable** with only few difference in usage:
+   - function signature could containe parameters and values for them must be set during **Callable** object creation.
+   - this object can't be sent as blocked.
+
 ----
 
 ## ***Service***
