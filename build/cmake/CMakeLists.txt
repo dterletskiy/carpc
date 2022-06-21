@@ -59,6 +59,9 @@ generate_xdls( "${DDL_FILES}" PROJECT_GEN_DDL_FILES )
 file( GLOB_RECURSE PROTO_FILES ${PROJECT_SOURCE_DIR}/*.proto )
 generate_gpbs( "${PROTO_FILES}" PROJECT_GEN_PROTO_FILES )
 
+file( GLOB_RECURSE PLANTUML_FILES ${PROJECT_SOURCE_DIR}/*.plantuml )
+generate_plantumls( "${PLANTUML_FILES}" PROJECT_GEN_PLANTUML_FILES )
+
 
 
 ###########################################################################################
@@ -107,6 +110,11 @@ endif( )
 if( USE_GPB )
    target_link_libraries( ${TARGET_NAME} ${Protobuf_LIBRARIES} )
 endif( )
+
+add_custom_target( "${TARGET_NAME}_documentation" ALL
+      COMMENT "cmake ${TARGET_NAME}_documentation"
+      DEPENDS ${PROJECT_GEN_PLANTUML_FILES}
+   )
 
 install( TARGETS ${TARGET_NAME} DESTINATION bin )
 install( FILES ${PROJECT_SOURCE_DIR}/${TARGET_NAME}.cfg DESTINATION etc )

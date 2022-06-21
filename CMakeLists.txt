@@ -365,10 +365,9 @@ set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar 
 #                                                                                         #
 ###########################################################################################
 set( CARPC_GENERATOR ${ROOT_SOURCE_DIR}/build/generator/generator.py )
-set( IDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlLexer.g4 )
-
 set( BASE_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/XdlLexer.g4 )
 set( BASE_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/XdlParser.g4 )
+set( IDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlLexer.g4 )
 set( IDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/IdlParser.g4 )
 set( DDL_LEXER ${ROOT_SOURCE_DIR}/build/generator/grammar/DdlLexer.g4 )
 set( DDL_PARSER ${ROOT_SOURCE_DIR}/build/generator/grammar/DdlParser.g4 )
@@ -442,26 +441,30 @@ set( TEMPLATE_ADL_GEN_FILES
 #     generate_xdl( ${XDL_FILE} GEN_FILES )
 #     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
 function( generate_xdl XDL_FILE GENERATED_FILES )
-   get_filename_component( XDL_FILE_NAME ${XDL_FILE} NAME )
-   string( REGEX MATCH "^(.*)(\\.[^.]*)$" dummy ${XDL_FILE_NAME} )
+   get_filename_component( _FILE_NAME_ ${XDL_FILE} NAME )
+   string( REGEX MATCH "^(.*)(\\.[^.]*)$" dummy ${_FILE_NAME_} )
    # *.xdl file name witout path and file extension
-   set( XDL_NAME        ${CMAKE_MATCH_1} )
+   set( XDL_FILE_NAME         ${CMAKE_MATCH_1} )
    # *.xdl file extension
-   set( XDL_EXTENTION   ${CMAKE_MATCH_2} )
+   set( XDL_FILE_EXTENTION    ${CMAKE_MATCH_2} )
+   # *.xdl location directory
+   get_filename_component( XDL_FILE_DIR ${XDL_FILE} DIRECTORY )
+   # *.xdl generated destination directory
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" XDL_GEN_DIR "${XDL_FILE_DIR}/${XDL_FILE_NAME}/" )
 
-   msg_inf( "processing xdl type: " ${XDL_EXTENTION} )
+   msg_inf( "processing xdl type: " ${XDL_FILE_EXTENTION} )
 
-   if( ".adl" STREQUAL ${XDL_EXTENTION} )
+   if( ".adl" STREQUAL ${XDL_FILE_EXTENTION} )
       set( TEMPLATE_ANTLR4_GEN_FILES      ${TEMPLATE_ANTLR4_ADL_GEN_FILES} )
       set( TEMPLATE_CPP_GEN_FILES         ${TEMPLATE_ADL_GEN_FILES}        )
       set( XDL_LEXER                      ${ADL_LEXER}                     )
       set( XDL_PARSER                     ${ADL_PARSER}                    )
-   elseif( ".idl" STREQUAL ${XDL_EXTENTION} )
+   elseif( ".idl" STREQUAL ${XDL_FILE_EXTENTION} )
       set( TEMPLATE_ANTLR4_GEN_FILES      ${TEMPLATE_ANTLR4_IDL_GEN_FILES} )
       set( TEMPLATE_CPP_GEN_FILES         ${TEMPLATE_IDL_GEN_FILES}        )
       set( XDL_LEXER                      ${IDL_LEXER}                     )
       set( XDL_PARSER                     ${IDL_PARSER}                    )
-   elseif( ".ddl" STREQUAL ${XDL_EXTENTION} )
+   elseif( ".ddl" STREQUAL ${XDL_FILE_EXTENTION} )
       set( TEMPLATE_ANTLR4_GEN_FILES      ${TEMPLATE_ANTLR4_DDL_GEN_FILES} )
       set( TEMPLATE_CPP_GEN_FILES         ${TEMPLATE_DDL_GEN_FILES}        )
       set( XDL_LEXER                      ${DDL_LEXER}                     )
@@ -478,8 +481,6 @@ function( generate_xdl XDL_FILE GENERATED_FILES )
          VERBATIM
       )
 
-   string( REPLACE ${XDL_EXTENTION} "/" XDL_GEN_DIR ${XDL_FILE} )
-   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" XDL_GEN_DIR ${XDL_GEN_DIR} )
    set( XDL_GEN_FILES ${TEMPLATE_CPP_GEN_FILES} )
    list( TRANSFORM XDL_GEN_FILES PREPEND "${XDL_GEN_DIR}" )
    set( ${GENERATED_FILES} ${XDL_GEN_FILES} PARENT_SCOPE )
@@ -522,7 +523,7 @@ endfunction( )
 
 
 
-# TEMPLATE_GPB_GEN_FILES - List of C++ file names produced by generator for proto file
+# TEMPLATE_GPB_GEN_FILES - List of C++ file extentions produced by generator for proto file
 set( TEMPLATE_GPB_GEN_FILES
       .pb.cc
       .pb.h
@@ -536,16 +537,17 @@ set( TEMPLATE_GPB_GEN_FILES
 #     generate_gpb( ${PROTO_FILE} GEN_FILES )
 #     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
 function( generate_gpb PROTO_FILE GENERATED_FILES )
-   # Get file name with extension
-   get_filename_component( PROTO_FILE_NAME ${PROTO_FILE} NAME )
-   # Remove extension
-   # get_filename_component could not be used because of it removes longest extention and could remove part
-   # of the file name in case last one contains '.'
-   string( REGEX REPLACE "[.]proto$" "" PROTO_FILE_NAME ${PROTO_FILE_NAME} )
-   # Get file directory location
+   get_filename_component( _FILE_NAME_ ${PROTO_FILE} NAME )
+   string( REGEX MATCH "^(.*)(\\.[^.]*)$" dummy ${_FILE_NAME_} )
+   # *.xdl file name witout path and file extension
+   set( PROTO_FILE_NAME       ${CMAKE_MATCH_1} )
+   # *.xdl file extension
+   set( PROTO_FILE_EXTENTION  ${CMAKE_MATCH_2} )
+   # *.xdl location directory
    get_filename_component( PROTO_FILE_DIR ${PROTO_FILE} DIRECTORY )
+   # *.xdl generated destination directory
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" PROTO_GEN_DIR "${PROTO_FILE_DIR}/" )
 
-   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" PROTO_GEN_DIR ${PROTO_FILE_DIR} )
    file( MAKE_DIRECTORY ${PROTO_GEN_DIR} )
 
    set( PROTO_GEN_FILES ${TEMPLATE_GPB_GEN_FILES} )
@@ -577,6 +579,63 @@ function( generate_gpbs PROTO_FILES GENERATED_FILES )
    endforeach( )
    set( ${GENERATED_FILES} ${PROTOS_GENERATED_FILES} PARENT_SCOPE )
 endfunction( )
+
+
+
+
+# TEMPLATE_PLANTUML_GEN_FILES - List of file extentions produced by generator for plantuml file
+set( TEMPLATE_PLANTUML_GEN_FILES
+      .png
+   )
+
+# Function for generating files from plantuml file
+# Parameters:
+#     PLANTUML_FILE - (in) full path to plantuml file
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+# Example:
+#     generate_gpb( ${PLANTUML_FILE} GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
+function( generate_plantuml PLANTUML_FILE GENERATED_FILES )
+   get_filename_component( _FILE_NAME_ ${PLANTUML_FILE} NAME )
+   string( REGEX MATCH "^(.*)(\\.[^.]*)$" dummy ${_FILE_NAME_} )
+   # *.plantuml file name witout path and file extension
+   set( PLANTUML_FILE_NAME       ${CMAKE_MATCH_1} )
+   # *.plantuml file extension
+   set( PLANTUML_FILE_EXTENTION  ${CMAKE_MATCH_2} )
+   # *.plantuml location directory
+   get_filename_component( PLANTUML_FILE_DIR ${PLANTUML_FILE} DIRECTORY )
+
+   string( REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" PLANTUML_GEN_DIR ${PLANTUML_FILE_DIR} )
+   set( PLANTUML_GEN_FILES ${TEMPLATE_PLANTUML_GEN_FILES} )
+   list( TRANSFORM PLANTUML_GEN_FILES PREPEND "${PLANTUML_FILE_NAME}" )
+   list( TRANSFORM PLANTUML_GEN_FILES PREPEND "${PLANTUML_GEN_DIR}/" )
+   set( ${GENERATED_FILES} ${PLANTUML_GEN_FILES} PARENT_SCOPE )
+
+   add_custom_command(
+         OUTPUT ${PLANTUML_GEN_FILES}
+         COMMENT "PLANTUML GENERATION: ${PLANTUML_GEN_FILES}"
+         COMMAND java -jar ${PLANTUML_JAR} -tpng -progress -V -debugsvek -o ${PLANTUML_GEN_DIR} ${PLANTUML_FILE}
+         DEPENDS ${PLANTUML_FILE}
+         VERBATIM
+      )
+endfunction( )
+
+# Function for generating files from several plantuml files
+# Parameters:
+#     PLANTUML_FILES - (in) list of full pathes to plantuml files
+#     GENERATED_FILES - (out) variable name that will be fullfilled by list of generated files
+# Example:
+#     generate_gpbs( ${PLANTUML_FILES} GEN_FILES )
+#     msg_dbg( "GEN_FILES = " ${GEN_FILES} )
+function( generate_plantumls PLANTUML_FILES GENERATED_FILES )
+   set( PLANTUMLS_GENERATED_FILES "" )
+   foreach( PLANTUML_FILE ${PLANTUML_FILES} )
+      generate_plantuml( ${PLANTUML_FILE} PLANTUML_GENERATED_FILES )
+      list( APPEND PLANTUMLS_GENERATED_FILES ${PLANTUML_GENERATED_FILES} )
+   endforeach( )
+   set( ${GENERATED_FILES} ${PLANTUMLS_GENERATED_FILES} PARENT_SCOPE )
+endfunction( )
+
 
 
 
