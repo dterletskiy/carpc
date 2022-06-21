@@ -64,7 +64,7 @@ print_project_files( )
 add_executable( ${TARGET_NAME} ${PROJECT_SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
-target_link_libraries( ${TARGET_NAME} framework )
+target_link_libraries( ${TARGET_NAME} runtime )
 if( MEMORY_HOOK )
    target_link_libraries( ${TARGET_NAME} hooks )
 endif( )

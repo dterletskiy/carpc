@@ -92,7 +92,7 @@ add_executable(
 )
 
 target_link_libraries( ${TARGET_NAME} tracing )
-target_link_libraries( ${TARGET_NAME} framework )
+target_link_libraries( ${TARGET_NAME} runtime )
 if( MEMORY_HOOK )
    target_link_libraries( ${TARGET_NAME} hooks )
 endif( )

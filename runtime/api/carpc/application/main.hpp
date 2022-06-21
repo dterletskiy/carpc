@@ -125,7 +125,7 @@ int main( int argc, char** argv, char** envp )
    extern "C"
    JNIEXPORT jstring JNICALL Java_com_tda_carpc_start( JNIEnv* env, jobject obj, jint id )
    {
-      MSG_VRB( "starting carpc framework: %d", id );
+      MSG_VRB( "starting carpc runtime: %d", id );
       boot_thread.run( );
 
       return env->NewStringUTF( "@TDA: Hello from C++" );
@@ -134,7 +134,7 @@ int main( int argc, char** argv, char** envp )
    extern "C"
    JNIEXPORT jstring JNICALL Java_com_tda_carpc_stop( JNIEnv* env, jobject obj )
    {
-      MSG_VRB( "stopping carpc framework" );
+      MSG_VRB( "stopping carpc runtime" );
 
       return env->NewStringUTF( "@TDA: Hello from C++" );
    }

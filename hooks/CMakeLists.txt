@@ -64,6 +64,6 @@ print_project_files( )
 add_library( ${TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
 
 target_link_libraries( ${TARGET_NAME} tracing )
-target_link_libraries( ${TARGET_NAME} framework )
+target_link_libraries( ${TARGET_NAME} runtime )
 
 install( TARGETS ${TARGET_NAME} DESTINATION lib )

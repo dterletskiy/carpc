@@ -77,7 +77,7 @@ cc_defaults {
     ],
     shared_libs: [
         "tda.carpc.tracing.shared",
-        "tda.carpc.framework.shared",
+        "tda.carpc.runtime.shared",
     ],
 }
 
@@ -96,20 +96,20 @@ cc_library_shared {
 }
 
 cc_library_shared {
-    name: "tda.carpc.framework.shared",
+    name: "tda.carpc.runtime.shared",
     defaults: [
         "tda.carpc.src.defaults"
     ],
-    export_include_dirs: ["./framework"],
+    export_include_dirs: ["./runtime"],
     srcs: [
-        "framework/**/*.cpp"
+        "runtime/**/*.cpp"
     ],
     exclude_srcs: [
-        "framework/imp/carpc/oswrappers/linux/backtrace.cpp",
-        "framework/imp/carpc/oswrappers/Spinlock.cpp"
+        "runtime/imp/carpc/oswrappers/linux/backtrace.cpp",
+        "runtime/imp/carpc/oswrappers/Spinlock.cpp"
     ],
     local_include_dirs: [
-        "framework/"
+        "runtime/"
     ],
     cppflags: [
         "-DSYS_TRACE",
@@ -147,7 +147,7 @@ cc_binary {
     ],
     shared_libs: [
         "tda.carpc.tracing.shared",
-        "tda.carpc.framework.shared",
+        "tda.carpc.runtime.shared",
     ],
     required: [
         "tda.carpc.servicebrocker.cfg"
