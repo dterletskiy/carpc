@@ -94,13 +94,14 @@ class AdlListener( AdlParserListener ):
    def enterApplication( self, ctx: AdlParser.ApplicationContext ):
       # pfw.console.debug.info( ctx.IDENTIFIER( ).getText( ) )
       self.__application = application.Application( ctx.IDENTIFIER( ).getText( ) )
-      str_threads = [ thread.IDENTIFIER( ).getText( ) for thread in ctx.threads( ).names( ).name( ) ]
-      # for str_thread in str_threads: pfw.console.debug.info( str_thread )
+      if None != ctx.threads( ):
+         str_threads = [ thread.IDENTIFIER( ).getText( ) for thread in ctx.threads( ).names( ).name( ) ]
+         # for str_thread in str_threads: pfw.console.debug.info( str_thread )
 
-      for str_thread in str_threads:
-         for thread in self.__threads:
-            if str_thread == thread.name( ):
-               self.__application.add_thread( thread )
+         for str_thread in str_threads:
+            for thread in self.__threads:
+               if str_thread == thread.name( ):
+                  self.__application.add_thread( thread )
 
 
 

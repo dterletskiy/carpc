@@ -17,7 +17,7 @@ thread               : DEF_THREAD IDENTIFIER LEFT_CURLY_BRACKET ( components | w
 components           : DEF_COMPONENTS names SEMICOLON ;
 watchdog             : DEF_WATCHDOG NUMBER SEMICOLON ;
 
-application          : DEF_APPLICATION IDENTIFIER LEFT_CURLY_BRACKET ( threads ) RIGHT_CURLY_BRACKET SEMICOLON ;
+application          : DEF_APPLICATION IDENTIFIER LEFT_CURLY_BRACKET ( threads )? RIGHT_CURLY_BRACKET SEMICOLON ;
 threads              : DEF_THREADS names SEMICOLON ;
 
 
