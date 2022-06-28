@@ -22,50 +22,97 @@
 #define DEFINE_EVENT_N( eventType, dataType, signatureType ) \
    DEFINE_EVENT_BASE( namespace, carpc::NO_IPC, eventType, dataType, signatureType )
 
-#define DEFINE_EVENT_SIMPLE_N( eventType, dataType ) \
+#define DEFINE_EVENT_NOSIG_N( eventType, dataType ) \
    DEFINE_EVENT_N( eventType, dataType, carpc::async::simple::Signature )
 
-#define DEFINE_EVENT_ID_N( eventType, enumType ) \
+#define DEFINE_EVENT_NODATA_N( eventType, signatureType ) \
+   DEFINE_EVENT_N( eventType, carpc::async::tEmptyData, signatureType )
+
+#define DEFINE_EVENT_NOSIG_NODATA_N( eventType ) \
+   DEFINE_EVENT_N( eventType, carpc::async::tEmptyData, carpc::async::simple::Signature )
+
+#define DEFINE_EVENT_IDSIG_N( eventType, dataType, enumType ) \
    DEFINE_EVENT_N( eventType, dataType, carpc::async::id::TSignature< enumType > )
+
+#define DEFINE_EVENT_IDSIG_NODATA_N( eventType, enumType ) \
+   DEFINE_EVENT_N( eventType, carpc::async::tEmptyData, carpc::async::id::TSignature< enumType > )
+
+
 
 #define DEFINE_IPC_EVENT_N( eventType, dataType, signatureType ) \
    DEFINE_EVENT_BASE( namespace, carpc::IPC, eventType, dataType, signatureType )
 
-#define DEFINE_IPC_EVENT_SIMPLE_N( eventType, dataType ) \
+#define DEFINE_IPC_EVENT_NOSIG_N( eventType, dataType ) \
    DEFINE_IPC_EVENT_N( eventType, dataType, carpc::async::simple::Signature )
 
-#define DEFINE_IPC_EVENT_ID_N( eventType, enumType ) \
+#define DEFINE_IPC_EVENT_NODATA_N( eventType, signatureType ) \
+   DEFINE_IPC_EVENT_N( eventType, carpc::async::tEmptyData, signatureType )
+
+#define DEFINE_IPC_EVENT_NOSIG_NODATA_N( eventType ) \
+   DEFINE_IPC_EVENT_N( eventType, carpc::async::tEmptyData, carpc::async::simple::Signature )
+
+#define DEFINE_IPC_EVENT_IDSIG_N( eventType, dataType, enumType ) \
    DEFINE_IPC_EVENT_N( eventType, dataType, carpc::async::id::TSignature< enumType > )
+
+#define DEFINE_IPC_EVENT_IDSIG_NODATA_N( eventType, enumType ) \
+   DEFINE_IPC_EVENT_N( eventType, carpc::async::tEmptyData, carpc::async::id::TSignature< enumType > )
 
 
 
 #define DEFINE_EVENT_S( eventType, dataType, signatureType ) \
    DEFINE_EVENT_BASE( struct, carpc::NO_IPC, eventType, dataType, signatureType )
 
-#define DEFINE_EVENT_SIMPLE_S( eventType, dataType ) \
+#define DEFINE_EVENT_NOSIG_S( eventType, dataType ) \
    DEFINE_EVENT_S( eventType, dataType, carpc::async::simple::Signature )
 
-#define DEFINE_EVENT_ID_S( eventType, dataType, enumType ) \
+#define DEFINE_EVENT_NODATA_S( eventType, signatureType ) \
+   DEFINE_EVENT_S( eventType, carpc::async::tEmptyData, signatureType )
+
+#define DEFINE_EVENT_NOSIG_NODATA_S( eventType ) \
+   DEFINE_EVENT_S( eventType, carpc::async::tEmptyData, carpc::async::simple::Signature )
+
+#define DEFINE_EVENT_IDSIG_S( eventType, dataType, enumType ) \
    DEFINE_EVENT_S( eventType, dataType, carpc::async::id::TSignature< enumType > )
+
+#define DEFINE_EVENT_IDSIG_NODATA_S( eventType, enumType ) \
+   DEFINE_EVENT_S( eventType, carpc::async::tEmptyData, carpc::async::id::TSignature< enumType > )
+
+
 
 #define DEFINE_IPC_EVENT_S( eventType, dataType, signatureType ) \
    DEFINE_EVENT_BASE( struct, carpc::IPC, eventType, dataType, signatureType )
 
-#define DEFINE_IPC_EVENT_SIMPLE_S( eventType, dataType ) \
+#define DEFINE_IPC_EVENT_NOSIG_S( eventType, dataType ) \
    DEFINE_IPC_EVENT_S( eventType, dataType, carpc::async::simple::Signature )
 
-#define DEFINE_IPC_EVENT_ID_S( eventType, dataType, enumType ) \
+#define DEFINE_IPC_EVENT_NODATA_S( eventType, signatureType ) \
+   DEFINE_IPC_EVENT_S( eventType, carpc::async::tEmptyData, signatureType )
+
+#define DEFINE_IPC_EVENT_NOSIG_NODATA_S( eventType ) \
+   DEFINE_IPC_EVENT_S( eventType, carpc::async::tEmptyData, carpc::async::simple::Signature )
+
+#define DEFINE_IPC_EVENT_IDSIG_S( eventType, dataType, enumType ) \
    DEFINE_IPC_EVENT_S( eventType, dataType, carpc::async::id::TSignature< enumType > )
 
+#define DEFINE_IPC_EVENT_IDSIG_NODATA_S( eventType, enumType ) \
+   DEFINE_IPC_EVENT_S( eventType, carpc::async::tEmptyData, carpc::async::id::TSignature< enumType > )
 
 
-#define DEFINE_EVENT             DEFINE_EVENT_S
-#define DEFINE_EVENT_SIMPLE      DEFINE_EVENT_SIMPLE_S
-#define DEFINE_EVENT_ID          DEFINE_EVENT_ID_S
 
-#define DEFINE_IPC_EVENT         DEFINE_IPC_EVENT_S
-#define DEFINE_IPC_EVENT_SIMPLE  DEFINE_IPC_EVENT_SIMPLE_S
-#define DEFINE_IPC_EVENT_ID      DEFINE_IPC_EVENT_ID_S
+
+#define DEFINE_EVENT                   DEFINE_EVENT_S
+#define DEFINE_EVENT_NOSIG             DEFINE_EVENT_NOSIG_S
+#define DEFINE_EVENT_NODATA            DEFINE_EVENT_NODATA_S
+#define DEFINE_EVENT_NOSIG_NODATA      DEFINE_EVENT_NOSIG_NODATA_S
+#define DEFINE_EVENT_IDSIG             DEFINE_EVENT_IDSIG_S
+#define DEFINE_EVENT_IDSIG_NODATA      DEFINE_EVENT_IDSIG_NODATA_S
+
+#define DEFINE_IPC_EVENT               DEFINE_IPC_EVENT_S
+#define DEFINE_IPC_EVENT_NOSIG         DEFINE_IPC_EVENT_NOSIG_S
+#define DEFINE_IPC_EVENT_NODATA        DEFINE_IPC_EVENT_NODATA_S
+#define DEFINE_IPC_EVENT_NOSIG_NODATA  DEFINE_IPC_EVENT_NOSIG_NODATA_S
+#define DEFINE_IPC_EVENT_IDSIG         DEFINE_IPC_EVENT_IDSIG_S
+#define DEFINE_IPC_EVENT_IDSIG_NODATA  DEFINE_IPC_EVENT_IDSIG_NODATA_S
 
 
 
@@ -80,7 +127,7 @@
 
 
 #define REGISTER_EVENT( eventType ) \
-   carpc::async::IEvent::check_in( eventType::Signature::build_type_id( ), eventType::Event::create );
+   carpc::async::IEvent::check_in( eventType::Signature::build_type_id( ), eventType::Event::create_empty );
 
 #define DUMP_IPC_EVENTS \
    carpc::async::IEvent::dump( );

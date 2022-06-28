@@ -42,11 +42,11 @@ namespace carpc::async {
 
       // static functions
       public:
-         static const bool set_notification( tConsumer* p_consumer, const tUserSignature& signature )
+         static const bool set_notification( tConsumer* p_consumer, const tUserSignature& signature = { } )
          {
             return IEvent::set_notification( p_consumer, tSignature::create( signature ) );
          }
-         static const bool clear_notification( tConsumer* p_consumer, const tUserSignature& signature )
+         static const bool clear_notification( tConsumer* p_consumer, const tUserSignature& signature = { } )
          {
             return IEvent::clear_notification( p_consumer, tSignature::create( signature ) );
          }
@@ -58,33 +58,78 @@ namespace carpc::async {
       public:
          // This "create" static function is used only for creating concrete event type with all empty data
          // what should be filled during serialization.
-         static IEvent::tSptr create( )
+         static IEvent::tSptr create_empty( )
          {
             return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), tPriority( ) ) );
          }
 
-         static std::shared_ptr< tEvent > create(
-               const tUserSignature& signature,
-               const tPriority& priority = carpc::priority( ePriority::DEFAULT )
-            )
+         // Create empty
+         static std::shared_ptr< tEvent > create( )
+         {
+            return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), carpc::priority( ePriority::DEFAULT ) ) );
+         }
+         // Create with signature
+         static std::shared_ptr< tEvent > create( const tUserSignature& signature )
+         {
+            return std::shared_ptr< tEvent >( new tEvent( signature, carpc::priority( ePriority::DEFAULT ) ) );
+         }
+         // Create with data
+         static std::shared_ptr< tEvent > create( const tData& data )
+         {
+            return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), data, carpc::priority( ePriority::DEFAULT ) ) );
+         }
+         // Create with priority
+         static std::shared_ptr< tEvent > create( const tPriority& priority )
+         {
+            return std::shared_ptr< tEvent >( new tEvent( tUserSignature( ), priority ) );
+         }
+         // Create with signature and priority
+         static std::shared_ptr< tEvent > create( const tUserSignature& signature, const tPriority& priority )
          {
             return std::shared_ptr< tEvent >( new tEvent( signature, priority ) );
          }
-         static std::shared_ptr< tEvent > create(
-               const tUserSignature& signature,
-               const tData& data,
-               const tPriority& priority = carpc::priority( ePriority::DEFAULT )
-            )
+         // Create with signature and data
+         static std::shared_ptr< tEvent > create( const tUserSignature& signature, const tData& data )
+         {
+            return std::shared_ptr< tEvent >( new tEvent( signature, data, carpc::priority( ePriority::DEFAULT ) ) );
+         }
+         // Create with data and priority
+         static std::shared_ptr< tEvent > create( const tData& data, const tPriority& priority )
+         {
+            return std::shared_ptr< tEvent >( new tEvent( tSignature( ), data, priority ) );
+         }
+         // Create with signature, data and priority
+         static std::shared_ptr< tEvent > create( const tUserSignature& signature, const tData& data, const tPriority& priority )
          {
             return std::shared_ptr< tEvent >( new tEvent( signature, data, priority ) );
          }
 
+         static const bool create_send(
+               const application::Context& to_context = application::Context::internal_broadcast
+            )
+         {
+            return create( )->send( to_context );
+         }
          static const bool create_send(
                const tUserSignature& signature,
                const application::Context& to_context = application::Context::internal_broadcast
             )
          {
             return create( signature )->send( to_context );
+         }
+         static const bool create_send(
+               const tData& data,
+               const application::Context& to_context = application::Context::internal_broadcast
+            )
+         {
+            return create( data )->send( to_context );
+         }
+         static const bool create_send(
+               const tPriority& priority,
+               const application::Context& to_context = application::Context::internal_broadcast
+            )
+         {
+            return create( priority )->send( to_context );
          }
          static const bool create_send(
                const tUserSignature& signature,
@@ -101,6 +146,14 @@ namespace carpc::async {
             )
          {
             return create( signature, data )->send( to_context );
+         }
+         static const bool create_send(
+               const tData& data,
+               const tPriority& priority,
+               const application::Context& to_context = application::Context::internal_broadcast
+            )
+         {
+            return create( data, priority )->send( to_context );
          }
          static const bool create_send(
                const tUserSignature& signature,

@@ -178,6 +178,7 @@ function main( )
       ;;
       ${COMMAND[BUILD]})
          print_info "build"
+         configure
          build
          install
       ;;
