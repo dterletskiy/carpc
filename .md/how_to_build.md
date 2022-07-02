@@ -53,10 +53,10 @@ pip install antlr4-python3-runtime
 </pre>
 
 
- - dlt development headers and libraries:
+ - dlt development headers and libraries for development and dlt-daemon and dlt-viewer for collecting traces in future:
 
 <pre>
-sudo apt install libdlt-dev
+sudo apt install libdlt-dev dlt-daemon dlt-viewer
 </pre>
 
 
@@ -83,7 +83,7 @@ git clone git@github.com:dterletskiy/python_fw.git
 </pre>
 
 
- - clone ***CARPC*** source code:
+ - ***CARPC*** source code:
 
 <pre>
 git clone git@github.com:dterletskiy/carpc.git
@@ -101,7 +101,8 @@ Let's suppose you have cloned all previous stuff to ***/mnt/dev/*** folder. So, 
    - ***build system***: build/, build.sh, CMakeList.txt, Android.bp - scripts and configuration files for building carpc project and other projects based on carpc.
    - ***tracing project***: tracing/ - tracing library sources.
    - ***service brocker project***: servicebrocker/ - servicebrocker binary sources required for IPC/RPC.
-   - ***carpc runtime project***: framework/ - carpc runtime library sources.
+   - ***carpc runtime project***: runtime/ - carpc runtime library sources.
+   - ***thirdparty***: thirdparty/ - required thirdparty binaries.
 
 There is ***buils.sh*** script in ***carpc*** folder. This script could be used to build ***CARPC*** framework libraries. For this it should be started with next parameters:
 

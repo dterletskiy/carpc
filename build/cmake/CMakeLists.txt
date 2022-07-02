@@ -117,4 +117,4 @@ add_custom_target( "${TARGET_NAME}_documentation" ALL
    )
 
 install( TARGETS ${TARGET_NAME} DESTINATION bin )
-install( FILES ${PROJECT_SOURCE_DIR}/${TARGET_NAME}.cfg DESTINATION etc )
+install( FILES ${PROJECT_SOURCE_DIR}/${TARGET_NAME}.cfg DESTINATION etc OPTIONAL )

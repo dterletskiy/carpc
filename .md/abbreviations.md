@@ -13,3 +13,9 @@
 **TID** - Thread ID
 
 **PID** - Process ID
+
+**ADL** - Application description language
+
+**DDL** - Data description language
+
+**IDL** - Interface description language

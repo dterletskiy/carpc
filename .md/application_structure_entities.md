@@ -8,6 +8,10 @@
    3. [IPC Application Thread](#ipc-application-thread)
    4. [Application Component](#application-component)
 
+Common structure of **CARPC Application** has next representation:
+
+![CARPC Application Structure](./img/carpc_application_structure.png)
+
 ----
 
 ## ***Application Process***

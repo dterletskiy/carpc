@@ -2,18 +2,18 @@
 
 # ***CARPC***
 
-![CARPC Framework logo](./.md/logo/01.png)
+![CARPC Framework logo](./.md/img/logo/logo_01.png)
 
 ----
 
 ## ***Table of contents***
 
 - [What is CARPC](./.md/what_is_carpc.md#what-is-carpc)
-- [Why is CARPC]
 - [How to build](./.md/how_to_build.md#how-to-build)
-- [CARPC entities description](./.md/carpc_entities_description.md#carpc-entities-description)
-- [Application structure](./.md/application_structure.md#application-structure)
+- [Runtime entities description](./.md/entities_description.md#entities-description)
 - [Tracing](./.md/tracing.md#tracing)
+- [Development](./.md/development.md#development)
+- [Configuration parameters](./.md/configuration_parameters.md#configuration-parameters)
 - [Abbreviations](./.md/abbreviations.md#abbreviations)
 
 ----
