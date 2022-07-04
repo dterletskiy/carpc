@@ -131,7 +131,7 @@ namespace carpc {
          {
             return m_value == invalid_value;
          }
-         const std::string name( ) const
+         const std::string dbg_name( ) const
          {
             return carpc::format_string( "0x", std::hex, static_cast< std::size_t >( m_value ) );
          }

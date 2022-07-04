@@ -102,7 +102,7 @@ namespace carpc::service::experimental::__private_server__ {
       // @TDA-DEBUG:
       if( to_id != mp_server->id( ) )
       {
-         SYS_ERR( "%s != %s", to_id.name( ).c_str( ), mp_server->id( ).name( ).c_str( ) );
+         SYS_ERR( "%s != %s", to_id.dbg_name( ).c_str( ), mp_server->id( ).dbg_name( ).c_str( ) );
       }
 
       auto result = m_request_status_map.emplace( event_id, RequestStatus{ } );
@@ -141,7 +141,7 @@ namespace carpc::service::experimental::__private_server__ {
       const auto emplace_result = request_status.info_set.emplace( m_seq_id, seq_id, Address{ from_context, from_id } );
       if( false == emplace_result.second )
       {
-         SYS_WRN( "emplace error: %s", m_seq_id.name( ).c_str( ) );
+         SYS_WRN( "emplace error: %s", m_seq_id.dbg_name( ).c_str( ) );
          return false;
       }
       return true;
@@ -204,7 +204,7 @@ namespace carpc::service::experimental::__private_server__ {
       auto iterator_request_info_set = request_info_set.find( RequestInfo{ searching_seq_id } );
       if( request_info_set.end( ) == iterator_request_info_set )
       {
-         SYS_WRN( "request info for currnet sequence id has not been found: %s", searching_seq_id.name( ).c_str( ) );
+         SYS_WRN( "request info for currnet sequence id has not been found: %s", searching_seq_id.dbg_name( ).c_str( ) );
          return;
       }
 
@@ -385,7 +385,7 @@ namespace carpc::service::experimental::__private_server__ {
             // @TDA-DEBUG:
             SYS_VRB(
                "subscriber '%s' added for attribute '%s'",
-               Address{ from_context, from_id }.name( ).c_str( ),
+               Address{ from_context, from_id }.dbg_name( ).c_str( ),
                event_id.c_str( )
             );
          }
@@ -419,7 +419,7 @@ namespace carpc::service::experimental::__private_server__ {
             // @TDA-DEBUG:
             SYS_VRB(
                "subscriber '%s' removed for attribute '%s'",
-               Address{ from_context, from_id }.name( ).c_str( ),
+               Address{ from_context, from_id }.dbg_name( ).c_str( ),
                event_id.c_str( )
             );
          }
@@ -585,14 +585,14 @@ namespace carpc::service::experimental::__private__ {
    template< typename TYPES >
    void TServer< TYPES >::process_event( const typename TYPES::method::tEvent& event )
    {
-      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).dbg_name( ).c_str( ) );
       m_method_processor.process( event );
    }
 
    template< typename TYPES >
    void TServer< TYPES >::process_event( const typename TYPES::attribute::tEvent& event )
    {
-      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).dbg_name( ).c_str( ) );
       m_attribute_processor.process( event );
    }
 

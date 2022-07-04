@@ -31,7 +31,7 @@ namespace carpc::os::os_linux::socket {
 
    struct configuration
    {
-      const std::string name( ) const;
+      const std::string dbg_name( ) const;
       void print( const std::string& _message = "" ) const;
 
       bool operator==( const configuration& ) const;

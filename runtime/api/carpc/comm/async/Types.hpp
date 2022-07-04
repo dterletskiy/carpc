@@ -95,7 +95,7 @@ namespace __private_carpc_async_v1__ {
                return carpc::generate::name< T >( );
             }
 
-         const std::string& name( ) const
+         const std::string& dbg_name( ) const
          {
             return TBaseAsyncTypeID< TYPE >::m_value;
          }
@@ -144,7 +144,7 @@ namespace __private_carpc_async_v1__ {
                return _hash_code;
             }
 
-         const std::string& name( ) const
+         const std::string& dbg_name( ) const
          {
             return m_name;
          }
@@ -222,7 +222,7 @@ namespace __private_carpc_async_v2__ {
                }
 
       public:
-         const std::string name( ) const
+         const std::string dbg_name( ) const
          {
             return name_t( );
          }

@@ -47,7 +47,7 @@ bool Signature::operator<( const Signature& other ) const
    return m_role < other.m_role;
 }
 
-const std::string Signature::name( ) const
+const std::string Signature::dbg_name( ) const
 {
-   return m_type_id.name( ) + "." + m_role;
+   return m_type_id.dbg_name( ) + "." + m_role;
 }

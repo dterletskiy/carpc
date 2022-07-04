@@ -114,8 +114,8 @@ void ConnectionProcessor::disconnected( carpc::os::Socket::tSptr p_socket )
          if( service_connection.server.value( ).socket == p_socket )
          {
             SYS_INF( "unregister server: %s / %s",
-               service_signature.name( ).c_str( ),
-               service_connection.server.value( ).service_address.name( ).c_str( )
+               service_signature.dbg_name( ).c_str( ),
+               service_connection.server.value( ).service_address.dbg_name( ).c_str( )
             );
             service_connection.server.reset( );
          }
@@ -127,8 +127,8 @@ void ConnectionProcessor::disconnected( carpc::os::Socket::tSptr p_socket )
          if( iterator->socket == p_socket )
          {
             SYS_INF( "unregister client: %s / %s",
-               service_signature.name( ).c_str( ),
-               iterator->service_address.name( ).c_str( )
+               service_signature.dbg_name( ).c_str( ),
+               iterator->service_address.dbg_name( ).c_str( )
             );
             iterator = clients.erase( iterator );
             if( clients.end( ) == iterator )
@@ -166,9 +166,9 @@ void ConnectionProcessor::register_server( carpc::os::Socket::tSptr p_socket, ca
       return;
    }
    SYS_INF( "service passport: %s / socket: %d / inet address: %s",
-               service_passport.name( ).c_str( ),
+               service_passport.dbg_name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.name( ).c_str( )
+               inet_address.dbg_name( ).c_str( )
             );
 
    // Add service signature and server information to DB
@@ -183,7 +183,7 @@ void ConnectionProcessor::register_server( carpc::os::Socket::tSptr p_socket, ca
    if( std::nullopt != service_connection.server )
    {
       SYS_ERR( "server already registered: %s(%d)",
-            service_passport.signature.name( ).c_str( ), service_iterator->second.server.value( ).socket->socket( )
+            service_passport.signature.dbg_name( ).c_str( ), service_iterator->second.server.value( ).socket->socket( )
          );
       return;
    }
@@ -196,7 +196,7 @@ void ConnectionProcessor::register_server( carpc::os::Socket::tSptr p_socket, ca
       return;
 
    // Send notification packet to clients about registered server with current service signature
-   SYS_INF( "notifying clients due to registered server with service signature '%s'", service_passport.name( ).c_str( ) );
+   SYS_INF( "notifying clients due to registered server with service signature '%s'", service_passport.dbg_name( ).c_str( ) );
    carpc::ipc::Packet packet;
    packet.add_package( carpc::ipc::eCommand::DetectedServer, service_passport, inet_address );
    carpc::ipc::tStream stream;
@@ -215,9 +215,9 @@ void ConnectionProcessor::unregister_server( carpc::os::Socket::tSptr p_socket, 
       return;
    }
    SYS_INF( "service passport: %s / socket: %d / inet address: %s",
-               service_passport.name( ).c_str( ),
+               service_passport.dbg_name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.name( ).c_str( )
+               inet_address.dbg_name( ).c_str( )
             );
 
    // Find registered server with current service signature 
@@ -232,7 +232,7 @@ void ConnectionProcessor::unregister_server( carpc::os::Socket::tSptr p_socket, 
    // Check is server with current service signature already registered
    if( std::nullopt == service_connection.server )
    {
-      SYS_ERR( "server was not registered: %s(%d)", service_passport.signature.name( ).c_str( ), p_socket->socket( ) );
+      SYS_ERR( "server was not registered: %s(%d)", service_passport.signature.dbg_name( ).c_str( ), p_socket->socket( ) );
       return;
    }
 
@@ -244,7 +244,7 @@ void ConnectionProcessor::unregister_server( carpc::os::Socket::tSptr p_socket, 
       return;
 
    // Send notification event to clients about registered server with current service signature
-   SYS_INF( "notifying clients due to unregistered server with service signature '%s'", service_passport.name( ).c_str( ) );
+   SYS_INF( "notifying clients due to unregistered server with service signature '%s'", service_passport.dbg_name( ).c_str( ) );
 }
 
 void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, carpc::ipc::Package& package )
@@ -257,9 +257,9 @@ void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, ca
       return;
    }
    SYS_INF( "service passport: %s / socket: %d / inet address: %s",
-               service_passport.name( ).c_str( ),
+               service_passport.dbg_name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.name( ).c_str( )
+               inet_address.dbg_name( ).c_str( )
             );
 
    // Add service signature to DB if it is not exists
@@ -276,11 +276,11 @@ void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, ca
    {
       if( service_connection.clients.end( ) != result.first )
       {
-         SYS_ERR( "client already registered %s(%d)", service_passport.signature.name( ).c_str( ), result.first->socket->socket( ) );
+         SYS_ERR( "client already registered %s(%d)", service_passport.signature.dbg_name( ).c_str( ), result.first->socket->socket( ) );
       }
       else
       {
-         SYS_ERR( "unable register client %s", service_passport.signature.name( ).c_str( ) );
+         SYS_ERR( "unable register client %s", service_passport.signature.dbg_name( ).c_str( ) );
       }
       return;
    }
@@ -293,7 +293,7 @@ void ConnectionProcessor::register_client( carpc::os::Socket::tSptr p_socket, ca
 
    // Send notification events to client about registered server with current service signature
    const Connection& server = service_connection.server.value( );
-   SYS_INF( "notifying server due to registered client with service signature '%s'", service_passport.name( ).c_str( ) );
+   SYS_INF( "notifying server due to registered client with service signature '%s'", service_passport.dbg_name( ).c_str( ) );
    carpc::ipc::Packet packet;
    packet.add_package(
       carpc::ipc::eCommand::DetectedServer,
@@ -315,9 +315,9 @@ void ConnectionProcessor::unregister_client( carpc::os::Socket::tSptr p_socket, 
       return;
    }
    SYS_INF( "service passport: %s / socket: %d / inet address: %s",
-               service_passport.name( ).c_str( ),
+               service_passport.dbg_name( ).c_str( ),
                p_socket->socket( ),
-               inet_address.name( ).c_str( )
+               inet_address.dbg_name( ).c_str( )
             );
 
    // Find registered client with current service signature 
@@ -334,7 +334,7 @@ void ConnectionProcessor::unregister_client( carpc::os::Socket::tSptr p_socket, 
    // Check if any client was removed
    if( 0 == result )
    {
-      SYS_ERR( "client was not registered: %s(%d)", service_passport.signature.name( ).c_str( ), p_socket->socket( ) );
+      SYS_ERR( "client was not registered: %s(%d)", service_passport.signature.dbg_name( ).c_str( ), p_socket->socket( ) );
       return;
    }
 
@@ -343,5 +343,5 @@ void ConnectionProcessor::unregister_client( carpc::os::Socket::tSptr p_socket, 
       return;
 
    // Send notification event about unregistered client with current service signature
-   SYS_INF( "notifying server due to unregistered client with service signature '%s'", service_passport.name( ).c_str( ) );
+   SYS_INF( "notifying server due to unregistered client with service signature '%s'", service_passport.dbg_name( ).c_str( ) );
 }

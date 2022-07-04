@@ -23,7 +23,7 @@ namespace carpc::service::experimental {
          ~TSignature( ) = default;
 
       public:
-         const std::string name( ) const;
+         const std::string dbg_name( ) const;
          bool operator<( const TSignature& ) const;
          const bool to_stream( ipc::tStream& ) const;
          const bool from_stream( ipc::tStream& );
@@ -74,15 +74,15 @@ namespace carpc::service::experimental {
    }
 
    template< typename _ID >
-   const std::string TSignature< _ID >::name( ) const
+   const std::string TSignature< _ID >::dbg_name( ) const
    {
       return carpc::format_string(
          "role: ", m_role.value( ),
          ", id: ", m_id.c_str( ),
          ", type: ", m_type.c_str( ),
-         ", from: ", m_from.name( ),
-         ", to: ", m_to.name( ),
-         ", seq_id: ", m_seq_id.name( )
+         ", from: ", m_from.dbg_name( ),
+         ", to: ", m_to.dbg_name( ),
+         ", seq_id: ", m_seq_id.dbg_name( )
       );
    }
 

@@ -29,7 +29,7 @@ bool AsyncPriorityQueue::insert( const IAsync::tSptr p_async )
 {
    SYS_VRB( "'%s': inserting async object (%s) with priority %u",
          m_name.c_str( ),
-         p_async->signature( )->name( ).c_str( ),
+         p_async->signature( )->dbg_name( ).c_str( ),
          p_async->priority( ).value( )
       );
 
@@ -95,7 +95,7 @@ IAsync::tSptr AsyncPriorityQueue::get( )
    collection.pop_front( );
    SYS_VRB( "'%s': received async object (%s) with priority: %u",
          m_name.c_str( ),
-         p_async->signature( )->name( ).c_str( ),
+         p_async->signature( )->dbg_name( ).c_str( ),
          p_async->priority( ).value( )
       );
    m_buffer_cond_var.unlock( );
@@ -109,10 +109,10 @@ void AsyncPriorityQueue::dump( ) const
    SYS_INF( "%s:", m_name.c_str( ) );
    for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero; --index )
    {
-      SYS_INF( "   priority: %s", index.name( ).c_str( ) );
+      SYS_INF( "   priority: %s", index.dbg_name( ).c_str( ) );
       for( auto p_async : m_collections[ index ] )
       {
-         SYS_INF( "      %s", p_async->signature( )->name( ).c_str( ) );
+         SYS_INF( "      %s", p_async->signature( )->dbg_name( ).c_str( ) );
       }
    }
    SYS_DUMP_END( );

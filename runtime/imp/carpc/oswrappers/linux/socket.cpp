@@ -114,7 +114,7 @@ namespace carpc::os::os_linux::socket {
 
 
 
-   const std::string configuration::name( ) const
+   const std::string configuration::dbg_name( ) const
    {
       return carpc::format_string( domain, ".", type, ".", protocole, "-", address, ":", port );
    }

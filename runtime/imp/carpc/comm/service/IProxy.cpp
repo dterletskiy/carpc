@@ -53,7 +53,7 @@ void IProxy::status( const Address& server_address, const eStatus connection_sta
          {
             if( server_address != m_server )
             {
-               SYS_ERR( "Current connected server: %s. Newly connected server: %s", m_server.name( ).c_str( ), server_address.name( ).c_str( ) );
+               SYS_ERR( "Current connected server: %s. Newly connected server: %s", m_server.dbg_name( ).c_str( ), server_address.dbg_name( ).c_str( ) );
             }
             return;
          }

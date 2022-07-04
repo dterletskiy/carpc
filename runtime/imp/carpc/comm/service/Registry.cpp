@@ -74,7 +74,7 @@ Registry::eResult Registry::register_server( const Signature& signature, const A
    // Check is server with current signature already registered
    if( connection.server.is_valid( ) )
    {
-      SYS_ERR( "server already registered: %s(%s)", signature.name( ).c_str( ), connection.server.name( ).c_str( ) );
+      SYS_ERR( "server already registered: %s(%s)", signature.dbg_name( ).c_str( ), connection.server.dbg_name( ).c_str( ) );
       return eResult::Duplicate;
    }
 
@@ -84,10 +84,10 @@ Registry::eResult Registry::register_server( const Signature& signature, const A
    // Check if any client registered with current signature
    if( true == connection.clients.empty( ) )
    {
-      SYS_INF( "registered not paired server: %s", signature.name( ).c_str( ) );
+      SYS_INF( "registered not paired server: %s", signature.dbg_name( ).c_str( ) );
       return eResult::OK_NotPaired;
    }
-   SYS_INF( "registered paired server: %s", signature.name( ).c_str( ) );
+   SYS_INF( "registered paired server: %s", signature.dbg_name( ).c_str( ) );
 
    // Send notification events to server about each registered client with current signature
    for( const auto& address_client : connection.clients )
@@ -107,7 +107,7 @@ Registry::eResult Registry::unregister_server( const Signature& signature, const
    auto iterator = m_db.find( signature );
    if( m_db.end( ) == iterator )
    {
-      SYS_ERR( "signature was not found: %s", signature.name( ).c_str( ) );
+      SYS_ERR( "signature was not found: %s", signature.dbg_name( ).c_str( ) );
       return eResult::Error;
    }
    auto& connection = iterator->second;
@@ -115,7 +115,7 @@ Registry::eResult Registry::unregister_server( const Signature& signature, const
    // Check is server with current signature already registered
    if( false == connection.server.is_valid( ) )
    {
-      SYS_ERR( "server was not registered: %s(%s)", signature.name( ).c_str( ), address.name( ).c_str( ) );
+      SYS_ERR( "server was not registered: %s(%s)", signature.dbg_name( ).c_str( ), address.dbg_name( ).c_str( ) );
       return eResult::NotFound;
    }
 
@@ -125,10 +125,10 @@ Registry::eResult Registry::unregister_server( const Signature& signature, const
    // Check if any client registered with current signature
    if( true == connection.clients.empty( ) )
    {
-      SYS_INF( "unregistered not paired server: %s", signature.name( ).c_str( ) );
+      SYS_INF( "unregistered not paired server: %s", signature.dbg_name( ).c_str( ) );
       return eResult::OK_NotPaired;
    }
-   SYS_INF( "unregistered paired server: %s", signature.name( ).c_str( ) );
+   SYS_INF( "unregistered paired server: %s", signature.dbg_name( ).c_str( ) );
 
    // Send notification event to clients about registered server with current signature
    ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ServerDisconnected }, address );
@@ -154,21 +154,21 @@ Registry::eResult Registry::register_client( const Signature& signature, const A
    {
       if( connection.clients.end( ) != result.first )
       {
-         SYS_ERR( "client already registered %s(%s)", signature.name( ).c_str( ), result.first->name( ).c_str( ) );
+         SYS_ERR( "client already registered %s(%s)", signature.dbg_name( ).c_str( ), result.first->dbg_name( ).c_str( ) );
          return eResult::Duplicate;
       }
 
-      SYS_ERR( "unable register client %s", signature.name( ).c_str( ) );
+      SYS_ERR( "unable register client %s", signature.dbg_name( ).c_str( ) );
       return eResult::Error;
    }
 
    // Check if any server already registered with current signature
    if( false == connection.server.is_valid( ) )
    {
-      SYS_INF( "registered not paired client: %s", signature.name( ).c_str( ) );
+      SYS_INF( "registered not paired client: %s", signature.dbg_name( ).c_str( ) );
       return eResult::OK_NotPaired;
    }
-   SYS_INF( "registered paired client: %s", signature.name( ).c_str( ) );
+   SYS_INF( "registered paired client: %s", signature.dbg_name( ).c_str( ) );
 
    // Send notification event to server about registered client with current signature
    ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientConnected }, address ); // @TDA-IMPROVE: here and in similar places should be send not broadcast event but addresed.
@@ -186,7 +186,7 @@ Registry::eResult Registry::unregister_client( const Signature& signature, const
    auto iterator = m_db.find( signature );
    if( m_db.end( ) == iterator )
    {
-      SYS_ERR( "signature was not found: %s", signature.name( ).c_str( ) );
+      SYS_ERR( "signature was not found: %s", signature.dbg_name( ).c_str( ) );
       return eResult::Error;
    }
    auto& connection = iterator->second;
@@ -196,17 +196,17 @@ Registry::eResult Registry::unregister_client( const Signature& signature, const
    // Check if any client was removed
    if( 0 == result )
    {
-      SYS_ERR( "client was not registered: %s(%s)", signature.name( ).c_str( ), address.name( ).c_str( ) );
+      SYS_ERR( "client was not registered: %s(%s)", signature.dbg_name( ).c_str( ), address.dbg_name( ).c_str( ) );
       return eResult::NotFound;
    }
 
    // Check if server registered with current signature
    if( false == connection.server.is_valid( ) )
    {
-      SYS_INF( "unregistered not paired client: %s", signature.name( ).c_str( ) );
+      SYS_INF( "unregistered not paired client: %s", signature.dbg_name( ).c_str( ) );
       return eResult::OK_NotPaired;
    }
-   SYS_INF( "unregistered paired client: %s", signature.name( ).c_str( ) );
+   SYS_INF( "unregistered paired client: %s", signature.dbg_name( ).c_str( ) );
 
    // Send notification event about unregistered client with current signature
    ev_i::Status::Event::create_send( { signature, ev_i::eStatus::ClientDisconnected }, address );

@@ -40,7 +40,7 @@ namespace carpc::application {
          bool operator<( const Context& ) const;
 
       public:
-         const std::string name( ) const;
+         const std::string dbg_name( ) const;
 
       public:
          bool is_internal( ) const;

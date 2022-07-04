@@ -22,12 +22,12 @@ namespace carpc::callback {
       protected:
          SharedCallback( )
          {
-            SYS_VRB( "'%s': created", m_id.name( ).c_str( ) );
+            SYS_VRB( "'%s': created", m_id.dbg_name( ).c_str( ) );
          }
       public:
          virtual ~SharedCallback( )
          {
-            SYS_VRB( "'%s': destroyed", m_id.name( ).c_str( ) );
+            SYS_VRB( "'%s': destroyed", m_id.dbg_name( ).c_str( ) );
          }
 
       public:

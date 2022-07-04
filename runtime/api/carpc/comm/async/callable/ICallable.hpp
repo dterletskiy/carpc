@@ -58,7 +58,7 @@ namespace carpc::async {
                {
                   return type_id( ) < signature.type_id( );
                }
-               const std::string name( ) const override
+               const std::string dbg_name( ) const override
                {
                   static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ) );
                   return s_name;

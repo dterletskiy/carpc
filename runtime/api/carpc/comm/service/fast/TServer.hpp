@@ -255,7 +255,7 @@ namespace carpc::service::fast::__private__ {
    template< typename TYPES >
    void TServer< TYPES >::process_event( const typename TYPES::tEvent& event )
    {
-      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).dbg_name( ).c_str( ) );
       m_processing_event_id = event.info( ).id( );
 
       if( true == prepare_request( event ) )
@@ -267,7 +267,7 @@ namespace carpc::service::fast::__private__ {
       }
       else
       {
-         SYS_WRN( "not processable event: %s", event.info( ).name( ).c_str( ) );
+         SYS_WRN( "not processable event: %s", event.info( ).dbg_name( ).c_str( ) );
       }
 
       m_processing_event_id.reset( );
@@ -336,7 +336,7 @@ namespace carpc::service::fast::__private__ {
       auto iterator_info_set = request_info_set.find( RequestInfo{ serching_seq_id } );
       if( request_info_set.end( ) == iterator_info_set )
       {
-         SYS_WRN( "request info for currnet sequence id has not been found: %s", serching_seq_id.name( ).c_str( ) );
+         SYS_WRN( "request info for currnet sequence id has not been found: %s", serching_seq_id.dbg_name( ).c_str( ) );
          return std::nullopt;
       }
 

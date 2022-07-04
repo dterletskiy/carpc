@@ -122,7 +122,7 @@ namespace carpc::service::secure::__private__ {
          auto result = client_map.emplace( ++m_seq_id, p_client );
          if( false == result.second )
          {
-            SYS_WRN( "can not insert: %s -> %p", m_seq_id.name( ).c_str( ), p_client );
+            SYS_WRN( "can not insert: %s -> %p", m_seq_id.dbg_name( ).c_str( ), p_client );
             return comm::sequence::ID::invalid;
          }
       }
@@ -456,7 +456,7 @@ namespace carpc::service::secure::__private__ {
 
       if( application::thread::current_id( ).is_invalid( ) )
       {
-         SYS_ERR( "creating proxy '%s.%s' not from application thread", interface_type_id.name( ).c_str( ), role_name.c_str( ) );
+         SYS_ERR( "creating proxy '%s.%s' not from application thread", interface_type_id.dbg_name( ).c_str( ), role_name.c_str( ) );
          return nullptr;
       }
 
@@ -494,7 +494,7 @@ namespace carpc::service::secure::__private__ {
       const comm::sequence::ID seq_id = event.info( ).seq_id( );
       const auto from_context = event.context( );
 
-      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).dbg_name( ).c_str( ) );
 
       if( true == m_request_processor.response( event ) )
          return;

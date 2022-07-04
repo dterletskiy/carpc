@@ -125,7 +125,7 @@ namespace carpc {
          {
             return m_value == invalid_value;
          }
-         const std::string name( ) const
+         const std::string dbg_name( ) const
          {
             return carpc::format_string( "0x", std::hex, m_value );
          }
@@ -188,7 +188,7 @@ namespace carpc {
       A a1, a2, a3;
       B b1, b2, b3;
 
-      MSG_DBG( "a1: %s", a1.id( ).name( ).c_str( ) );
+      MSG_DBG( "a1: %s", a1.id( ).dbg_name( ).c_str( ) );
       MSG_DBG( "a1: %zu", (A::ID::TYPE)(a1.id( )) );
       MSG_DBG( "a2: %zu", (A::ID::TYPE)(a2.id( )) );
       MSG_DBG( "a3: %zu", (A::ID::TYPE)(a3.id( )) );
@@ -200,12 +200,12 @@ namespace carpc {
       {
          A::ID id_a = A::ID::generate( );
          // B::ID id_b = id_a;
-         MSG_DBG( "id_a: %s", id_a.name( ).c_str( ) );
+         MSG_DBG( "id_a: %s", id_a.dbg_name( ).c_str( ) );
       }
 
       {
          A::ID id_a = A::ID::invalid;
-         MSG_DBG( "id_a: %s", id_a.name( ).c_str( ) );
+         MSG_DBG( "id_a: %s", id_a.dbg_name( ).c_str( ) );
       }
 
       return 0;

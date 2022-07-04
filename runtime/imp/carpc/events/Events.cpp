@@ -48,9 +48,9 @@ namespace carpc::events::service {
    {
    }
 
-   const std::string SignatureStatus::name( ) const
+   const std::string SignatureStatus::dbg_name( ) const
    {
-      return carpc::format_string( "signature: ", m_signature.name( ), ", id: ", size_t(m_id) );
+      return carpc::format_string( "signature: ", m_signature.dbg_name( ), ", id: ", size_t(m_id) );
    }
 
    bool SignatureStatus::operator<( const SignatureStatus& other ) const

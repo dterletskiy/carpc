@@ -23,7 +23,7 @@ AsyncQueue::~AsyncQueue( )
 
 bool AsyncQueue::insert( const IAsync::tSptr p_async )
 {
-   SYS_VRB( "'%s': inserting async object (%s)", m_name.c_str( ), p_async->signature( )->name( ).c_str( ) );
+   SYS_VRB( "'%s': inserting async object (%s)", m_name.c_str( ), p_async->signature( )->dbg_name( ).c_str( ) );
    m_buffer_cond_var.lock( );
    m_collection.push_back( p_async );
    m_buffer_cond_var.notify( );
@@ -42,7 +42,7 @@ IAsync::tSptr AsyncQueue::get( )
    }
    IAsync::tSptr p_async = m_collection.front( );
    m_collection.pop_front( );
-   SYS_VRB( "'%s': received async object (%s)", m_name.c_str( ), p_async->signature( )->name( ).c_str( ) );
+   SYS_VRB( "'%s': received async object (%s)", m_name.c_str( ), p_async->signature( )->dbg_name( ).c_str( ) );
    m_buffer_cond_var.unlock( );
 
    return p_async;
@@ -54,7 +54,7 @@ void AsyncQueue::dump( ) const
    SYS_INF( "%s:", m_name.c_str( ) );
    for( const auto& element : m_collection )
    {
-      SYS_INF( "%s", element->signature( )->name( ).c_str( ) );
+      SYS_INF( "%s", element->signature( )->dbg_name( ).c_str( ) );
    }
    SYS_WRN( "-------------------------  END DUMP  -------------------------" );
 }

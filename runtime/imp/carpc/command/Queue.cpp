@@ -12,13 +12,13 @@ using namespace carpc::command;
 Queue::Queue( const std::string& name )
    : m_name( name )
 {
-   SYS_DBG( "'%s': created '%s'", m_name.c_str( ), m_id.name( ).c_str( ) );
+   SYS_DBG( "'%s': created '%s'", m_name.c_str( ), m_id.dbg_name( ).c_str( ) );
    ICommand::Signal::Event::set_notification( this, { m_id } );
 }
 
 Queue::~Queue( )
 {
-   SYS_DBG( "'%s': destroyed '%s'", m_name.c_str( ), m_id.name( ).c_str( ) );
+   SYS_DBG( "'%s': destroyed '%s'", m_name.c_str( ), m_id.dbg_name( ).c_str( ) );
    ICommand::Signal::Event::clear_all_notifications( this );
 }
 
@@ -124,7 +124,7 @@ bool Queue::execute_next( )
    if( command::eState::EXECUTING == m_commands.front( )->state( ) )
       return false;
 
-   SYS_DBG( "'%s': starting next command: %s", m_name.c_str( ), m_commands.front( )->id( ).name( ).c_str( ) );
+   SYS_DBG( "'%s': starting next command: %s", m_name.c_str( ), m_commands.front( )->id( ).dbg_name( ).c_str( ) );
    m_commands.front( )->action( ICommand::eAction::EXECUTE );
 
    return true;
@@ -139,7 +139,7 @@ void Queue::process_event( const typename ICommand::Signal::Event& event )
 
    if( data.id != m_commands.front( )->id( ) )
    {
-      SYS_WRN( "'%s': finished command that should not been running: %s", m_name.c_str( ), data.id.name( ).c_str( ) );
+      SYS_WRN( "'%s': finished command that should not been running: %s", m_name.c_str( ), data.id.dbg_name( ).c_str( ) );
       return;
    }
 

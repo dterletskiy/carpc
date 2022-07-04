@@ -31,7 +31,7 @@ void ServiceEventConsumer::process_event( const ev_i::Action::Event& event )
 {
    const auto& id = event.info( ).id( );
    const carpc::service::Passport& service_passport = *(event.data( ));
-   SYS_INF( "id: %s / passport: %s", ev_i::c_str( id ), service_passport.name( ).c_str( ) );
+   SYS_INF( "id: %s / passport: %s", ev_i::c_str( id ), service_passport.dbg_name( ).c_str( ) );
 
    ipc::eCommand command = ipc::eCommand::Undefined;
    switch( id )

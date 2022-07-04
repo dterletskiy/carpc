@@ -26,7 +26,7 @@ void AsyncConsumerMap::set_notification( const IAsync::ISignature::tSptr p_signa
 {
    if( nullptr == p_consumer ) return;
 
-   SYS_INF( "'%s': async object (%s) / consumer (%p)", m_name.c_str( ), p_signature->name( ).c_str( ), p_consumer );
+   SYS_INF( "'%s': async object (%s) / consumer (%p)", m_name.c_str( ), p_signature->dbg_name( ).c_str( ), p_consumer );
 
    const auto& iterator = m_map.find( p_signature );
    if( iterator == m_map.end( ) )
@@ -147,7 +147,7 @@ bool AsyncConsumerMap::finish_process( )
    if( iterator == m_map.end( ) )
    {
       SYS_WRN( "'%s': consumers are not found, but are in processing for async object (%s)",
-         m_name.c_str( ), m_processing.signature( )->name( ).c_str( )
+         m_name.c_str( ), m_processing.signature( )->dbg_name( ).c_str( )
       );
       m_processing.reset( );
       return false;
@@ -162,7 +162,7 @@ void AsyncConsumerMap::dump( ) const
    SYS_INF( "%s:", m_name.c_str( ) );
    for( const auto& pair : m_map )
    {
-      printf( "%s => ", pair.first->name( ).c_str( ) );
+      printf( "%s => ", pair.first->dbg_name( ).c_str( ) );
       for( const auto item : pair.second )
          printf( "%p, ", item );
       printf( "\n" );
@@ -184,7 +184,7 @@ const AsyncConsumerMap::tConsumersSet& AsyncConsumerMap::ProcessingSignature::st
    if( mp_signature )
    {
       SYS_WRN( "'%s': consumers are in processing for async object (%s)",
-         m_name.c_str( ), mp_signature->name( ).c_str( )
+         m_name.c_str( ), mp_signature->dbg_name( ).c_str( )
       );
       static const tConsumersSet dummy = { };
       return dummy;

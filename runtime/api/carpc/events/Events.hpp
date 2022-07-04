@@ -59,7 +59,7 @@ namespace carpc::events {
             ~SignatureStatus( ) = default;
 
          public:
-            const std::string name( ) const;
+            const std::string dbg_name( ) const;
             bool operator<( const SignatureStatus& ) const;
             const bool to_stream( ipc::tStream& ) const;
             const bool from_stream( ipc::tStream& );

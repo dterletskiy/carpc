@@ -19,8 +19,8 @@ const bool IRunnable::send( const application::Context& to_context, const bool i
    {
       SYS_ERR(
             "sending blocking runnable object to destination context '%s' = calling context '%s'",
-            to_context.name( ).c_str( ),
-            application::Context::current( ).name( ).c_str( )
+            to_context.dbg_name( ).c_str( ),
+            application::Context::current( ).dbg_name( ).c_str( )
          );
       return false;
    }
@@ -51,7 +51,7 @@ const bool IRunnable::send( const application::Context& to_context, const bool i
 const bool IRunnable::send_to( const application::Context& to_context )
 {
    auto p_runnable = shared_from_this( );
-   SYS_VRB( "runnable: %s", p_runnable->signature( )->name( ).c_str( ) );
+   SYS_VRB( "runnable: %s", p_runnable->signature( )->dbg_name( ).c_str( ) );
 
    if( to_context.is_external( ) )
    {
@@ -82,7 +82,7 @@ const bool IRunnable::send_to( const application::Context& to_context )
    }
    else if( application::thread::local == to_context.tid( ) )
    {
-      SYS_INF( "sending runnable to current application thread: %s", to_context.tid( ).name( ).c_str( ) );
+      SYS_INF( "sending runnable to current application thread: %s", to_context.tid( ).dbg_name( ).c_str( ) );
       application::IThread::tSptr p_thread = carpc::application::Process::instance( )->current_thread( );
       if( nullptr == p_thread )
       {
@@ -94,7 +94,7 @@ const bool IRunnable::send_to( const application::Context& to_context )
    }
    else
    {
-      SYS_INF( "sending runnable to %s application thread", to_context.tid( ).name( ).c_str( ) );
+      SYS_INF( "sending runnable to %s application thread", to_context.tid( ).dbg_name( ).c_str( ) );
       application::IThread::tSptr p_thread = carpc::application::Process::instance( )->thread( to_context.tid( ) );
       if( nullptr == p_thread )
       {

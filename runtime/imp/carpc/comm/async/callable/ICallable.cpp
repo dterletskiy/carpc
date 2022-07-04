@@ -12,7 +12,7 @@ using namespace carpc::async;
 const bool ICallable::send( const application::Context& to_context )
 {
    auto p_callable = shared_from_this( );
-   SYS_VRB( "callable: %s", p_callable->signature( )->name( ).c_str( ) );
+   SYS_VRB( "callable: %s", p_callable->signature( )->dbg_name( ).c_str( ) );
 
    if( to_context.is_external( ) )
    {
@@ -43,7 +43,7 @@ const bool ICallable::send( const application::Context& to_context )
    }
    else if( application::thread::local == to_context.tid( ) )
    {
-      SYS_INF( "sending callable to current application thread: %s", to_context.tid( ).name( ).c_str( ) );
+      SYS_INF( "sending callable to current application thread: %s", to_context.tid( ).dbg_name( ).c_str( ) );
       application::IThread::tSptr p_thread = carpc::application::Process::instance( )->current_thread( );
       if( nullptr == p_thread )
       {
@@ -55,7 +55,7 @@ const bool ICallable::send( const application::Context& to_context )
    }
    else
    {
-      SYS_INF( "sending callable to %s application thread", to_context.tid( ).name( ).c_str( ) );
+      SYS_INF( "sending callable to %s application thread", to_context.tid( ).dbg_name( ).c_str( ) );
       application::IThread::tSptr p_thread = carpc::application::Process::instance( )->thread( to_context.tid( ) );
       if( nullptr == p_thread )
       {

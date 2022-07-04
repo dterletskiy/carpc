@@ -88,7 +88,7 @@ void* Thread::thread_loop( void* parameters )
    }
    thread_loop_mutex.unlock( );
 
-   SYS_INF( "%lx -> %s", p_thread->m_thread_id, p_thread->m_id.name( ).c_str( ) );
+   SYS_INF( "%lx -> %s", p_thread->m_thread_id, p_thread->m_id.dbg_name( ).c_str( ) );
    s_registry_mutex.lock( );
    s_registry.emplace( std::make_pair( p_thread->m_thread_id, p_thread->m_id ) );
    s_registry_mutex.unlock( );

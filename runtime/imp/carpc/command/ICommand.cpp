@@ -25,12 +25,12 @@ const char* ICommand::c_str( const eAction& action )
 
 ICommand::ICommand( )
 {
-   SYS_DBG( "'%s': created", m_id.name( ).c_str( ) );
+   SYS_DBG( "'%s': created", m_id.dbg_name( ).c_str( ) );
 }
 
 ICommand::~ICommand( )
 {
-   SYS_DBG( "'%s': destroyed", m_id.name( ).c_str( ) );
+   SYS_DBG( "'%s': destroyed", m_id.dbg_name( ).c_str( ) );
 }
 
 bool ICommand::state( const command::eState& new_state )
@@ -81,13 +81,13 @@ bool ICommand::state( const command::eState& new_state )
 
    if( true == result )
    {
-      SYS_DBG( "'%s': '%s' -> '%s'", m_id.name( ).c_str( ), command::c_str( m_state ), command::c_str( new_state )  );
+      SYS_DBG( "'%s': '%s' -> '%s'", m_id.dbg_name( ).c_str( ), command::c_str( m_state ), command::c_str( new_state )  );
       m_state = new_state;
       Signal::Event::create_send( { m_parent_id }, { m_id, m_state } );
    }
    else
    {
-      SYS_ERR( "'%s': '%s' -> '%s'", m_id.name( ).c_str( ), command::c_str( m_state ), command::c_str( new_state )  );
+      SYS_ERR( "'%s': '%s' -> '%s'", m_id.dbg_name( ).c_str( ), command::c_str( m_state ), command::c_str( new_state )  );
    }
 
    return result;
@@ -107,7 +107,7 @@ void ICommand::action( const eAction& act )
                [ wp = tWptr( shared_from_this( ) ), id = m_id ]( )
                {
                   if( auto p = wp.lock( ) ) p->state( command::eState::FINISHED );
-                  else SYS_ERR( "'%s': command was deleted", id.name( ).c_str( ) );
+                  else SYS_ERR( "'%s': command was deleted", id.dbg_name( ).c_str( ) );
                }
             )
          );
@@ -124,7 +124,7 @@ void ICommand::action( const eAction& act )
                [ wp = tWptr( shared_from_this( ) ), id = m_id ]( )
                {
                   if( auto p = wp.lock( ) ) p->state( command::eState::PAUSED );
-                  else SYS_ERR( "'%s': command was deleted", id.name( ).c_str( ) );
+                  else SYS_ERR( "'%s': command was deleted", id.dbg_name( ).c_str( ) );
                }
             )
          );
@@ -141,7 +141,7 @@ void ICommand::action( const eAction& act )
                [ wp = tWptr( shared_from_this( ) ), id = m_id ]( )
                {
                   if( auto p = wp.lock( ) ) p->state( command::eState::EXECUTING );
-                  else SYS_ERR( "'%s': command was deleted", id.name( ).c_str( ) );
+                  else SYS_ERR( "'%s': command was deleted", id.dbg_name( ).c_str( ) );
                }
             )
          );
@@ -158,7 +158,7 @@ void ICommand::action( const eAction& act )
                [ wp = tWptr( shared_from_this( ) ), id = m_id ]( )
                {
                   if( auto p = wp.lock( ) ) p->state( command::eState::STOPED );
-                  else SYS_ERR( "'%s': command was deleted", id.name( ).c_str( ) );
+                  else SYS_ERR( "'%s': command was deleted", id.dbg_name( ).c_str( ) );
                }
             )
          );
@@ -167,7 +167,7 @@ void ICommand::action( const eAction& act )
       }
       default:
       {
-         SYS_ERR( "'%s': unhandled action: '%s'", m_id.name( ).c_str( ), c_str( act ) );
+         SYS_ERR( "'%s': unhandled action: '%s'", m_id.dbg_name( ).c_str( ), c_str( act ) );
          break;
       }
    }

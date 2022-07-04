@@ -20,8 +20,8 @@ const bool Runnable::create_send( const tOperation operation, const application:
    {
       SYS_ERR(
             "sending blocking runnable object to destination context '%s' = calling context '%s'",
-            to_context.name( ).c_str( ),
-            application::Context::current( ).name( ).c_str( )
+            to_context.dbg_name( ).c_str( ),
+            application::Context::current( ).dbg_name( ).c_str( )
          );
       return false;
    }

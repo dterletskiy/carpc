@@ -40,7 +40,7 @@ bool IEvent::serialize( ipc::tStream& stream, const IEvent& event )
 {
    if( s_registry.end( ) == s_registry.find( event.signature( )->type_id( ) ) )
    {
-      SYS_ERR( "event '%s' is not registered", event.signature( )->name( ).c_str( ) );
+      SYS_ERR( "event '%s' is not registered", event.signature( )->dbg_name( ).c_str( ) );
       return false;
    }
 
@@ -52,7 +52,7 @@ bool IEvent::serialize( ipc::tStream& stream, const IEvent& event )
 
    if( false == event.to_stream_t( stream ) )
    {
-      SYS_ERR( "event '%s' serialization error", event.signature( )->name( ).c_str( ) );
+      SYS_ERR( "event '%s' serialization error", event.signature( )->dbg_name( ).c_str( ) );
       return false;
    }
 
@@ -106,7 +106,7 @@ const bool IEvent::set_notification( IAsync::IConsumer* p_consumer, const ISigna
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->dbg_name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
    p_thread->set_notification( p_signature, p_consumer );
 
    return true;
@@ -121,7 +121,7 @@ const bool IEvent::clear_notification( IAsync::IConsumer* p_consumer, const ISig
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->dbg_name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
    p_thread->clear_notification( p_signature, p_consumer );
 
    return true;
@@ -136,7 +136,7 @@ const bool IEvent::clear_all_notifications( IAsync::IConsumer* p_consumer, const
       return false;
    }
 
-   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
+   SYS_INF( "event: %s / consumer: %p / application thread: %s", p_signature->dbg_name( ).c_str( ), p_consumer, p_thread->name( ).c_str( ) );
    p_thread->clear_all_notifications( p_signature, p_consumer );
 
    return true;
@@ -145,7 +145,7 @@ const bool IEvent::clear_all_notifications( IAsync::IConsumer* p_consumer, const
 const bool IEvent::send( const application::Context& to_context )
 {
    auto p_event = shared_from_this( );
-   SYS_VRB( "event: %s", p_event->signature( )->name( ).c_str( ) );
+   SYS_VRB( "event: %s", p_event->signature( )->dbg_name( ).c_str( ) );
 
    if( to_context.is_external( ) )
    {
@@ -183,7 +183,7 @@ const bool IEvent::send( const application::Context& to_context )
    }
    else if( application::thread::local == to_context.tid( ) )
    {
-      SYS_INF( "sending event to current application thread: %s", to_context.tid( ).name( ).c_str( ) );
+      SYS_INF( "sending event to current application thread: %s", to_context.tid( ).dbg_name( ).c_str( ) );
       application::IThread::tSptr p_thread = carpc::application::Process::instance( )->current_thread( );
       if( nullptr == p_thread )
       {
@@ -195,7 +195,7 @@ const bool IEvent::send( const application::Context& to_context )
    }
    else
    {
-      SYS_INF( "sending event to %s application thread", to_context.tid( ).name( ).c_str( ) );
+      SYS_INF( "sending event to %s application thread", to_context.tid( ).dbg_name( ).c_str( ) );
       application::IThread::tSptr p_thread = carpc::application::Process::instance( )->thread( to_context.tid( ) );
       if( nullptr == p_thread )
       {

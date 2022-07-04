@@ -39,10 +39,10 @@ namespace carpc::async {
          }
 
       public:
-         const std::string name( ) const override
+         const std::string dbg_name( ) const override
          {
             static const std::string s_name = format_string( "type_id: ", type_id( ).c_str( ), ", " );
-            return s_name + m_user_signature.name( );
+            return s_name + m_user_signature.dbg_name( );
          }
          const tAsyncTypeID& type_id( ) const override
          {
@@ -109,7 +109,7 @@ namespace carpc::async::simple {
          ~Signature( ) = default;
 
       public:
-         const std::string name( ) const
+         const std::string dbg_name( ) const
          {
             return std::string{ };
          }
@@ -144,12 +144,12 @@ namespace carpc::async::id {
          ~TSignature( ) = default;
 
       public:
-         const std::string name( ) const
+         const std::string dbg_name( ) const
          {
             if constexpr( std::is_enum_v< _ID > || std::is_integral_v< _ID > )
                return carpc::format_string( "id: ", std::size_t(m_id) );
             else
-               return carpc::format_string( "id: ", m_id.name( ) );
+               return carpc::format_string( "id: ", m_id.dbg_name( ) );
          }
          bool operator<( const TSignature& other ) const
          {

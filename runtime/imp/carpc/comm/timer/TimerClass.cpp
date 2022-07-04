@@ -99,7 +99,7 @@ Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
       return;
    }
 
-   SYS_VRB( "created timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+   SYS_VRB( "created timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.dbg_name( ).c_str( ), (long) m_timer_id );
    TimerEvent::Event::set_notification( mp_consumer, { m_id.value( ) } );
 }
 
@@ -125,7 +125,7 @@ Timer::~Timer( )
    }
    else
    {
-      SYS_VRB( "removed timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+      SYS_VRB( "removed timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.dbg_name( ).c_str( ), (long) m_timer_id );
    }
 }
 
@@ -159,7 +159,7 @@ bool Timer::start( const std::size_t nanoseconds, const std::size_t count )
       return false;
    }
 
-   SYS_VRB( "started timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+   SYS_VRB( "started timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.dbg_name( ).c_str( ), (long) m_timer_id );
    m_is_running = true;
    return true;  
 }
@@ -183,7 +183,7 @@ bool Timer::stop( )
       return false;
    }
 
-   SYS_VRB( "stoped timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.name( ).c_str( ), (long) m_timer_id );
+   SYS_VRB( "stoped timer: %s(%s -> %#lx)", m_name.c_str( ), m_id.dbg_name( ).c_str( ), (long) m_timer_id );
    return true;  
 }
 

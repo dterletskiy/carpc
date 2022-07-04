@@ -127,7 +127,7 @@ bool Context::operator<( const Context& other ) const
    return m_tid < other.m_tid;
 }
 
-const std::string Context::name( ) const
+const std::string Context::dbg_name( ) const
 {
-   return carpc::format_string( m_pid.name( ), ".", m_tid.name( ) );
+   return carpc::format_string( m_pid.dbg_name( ), ".", m_tid.dbg_name( ) );
 }

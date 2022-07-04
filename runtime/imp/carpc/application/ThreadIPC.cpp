@@ -42,7 +42,7 @@ void ThreadIPC::thread_loop( )
    while( m_started.load( ) )
    {
       carpc::async::IAsync::tSptr p_event = get_event( );
-      SYS_VRB( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
+      SYS_VRB( "'%s': processing event (%s)", m_name.c_str( ), p_event->signature( )->dbg_name( ).c_str( ) );
       notify( p_event );
    }
 
@@ -109,7 +109,7 @@ bool ThreadIPC::insert_event( const carpc::async::IAsync::tSptr p_event )
 
    if( false == is_subscribed( p_event ) )
    {
-      SYS_INF( "'%s': there are no consumers for event '%s'", m_name.c_str( ), p_event->signature( )->name( ).c_str( ) );
+      SYS_INF( "'%s': there are no consumers for event '%s'", m_name.c_str( ), p_event->signature( )->dbg_name( ).c_str( ) );
       return false;
    }
 
@@ -132,13 +132,13 @@ void ThreadIPC::notify( const carpc::async::IAsync::tSptr p_event )
          SYS_VRB( "'%s': start processing runnable at %ld (%s)",
                m_name.c_str( ),
                process_started( ),
-               p_event->signature( )->name( ).c_str( )
+               p_event->signature( )->dbg_name( ).c_str( )
             );
          p_event->process( );
          SYS_VRB( "'%s': finished processing runnable started at %ld (%s)",
                m_name.c_str( ),
                process_started( ),
-               p_event->signature( )->name( ).c_str( )
+               p_event->signature( )->dbg_name( ).c_str( )
             );
          process_stop( );
 
@@ -154,13 +154,13 @@ void ThreadIPC::notify( const carpc::async::IAsync::tSptr p_event )
             SYS_VRB( "'%s': start processing event at %ld (%s)",
                   m_name.c_str( ),
                   process_started( ),
-                  p_event->signature( )->name( ).c_str( )
+                  p_event->signature( )->dbg_name( ).c_str( )
                );
             p_event->process( p_consumer );
             SYS_VRB( "'%s': finished processing event started at %ld (%s)",
                   m_name.c_str( ),
                   process_started( ),
-                  p_event->signature( )->name( ).c_str( )
+                  p_event->signature( )->dbg_name( ).c_str( )
                );
          }
          process_stop( );

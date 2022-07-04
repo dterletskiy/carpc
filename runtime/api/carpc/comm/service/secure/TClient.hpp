@@ -49,12 +49,12 @@ namespace carpc::service::secure::__private__ {
       mp_proxy->register_client( this );
       if( mp_proxy )
       {
-         SYS_VRB( "created: %s", mp_proxy->signature( ).name( ).c_str( ) );
+         SYS_VRB( "created: %s", mp_proxy->signature( ).dbg_name( ).c_str( ) );
       }
       else
       {
          SYS_ERR( "proxy can't be created => client will not work: %s / %s / %s",
-                     interface_type_id.name( ).c_str( ),
+                     interface_type_id.dbg_name( ).c_str( ),
                      role_name.c_str( ),
                      is_import ? "import" : " no import"
             );
@@ -66,7 +66,7 @@ namespace carpc::service::secure::__private__ {
    {
       if( mp_proxy )
       {
-         SYS_VRB( "destroyed: %s", mp_proxy->signature( ).name( ).c_str( ) );
+         SYS_VRB( "destroyed: %s", mp_proxy->signature( ).dbg_name( ).c_str( ) );
          mp_proxy->unregister_client( this );
          mp_proxy = nullptr;
       }

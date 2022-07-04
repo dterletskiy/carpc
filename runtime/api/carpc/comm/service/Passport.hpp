@@ -16,7 +16,7 @@ namespace carpc::service {
       Passport( );
       Passport( const Signature&, const Address& );
 
-      const std::string name( ) const;
+      const std::string dbg_name( ) const;
 
       bool to_stream( carpc::ipc::tStream& ) const;
       bool from_stream( carpc::ipc::tStream& );

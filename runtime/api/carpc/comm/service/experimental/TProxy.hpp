@@ -81,7 +81,7 @@ namespace carpc::service::experimental::__private_proxy__ {
          auto result = client_map.emplace( ++m_seq_id, p_client );
          if( false == result.second )
          {
-            SYS_WRN( "emplace error: %s -> %p", m_seq_id.name( ).c_str( ), p_client );
+            SYS_WRN( "emplace error: %s -> %p", m_seq_id.dbg_name( ).c_str( ), p_client );
             return comm::sequence::ID::invalid;
          }
 
@@ -175,7 +175,7 @@ namespace carpc::service::experimental::__private_proxy__ {
       auto seq_id_iterator = client_map.find( seq_id );
       if( client_map.end( ) == seq_id_iterator )
       {
-         SYS_WRN( "delivered event with sequence id '%s' to unknown client", m_seq_id.name( ).c_str( ) );
+         SYS_WRN( "delivered event with sequence id '%s' to unknown client", m_seq_id.dbg_name( ).c_str( ) );
          return false;
       }
       seq_id_iterator->second->process_event( event );
@@ -441,7 +441,7 @@ namespace carpc::service::experimental::__private__ {
 
       if( application::thread::current_id( ).is_invalid( ) )
       {
-         SYS_ERR( "creating proxy '%s.%s' not from application thread", interface_type_id.name( ).c_str( ), role_name.c_str( ) );
+         SYS_ERR( "creating proxy '%s.%s' not from application thread", interface_type_id.dbg_name( ).c_str( ), role_name.c_str( ) );
          return nullptr;
       }
 
@@ -473,14 +473,14 @@ namespace carpc::service::experimental::__private__ {
    template< typename TYPES >
    void TProxy< TYPES >::process_event( const typename TYPES::method::tEvent& event )
    {
-      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).dbg_name( ).c_str( ) );
       m_method_processor.process( event );
    }
 
    template< typename TYPES >
    void TProxy< TYPES >::process_event( const typename TYPES::attribute::tEvent& event )
    {
-      SYS_VRB( "processing event: %s", event.info( ).name( ).c_str( ) );
+      SYS_VRB( "processing event: %s", event.info( ).dbg_name( ).c_str( ) );
       m_attribute_processor.process( event );
    }
 

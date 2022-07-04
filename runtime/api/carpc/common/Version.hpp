@@ -125,7 +125,7 @@ namespace carpc {
             return *this;
          }
 
-         const std::string name( ) const
+         const std::string dbg_name( ) const
          {
             return carpc::format_string( m_major, ".", m_minor, ".", m_patch );
          }

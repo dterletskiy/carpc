@@ -63,7 +63,7 @@ bool Address::operator<( const Address& other ) const
    return m_id < other.m_id;
 }
 
-const std::string Address::name( ) const
+const std::string Address::dbg_name( ) const
 {
-   return m_context.name( ) + "." + m_id.name( );
+   return m_context.dbg_name( ) + "." + m_id.dbg_name( );
 }

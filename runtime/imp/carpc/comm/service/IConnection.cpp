@@ -19,16 +19,16 @@ IConnection::IConnection( const carpc::async::tAsyncTypeID& interface_type_id, c
 {
    if( false == m_context.is_valid( ) )
    {
-      SYS_ERR( "creating connection '%s' not from application thread", m_signature.name( ).c_str( ) );
+      SYS_ERR( "creating connection '%s' not from application thread", m_signature.dbg_name( ).c_str( ) );
       return;
    }
 
-   SYS_VRB( "created %s", m_signature.name( ).c_str( ) );
+   SYS_VRB( "created %s", m_signature.dbg_name( ).c_str( ) );
 }
 
 IConnection::~IConnection( )
 {
-   SYS_VRB( "destroyed %s", m_signature.name( ).c_str( ) );
+   SYS_VRB( "destroyed %s", m_signature.dbg_name( ).c_str( ) );
    ev_i::Status::Event::clear_all_notifications( this );
 }
 
@@ -46,14 +46,14 @@ void IConnection::process_event( const ev_i::Status::Event& event )
       case ev_i::eStatus::ServerConnected:
       case ev_i::eStatus::ClientConnected:
       {
-         SYS_VRB( "connected side: %s", address.name( ).c_str( ) );
+         SYS_VRB( "connected side: %s", address.dbg_name( ).c_str( ) );
          status( address, eStatus::Connected );
          break;
       }
       case ev_i::eStatus::ServerDisconnected:
       case ev_i::eStatus::ClientDisconnected:
       {
-         SYS_VRB( "disconnected side: %s", address.name( ).c_str( ) );
+         SYS_VRB( "disconnected side: %s", address.dbg_name( ).c_str( ) );
          status( address, eStatus::Disconnected );
          break;
       }

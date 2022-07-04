@@ -19,9 +19,9 @@ Passport::Passport( const Signature& _signature, const Address& _address )
 {
 }
 
-const std::string Passport::name( ) const
+const std::string Passport::dbg_name( ) const
 {
-   return signature.name( ) + " / " + address.name( );
+   return signature.dbg_name( ) + " / " + address.dbg_name( );
 }
 
 

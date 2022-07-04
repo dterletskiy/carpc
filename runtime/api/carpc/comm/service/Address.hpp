@@ -32,7 +32,7 @@ namespace carpc::service {
          bool operator<( const Address& ) const;
 
       public:
-         const std::string name( ) const;
+         const std::string dbg_name( ) const;
 
       public:
          const application::Context& context( ) const;

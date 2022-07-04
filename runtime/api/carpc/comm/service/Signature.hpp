@@ -29,7 +29,7 @@ namespace carpc::service {
          bool operator<( const Signature& ) const;
 
       public:
-         const std::string name( ) const;
+         const std::string dbg_name( ) const;
 
       public:
          const carpc::async::tAsyncTypeID& type_id( ) const;

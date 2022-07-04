@@ -88,7 +88,7 @@ carpc::os::Socket::tSptr SendReceive::socket( const application::Context& contex
    auto p_socket_send = Connections::channel::send::socket( context.pid( ) );
    if( nullptr == p_socket_send )
    {
-      SYS_WRN( "unable to find socket for context '%s'", context.name( ).c_str( ) );
+      SYS_WRN( "unable to find socket for context '%s'", context.dbg_name( ).c_str( ) );
    }
 
    return p_socket_send;
@@ -224,7 +224,7 @@ bool SendReceive::ServiceBrocker::process_package( ipc::Package& package, os::So
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "detected server: '%s' / %s", service_passport.name( ).c_str( ), inet_address.name( ).c_str( ) );
+         SYS_INF( "detected server: '%s' / %s", service_passport.dbg_name( ).c_str( ), inet_address.dbg_name( ).c_str( ) );
 
          auto& pid = service_passport.address.context( ).pid( );
          auto p_socket_send = Connections::channel::send::socket( pid );
@@ -265,7 +265,7 @@ bool SendReceive::ServiceBrocker::process_package( ipc::Package& package, os::So
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "detected client: %s / %s", service_passport.name( ).c_str( ), inet_address.name( ).c_str( ) );
+         SYS_INF( "detected client: %s / %s", service_passport.dbg_name( ).c_str( ), inet_address.dbg_name( ).c_str( ) );
 
          break;
       }
@@ -434,7 +434,7 @@ bool SendReceive::Connections::process_package( ipc::Package& package, os::Socke
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register process: %s / %s", pid.name( ).c_str( ), inet_address.name( ).c_str( ) );
+         SYS_INF( "register process: %s / %s", pid.dbg_name( ).c_str( ), inet_address.dbg_name( ).c_str( ) );
 
          auto p_socket_send = channel::send::socket( pid );
          if( nullptr == p_socket_send )
@@ -459,12 +459,12 @@ bool SendReceive::Connections::process_package( ipc::Package& package, os::Socke
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register process acknowledge: %s", pid.name( ).c_str( ) );
+         SYS_INF( "register process acknowledge: %s", pid.dbg_name( ).c_str( ) );
 
          auto p_socket_send = channel::send::socket( pid );
          if( nullptr == p_socket_send )
          {
-            SYS_WRN( "process '%s' was not registered or send socket is nullptr for connection to process", pid.name( ).c_str( ) );
+            SYS_WRN( "process '%s' was not registered or send socket is nullptr for connection to process", pid.dbg_name( ).c_str( ) );
             return false;
          }
 
@@ -498,7 +498,7 @@ bool SendReceive::Connections::process_package( ipc::Package& package, os::Socke
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_VRB( "received event '%s' to context: %s", p_event->signature( )->name( ).c_str( ), to_context.name( ).c_str( ) );
+         SYS_VRB( "received event '%s' to context: %s", p_event->signature( )->dbg_name( ).c_str( ), to_context.dbg_name( ).c_str( ) );
          p_event->send( to_context );
 
          break;
@@ -511,19 +511,19 @@ bool SendReceive::Connections::process_package( ipc::Package& package, os::Socke
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register server: %s", server_passport.name( ).c_str( ) );
+         SYS_INF( "register server: %s", server_passport.dbg_name( ).c_str( ) );
 
          const auto& pid = channel::recv::pid( p_socket );
          const auto& pid_test = server_passport.address.context( ).pid( );
          if( pid != pid_test )
          {
-            SYS_ERR( "PID mismatch %s != %s", pid.name( ).c_str( ), pid_test.name( ).c_str( ) );
+            SYS_ERR( "PID mismatch %s != %s", pid.dbg_name( ).c_str( ), pid_test.dbg_name( ).c_str( ) );
             return false;
          }
 
          if( false == channel::established( pid ) )
          {
-            SYS_WRN( "connection was not established to process %s", pid.name( ).c_str( ) );
+            SYS_WRN( "connection was not established to process %s", pid.dbg_name( ).c_str( ) );
             return false;
          }
 
@@ -540,26 +540,26 @@ bool SendReceive::Connections::process_package( ipc::Package& package, os::Socke
             SYS_ERR( "parce package error" );
             return false;
          }
-         SYS_INF( "register client: %s", client_passport.name( ).c_str( ) );
+         SYS_INF( "register client: %s", client_passport.dbg_name( ).c_str( ) );
 
          const auto& pid = channel::recv::pid( p_socket );
          const auto& pid_test = client_passport.address.context( ).pid( );
          if( pid != pid_test )
          {
-            SYS_ERR( "PID mismatch %s != %s", pid.name( ).c_str( ), pid_test.name( ).c_str( ) );
+            SYS_ERR( "PID mismatch %s != %s", pid.dbg_name( ).c_str( ), pid_test.dbg_name( ).c_str( ) );
             return false;
          }
 
          if( false == channel::established( pid ) )
          {
-            SYS_WRN( "connection was not established to process %s", pid.name( ).c_str( ) );
+            SYS_WRN( "connection was not established to process %s", pid.dbg_name( ).c_str( ) );
             return false;
          }
 
          const auto& server_address = application::Process::instance( )->service_registry( ).server( client_passport );
          if( false == server_address.is_valid( ) )
          {
-            SYS_WRN( "server '%s' is not registered", client_passport.name( ).c_str( ) );
+            SYS_WRN( "server '%s' is not registered", client_passport.dbg_name( ).c_str( ) );
             return false;
          }
          service::Passport server_passport( client_passport.signature, server_address );
@@ -598,7 +598,7 @@ carpc::os::Socket::tSptr SendReceive::Connections::channel::send::create(
    auto iterator = data::ms_send.find( pid );
    if( data::ms_send.end( ) != iterator && nullptr != iterator->second )
    {
-      SYS_WRN( "send socket already exists for PID %s", pid.name( ).c_str( ) );
+      SYS_WRN( "send socket already exists for PID %s", pid.dbg_name( ).c_str( ) );
       return iterator->second;
    }
 
@@ -612,12 +612,12 @@ carpc::os::Socket::tSptr SendReceive::Connections::channel::send::create(
 
    if( data::ms_send.end( ) != iterator )
    {
-      SYS_WRN( "send socket does not exist for PID %s", pid.name( ).c_str( ) );
+      SYS_WRN( "send socket does not exist for PID %s", pid.dbg_name( ).c_str( ) );
       iterator->second = p_socket;
    }
    else
    {
-      SYS_WRN( "PID %s was registered and socket created", pid.name( ).c_str( ) );
+      SYS_WRN( "PID %s was registered and socket created", pid.dbg_name( ).c_str( ) );
       data::ms_send.emplace( pid, p_socket );
    }
 
