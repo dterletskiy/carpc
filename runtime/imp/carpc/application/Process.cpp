@@ -62,7 +62,7 @@ Process::Process( int argc, char** argv, char** envp )
    : m_id( getpid( ) ) // @TDA: should be unique for all computers in the network
    , m_pce( argc, argv, envp )
 {
-   SYS_VRB( "created" );
+   SYS_DBG( "[runtime] creating..." );
 
    m_pce.print( );
 
@@ -120,11 +120,13 @@ Process::Process( int argc, char** argv, char** envp )
    m_configuration.wd_timout = static_cast< std::size_t >( std::stoll( m_pce.value_or( "application_wd_timout", "10" ) ) );
 
    DUMP_IPC_EVENTS;
+
+   SYS_DBG( "[runtime] created" );
 }
 
 Process::~Process( )
 {
-   SYS_VRB( "destroyed" );
+   SYS_DBG( "[runtime] destroyed" );
 }
 
 namespace { carpc::os::Mutex s_mutex; }
@@ -188,6 +190,8 @@ IThread::tSptr Process::current_thread( ) const
 
 bool Process::start( const Thread::Configuration::tVector& thread_configs )
 {
+   SYS_DBG( "[runtime] starting..." );
+
    if( true == m_configuration.ipc )
    {
       // Creating IPC brocker thread
@@ -198,22 +202,22 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
       // Starting IPC brocker thread
       if( true == mp_thread_ipc->start( ) )
       {
-         SYS_INF( "starting IPC thread started" );
+         SYS_DBG( "[runtime] starting IPC thread" );
          while( false == mp_thread_ipc->started( ) )
          {
             std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-            SYS_WRN( "waiting to strat IPC thread" );
+            SYS_WRN( "[runtime] waiting to strat IPC thread" );
          }
-         SYS_INF( "IPC thread started" );
+         SYS_DBG( "[runtime] IPC thread started" );
       }
       else
       {
-         SYS_WRN( "starting without IPC thread" );
+         SYS_WRN( "[runtime] IPC thread can't be started" );
       }
    }
    else
    {
-      SYS_INF( "starting without IPC thread" );
+      SYS_DBG( "[runtime] starting without IPC thread" );
    }
 
    // Creating application threads
@@ -228,7 +232,7 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    // Starting application threads
    for( const auto& p_thread : m_thread_list )
    {
-      SYS_INF( "starting '%s' thread", p_thread->name( ).c_str( ) );
+      SYS_DBG( "[runtime] starting '%s' thread", p_thread->name( ).c_str( ) );
       if( false == p_thread->start( ) )
          return false;
    }
@@ -243,14 +247,14 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
          threads_started &= thread_started;
          if( false == thread_started )
          {
-            SYS_WRN( "waiting to strat '%s' thread", p_thread->name( ).c_str( ) );
+            SYS_WRN( "[runtime] waiting to strat '%s' thread", p_thread->name( ).c_str( ) );
          }
       }
 
       if( true == threads_started )
          break;
    }
-   SYS_INF( "all application threads started" );
+   SYS_DBG( "[runtime] all application threads started" );
 
    // Watchdog timer
    if( 0 < m_configuration.wd_timout )
@@ -262,14 +266,17 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    }
    else
    {
-      SYS_WRN( "WatchDog disabled" );
+      SYS_WRN( "[runtime] watchdog disabled" );
    }
 
+   SYS_DBG( "[runtime] started" );
    return true;
 }
 
 bool Process::stop( )
 {
+   SYS_DBG( "[runtime] stopping" );
+
    for( auto& p_thread : m_thread_list )
       if( p_thread )
          p_thread->stop( );
@@ -279,26 +286,29 @@ bool Process::stop( )
 
    os::os_linux::timer::remove( m_timer_id );
 
+   SYS_DBG( "[runtime] stopped" );
    return true;
 }
 
 void Process::boot( )
 {
-   SYS_DBG( "booting..." );
+   SYS_DBG( "[runtime] running..." );
 
    events::system::System::Event::create_send( { events::system::eID::boot }, { "booting application" } );
 
    for( auto& p_thread : m_thread_list )
       if( p_thread )
          p_thread->wait( );
-   SYS_INF( "All application threads are stopped" );
+   SYS_DBG( "[runtime] all application threads are stopped" );
 
    if( mp_thread_ipc )
       mp_thread_ipc->wait( );
-   SYS_INF( "IPC thread is stopped" );
+   SYS_DBG( "[runtime] IPC thread is stopped" );
 
    os::os_linux::timer::remove( m_timer_id );
 
    m_thread_list.clear( );
    mp_thread_ipc.reset( );
+
+   SYS_DBG( "[runtime] stopped" );
 }
