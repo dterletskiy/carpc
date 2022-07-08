@@ -8,6 +8,8 @@
 
 [Creating empty application](./dev_create_empty_app.md#creating-empty-application)
 
+[Creating application component](./dev_create_app_component.md#creating-application-component)
+
 [Creating application component](#preconditions)
 
 
