@@ -1,5 +1,8 @@
+version 3.10.4
+   - Added 'CompileDefinitions.txt' CMake file, to allow more comfortable integration on the client's side.
+
 version 3.10.3
-   - Changeed functions "name( )" for debug pritn objects to "dbg_name( )".
+   - Changed functions "name( )" for debug pritn objects to "dbg_name( )".
 
 version 3.10.2
    - Extending DEFINE_EVENT macros.
