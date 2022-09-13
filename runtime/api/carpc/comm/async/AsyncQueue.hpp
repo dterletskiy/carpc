@@ -12,6 +12,7 @@ namespace carpc::async {
       public:
          using tSptr = std::shared_ptr< AsyncQueue >;
          using tWptr = std::weak_ptr< AsyncQueue >;
+         using tCollection = std::deque< IAsync::tSptr >;
 
       public:
          AsyncQueue( const std::string& name = "NoName" );
@@ -25,9 +26,13 @@ namespace carpc::async {
       public:
          bool insert( const IAsync::tSptr );
          IAsync::tSptr get( );
+         void clear( );
+         void freeze( );
+         void unfreeze( );
       private:
-         std::deque< IAsync::tSptr >      m_collection;
-         os::ConditionVariable            m_buffer_cond_var;
+         tCollection                m_collection;
+         os::ConditionVariable      m_buffer_cond_var;
+         std::atomic< bool >        m_freezed = false;
 
       public:
          void dump( ) const;

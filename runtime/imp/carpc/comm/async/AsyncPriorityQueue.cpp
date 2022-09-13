@@ -27,6 +27,16 @@ AsyncPriorityQueue::~AsyncPriorityQueue( )
 
 bool AsyncPriorityQueue::insert( const IAsync::tSptr p_async )
 {
+   if( m_freezed.load( ) )
+   {
+      SYS_VRB( "'%s': async object (%s) with priority %u can't be inserted, because of collection is freezed",
+         m_name.c_str( ),
+         p_async->signature( )->dbg_name( ).c_str( ),
+         p_async->priority( ).value( )
+      );
+      return false;
+   }
+
    SYS_VRB( "'%s': inserting async object (%s) with priority %u",
          m_name.c_str( ),
          p_async->signature( )->dbg_name( ).c_str( ),
@@ -101,6 +111,27 @@ IAsync::tSptr AsyncPriorityQueue::get( )
    m_buffer_cond_var.unlock( );
 
    return p_async;
+}
+
+void AsyncPriorityQueue::clear( )
+{
+   m_buffer_cond_var.lock( );
+   SYS_INF( "clearing collection..." );
+   for( tPriority index = tPriority( m_collections.size( ) - 1 ); index > tPriority::zero; --index )
+   {
+      m_collections[ index ].clear( );
+   }
+   m_buffer_cond_var.unlock( );
+}
+
+void AsyncPriorityQueue::freeze( )
+{
+   m_freezed.store( true );
+}
+
+void AsyncPriorityQueue::unfreeze( )
+{
+   m_freezed.store( false );
 }
 
 void AsyncPriorityQueue::dump( ) const

@@ -9,7 +9,7 @@ using namespace carpc::application;
 
 
 
-IThread::IThread( const std::string& name, const size_t wd_timeout )
+IThread::IThread( const std::string& name, const std::size_t wd_timeout )
    : m_name( name )
    , m_wd_timeout( wd_timeout )
 {

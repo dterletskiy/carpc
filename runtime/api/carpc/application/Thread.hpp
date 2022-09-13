@@ -44,7 +44,6 @@ namespace carpc::application {
 
       private:
          bool insert_event( const carpc::async::IAsync::tSptr ) override;
-         bool send( const carpc::async::IAsync::tSptr, const application::Context& ) override;
          carpc::async::IAsync::tSptr get_event( );
          tEventCollection                             m_event_queue;
 
@@ -62,6 +61,9 @@ namespace carpc::application {
 
       private:
          void dump( ) const override;
+
+      private:
+         bool send( const carpc::async::IAsync::tSptr, const application::Context& ) override;
    };
 
 

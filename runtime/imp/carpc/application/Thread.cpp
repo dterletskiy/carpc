@@ -109,12 +109,6 @@ bool Thread::insert_event( const carpc::async::IAsync::tSptr p_event )
    return m_event_queue.insert( p_event );
 }
 
-bool Thread::send( const carpc::async::IAsync::tSptr, const application::Context& )
-{
-   SYS_WRN( "not supported for not IPC thread" );
-   return false;
-}
-
 carpc::async::IAsync::tSptr Thread::get_event( )
 {
    return m_event_queue.get( );
@@ -204,4 +198,10 @@ void Thread::dump( ) const
    m_event_queue.dump( );
    m_consumers_map.dump( );
    SYS_DUMP_END( );
+}
+
+bool Thread::send( const carpc::async::IAsync::tSptr, const application::Context& )
+{
+   SYS_WRN( "not supported for not IPC thread" );
+   return false;
 }

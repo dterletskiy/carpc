@@ -28,7 +28,7 @@ namespace carpc::application {
          using tConsumerMap = async::AsyncConsumerMap;
 
       public:
-         IThread( const std::string&, const size_t );
+         IThread( const std::string&, const std::size_t );
          virtual ~IThread( ) = default;
          IThread( const IThread& ) = delete;
          IThread& operator=( const IThread& ) = delete;
@@ -58,13 +58,13 @@ namespace carpc::application {
          thread::Name   m_name{ "NoName_Thread" };
 
       public:
-         const size_t wd_timeout( ) const;
+         const std::size_t wd_timeout( ) const;
          const time_t process_started( ) const;
       protected:
          void process_start( );
          void process_stop( );
       private:
-         size_t                        m_wd_timeout = 0;
+         std::size_t                   m_wd_timeout = 0;
          std::atomic< time_t >         m_process_started = 0;
    };
 
@@ -83,7 +83,7 @@ namespace carpc::application {
    }
 
    inline
-   const size_t IThread::wd_timeout( ) const
+   const std::size_t IThread::wd_timeout( ) const
    {
       return m_wd_timeout;
    }

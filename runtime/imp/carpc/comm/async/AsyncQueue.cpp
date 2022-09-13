@@ -23,6 +23,15 @@ AsyncQueue::~AsyncQueue( )
 
 bool AsyncQueue::insert( const IAsync::tSptr p_async )
 {
+   if( m_freezed.load( ) )
+   {
+      SYS_VRB( "'%s': async object (%s) can't be inserted, because of collection is freezed",
+         m_name.c_str( ),
+         p_async->signature( )->dbg_name( ).c_str( )
+      );
+      return false;
+   }
+
    SYS_VRB( "'%s': inserting async object (%s)", m_name.c_str( ), p_async->signature( )->dbg_name( ).c_str( ) );
    m_buffer_cond_var.lock( );
    m_collection.push_back( p_async );
@@ -46,6 +55,24 @@ IAsync::tSptr AsyncQueue::get( )
    m_buffer_cond_var.unlock( );
 
    return p_async;
+}
+
+void AsyncQueue::clear( )
+{
+   m_buffer_cond_var.lock( );
+   SYS_INF( "clearing collection..." );
+   m_collection.clear( );
+   m_buffer_cond_var.unlock( );
+}
+
+void AsyncQueue::freeze( )
+{
+   m_freezed.store( true );
+}
+
+void AsyncQueue::unfreeze( )
+{
+   m_freezed.store( false );
 }
 
 void AsyncQueue::dump( ) const
