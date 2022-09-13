@@ -2,11 +2,11 @@ cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 project( CARPC )
 
-include( ./build/CMakeLists-compiler_definitions.txt )
-include( ./build/CMakeLists-message.txt )
-include( ./build/CMakeLists-debug_print.txt )
-include( ./build/CMakeLists-setup_macros.txt )
-include( ./build/CMakeLists-generators.txt )
+include( ./CMakeLists-compiler_definitions.txt )
+include( ./build/cmake/CMakeLists-message.txt )
+include( ./build/cmake/CMakeLists-debug_print.txt )
+include( ./build/cmake/CMakeLists-setup_macros.txt )
+include( ./build/cmake/CMakeLists-generators.txt )
 
 
 
