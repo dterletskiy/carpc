@@ -120,6 +120,7 @@ There will be next traces in console:
 [runtime] started
 [runtime] running...
 [runtime] stopped
+[runtime] destroyed
 </pre>
 
 
