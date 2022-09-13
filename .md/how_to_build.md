@@ -98,7 +98,7 @@ Let's suppose you have cloned all previous stuff to ***/mnt/dev/*** folder. So, 
  - python_fw
 
 ***carpc*** folder contains next stuff:
-   - ***build system***: build/, build.sh, CMakeList.txt, Android.bp - scripts and configuration files for building carpc project and other projects based on carpc.
+   - ***build system***: build/, build.sh, CMakeList.txt, CMakeLists-compiler_definitions.txt, CMakeLists-projects.txt, Android.bp - scripts and configuration files for building carpc project and other projects based on carpc.
    - ***tracing project***: tracing/ - tracing library sources.
    - ***service brocker project***: servicebrocker/ - servicebrocker binary sources required for IPC/RPC.
    - ***carpc runtime project***: runtime/ - carpc runtime library sources.

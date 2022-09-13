@@ -43,22 +43,21 @@ mkdir -p ${CARPC_EXAMPLES_SOURCE_DIR}
 Copy build system to our project folder:
 
 <pre>
-cp -r ${CARPC_DELIVERY_DIR}/* ${CARPC_EXAMPLES_SOURCE_DIR}
+cp -r ${CARPC_DELIVERY_DIR}/bin/build-system/* ${CARPC_EXAMPLES_SOURCE_DIR}
 chmod +x ${CARPC_EXAMPLES_SOURCE_DIR}/build.sh
 chmod +x ${CARPC_EXAMPLES_SOURCE_DIR}/build/generator/generator.py
 </pre>
-
-Open ${CARPC_EXAMPLES_SOURCE_DIR}/CMakeList.txt scroll to the and of this file, remove all ***add_subdirectory(...)*** functions and add ***add_subdirectory( examples )***.
 
 Create subfolder with CMakeList.txt for examples:
 
 <pre>
 mkdir ${CARPC_EXAMPLES_SOURCE_DIR}/examples
 touch ${CARPC_EXAMPLES_SOURCE_DIR}/examples/CMakeList.txt
-echo "cmake_minimum_required( VERSION 3.16 FATAL_ERROR )" > ${CARPC_EXAMPLES_SOURCE_DIR}/examples/CMakeList.txt
 </pre>
 
 This ***examples*** folder will containe all examples in separate folders (ex_01, ex_02, ...), so CMakeLists.txt file will be extended by new ***add_subdirectory(...)*** functions. Each subdirectory will contain additinal CMakeLists.txt file what will define target for current example and rules for it.
+
+Now we should include ***examples*** folder to build system. For this open ${CARPC_EXAMPLES_SOURCE_DIR}/CMakeList-projects.txt and change ***add_subdirectory( subfolder_with_project )*** to ***add_subdirectory( examples )***.
 
 
 

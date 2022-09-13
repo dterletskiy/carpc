@@ -31,14 +31,9 @@ install(
    DIRECTORY ${ROOT_SOURCE_DIR}/build/cmake
    DESTINATION bin/build-system/build
    PATTERN CMakeLists-projects.txt EXCLUDE
-   PATTERN example EXCLUDE
 )
 install(
    FILES ${ROOT_SOURCE_DIR}/build/cmake/CMakeLists-projects.txt
-   DESTINATION bin/build-system
-)
-install(
-   DIRECTORY ${ROOT_SOURCE_DIR}/build/cmake/example
    DESTINATION bin/build-system
 )
 
