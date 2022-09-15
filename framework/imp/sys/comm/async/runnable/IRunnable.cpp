@@ -26,15 +26,15 @@ const bool IRunnable::send( const application::Context& to_context, const bool i
    }
 
    // Sending blocking Async object
-   carpc::os::ConditionVariable cond_var;
+   std::shared_ptr<carpc::os::ConditionVariable> p_cond_var = std::make_shared<carpc::os::ConditionVariable>();
 
 
-   auto operation_wrapper = [ operation = m_operation, &cond_var ]( )
+   auto operation_wrapper = [ operation = m_operation, p_cond_var ]( )
    {
       if( operation )
          operation( );
 
-      cond_var.notify( );
+      p_cond_var->notify( );
    };
 
    m_operation = operation_wrapper;
@@ -42,8 +42,8 @@ const bool IRunnable::send( const application::Context& to_context, const bool i
    if( false == send_to( to_context ) )
       return false;
 
-   while ( true != cond_var.test( ) )
-      cond_var.wait( );
+   while ( true != p_cond_var->test( ) )
+      p_cond_var->wait( );
 
    return true;
 }
