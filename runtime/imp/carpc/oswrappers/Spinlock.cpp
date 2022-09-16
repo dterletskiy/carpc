@@ -16,6 +16,8 @@ using namespace carpc::os;
 
 
 
+thread_local int Spinlock::m_error{ 0 };
+
 Spinlock::Spinlock( const bool auto_lock, const bool shared )
 {
    pthread_spin_init( &m_spinlock, shared ? PTHREAD_PROCESS_SHARED : PTHREAD_PROCESS_PRIVATE );
@@ -28,8 +30,7 @@ Spinlock::Spinlock( const bool auto_lock, const bool shared )
 
 Spinlock::~Spinlock( )
 {
-   if( m_locked )
-      unlock( );
+   unlock( );
 
    pthread_spin_destroy( &m_spinlock );
 
@@ -47,7 +48,6 @@ bool Spinlock::lock( )
       return false;
    }
 
-   m_locked = true;
    MESSAGE( "%s: locked(%#10lx)\n", m_id.dbg_name( ).c_str( ), pthread_self( ) );
    return true;
 }
@@ -63,7 +63,6 @@ bool Spinlock::try_lock( )
       return false;
    }
 
-   m_locked = true;
    MESSAGE( "%s: locked(%#10lx)\n", m_id.dbg_name( ).c_str( ), pthread_self( ) );
    return true;
 }
@@ -79,7 +78,6 @@ bool Spinlock::unlock( )
       return false;
    }
 
-   m_locked = false;
    MESSAGE( "%s: unlocked(%#10lx)\n", m_id.dbg_name( ).c_str( ), pthread_self( ) );
    return true;
 }

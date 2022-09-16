@@ -40,14 +40,14 @@ namespace carpc::os {
       public:
          const futex::ID& id( ) const;
       protected:
-         futex::ID   m_id = futex::ID::generate( );
+         futex::ID                  m_id = futex::ID::generate( );
 
       public:
          bool lock( );
          bool unlock( );
       protected:
-         tFutex      m_futex = UNLOCKED;
-         int         m_error = 0;
+         tFutex                     m_futex = UNLOCKED;
+         static thread_local int    m_error;
    };
 
 

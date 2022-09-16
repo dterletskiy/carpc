@@ -35,7 +35,7 @@ namespace carpc::os {
       public:
          const mutex::ID& id( ) const;
       protected:
-         mutex::ID            m_id = mutex::ID::generate( );
+         mutex::ID                  m_id = mutex::ID::generate( );
 
       public:
          bool lock( );
@@ -43,12 +43,12 @@ namespace carpc::os {
          bool timed_lock( const timespec& abs_timeout );
          bool unlock( );
       protected:
-         unsigned int         m_locked = 0;
-         int                  m_error = 0;
+         std::atomic< std::size_t > m_locked{ 0 };
+         static thread_local int    m_error;
 
       protected:
-         pthread_mutex_t      m_mutex = PTHREAD_MUTEX_INITIALIZER;
-         pthread_mutexattr_t  m_mutex_attr;
+         pthread_mutex_t            m_mutex = PTHREAD_MUTEX_INITIALIZER;
+         pthread_mutexattr_t        m_mutex_attr;
    };
 
 
@@ -75,7 +75,7 @@ namespace carpc::os {
       public:
          const mutex::ID& id( ) const;
       protected:
-         mutex::ID            m_id = mutex::ID::generate( );
+         mutex::ID                  m_id = mutex::ID::generate( );
 
       public:
          bool read_lock( );
@@ -86,12 +86,12 @@ namespace carpc::os {
          bool write_time_lock( const timespec& abs_timeout );
          bool unlock( );
       protected:
-         unsigned int         m_locked = 0;
-         int                  m_error = 0;
+         std::atomic< std::size_t > m_locked{ 0 };
+         static thread_local int    m_error;
 
       protected:
-         pthread_rwlock_t     m_mutex = PTHREAD_RWLOCK_INITIALIZER;
-         pthread_rwlockattr_t m_mutex_attr;
+         pthread_rwlock_t           m_mutex = PTHREAD_RWLOCK_INITIALIZER;
+         pthread_rwlockattr_t       m_mutex_attr;
    };
 
 

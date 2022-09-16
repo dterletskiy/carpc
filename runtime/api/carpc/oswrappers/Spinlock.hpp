@@ -35,18 +35,17 @@ namespace carpc::os {
       public:
          const spinlock::ID& id( ) const;
       protected:
-         spinlock::ID            m_id = spinlock::ID::generate( );
+         spinlock::ID               m_id = spinlock::ID::generate( );
 
       public:
          bool lock( );
          bool try_lock( );
          bool unlock( );
       protected:
-         bool                    m_locked = false;
-         int                     m_error = 0;
+         static thread_local int    m_error;
 
       protected:
-         pthread_spinlock_t      m_spinlock;
+         pthread_spinlock_t         m_spinlock;
    };
 
 

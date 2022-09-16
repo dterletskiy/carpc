@@ -16,6 +16,8 @@ using namespace carpc::os;
 
 
 
+thread_local int Futex::m_error{ 0 };
+
 Futex::Futex( const bool auto_lock )
 {
    if( auto_lock )

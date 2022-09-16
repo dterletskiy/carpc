@@ -16,6 +16,8 @@ using namespace carpc::os;
 
 
 
+thread_local int Mutex::m_error{ 0 };
+
 Mutex::Mutex( const bool auto_lock, const bool recursive )
 {
    pthread_mutexattr_init( &m_mutex_attr );
@@ -31,7 +33,7 @@ Mutex::Mutex( const bool auto_lock, const bool recursive )
 
 Mutex::~Mutex( )
 {
-   if( 0 != m_locked )
+   if( 0 != m_locked.load( ) )
    {
       MESSAGE( "%s: destroying locked mutex(%#10lx)\n", m_id.dbg_name( ).c_str( ), pthread_self( ) );
    }
@@ -108,6 +110,8 @@ bool Mutex::unlock( )
 
 
 
+thread_local int MutexRW::m_error{ 0 };
+
 MutexRW::MutexRW( )
 {
    pthread_rwlockattr_init( &m_mutex_attr );
@@ -118,7 +122,7 @@ MutexRW::MutexRW( )
 
 MutexRW::~MutexRW( )
 {
-   if( 0 != m_locked )
+   if( 0 != m_locked.load( ) )
    {
       MESSAGE( "%s: destroying locked mutex(%#10lx)\n", m_id.dbg_name( ).c_str( ), pthread_self( ) );
    }

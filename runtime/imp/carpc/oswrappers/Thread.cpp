@@ -36,7 +36,7 @@ Thread::~Thread( )
 {
    SYS_INF( );
    // Not supported by Android
-   // if( true == m_created ) pthread_cancel( m_created );
+   // if( true == m_created ) pthread_cancel( m_thread_id );
    os::Mutex::AutoLocker locker( s_registry_mutex );
    s_registry.erase( m_thread_id );
 }
