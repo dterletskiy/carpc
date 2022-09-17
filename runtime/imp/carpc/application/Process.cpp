@@ -259,7 +259,7 @@ bool Process::start( const Thread::Configuration::tVector& thread_configs )
    // Watchdog timer
    if( 0 < m_configuration.wd_timout )
    {
-      if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
+      if( false == os::os_linux::timer::create( m_timer_id, timer_handler, &m_timer_id ) )
          return false;
       if( false == os::os_linux::timer::start( m_timer_id, m_configuration.wd_timout * 1000000000, os::os_linux::timer::eTimerType::continious ) )
          return false;

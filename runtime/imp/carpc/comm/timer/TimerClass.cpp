@@ -42,6 +42,16 @@ namespace {
       timer_processor( *timer_id );
    }
 
+   void timer_handler_simple( union sigval sv )
+   {
+      if( nullptr == sv.sival_ptr )
+         return;
+
+      Timer* p_timer = static_cast< Timer* >( sv.sival_ptr );
+      SYS_VRB( "Timer: %p", p_timer );
+      p_timer->process( p_timer->timer_id( ) );
+   }
+
    void signal_handler( int signal, siginfo_t* si, void* uc )
    {
       SYS_VRB( "signal: %d / si->si_signo: %d", signal, si->si_signo );
@@ -76,11 +86,12 @@ Timer::Timer( ITimerConsumer* p_consumer, const std::string& name )
       return;
    }
 
-   // Variant with "timer_handler" should be used because of in some cases linux can create several timers with the same id
-   // in case of using variant with "signal_handler".
-   // os::os_linux::signals::set_handler( SIGRTMIN, signal_handler );
-   // if( false == os::os_linux::timer::create( m_timer_id, SIGRTMIN ) )
-   if( false == os::os_linux::timer::create( m_timer_id, timer_handler ) )
+   // 1.
+   // if( false == os::os_linux::timer::create( m_timer_id, SIGRTMIN, signal_handler ) )
+   // 2.
+   // if( false == os::os_linux::timer::create( m_timer_id, timer_handler, &m_timer_id ) )
+   // 3.
+   if( false == os::os_linux::timer::create( m_timer_id, timer_handler_simple, this ) )
    {
       SYS_ERR( "create timer error" );
       return;

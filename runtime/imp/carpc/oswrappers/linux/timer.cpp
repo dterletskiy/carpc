@@ -9,8 +9,14 @@ namespace carpc::os::os_linux::timer {
 
 
 
-   bool create( tID& timer_id, int signal )
+   bool create( tID& timer_id, int signal, signals::tHandler handler )
    {
+      if( nullptr != handler )
+      {
+         if( false == signals::set_handler( signal, handler ) )
+            return false;
+      }
+
       struct sigevent sev;
       memset( &sev, 0, sizeof(struct sigevent) );
       sev.sigev_notify = SIGEV_SIGNAL;
@@ -25,17 +31,17 @@ namespace carpc::os::os_linux::timer {
       }
 
       SYS_VRB( "%#lx", (long)timer_id );
-      SYS_VRB( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
+      // SYS_VRB( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
       return 0 == result;
    }
 
-   bool create( tID& timer_id, tEventHandler callback, void* p_attributes )
+   bool create( tID& timer_id, tEventHandler callback, void* p_data, void* p_attributes )
    {
       struct sigevent sev;
       memset( &sev, 0, sizeof(struct sigevent) );
       sev.sigev_notify = SIGEV_THREAD;
       sev.sigev_notify_function = callback;
-      sev.sigev_value.sival_ptr = static_cast< void* >( &timer_id );
+      sev.sigev_value.sival_ptr = p_data;
       sev.sigev_notify_attributes = static_cast< pthread_attr_t* >( p_attributes );
 
       int result = timer_create( CLOCK_REALTIME, &sev, &timer_id );
@@ -46,7 +52,7 @@ namespace carpc::os::os_linux::timer {
       }
 
       SYS_VRB( "%#lx", (long)timer_id );
-      SYS_VRB( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
+      // SYS_VRB( "%p -> %#lx", sev.sigev_value.sival_ptr, *static_cast< long* >( sev.sigev_value.sival_ptr ) );
       return 0 == result;
    }
 

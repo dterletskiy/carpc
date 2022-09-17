@@ -7,6 +7,8 @@
 #include <time.h>
 #include <string.h>
 
+#include "carpc/oswrappers/linux/signals.hpp"
+
 
 
 namespace carpc::os::os_linux::timer {
@@ -16,8 +18,8 @@ namespace carpc::os::os_linux::timer {
    using tID = timer_t;
    using tEventHandler = void(*)( union sigval );
 
-   bool create( tID& timer_id, int signal );
-   bool create( tID& timer_id, tEventHandler callback, void* p_attributes = nullptr );
+   bool create( tID& timer_id, int signal, signals::tHandler handler = nullptr );
+   bool create( tID& timer_id, tEventHandler callback, void* p_data = nullptr, void* p_attributes = nullptr );
    bool remove( const tID& timer_id );
    bool start( const tID& timer_id, long int freq_nanosecs, eTimerType type = eTimerType::single );
    bool stop( const tID& timer_id );
