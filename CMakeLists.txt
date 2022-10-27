@@ -27,6 +27,7 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 #                             Compilation include directories                             #
 #                                                                                         #
 ###########################################################################################
+include_directories( "$ENV{HOME}/.local/include" )
 
 
 
@@ -35,7 +36,8 @@ set( CMAKE_VERBOSE_MAKEFILE on )
 #                                Linkage include directories                              #
 #                                                                                         #
 ###########################################################################################
-# link_directories( "/usr/local/lib/" )
+link_directories( "/usr/local/lib/" )
+link_directories( "$ENV{HOME}/.local/lib" )
 
 
 

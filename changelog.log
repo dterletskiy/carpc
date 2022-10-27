@@ -1,3 +1,6 @@
+version 3.11.1
+   - Added to cmake build system automatic include directory "~/.local/include/" and library directory "~/.local/lib/"
+
 version 3.11.0
    - Linux timer wrapper implementation changed: data could be set and transfered to timer handler.
    - Framwork "Timer" class and linux timer handling implementation optimization. Timers map and guard mutexes are not needed any more.
