@@ -1,3 +1,6 @@
+version 3.11.2
+   - Added helper converter functions: "from_string" to numeric types and "from_string_ss" to any types.
+
 version 3.11.1
    - Added to cmake build system automatic include directory "~/.local/include/" and library directory "~/.local/lib/"
 
