@@ -21,10 +21,10 @@ mkdir ${CARPC_EXAMPLES_SOURCE_DIR}/examples/ex_01
 
 ### ***Building rules***
 
-Afterward CMakeLists.txt file must be written what will define new target and rules for its building. In this case could be used template CMakeLists.txt file located in ***${CARPC_EXAMPLES_SOURCE_DIR}/build/cmake***.
+Afterward CMakeLists.txt file must be written what will define new target and rules for its building. In this case could be used template CMakeLists.txt file located in ***${CARPC_EXAMPLES_SOURCE_DIR}/build/cmake/example***.
 
 <pre>
-cp ${CARPC_EXAMPLES_SOURCE_DIR}/build/cmake/CMakeLists.txt ${CARPC_EXAMPLES_SOURCE_DIR}/examples/ex_01
+cp ${CARPC_EXAMPLES_SOURCE_DIR}/build/cmake/example/CMakeLists.txt ${CARPC_EXAMPLES_SOURCE_DIR}/examples/ex_01
 </pre>
 
 The only thing should be done on this stage is just rename project name ***project( ... )***. In this case let's call it ***EXAMPLE_01***.

@@ -11,9 +11,17 @@
 
 ## ***Implementation***
 
-Let's use previous example code for base implementation, but moved to another folder (ex_02).
+### ***Example folder***
 
-Now let's extend this application by new ***Application Component*** and ***Application Thread***. This could be done in two steps.
+Let's use previous example code for base implementation, but moved to another folder ***ex_02***.
+
+### ***Building rules***
+
+Afterward we should change project name in {CARPC_EXAMPLES_SOURCE_DIR}/examples/ex_02/CMakeLists.txt to ***EXAMPLE_02***
+
+Now let's extend this application by new ***Application Component*** and ***Application Thread***. This could be done in two steps:
+   - [aidl implementation](#adding-component-and-thread-description-in-aidl-file)
+   - [source implementation](#source-code-implementation-for-application-component)
 
 ### ***Adding Component and Thread description in .aidl file***
 

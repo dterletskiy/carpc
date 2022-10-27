@@ -55,7 +55,7 @@ mkdir ${CARPC_EXAMPLES_SOURCE_DIR}/examples
 touch ${CARPC_EXAMPLES_SOURCE_DIR}/examples/CMakeList.txt
 </pre>
 
-This ***examples*** folder will containe all examples in separate folders (ex_01, ex_02, ...), so CMakeLists.txt file will be extended by new ***add_subdirectory(...)*** functions. Each subdirectory will contain additinal CMakeLists.txt file what will define target for current example and rules for it.
+This ***examples*** folder will containe all examples in separate folders (ex_01, ex_02, ...), so CMakeLists.txt file will be extended by new ***add_subdirectory(...)*** functions. Each subdirectory will contain additinal CMakeLists.txt file what will define target for current example and rules for it. The pattern example for mentioned CMakeLists.txt file could be found in ***${CARPC_EXAMPLES_SOURCE_DIR}/build/cmake/example/CMakeLists.txt***
 
 Now we should include ***examples*** folder to build system. For this open ${CARPC_EXAMPLES_SOURCE_DIR}/CMakeList-projects.txt and change ***add_subdirectory( subfolder_with_project )*** to ***add_subdirectory( examples )***.
 
