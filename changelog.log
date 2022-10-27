@@ -1,3 +1,6 @@
+version 3.11.3
+   - Improved helper converter function "from_string" to numeric type.
+
 version 3.11.2
    - Added helper converter functions: "from_string" to numeric types and "from_string_ss" to any types.
 

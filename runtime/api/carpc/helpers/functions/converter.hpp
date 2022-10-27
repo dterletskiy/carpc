@@ -13,89 +13,38 @@ namespace carpc::converter {
       std::enable_if_t< std::is_integral_v< T > || std::is_floating_point_v< T >, bool >
          from_string( const std::string& value_str, T& value, std::size_t* pos = nullptr, int base = 10 )
    {
-      T min_value = std::numeric_limits< T >::min( );
-      T max_value = std::numeric_limits< T >::max( );
-      MSG_DBG(
-            "converting '%s' (min = %s / max = %s)",
-            value_str.c_str( ),
-            std::to_string( min_value ).c_str( ),
-            std::to_string( max_value ).c_str( )
-         );
+      static const T min_value = std::numeric_limits< T >::min( );
+      static const T max_value = std::numeric_limits< T >::max( );
+      static const std::string min_value_str = std::to_string( min_value );
+      static const std::string max_value_str = std::to_string( max_value );
+      MSG_DBG( "converting '%s' (min = %s / max = %s)", value_str.c_str( ), min_value_str.c_str( ), max_value_str.c_str( ) );
 
       bool result = true;
 
       try
       {
-         #if 0 // Depricated implementation
-            // Processing unsigned integral values
-            if( std::is_same_v< unsigned short int, T > )
-            {
-               unsigned long int tmp_value = std::stoul( value_str, pos, base );
-               if( tmp_value > max_value || tmp_value < min_value )
-                  throw std::out_of_range( "stous" );
-               value = static_cast< T >( tmp_value );
-            }
-            else if( std::is_same_v< unsigned int, T > )
-            {
-               unsigned long int tmp_value = std::stoul( value_str, pos, base );
-               if( tmp_value > max_value || tmp_value < min_value )
-                  throw std::out_of_range( "stoui" );
-               value = static_cast< T >( tmp_value );
-            }
-            else if( std::is_same_v< unsigned long int, T > )
-            {
-               value = std::stoul( value_str, pos, base );
-            }
-            else if( std::is_same_v< unsigned long long int, T > )
-            {
-               value = std::stoull( value_str, pos, base );
-            }
-            // Processing signed integral values
-            else if( std::is_same_v< short int, T > )
-            {
-               int tmp_value = std::stoi( value_str, pos, base );
-               if( tmp_value > max_value || tmp_value < min_value )
-                  throw std::out_of_range( "stos" );
-               value = static_cast< T >( tmp_value );
-            }
-            else if( std::is_same_v< int, T > )
-            {
-               value = std::stoi( value_str, pos, base );
-            }
-            else if( std::is_same_v< long int, T > )
-            {
-               value = std::stol( value_str, pos, base );
-            }
-            else if( std::is_same_v< long long int, T > )
-            {
-               value = std::stoll( value_str, pos, base );
-            }
-         #endif
          // Processing integral values
          if( std::is_integral_v< T > )
          {
+            static const std::size_t error_size = 1024;
+            static thread_local char error[ error_size ];
+            static const char* const error_format_min_lld = "value( %lld ) < min( %s )";
+            static const char* const error_format_max_lld = "value( %lld ) > max( %s )";
+            static const char* const error_format_min_llu = "value( %llu ) < min( %s )";
+            static const char* const error_format_max_llu = "value( %llu ) > max( %s )";
+
             // Processing signed integral values
             if( std::is_signed_v< T > )
             {
                long long int tmp_value = std::stoll( value_str, pos, base );
                if( tmp_value < min_value )
                {
-                  std::string error =
-                       std::string{ "value( " }
-                     + std::to_string( tmp_value )
-                     + std::string{ " ) < min( " }
-                     + std::to_string( min_value )
-                     + std::string{ " )" };
+                  std::size_t size = ::snprintf( error, error_size, error_format_min_lld, tmp_value, min_value_str.c_str( ) );
                   throw std::out_of_range( error );
                }
                else if( tmp_value > max_value )
                {
-                  std::string error =
-                       std::string{ "value( " }
-                     + std::to_string( tmp_value )
-                     + std::string{ " ) > max( " }
-                     + std::to_string( max_value )
-                     + std::string{ " )" };
+                  std::size_t size = ::snprintf( error, error_size, error_format_max_lld, tmp_value, max_value_str.c_str( ) );
                   throw std::out_of_range( error );
                }
                value = static_cast< T >( tmp_value );
@@ -106,22 +55,12 @@ namespace carpc::converter {
                long long unsigned int tmp_value = std::stoull( value_str, pos, base );
                if( tmp_value < min_value )
                {
-                  std::string error =
-                       std::string{ "value( " }
-                     + std::to_string( tmp_value )
-                     + std::string{ " ) < min( " }
-                     + std::to_string( min_value )
-                     + std::string{ " )" };
+                  std::size_t size = ::snprintf( error, error_size, error_format_min_llu, tmp_value, min_value_str.c_str( ) );
                   throw std::out_of_range( error );
                }
                else if( tmp_value > max_value )
                {
-                  std::string error =
-                       std::string{ "value( " }
-                     + std::to_string( tmp_value )
-                     + std::string{ " ) > max( " }
-                     + std::to_string( max_value )
-                     + std::string{ " )" };
+                  std::size_t size = ::snprintf( error, error_size, error_format_max_llu, tmp_value, max_value_str.c_str( ) );
                   throw std::out_of_range( error );
                }
                value = static_cast< T >( tmp_value );
