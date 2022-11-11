@@ -1,3 +1,6 @@
+version 3.11.5
+   - Implemented 'is_specialization' in helpers.
+
 version 3.11.4
    - Improved and extended helper converter functions.
 
