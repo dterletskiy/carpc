@@ -10,6 +10,33 @@
 namespace carpc::converter {
 
    template< typename T >
+   const char* const to_string( )
+   {
+      if( std::is_same_v< char, T > )                 return "char";
+      else if( std::is_same_v< short int, T > )       return "short int";
+      else if( std::is_same_v< int, T > )             return "int";
+      else if( std::is_same_v< long int, T > )        return "long int";
+      else if( std::is_same_v< long long int, T > )   return "long long int";
+      else if( std::is_same_v< float, T > )           return "float";
+      else if( std::is_same_v< double, T > )          return "double";
+      else if( std::is_same_v< long double, T > )     return "long double";
+      else                                            return "";
+
+      return "";
+   }
+
+   # define TYPE_INFO( TYPE ) \
+      MSG_DBG( "'%s' -> '%s' (min = %s / max = %s / sizeof = %zu)" \
+            , #TYPE \
+            , carpc::converter::to_string< TYPE >( ) \
+            , std::to_string( std::numeric_limits< TYPE >::min( ) ).c_str( ) \
+            , std::to_string( std::numeric_limits< TYPE >::max( ) ).c_str( ) \
+            , sizeof( TYPE ) \
+         )
+
+
+
+   template< typename T >
       std::enable_if_t< std::is_integral_v< T > || std::is_floating_point_v< T >, bool >
          from_string( const std::string& value_str, T& value, std::size_t* pos = nullptr, int base = 10 )
    {
@@ -17,7 +44,12 @@ namespace carpc::converter {
       static const T max_value = std::numeric_limits< T >::max( );
       static const std::string min_value_str = std::to_string( min_value );
       static const std::string max_value_str = std::to_string( max_value );
-      MSG_DBG( "converting '%s' (min = %s / max = %s)", value_str.c_str( ), min_value_str.c_str( ), max_value_str.c_str( ) );
+      MSG_DBG( "converting '%s' (min = %s / max = %s / sizeof = %zu)"
+            , value_str.c_str( )
+            , min_value_str.c_str( )
+            , max_value_str.c_str( )
+            , sizeof( T )
+         );
 
       bool result = true;
 
