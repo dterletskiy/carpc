@@ -58,6 +58,8 @@ set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar 
 ###########################################################################################
 print_project_files( )
 print_toolchain_config( )
+print_environment_variables( )
+print_cmake_variables( )
 
 
 

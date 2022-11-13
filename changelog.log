@@ -1,3 +1,6 @@
+version 3.11.6
+   - Implementing build scripts in Python.
+
 version 3.11.5
    - Implemented 'is_specialization' in helpers.
 
