@@ -159,7 +159,7 @@ def antlr_gen( app_data ):
    os.makedirs( app_data.antlr_outdir, exist_ok = True )
 
    for g4_file in app_data.antlr_lexer:
-      pfw.shell.run_and_wait_with_status(
+      pfw.shell.execute(
             "java", "-jar", app_data.antlr_jar, "-Dlanguage=Python3",
             g4_file,
             "-o", app_data.antlr_outdir,
@@ -167,7 +167,7 @@ def antlr_gen( app_data ):
          )
 
    for g4_file in app_data.antlr_parser:
-      pfw.shell.run_and_wait_with_status(
+      pfw.shell.execute(
             "java", "-jar", app_data.antlr_jar, "-Dlanguage=Python3",
             g4_file,
             "-o", app_data.antlr_outdir,
