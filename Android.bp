@@ -71,7 +71,6 @@ cc_defaults {
         "tda.carpc.src.defaults"
     ],
     cppflags: [
-        "-DSYS_TRACE",
         "-DMSG_TRACE",
         "-DCOLORED_TRACE"
     ],
@@ -112,7 +111,6 @@ cc_library_shared {
         "framework/"
     ],
     cppflags: [
-        "-DSYS_TRACE",
         "-DMSG_TRACE",
         "-DCOLORED_TRACE"
     ],
