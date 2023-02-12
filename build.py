@@ -51,9 +51,8 @@ configuration.configure( sys.argv[1:] )
 import pfw.console
 import pfw.shell
 import pfw.size
-import pfw.image
 import pfw.os.environment
-import pfw.os.process
+import pfw.linux.os.process
 
 
 
@@ -199,8 +198,8 @@ def start_target( **kwargs ):
       pfw.console.debug.error( "'target' is not defined" )
       return
 
-   pid: int = pfw.os.process.is_running( kw_target )
    if None != pid:
+   pid: int = pfw.linux.os.process.is_running( kw_target )
       pfw.console.debug.warning( "process '%s' is running with pid '%d'" % ( kw_target, pid ) )
       return
 
@@ -220,14 +219,14 @@ def stop_target( **kwargs ):
       pfw.console.debug.error( "'target' is not defined" )
       return
 
-   pfw.os.process.kill( kw_target )
+   pfw.linux.os.process.kill( kw_target )
 # def stop_target
 
 def start_dlt_daemon( **kwargs ):
    kw_dlt_daemon = kwargs.get( "name", "dlt-daemon" )
    kw_dlt_daemon_config = kwargs.get( "config", None )
 
-   pid: int = pfw.os.process.is_running( kw_dlt_daemon )
+   pid: int = pfw.linux.os.process.is_running( kw_dlt_daemon )
    if None != pid:
       pfw.console.debug.warning( "process '%s' is running with pid '%d'" % ( kw_dlt_daemon, pid ) )
       return
@@ -242,7 +241,7 @@ def start_dlt_daemon( **kwargs ):
 def stop_dlt_daemon( **kwargs ):
    kw_dlt_daemon = kwargs.get( "name", "dlt-daemon" )
 
-   pfw.os.process.kill( kw_dlt_daemon )
+   pfw.linux.os.process.kill( kw_dlt_daemon )
 # def stop_dlt_daemon
 
 def main( ):

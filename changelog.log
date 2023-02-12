@@ -1,3 +1,6 @@
+version 3.11.7
+   - Build scripts adaptation to changes in pfw.
+
 version 3.11.6a
    - Minor changes in python build scripts (adapting to pfw changes).
 
