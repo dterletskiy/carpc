@@ -94,7 +94,7 @@ This filename will be used by default to identify and copy configuration file to
 To build current application ***build.sh*** script should be called with next parameters:
 
 <pre>
-./build.sh --sfw=${SHELL_FW_DIR} --pfw=${PYTHON_FW_DIR} --carpc=${CARPC_DELIVERY_DIR} --arch=x86_64 --os=linux --action=clean_build
+./build.sh --sfw=${SHELL_FW_DIR} --pfw=${PYTHON_FW_DIR} --carpc=${CARPC_DELIVERY_DIR} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build
 </pre>
 
 As the result there will be ***${CARPC_EXAMPLES_DELIVERY_DIR}/bin/ex_01*** binary file.
@@ -106,7 +106,7 @@ As the result there will be ***${CARPC_EXAMPLES_DELIVERY_DIR}/bin/ex_01*** binar
 To verify current application it is just enough to run it and have a look to produced traces:
 
 <pre>
-./build.sh --sfw=${SHELL_FW_DIR} --pfw=${PYTHON_FW_DIR} --carpc=${CARPC_DELIVERY_DIR} --arch=x86_64 --os=linux --action=start --target=ex_01
+./build.sh --sfw=${SHELL_FW_DIR} --pfw=${PYTHON_FW_DIR} --carpc=${CARPC_DELIVERY_DIR} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=start --target=ex_01
 </pre>
 
 Application will be started and stopped immidiatly because of missing and logic inside.

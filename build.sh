@@ -2,16 +2,16 @@
 
 # SFW=/mnt/dev/repos/github.com/dterletskiy/shell_fw
 # PFW=/mnt/dev/repos/github.com/dterletskiy/python_fw
-# ARCH=x86_64
-# OS=linux
-# CARPC=/mnt/dev/repos/github.com/dterletskiy/carpc_product/${OS}-${ARCH}/delivery/
+# TARGET_ARCH=x86_64
+# TARGET_OS=linux
+# CARPC=/mnt/dev/repos/github.com/dterletskiy/carpc_product/${TARGET_OS}-${TARGET_ARCH}/delivery/
 
 # # Building CARPC framework
-# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${ARCH} --os=${OS} --action=clean_build
+# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build
 # # Building application using CARPC pramework
-# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${ARCH} --os=${OS} --action=clean_build --carpc=${CARPC}
+# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build --carpc=${CARPC}
 # # Starting application
-# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${ARCH} --os=${OS} --action=start --target=application --carpc=${CARPC}
+# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=start --target=application --carpc=${CARPC}
 
 
 

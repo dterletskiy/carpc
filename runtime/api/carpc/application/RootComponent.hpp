@@ -13,7 +13,7 @@ namespace carpc::application {
          ~RootComponent( ) override;
 
       private:
-         const bool is_root( ) const override { return true; }
+         const bool is_root( ) const override final { return true; }
       protected:
          void shutdown( const std::string& info = "shutdown" );
    };

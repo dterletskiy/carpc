@@ -10,7 +10,7 @@
 
 [Creating application component](./dev_create_app_component.md#creating-application-component)
 
-[Creating application component](#preconditions)
+[Creating application with several components components](./dev_create_app_with_several_components.md#creating-application-with-several-components)
 
 
 
@@ -18,6 +18,7 @@
 
 Let's suppose we have next preconditions:
    - Host OS: ***Ubuntu x86_64***
+   - Target OS: ***Ubuntu x86_64***
    - CARPC prebuild path: ***/mnt/dev/carpc_product/linux-x86_64/delivery/***
    - Shell framework scripts: ***/mnt/dev/shell_fw/***
    - Python framework scripts: ***/mnt/dev/python_fw/***
@@ -26,9 +27,11 @@ Let's introduce next shell variables:
 
 <pre>
 ROOT_DIR=/mnt/dev/
-CARPC_DELIVERY_DIR=${ROOT_DIR}/carpc_product/linux-x86_64/delivery/
+TARGET_ARCH=x86_64
+TARGET_OS=linux
+CARPC_DELIVERY_DIR=${ROOT_DIR}/carpc_product/${TARGET_OS}-${TARGET_ARCH}/delivery/
 CARPC_EXAMPLES_SOURCE_DIR=${ROOT_DIR}/carpc-examples/
-CARPC_EXAMPLES_PRODUCT_DIR=${ROOT_DIR}/carpc-examples_product/linux-x86_64/
+CARPC_EXAMPLES_PRODUCT_DIR=${ROOT_DIR}/carpc-examples_product/${TARGET_OS}-${TARGET_ARCH}/
 CARPC_EXAMPLES_DELIVERY_DIR=${CARPC_EXAMPLES_PRODUCT_DIR}/delivery/
 SHELL_FW_DIR=${ROOT_DIR}/shell_fw/
 PYTHON_FW_DIR=${ROOT_DIR}/python_fw/

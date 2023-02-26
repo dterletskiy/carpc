@@ -1,12 +1,13 @@
-[Go to previous menu](./carpc_entities_description.md#carpc-entities-description)
+[Go to previous menu](./entities_description.md#entities-description)
 
 # ***Application structure entities***
 
 **CARPC** framework contains next main ***Applicationentities ***:
-   1. [Application Process](#application-process)
-   2. [Application Thread](#application-thread)
-   3. [IPC Application Thread](#ipc-application-thread)
-   4. [Application Component](#application-component)
+- [***Application structure entities***](#application-structure-entities)
+  - [***Application Process***](#application-process)
+  - [***Application Thread***](#application-thread)
+  - [***IPC Application Thread***](#ipc-application-thread)
+  - [***Application Component***](#application-component)
 
 Common structure of **CARPC Application** has next representation:
 

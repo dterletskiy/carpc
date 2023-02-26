@@ -1,4 +1,4 @@
-[Go to previous menu](./carpc_entities_description.md#carpc-entities-description)
+[Go to previous menu](./entities_description.md#entities-description)
 
 # ***Communication entities***
 
