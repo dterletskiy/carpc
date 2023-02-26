@@ -1,3 +1,6 @@
+version 3.11.8
+   - Build system scripts minor changes.
+
 version 3.11.7
    - Build scripts adaptation to changes in pfw.
 

@@ -1,10 +1,17 @@
 #!/bin/bash
 
-# used commands:
-# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA/python_fw --arch=x86_64 --os=linux --action=clean_build
-# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA/python_fw --arch=x86_64 --os=linux --action=start --target=application
-# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA/python_fw --arch=x86_64 --os=linux --action=clean_build --carpc=/mnt/dev/TDA/carpc_product/linux-x86_64/delivery
-# ./build.sh --sfw=/mnt/dev/TDA/shell_fw --pfw=/mnt/dev/TDA/python_fw --arch=x86_64 --os=linux --action=start --target=application --carpc=/mnt/dev/TDA/carpc_product/linux-x86_64/delivery
+# SFW=/mnt/dev/repos/github.com/dterletskiy/shell_fw
+# PFW=/mnt/dev/repos/github.com/dterletskiy/python_fw
+# ARCH=x86_64
+# OS=linux
+# CARPC=/mnt/dev/repos/github.com/dterletskiy/carpc_product/${OS}-${ARCH}/delivery/
+
+# # Building CARPC framework
+# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${ARCH} --os=${OS} --action=clean_build
+# # Building application using CARPC pramework
+# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${ARCH} --os=${OS} --action=clean_build --carpc=${CARPC}
+# # Starting application
+# ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${ARCH} --os=${OS} --action=start --target=application --carpc=${CARPC}
 
 
 
@@ -37,13 +44,13 @@ function setup_build_system( )
    done
 
    if [ -z ${PROJECT_CONFIG[SFW]+x} ]; then
-      echo --- "Shell framework is unset";
+      echo --- "ERROR: Shell framework is unset";
       exit 1
    elif [ -z ${PROJECT_CONFIG[SFW]} ]; then
-      echo --- "Shell framework is empty";
+      echo --- "ERROR: Shell framework is empty";
       exit 1
    elif [ ! -d ${PROJECT_CONFIG[SFW]} ]; then
-      echo "Shell framework does not exists '${PROJECT_CONFIG[SFW]}'";
+      echo "Shell framework does not exist '${PROJECT_CONFIG[SFW]}'";
       exit 1
    else
       echo "Shell framework is set to '${PROJECT_CONFIG[SFW]}'";
@@ -55,13 +62,13 @@ function setup_build_system( )
    source ${PROJECT_CONFIG[SFW]}/print.sh
 
    if [ -z ${PROJECT_CONFIG[PFW]+x} ]; then
-      echo --- "Python framework is unset";
+      echo --- "ERROR: Python framework is unset";
       exit 1
    elif [ -z ${PROJECT_CONFIG[PFW]} ]; then
-      echo --- "Python framework is empty";
+      echo --- "ERROR: Python framework is empty";
       exit 1
    elif [ ! -d ${PROJECT_CONFIG[PFW]} ]; then
-      echo "Shell framework does not exists '${PROJECT_CONFIG[PFW]}'";
+      echo "Shell framework does not exist '${PROJECT_CONFIG[PFW]}'";
       exit 1
    else
       echo "Python framework is set to '${PROJECT_CONFIG[PFW]}'";
@@ -81,7 +88,7 @@ source ${CARPC_FW}/tools.sh
 
 
 
-function pre_main( )
+function process_parameters( )
 {
    print_header "Pre-Main Menu"
 
@@ -157,7 +164,7 @@ function main( )
 
    STARTED=$(($(date +%s%N)/1000000))
 
-   pre_main $@
+   process_parameters $@
 
    setup
    setup_sdk ${PROJECT_CONFIG[ENVIRONMENT_SETUP]}

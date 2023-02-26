@@ -2,9 +2,9 @@
 
 # ***What is CARPC***
 
-CARPC is the Component Architecture Remote Procedure Call.
+As you know there are huge amount of different frameworks and libraries what are allowes to implement Remote Procedure Call for your applications. Obviously each of them has its advantages and disadvantages. Each of them does not have some functionality what could be usefull in some particular cases just because there was no aim to implement and support such functionality.
 
-As you know there are huge amount of different frameworks and libraries what are allowed to implement Remote Procedure Call for your applications. Obviously each of them has its advantages and disadvantages. Each of them does not have some functionality what could be usefull in some particular cases just because threre was no aim to implement and support such functionality.
+CARPC is the Component Architecture Remote Procedure Call what allowes you implement RPC in your application.
 
 CARPC allows you to:
    - implement your **component architecture** / **event driven architecture** / **client-server** application using functionality provided by current framework.
