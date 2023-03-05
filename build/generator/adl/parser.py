@@ -9,7 +9,6 @@ from AdlLexer import AdlLexer
 from AdlParser import AdlParser
 from AdlParserListener import AdlParserListener
 
-import pfw.base
 import pfw.console
 import pfw.shell
 

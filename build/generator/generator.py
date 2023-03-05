@@ -146,7 +146,6 @@ filename, file_extension = os.path.splitext( g_app_data.source_file )
 
 
 
-import pfw.base
 import pfw.console
 import pfw.shell
 

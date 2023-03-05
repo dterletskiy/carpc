@@ -9,7 +9,6 @@ from IdlLexer import IdlLexer
 from IdlParser import IdlParser
 from IdlParserListener import IdlParserListener
 
-import pfw.base
 import pfw.console
 import pfw.shell
 

@@ -9,7 +9,6 @@ from DdlLexer import DdlLexer
 from DdlParser import DdlParser
 from DdlParserListener import DdlParserListener
 
-import pfw.base
 import pfw.console
 import pfw.shell
 

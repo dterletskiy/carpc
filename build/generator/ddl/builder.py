@@ -4,7 +4,7 @@ from enum import Enum
 import os
 import sys
 
-import pfw.base
+import pfw.base.struct
 import pfw.console
 
 import ddl.data
@@ -36,7 +36,8 @@ class Builder:
    # def __setattr__
 
    def __str__( self ):
-      attr_list = [ i for i in Builder.__dict__.keys( ) if i[:2] != pfw.base.class_ignore_field ]
+      attr_list = [ i for i in Builder.__dict__.keys( ) if i[:2] != pfw.base.struct.ignore_field
+ ]
       vector = [ ]
       for attr in attr_list:
          vector.append( str( attr ) + " = " + str( self.__dict__.get( attr ) ) )

@@ -26,7 +26,7 @@ import sys
 import subprocess
 import copy
 
-import configuration
+import build.python.configuration
 
 
 

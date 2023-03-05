@@ -4,7 +4,7 @@ from enum import Enum
 
 import os
 
-import pfw.base
+import pfw.base.struct
 import pfw.console
 import pfw.code
 
@@ -30,7 +30,8 @@ class Connection:
    # def __setattr__
 
    def __str__( self ):
-      attr_list = [ i for i in Connection.__dict__.keys( ) if i[:2] != pfw.base.class_ignore_field ]
+      attr_list = [ i for i in Connection.__dict__.keys( ) if i[:2] != pfw.base.struct.ignore_field
+ ]
       vector = [ ]
       for attr in attr_list:
          vector.append( str( attr ) + " = " + str( self.__dict__.get( attr ) ) )
@@ -98,7 +99,8 @@ class Interface:
    # def __setattr__
 
    def __str__( self ):
-      attr_list = [ i for i in Interface.__dict__.keys( ) if i[:2] != pfw.base.class_ignore_field ]
+      attr_list = [ i for i in Interface.__dict__.keys( ) if i[:2] != pfw.base.struct.ignore_field
+ ]
       vector = [ ]
       for attr in attr_list:
          vector.append( str( attr ) + " = " + str( self.__dict__.get( attr ) ) )
