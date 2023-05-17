@@ -132,10 +132,8 @@ namespace carpc::converter {
    }
 
    template< typename T >
-   bool from_string_ss( const std::string& value_str, T& value )
+   T& from_string_ss( const std::string& value_str, T& value )
    {
-      bool result = true;
-
       std::stringstream ss( value_str );
       ss >> value;
 
