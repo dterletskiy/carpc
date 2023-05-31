@@ -28,7 +28,7 @@ namespace carpc::tools {
          tValueOpt value( const tParameter& parameter ) const;
          tValue value_or( const tParameter& parameter, const tValue& default_value ) const;
          template< typename T >
-            T value_or( const tParameter& parameter, const T& default_value ) const;
+            T value_or( const tParameter& parameter, const T& default_value ) const
             {
                const auto iterator = m_map.find( parameter );
                if( m_map.end( ) == iterator )
