@@ -18,7 +18,8 @@
 
 namespace carpc::trace {
 
-   enum class eLogLevel : std::uint8_t { VERBOSE, DEBUG, INFO, WARNING, ERROR, FATAL };
+   enum class eLogLevel : std::size_t { NONE = 0, FATAL, ERROR, WARNING, INFO, DEBUG, VERBOSE, MAX };
+   const eLogLevel log_level_from_number( const std::size_t& );
    const char* const to_color( const eLogLevel& );
    #if OS_TARGET == OS_ANDROID
       int to_android( const eLogLevel& );
@@ -27,7 +28,7 @@ namespace carpc::trace {
       DltLogLevelType to_dlt( const eLogLevel& );
    #endif
 
-   enum class eLogStrategy : std::uint8_t { CONSOLE, CONSOLE_EXT, DLT, ANDROID_LOGCAT, UNDEFINED };
+   enum class eLogStrategy : std::size_t { CONSOLE, CONSOLE_EXT, DLT, ANDROID_LOGCAT, UNDEFINED };
    const char* const log_strategy_to_string( const eLogStrategy& );
    const eLogStrategy log_strategy_from_string( const char* const );
 

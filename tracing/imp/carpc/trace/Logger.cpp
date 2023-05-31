@@ -24,9 +24,15 @@ Logger::Logger( )
    log_strategy( eLogStrategy::CONSOLE );
 }
 
-Logger::Logger( const eLogStrategy& _log_strategy, const std::string& app_name, const std::size_t buffer_size )
+Logger::Logger(
+         const eLogStrategy& _log_strategy,
+         const std::string& app_name,
+         const std::size_t buffer_size,
+         const eLogLevel& max_log_level
+      )
    : mp_application_name( app_name )
    , m_buffer_size( buffer_size )
+   , m_max_log_level( max_log_level )
 {
    log_strategy( _log_strategy );
 
@@ -90,17 +96,27 @@ Logger& Logger::instance( )
    return *mp_instance;
 }
 
-Logger& Logger::instance( const eLogStrategy& log_strategy, const std::string& app_name, const std::size_t buffer_size )
+Logger& Logger::instance(
+      const eLogStrategy& log_strategy,
+      const std::string& app_name,
+      const std::size_t buffer_size,
+      const eLogLevel& max_log_level
+   )
 {
    if( nullptr == mp_instance )
-      mp_instance = new Logger( log_strategy, app_name, buffer_size );
+      mp_instance = new Logger( log_strategy, app_name, buffer_size, max_log_level );
 
    return *mp_instance;
 }
 
-bool Logger::init( const eLogStrategy& log_strategy, const std::string& app_name, const std::size_t buffer_size )
+bool Logger::init(
+      const eLogStrategy& log_strategy,
+      const std::string& app_name,
+      const std::size_t buffer_size,
+      const eLogLevel& max_log_level
+   )
 {
-   instance( log_strategy, app_name, buffer_size );
+   instance( log_strategy, app_name, buffer_size, max_log_level );
 
    return true;
 }

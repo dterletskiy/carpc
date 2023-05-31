@@ -6,6 +6,14 @@
 
 namespace carpc::trace {
 
+   const eLogLevel log_level_from_number( const std::size_t& number )
+   {
+      if( number > static_cast< std::size_t >( eLogLevel::MAX ) )
+         return eLogLevel::MAX;
+
+      return static_cast< eLogLevel >( number );
+   }
+
    const char* const to_color( const eLogLevel& log_level )
    {
       switch( log_level )
@@ -16,6 +24,7 @@ namespace carpc::trace {
          case eLogLevel::WARNING:   return FG_LIGHT_BLUE;
          case eLogLevel::ERROR:     return FG_LIGHT_RED;
          case eLogLevel::FATAL:     return FG_RED;
+         default:                   break;
       }
       return FG_WHITE;
    }
@@ -31,6 +40,7 @@ namespace carpc::trace {
          case eLogLevel::WARNING:   return ANDROID_LOG_WARN;
          case eLogLevel::ERROR:     return ANDROID_LOG_ERROR;
          case eLogLevel::FATAL:     return ANDROID_LOG_FATAL;
+         default:                   break;
       }
       return ANDROID_LOG_VERBOSE;
    }
@@ -47,6 +57,7 @@ namespace carpc::trace {
          case eLogLevel::WARNING:   return DLT_LOG_WARN;
          case eLogLevel::ERROR:     return DLT_LOG_ERROR;
          case eLogLevel::FATAL:     return DLT_LOG_FATAL;
+         default:                   break;
       }
       return DLT_LOG_VERBOSE;
    }
@@ -84,7 +95,7 @@ namespace carpc::trace {
 
 namespace carpc::trace {
 
-   void local_time_of_date( tm*& _time_tm, size_t& _milliseconds )
+   void local_time_of_date( tm*& _time_tm, std::size_t& _milliseconds )
    {
       timeval tv;
       gettimeofday( &tv, NULL );
@@ -92,11 +103,11 @@ namespace carpc::trace {
       _milliseconds = tv.tv_usec;
    }
 
-   uint64_t time( const eGranularity gran, clockid_t clk_id )
+   std::uint64_t time( const eGranularity gran, clockid_t clk_id )
    {
       timespec time_timespec;
       clock_gettime( clk_id, &time_timespec );
-      return time_timespec.tv_sec * static_cast< size_t >( gran ) + time_timespec.tv_nsec / ( 1000000000 / static_cast< size_t >( gran ) );
+      return time_timespec.tv_sec * static_cast< std::size_t >( gran ) + time_timespec.tv_nsec / ( 1000000000 / static_cast< std::size_t >( gran ) );
    }
 
 } // namespace carpc::trace

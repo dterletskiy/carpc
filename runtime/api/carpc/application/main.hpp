@@ -58,7 +58,12 @@ void preinit( int argc, char** argv, char** envp )
          configuration.value_or( "trace_buffer", "4096" )
       ) );
    const std::string trace_app_name = configuration.value_or( "trace_app_name", "APP" );
-   carpc::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer );
+   const carpc::trace::eLogLevel trace_level = carpc::trace::log_level_from_number(
+         std::stoll(
+            configuration.value_or( "trace_level", "6" )
+         )
+      );
+   carpc::trace::Logger::init( trace_strategy, trace_app_name, trace_buffer, trace_level );
 
    MSG_INF( "preinit_array" );
 }

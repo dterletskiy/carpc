@@ -18,19 +18,37 @@ namespace carpc::trace {
    {
       private:
          Logger( );
-         Logger( const eLogStrategy&, const std::string& app_name, const std::size_t buffer_size = s_buffer_size );
+         Logger(
+               const eLogStrategy&,
+               const std::string& app_name,
+               const std::size_t buffer_size,
+               const eLogLevel& max_log_level
+            );
          static Logger* mp_instance;
       public:
          ~Logger( );
          static Logger& instance( );
-         static Logger& instance( const eLogStrategy&, const std::string& app_name, const std::size_t buffer_size = s_buffer_size );
+         static Logger& instance(
+               const eLogStrategy&,
+               const std::string& app_name,
+               const std::size_t buffer_size,
+               const eLogLevel& max_log_level
+            );
 
-         static bool init( const eLogStrategy&, const std::string& app_name, const std::size_t buffer_size = s_buffer_size );
+         static bool init(
+               const eLogStrategy&,
+               const std::string& app_name,
+               const std::size_t buffer_size,
+               const eLogLevel& max_log_level
+            );
          static bool deinit( );
 
          template< typename... Args >
          void message( const eLogLevel& log_level, const char* const format, Args... args )
          {
+            if( log_level > m_max_log_level )
+               return;
+
             char message_buffer[ m_buffer_size ];
             std::size_t size = ::snprintf( message_buffer, m_buffer_size, format, args... );
             char* p_buffer = const_cast< char* >( message_buffer );
@@ -187,6 +205,7 @@ namespace carpc::trace {
       private:
          std::string mp_application_name = nullptr;
          std::size_t m_buffer_size = s_buffer_size;
+         eLogLevel m_max_log_level = eLogLevel::MAX;
 
       public:
          const eLogStrategy& log_strategy( ) const;
