@@ -1,3 +1,6 @@
+version 3.12.2
+   - Modify shell build script to support project submodules
+
 version 3.12.1
    - Add submodules/dterletskiy/shell_fw
    - Add submodules/dterletskiy/python_fw

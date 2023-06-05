@@ -19,6 +19,9 @@ declare -A PROJECT_CONFIG
 declare -A TARGET_CONFIG
 declare -A ACTION
 
+readonly CURRENT_SCRIPT_DIR=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+# readonly CURRENT_SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 
 
 # Processing parameter "--sfw" and source its value for using shell framework scripts in current build system
@@ -44,14 +47,14 @@ function setup_build_system( )
    done
 
    if [ -z ${PROJECT_CONFIG[SFW]+x} ]; then
-      echo --- "ERROR: Shell framework is unset";
-      exit 1
+      echo "Shell framework is unset. Default one will be used from submodule.";
+      PROJECT_CONFIG[SFW]=${CURRENT_SCRIPT_DIR}/submodules/dterletskiy/shell_fw/
    elif [ -z ${PROJECT_CONFIG[SFW]} ]; then
-      echo --- "ERROR: Shell framework is empty";
-      exit 1
+      echo --- "ERROR: Shell framework is empty. Default one will be used from submodule.";
+      PROJECT_CONFIG[SFW]=${CURRENT_SCRIPT_DIR}/submodules/dterletskiy/shell_fw/
    elif [ ! -d ${PROJECT_CONFIG[SFW]} ]; then
-      echo "Shell framework does not exist '${PROJECT_CONFIG[SFW]}'";
-      exit 1
+      echo  --- "ERROR: Shell framework does not exist '${PROJECT_CONFIG[SFW]}'. Default one will be used from submodule.";
+      PROJECT_CONFIG[SFW]=${CURRENT_SCRIPT_DIR}/submodules/dterletskiy/shell_fw/
    else
       echo "Shell framework is set to '${PROJECT_CONFIG[SFW]}'";
    fi
@@ -62,20 +65,21 @@ function setup_build_system( )
    source ${PROJECT_CONFIG[SFW]}/print.sh
 
    if [ -z ${PROJECT_CONFIG[PFW]+x} ]; then
-      echo --- "ERROR: Python framework is unset";
-      exit 1
+      echo "Python framework is unset. Default one will be used from submodule.";
+      PROJECT_CONFIG[PFW]=${CURRENT_SCRIPT_DIR}/submodules/dterletskiy/python_fw/
    elif [ -z ${PROJECT_CONFIG[PFW]} ]; then
-      echo --- "ERROR: Python framework is empty";
-      exit 1
+      echo --- "ERROR: Python framework is empty. Default one will be used from submodule.";
+      PROJECT_CONFIG[PFW]=${CURRENT_SCRIPT_DIR}/submodules/dterletskiy/python_fw/
    elif [ ! -d ${PROJECT_CONFIG[PFW]} ]; then
-      echo "Shell framework does not exist '${PROJECT_CONFIG[PFW]}'";
-      exit 1
+      echo  --- "ERROR: Shell framework does not exist '${PROJECT_CONFIG[PFW]}'. Default one will be used from submodule.";
+      PROJECT_CONFIG[PFW]=${CURRENT_SCRIPT_DIR}/submodules/dterletskiy/python_fw/
    else
       echo "Python framework is set to '${PROJECT_CONFIG[PFW]}'";
    fi
 }
 
 reset
+echo "CURRENT_SCRIPT_DIR = ${CURRENT_SCRIPT_DIR}"
 setup_build_system $@
 
 
