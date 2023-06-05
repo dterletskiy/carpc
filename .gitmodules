@@ -1,0 +1,6 @@
+[submodule "submodules/dterletskiy/shell_fw"]
+	path = submodules/dterletskiy/shell_fw
+	url = https://github.com/dterletskiy/shell_fw.git
+[submodule "submodules/dterletskiy/python_fw"]
+	path = submodules/dterletskiy/python_fw
+	url = https://github.com/dterletskiy/python_fw.git
