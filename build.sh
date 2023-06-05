@@ -7,6 +7,8 @@
 # CARPC=/mnt/dev/repos/github.com/dterletskiy/carpc_product/${TARGET_OS}-${TARGET_ARCH}/delivery/
 
 # # Building CARPC framework
+# ./build.sh --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build
+# # Building CARPC framework with defined "shell_fw" and "python_fw" locations
 # ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build
 # # Building application using CARPC pramework
 # ./build.sh --sfw=${SFW} --pfw=${PFW} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build --carpc=${CARPC}
@@ -132,8 +134,8 @@ function process_parameters( )
    done
 
    if [ -z ${TARGET_CONFIG[ARCH]+x} ]; then
-      print_error "Target ARCH is unset";
-      exit 1
+      print_info "Target ARCH is unset. Default 'x86_64' will be used.";
+      TARGET_CONFIG[ARCH]=x86_64
    elif [ -z ${TARGET_CONFIG[ARCH]} ]; then
       print_error "Target ARCH is empty";
       exit 1
@@ -147,8 +149,8 @@ function process_parameters( )
    fi
 
    if [ -z ${TARGET_CONFIG[OS]+x} ]; then
-      print_error "Target OS is unset";
-      exit 1
+      print_info "Target OS is unset. Default 'linux' will be used.";
+      TARGET_CONFIG[OS]=linux
    elif [ -z ${TARGET_CONFIG[OS]} ]; then
       print_error "Target OS is empty";
       exit 1
