@@ -39,22 +39,6 @@ jobs:
       run: pip install antlr4-python3-runtime
       shell: bash
 
-    # Checkout shell framework project
-    - name: Checkout shell framework
-      uses: actions/checkout@v2
-      with:
-        repository: dterletskiy/shell_fw
-        path: ./shell_fw
-        ref: ${{ github.ref }}
-
-    # Checkout python framework project
-    - name: Checkout python framework
-      uses: actions/checkout@v2
-      with:
-        repository: dterletskiy/python_fw
-        path: ./python_fw
-        ref: ${{ github.ref }}
-
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
       uses: actions/checkout@v2
@@ -63,8 +47,26 @@ jobs:
         path: ./${{ github.event.repository.name }}
         ref: ${{ github.ref }}
 
-    # CMake execution
+    # Submodules update
+    - name: Update submodules
+      run: git submodule update --init --recursive
+      shell: bash
+      working-directory: ./${{ github.event.repository.name }}
+
+    # CMake configure
+    - name: Configure
+      run: cmake -S ${PWD} -B ${PWD}/out/build --install-prefix ${PWD}/out/delivery --graphviz=${PWD}/out/doc/graph/carpc
+      shell: bash
+      working-directory: ./${{ github.event.repository.name }}
+
+    # CMake build
     - name: Build
-      run: ./build.sh --sfw=${PWD}/../shell_fw --pfw=${PWD}/../python_fw --arch=x86_64 --os=linux --action=clean_build
+      run: cmake --build ${PWD}/out/build -j 8
+      shell: bash
+      working-directory: ./${{ github.event.repository.name }}
+
+    # CMake install
+    - name: Install
+      run: cmake --build ${PWD}/out/build --target install
       shell: bash
       working-directory: ./${{ github.event.repository.name }}
