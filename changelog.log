@@ -1,5 +1,8 @@
+version 3.13.3
+   - Remove submodules/dterletskiy/shell_fw
+
 version 3.13.2
-   - Update submodules/dterletskiy/shell_fw
+   - Update submodules/dterletskiy/python_fw
 
 version 3.13.1
    - Complete refactoring build system.
