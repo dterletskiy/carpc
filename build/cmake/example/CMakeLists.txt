@@ -9,8 +9,7 @@ project( APPLICATION )
 #                                Setup common configuration                               #
 #                                                                                         #
 ###########################################################################################
-setup_target_name( )
-setup_gen_dir( )
+setup_project( TARGET_NAME )
 
 
 
@@ -47,19 +46,19 @@ link_directories( ${CARPC_LIB_DIR} )
 #                                      Code generation                                    #
 #                                                                                         #
 ###########################################################################################
-file( GLOB_RECURSE ADL_FILES ${PROJECT_SOURCE_DIR}/*.adl )
+find_files_by_ext( ADL_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_ADL}" )
 generate_xdls( "${ADL_FILES}" PROJECT_GEN_ADL_FILES )
 
-file( GLOB_RECURSE IDL_FILES ${PROJECT_SOURCE_DIR}/*.idl )
+find_files_by_ext( IDL_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_IDL}" )
 generate_xdls( "${IDL_FILES}" PROJECT_GEN_IDL_FILES )
 
-file( GLOB_RECURSE DDL_FILES ${PROJECT_SOURCE_DIR}/*.ddl )
+find_files_by_ext( DDL_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_DDL}" )
 generate_xdls( "${DDL_FILES}" PROJECT_GEN_DDL_FILES )
 
-file( GLOB_RECURSE PROTO_FILES ${PROJECT_SOURCE_DIR}/*.proto )
+find_files_by_ext( PROTO_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_PROTO}" )
 generate_gpbs( "${PROTO_FILES}" PROJECT_GEN_PROTO_FILES )
 
-file( GLOB_RECURSE PLANTUML_FILES ${PROJECT_SOURCE_DIR}/*.plantuml )
+find_files_by_ext( PLANTUML_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_PLANTUML}" )
 generate_plantumls( "${PLANTUML_FILES}" PROJECT_GEN_PLANTUML_FILES )
 
 
@@ -69,7 +68,7 @@ generate_plantumls( "${PLANTUML_FILES}" PROJECT_GEN_PLANTUML_FILES )
 #                                   Build source file list                                #
 #                                                                                         #
 ###########################################################################################
-file( GLOB_RECURSE PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
+find_files_by_ext( PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_CPP_SRC}" )
 
 
 

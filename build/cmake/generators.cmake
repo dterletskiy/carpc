@@ -134,7 +134,7 @@ function( generate_xdl XDL_FILE GENERATED_FILES )
          COMMENT "CODE GENERATION: ${XDL_GEN_FILES}"
          DEPENDS ${XDL_FILE} ${TEMPLATE_ANTLR4_GEN_FILES}
          COMMAND ${CARPC_GENERATOR}
-               --include=${PFW}
+               --include=${PFW_DIR}
                --antlr_outdir=${ANTLR4_GEN_DIR}
                --source=${XDL_FILE}
                --gen_outdir=${XDL_GEN_DIR}

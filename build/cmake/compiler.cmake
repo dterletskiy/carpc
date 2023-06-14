@@ -1,18 +1,11 @@
-option( SYS_TRACE                "Enable framework system tracing"                              ON )
-option( MSG_TRACE                "Enable application tracing"                                   ON )
-option( COLORED_TRACE            "Enable colored tracing for console"                           ON )
-option( DLT_TRACE                "Enable dlt tracing"                                           ON )
-option( MEMORY_HOOK              "Enable memory allocator hooks"                                OFF )
-option( INSTRUMENTAL             "Enable instrumental functionality"                            OFF )
-option( USE_DEBUG                "Enable debug information"                                     OFF )
-option( USE_GPB                  "Enable goolgle protobuf"                                      ON )
-option( USE_RTTI                 "Enable RTTI"                                                  ON )
-
 ###########################################################################################
 #                                                                                         #
 #                                   Compile definitions                                   #
 #                                                                                         #
 ###########################################################################################
+set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD_REQUIRED True )
+
 # https://stackoverflow.com/questions/10046114/in-cmake-how-can-i-test-if-the-compiler-is-clang
 if( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
    message( NOTICE "compiler: Clang" )
@@ -61,9 +54,17 @@ else( )
    add_definitions( -fno-rtti )
 endif( )
 
-add_compile_definitions( OS_ANDROID=${OS_ANDROID} )
-add_compile_definitions( OS_LINUX=${OS_LINUX} )
-add_compile_definitions( OS_TARGET=${OS_TARGET} )
+add_compile_definitions( OS_LINUX=0 )
+add_compile_definitions( OS_ANDROID=1 )
+if( ${TARGET_OS} STREQUAL "linux" )
+   add_compile_definitions( OS_TARGET=0 )
+elseif( ${TARGET_OS} STREQUAL "android" )
+   add_compile_definitions( OS_TARGET=1 )
+else( )
+   add_compile_definitions( OS_TARGET=0 )
+endif( )
+
+
 if( SYS_TRACE )
    add_compile_definitions( SYS_TRACE )
 endif( )
@@ -76,9 +77,11 @@ endif( )
 if( DLT_TRACE )
    add_compile_definitions( USE_DLT )
 endif( )
+
 if( MEMORY_HOOK )
    add_compile_definitions( USE_MEMORY_HOOK )
 endif( )
+
 if( USE_GPB )
    find_package( Protobuf REQUIRED )
    add_compile_definitions( USE_GPB )

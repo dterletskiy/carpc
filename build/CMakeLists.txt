@@ -3,17 +3,7 @@ cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 
 install(
-   FILES ${ROOT_SOURCE_DIR}/build.sh
-   DESTINATION bin/build-system
-)
-
-install(
    FILES ${ROOT_SOURCE_DIR}/CMakeLists.txt
-   DESTINATION bin/build-system
-)
-
-install(
-   FILES ${ROOT_SOURCE_DIR}/CMakeLists-compiler_definitions.txt
    DESTINATION bin/build-system
 )
 
@@ -23,17 +13,12 @@ install(
 )
 
 install(
-   DIRECTORY ${ROOT_SOURCE_DIR}/build/shell
-   DESTINATION bin/build-system/build
-)
-
-install(
    DIRECTORY ${ROOT_SOURCE_DIR}/build/cmake
    DESTINATION bin/build-system/build
-   PATTERN CMakeLists-projects.txt EXCLUDE
+   PATTERN projects.cmake EXCLUDE
 )
 install(
-   FILES ${ROOT_SOURCE_DIR}/build/cmake/CMakeLists-projects.txt
+   FILES ${ROOT_SOURCE_DIR}/build/cmake/projects.cmake
    DESTINATION bin/build-system
 )
 

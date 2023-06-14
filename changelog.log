@@ -1,3 +1,9 @@
+version 3.13.1
+   - Complete refactoring build system.
+   - Simplify cmake calls for building project.
+   - Remove shell build scripts.
+   - Remove python build scripts except of generators.
+
 version 3.12.2a
    - Modify shell build script with default build parameters.
 

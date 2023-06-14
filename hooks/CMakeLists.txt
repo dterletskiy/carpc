@@ -9,8 +9,7 @@ project( HOOKS )
 #                                Setup common configuration                               #
 #                                                                                         #
 ###########################################################################################
-setup_target_name( )
-setup_gen_dir( )
+setup_project( TARGET_NAME )
 
 
 
@@ -48,7 +47,7 @@ link_directories( ${FRAMEWORK_BINARY_DIR} )
 #                                   Build source file list                                #
 #                                                                                         #
 ###########################################################################################
-file( GLOB_RECURSE PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR}/*.cpp )
+find_files_by_ext( PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_CPP_SRC}" )
 
 
 
