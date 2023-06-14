@@ -1,3 +1,6 @@
+version 3.13.2
+   - Update submodules/dterletskiy/shell_fw
+
 version 3.13.1
    - Complete refactoring build system.
    - Simplify cmake calls for building project.
