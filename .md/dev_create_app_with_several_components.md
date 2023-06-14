@@ -94,7 +94,7 @@ All code implemented in **Driver** component will be executed only by some event
 To build current application ***build.sh*** script should be called with next parameters:
 
 <pre>
-./build.sh --sfw=${SHELL_FW_DIR} --pfw=${PYTHON_FW_DIR} --carpc=${CARPC_DELIVERY_DIR} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build
+./build.sh --carpc=${CARPC_DELIVERY_DIR} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=clean_build
 </pre>
 
 As the result there will be ***${CARPC_EXAMPLES_DELIVERY_DIR}/bin/ex_03*** binary file.
@@ -104,7 +104,7 @@ As the result there will be ***${CARPC_EXAMPLES_DELIVERY_DIR}/bin/ex_03*** binar
 To verify current application it is just enough to run it and have a look to produced traces:
 
 <pre>
-./build.sh --sfw=${SHELL_FW_DIR} --pfw=${PYTHON_FW_DIR} --carpc=${CARPC_DELIVERY_DIR} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=start --target=ex_03
+./build.sh --carpc=${CARPC_DELIVERY_DIR} --arch=${TARGET_ARCH} --os=${TARGET_OS} --action=start --target=ex_03
 </pre>
 
 Application will be started and stopped immidiatly because of callind sutdown methos from root component logic inside.

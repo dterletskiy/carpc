@@ -20,8 +20,6 @@ Let's suppose we have next preconditions:
    - Host OS: ***Ubuntu x86_64***
    - Target OS: ***Ubuntu x86_64***
    - CARPC prebuild path: ***/mnt/dev/carpc_product/linux-x86_64/delivery/***
-   - Shell framework scripts: ***/mnt/dev/shell_fw/***
-   - Python framework scripts: ***/mnt/dev/python_fw/***
 
 Let's introduce next shell variables:
 
@@ -33,8 +31,6 @@ CARPC_DELIVERY_DIR=${ROOT_DIR}/carpc_product/${TARGET_OS}-${TARGET_ARCH}/deliver
 CARPC_EXAMPLES_SOURCE_DIR=${ROOT_DIR}/carpc-examples/
 CARPC_EXAMPLES_PRODUCT_DIR=${ROOT_DIR}/carpc-examples_product/${TARGET_OS}-${TARGET_ARCH}/
 CARPC_EXAMPLES_DELIVERY_DIR=${CARPC_EXAMPLES_PRODUCT_DIR}/delivery/
-SHELL_FW_DIR=${ROOT_DIR}/shell_fw/
-PYTHON_FW_DIR=${ROOT_DIR}/python_fw/
 </pre>
 
 Next step we should create folder for our projects:
