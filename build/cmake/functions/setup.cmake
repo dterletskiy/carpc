@@ -24,6 +24,7 @@ function( setup_target_name OUT_TARGET_NAME )
    set( ${OUT_TARGET_NAME} ${LOCAL_TARGET_NAME} PARENT_SCOPE )
 endfunction( )
 
+# Calculate target name and generate path to generated files.
 function( setup_project OUT_TARGET_NAME )
    setup_target_name( LOCAL_TARGET_NAME )
    set( ${OUT_TARGET_NAME} ${LOCAL_TARGET_NAME} PARENT_SCOPE )

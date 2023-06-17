@@ -45,9 +45,11 @@ if( INSTRUMENTAL )
 else( )
    add_definitions( -Ofast )
 endif( )
+
 if( USE_DEBUG OR INSTRUMENTAL )
    add_definitions( -g )
 endif( )
+
 if( USE_RTTI )
    add_definitions( -frtti )
 else( )

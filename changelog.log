@@ -1,3 +1,6 @@
+version 3.13.4
+   - Build system refactoring.
+
 version 3.13.3
    - Remove submodules/dterletskiy/shell_fw
 
