@@ -8,6 +8,7 @@
 function( setup_gen_dir )
    string( REGEX REPLACE "${ROOT_SOURCE_DIR}" "${ROOT_GEN_DIR}" PROJECT_GEN_DIR ${PROJECT_SOURCE_DIR} )
    file( MAKE_DIRECTORY ${PROJECT_GEN_DIR} )
+   set( PROJECT_GEN_DIR  "${PROJECT_GEN_DIR}" CACHE INTERNAL "PROJECT_GEN_DIR" )
 endfunction( )
 
 # Calculate target name as a last directory from the location path and put it to TARGET_NAME variable.

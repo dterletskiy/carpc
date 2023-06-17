@@ -1,3 +1,6 @@
+version 3.13.5
+   - Fix build system PROJECT_GEN_DIR setup in cmake.
+
 version 3.13.4
    - Build system refactoring.
 
