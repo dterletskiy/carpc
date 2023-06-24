@@ -1,41 +1,35 @@
-set( POSITIVE_VALUES "true" "TRUE" "yes" "YES" "on" "ON" )
-set( NEGATIVE_VALUES "false" "FALSE" "no" "NO" "off" "OFF" )
-
-
-
-# Test string the variable for positive or negative boolean value.
-# In this way, the call parameters can be checked.
+# Find all files with defined extentions in defined directory and put them to OUT_FILES variable.
 # Parameters:
-#     OUT_RESULT - (out) test result ON/OFF
-#     IN_VALUE - (in) variable to test
-#     IN_DEFAULT_VALUE - (in optional) default result in case if IN_VALUE is not defined
+#     IN_LOCATION - (in) directory where recursive search will be performed
+#     IN_EXTENTIONS - (in) file extentions what should be found
+#     OUT_FILES - (out) list of detected files
 # Example:
-#     set( VARIABLE "yes" )
-#     is_on_off( RESULT VARIABLE )
-#     msg_err( "RESULT = " ${RESULT} )
+#     find_files_by_ext( PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR} "${CPP_EXTENTIONS}" )
+#     msg_dbg( "PROJECT_SOURCE_FILES = " ${PROJECT_SOURCE_FILES} )
+function( find_files_by_ext OUT_FILES IN_LOCATION IN_EXTENTIONS )
+   set( LOCAL_FILES "" )
+   foreach( EXTENTION ${IN_EXTENTIONS} )
+      file( GLOB_RECURSE _FILES_ ${IN_LOCATION}/*.${EXTENTION} )
+      list( APPEND LOCAL_FILES ${_FILES_} )
+   endforeach( )
+   set( ${OUT_FILES} ${LOCAL_FILES} PARENT_SCOPE )
+endfunction( )
+
+# Find all files with defined extentions in defined directory, add them to
+# provided list of files and put result to OUT_FILES variable.
+# Parameters:
+#     IN_LOCATION - (in) directory where recursive search will be performed
+#     IN_EXTENTIONS - (in) file extentions what should be found
+#     IN_FILES - (in) files to be extended
+#     OUT_FILES - (out) list of detected files and provided files
 # Example:
-#     is_on_off( RESULT VARIABLE ON )
-#     msg_err( "RESULT = " ${RESULT} )
-function( is_on_off OUT_RESULT IN_VALUE )
-   set( RESULT_POSITIVE ON )
-   set( RESULT_NEGATIVE OFF )
+#     msg_dbg( "PROJECT_SOURCE_FILES = " ${PROJECT_SOURCE_FILES} )
+#     add_files_by_ext( PROJECT_SOURCE_FILES "${PROJECT_SOURCE_FILES}" ${PROJECT_SOURCE_DIR} "${CPP_EXTENTIONS}" )
+#     msg_dbg( "PROJECT_SOURCE_FILES = " ${PROJECT_SOURCE_FILES} )
+function( add_files_by_ext OUT_FILES IN_FILES IN_LOCATION IN_EXTENTIONS )
+   set( LOCAL_FILES "" )
+   find_files_by_ext( LOCAL_FILES ${IN_LOCATION} "${IN_EXTENTIONS}" )
 
-   if( ${ARGC} GREATER 2 )
-      set( IN_DEFAULT_VALUE ${ARGV2} )
-   else( )
-      set( IN_DEFAULT_VALUE ${RESULT_NEGATIVE} )
-   endif( )
-
-   if( NOT DEFINED ${IN_VALUE} )
-      set( ${OUT_RESULT} ${IN_DEFAULT_VALUE} PARENT_SCOPE )
-   else( )
-      set( ${OUT_RESULT} ${RESULT_NEGATIVE} PARENT_SCOPE )
-
-      foreach( POSITIVE_ITEM IN LISTS POSITIVE_VALUES )
-         if( ${POSITIVE_ITEM} STREQUAL ${IN_VALUE} )
-            set( ${OUT_RESULT} ${RESULT_POSITIVE} PARENT_SCOPE )
-            break( )
-         endif( )
-      endforeach( )
-   endif( )
+   list( APPEND IN_FILES ${LOCAL_FILES} )
+   set( ${OUT_FILES} ${IN_FILES} PARENT_SCOPE )
 endfunction( )

@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-project( APPLICATION )
-
-
-
-###########################################################################################
-#                                                                                         #
-#                                Setup common configuration                               #
-#                                                                                         #
-###########################################################################################
-setup_project( TARGET_NAME )
+carpc_project( APPLICATION )
 
 
 
@@ -77,12 +68,12 @@ find_files_by_ext( PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_CPP_
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
-print_project_files( )
+print_variables( )
 
 
 
 add_executable(
-   ${TARGET_NAME}
+   ${PROJECT_TARGET_NAME}
    ${PROJECT_SOURCE_FILES}
    ${PROJECT_GEN_ADL_FILES}
    ${PROJECT_GEN_IDL_FILES}
@@ -90,30 +81,30 @@ add_executable(
    ${PROJECT_GEN_PROTO_FILES}
 )
 
-target_link_libraries( ${TARGET_NAME} tracing )
-target_link_libraries( ${TARGET_NAME} runtime )
+target_link_libraries( ${PROJECT_TARGET_NAME} ${TRACING_TARGET_NAME} )
+target_link_libraries( ${PROJECT_TARGET_NAME} ${RUNTIME_TARGET_NAME} )
 if( MEMORY_HOOK )
-   target_link_libraries( ${TARGET_NAME} hooks )
+   target_link_libraries( ${PROJECT_TARGET_NAME} ${HOOKS_TARGET_NAME} )
 endif( )
 if( INSTRUMENTAL )
-   target_link_libraries( ${TARGET_NAME} instrumental )
+   target_link_libraries( ${PROJECT_TARGET_NAME} ${INSTRUMENTAL_TARGET_NAME} )
 endif( )
 
 if( DLT_TRACE )
-   target_link_libraries( ${TARGET_NAME} dlt )
+   target_link_libraries( ${PROJECT_TARGET_NAME} dlt )
 endif( )
 if( ${OS_TARGET} EQUAL ${OS_ANDROID} )
-   target_link_libraries( ${TARGET_NAME} log )
+   target_link_libraries( ${PROJECT_TARGET_NAME} log )
 endif( )
 
 if( USE_GPB )
-   target_link_libraries( ${TARGET_NAME} ${Protobuf_LIBRARIES} )
+   target_link_libraries( ${PROJECT_TARGET_NAME} ${Protobuf_LIBRARIES} )
 endif( )
 
-add_custom_target( "${TARGET_NAME}_documentation" ALL
-      COMMENT "cmake ${TARGET_NAME}_documentation"
+add_custom_target( "${PROJECT_TARGET_NAME}_documentation" ALL
+      COMMENT "cmake ${PROJECT_TARGET_NAME}_documentation"
       DEPENDS ${PROJECT_GEN_PLANTUML_FILES}
    )
 
-install( TARGETS ${TARGET_NAME} DESTINATION bin )
-install( FILES ${PROJECT_SOURCE_DIR}/${TARGET_NAME}.cfg DESTINATION etc OPTIONAL )
+install( TARGETS ${PROJECT_TARGET_NAME} DESTINATION bin )
+install( FILES ${PROJECT_SOURCE_DIR}/${PROJECT_TARGET_NAME}.cfg DESTINATION etc OPTIONAL )

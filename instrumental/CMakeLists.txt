@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-project( INSTRUMENTAL )
-
-
-
-###########################################################################################
-#                                                                                         #
-#                                Setup common configuration                               #
-#                                                                                         #
-###########################################################################################
-setup_project( TARGET_NAME )
+carpc_project( INSTRUMENTAL )
 
 
 
@@ -54,13 +45,13 @@ find_files_by_ext( PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_CPP_
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
-print_project_files( )
+print_variables( )
 
 
 
-add_library( ${TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
+add_library( ${PROJECT_TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
 
-target_link_libraries( ${TARGET_NAME} dl )
-target_link_libraries( ${TARGET_NAME} tracing )
+target_link_libraries( ${PROJECT_TARGET_NAME} dl )
+target_link_libraries( ${PROJECT_TARGET_NAME} ${TRACING_TARGET_NAME} )
 
-install( TARGETS ${TARGET_NAME} DESTINATION lib )
+install( TARGETS ${PROJECT_TARGET_NAME} DESTINATION lib )

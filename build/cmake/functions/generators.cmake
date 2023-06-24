@@ -274,3 +274,46 @@ function( generate_plantumls PLANTUML_FILES GENERATED_FILES )
    endforeach( )
    set( ${GENERATED_FILES} ${PLANTUMLS_GENERATED_FILES} PARENT_SCOPE )
 endfunction( )
+
+# Generate graph file with dependancies between targets.
+# Parameters:
+#     IN_DESTINATION - (in) destination directory
+#     IN_NAME - (in) destination graph name
+#     IN_TARGETS - (in) list of targets
+# Example:
+# get_all_targets( TARGETS )
+# generate_dependencies_graph( TARGETS )
+function( generate_dependencies_graph IN_DESTINATION IN_NAME IN_TARGETS )
+   set( DOT_FILE "${IN_DESTINATION}/${IN_NAME}.dot" )
+   set( PNG_FILE "${IN_DESTINATION}/${IN_NAME}.png" )
+
+   file( WRITE ${DOT_FILE} "digraph ${IN_NAME} {\n" )
+   foreach( target IN LISTS IN_TARGETS )
+      file( APPEND ${DOT_FILE} "  \"${target}\"\n" )
+
+      get_property( target_deps TARGET ${target} PROPERTY INTERFACE_LINK_LIBRARIES )
+      foreach( dep IN LISTS target_deps )
+         file( APPEND ${DOT_FILE} "  \"${dep}\" -> \"${target}\"\n" )
+      endforeach( )
+   endforeach( )
+   file( APPEND ${DOT_FILE} "}\n" )
+
+   execute_process(
+      COMMAND bash -c "dot -Tpng ${DOT_FILE} -o ${PNG_FILE}"
+      OUTPUT_VARIABLE output_variable
+      RESULT_VARIABLE result_variable
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+   )
+
+   msg_dbg( "Output: ${output_variable}" )
+   msg_dbg( "Result: ${result_variable}" )
+
+
+   # add_custom_command(
+   #    OUTPUT ${PNG_FILE}
+   #    COMMENT "PNG graph file generation"
+   #    COMMAND dot -Tpng ${DOT_FILE} -o ${PNG_FILE}
+   #    DEPENDS ${DOT_FILE}
+   #    VERBATIM
+   # )
+endfunction( )

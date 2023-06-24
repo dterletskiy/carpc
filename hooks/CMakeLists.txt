@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-project( HOOKS )
-
-
-
-###########################################################################################
-#                                                                                         #
-#                                Setup common configuration                               #
-#                                                                                         #
-###########################################################################################
-setup_project( TARGET_NAME )
+carpc_project( HOOKS )
 
 
 
@@ -20,7 +11,7 @@ setup_project( TARGET_NAME )
 ###########################################################################################
 include_directories( ${PROJECT_SOURCE_DIR}/api )
 include_directories( ${TRACING_SOURCE_DIR}/api )
-include_directories( ${FRAMEWORK_SOURCE_DIR}/api )
+include_directories( ${RUNTIME_SOURCE_DIR}/api )
 
 
 
@@ -30,7 +21,7 @@ include_directories( ${FRAMEWORK_SOURCE_DIR}/api )
 #                                                                                         #
 ###########################################################################################
 link_directories( ${TRACING_BINARY_DIR} )
-link_directories( ${FRAMEWORK_BINARY_DIR} )
+link_directories( ${RUNTIME_BINARY_DIR} )
 
 
 
@@ -56,13 +47,13 @@ find_files_by_ext( PROJECT_SOURCE_FILES ${PROJECT_SOURCE_DIR} "${EXTENTIONS_CPP_
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
-print_project_files( )
+print_variables( )
 
 
 
-add_library( ${TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
+add_library( ${PROJECT_TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
 
-target_link_libraries( ${TARGET_NAME} tracing )
-target_link_libraries( ${TARGET_NAME} runtime )
+target_link_libraries( ${PROJECT_TARGET_NAME} ${TRACING_TARGET_NAME} )
+target_link_libraries( ${PROJECT_TARGET_NAME} ${RUNTIME_TARGET_NAME} )
 
-install( TARGETS ${TARGET_NAME} DESTINATION lib )
+install( TARGETS ${PROJECT_TARGET_NAME} DESTINATION lib )

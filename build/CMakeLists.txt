@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 
 
+carpc_project( BUILD_SYSTEM )
+
 install(
    FILES ${ROOT_SOURCE_DIR}/CMakeLists.txt
    DESTINATION bin/build-system

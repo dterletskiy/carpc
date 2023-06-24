@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-project( FRAMEWORK )
-
-
-
-###########################################################################################
-#                                                                                         #
-#                                Setup common configuration                               #
-#                                                                                         #
-###########################################################################################
-setup_project( TARGET_NAME )
+carpc_project( RUNTIME )
 
 
 
@@ -68,25 +59,27 @@ endif( )
 #                                      Debug messages                                     #
 #                                                                                         #
 ###########################################################################################
-print_project_files( )
+print_variables( )
 
 
 
-add_library( ${TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
+add_library( ${PROJECT_TARGET_NAME} SHARED ${PROJECT_SOURCE_FILES} )
 
-target_link_libraries( ${TARGET_NAME} tracing )
+target_link_libraries( ${PROJECT_TARGET_NAME} ${TRACING_TARGET_NAME} )
 if( ${OS_TARGET} EQUAL ${OS_LINUX} )
-   target_link_libraries( ${TARGET_NAME} pthread )
-   target_link_libraries( ${TARGET_NAME} rt )
+   target_link_libraries( ${PROJECT_TARGET_NAME} pthread )
+   target_link_libraries( ${PROJECT_TARGET_NAME} rt )
 endif( )
 if( USE_GPB )
-   target_link_libraries( ${TARGET_NAME} ${Protobuf_LIBRARIES} )
+   target_link_libraries( ${PROJECT_TARGET_NAME} ${Protobuf_LIBRARIES} )
 endif( )
 
-add_custom_target( "${TARGET_NAME}_documentation" ALL
-      COMMENT "cmake ${TARGET_NAME}_documentation"
+add_custom_target( "${PROJECT_TARGET_NAME}_documentation" ALL
+      COMMENT "cmake ${PROJECT_TARGET_NAME}_documentation"
       DEPENDS ${PROJECT_GEN_PLANTUML_FILES}
    )
 
-install( TARGETS ${TARGET_NAME} DESTINATION lib )
+add_dependencies( ${PROJECT_TARGET_NAME} "${PROJECT_TARGET_NAME}_documentation" )
+
+install( TARGETS ${PROJECT_TARGET_NAME} DESTINATION lib )
 install( DIRECTORY ${PROJECT_SOURCE_DIR}/api/ DESTINATION include )

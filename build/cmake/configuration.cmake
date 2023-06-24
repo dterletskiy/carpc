@@ -34,48 +34,34 @@ endif( )
 
 
 # Enable framework system tracin
-is_on_off( SYS_TRACE SYS_TRACE ON )
+carpc_is_on_off( SYS_TRACE SYS_TRACE ON )
 
 # Enable application tracing
-is_on_off( MSG_TRACE MSG_TRACE ON )
+carpc_is_on_off( MSG_TRACE MSG_TRACE ON )
 
 # Enable colored tracing for console
-is_on_off( COLORED_TRACE COLORED_TRACE ON )
+carpc_is_on_off( COLORED_TRACE COLORED_TRACE ON )
 
 # Enable dlt tracing
-is_on_off( DLT_TRACE DLT_TRACE ON )
+carpc_is_on_off( DLT_TRACE DLT_TRACE ON )
 
 # Enable memory allocator hooks
-is_on_off( MEMORY_HOOK MEMORY_HOOK OFF )
+carpc_is_on_off( MEMORY_HOOK MEMORY_HOOK OFF )
 
 # Enable instrumental functionality
-is_on_off( INSTRUMENTAL INSTRUMENTAL OFF )
+carpc_is_on_off( INSTRUMENTAL INSTRUMENTAL OFF )
 
 # Enable debug information
-is_on_off( USE_DEBUG USE_DEBUG OFF )
+carpc_is_on_off( USE_DEBUG USE_DEBUG OFF )
 
 # Enable goolgle protobuf
-is_on_off( USE_GPB USE_GPB ON )
+carpc_is_on_off( USE_GPB USE_GPB ON )
 
 # Enable RTTI
-is_on_off( USE_RTTI USE_RTTI ON )
+carpc_is_on_off( USE_RTTI USE_RTTI ON )
 
 
 
 
 set( ANTLR4_JAR ${ROOT_SOURCE_DIR}/thirdparty/antlr/antlr-4.10.1-complete.jar )
 set( PLANTUML_JAR ${ROOT_SOURCE_DIR}/thirdparty/plantuml/plantuml-1.2021.14.jar )
-
-
-
-function( print_configuration )
-   msg_dbg( "SYS_TRACE        = " ${SYS_TRACE} )
-   msg_dbg( "MSG_TRACE        = " ${MSG_TRACE} )
-   msg_dbg( "COLORED_TRACE    = " ${COLORED_TRACE} )
-   msg_dbg( "DLT_TRACE        = " ${DLT_TRACE} )
-   msg_dbg( "MEMORY_HOOK      = " ${MEMORY_HOOK} )
-   msg_dbg( "INSTRUMENTAL     = " ${INSTRUMENTAL} )
-   msg_dbg( "USE_DEBUG        = " ${USE_DEBUG} )
-   msg_dbg( "USE_GPB          = " ${USE_GPB} )
-   msg_dbg( "USE_RTTI         = " ${USE_RTTI} )
-endfunction( )
