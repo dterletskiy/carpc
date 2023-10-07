@@ -7,6 +7,9 @@
 #include <list>
 #include <set>
 #include <map>
+#include <tuple>
+#include <optional>
+#include <memory>
 #include <unistd.h>
 
 
@@ -70,6 +73,51 @@ namespace carpc {
 
 
 
+
+
+
+   /****************************************************************************************************
+    *
+    * Forward declarations for "print" functions
+    *
+    ***************************************************************************************************/
+   template< typename TYPE >
+   void print( const TYPE* array, const std::size_t size, const bool is_new_line = false );
+
+   template < typename T, std::size_t N >
+   void print( T (&array)[N], const bool is_new_line = false );
+
+   void print( const std::string& string, const bool is_new_line = false );
+
+   template< typename TYPE >
+   void print( const std::shared_ptr< TYPE >& shared_ptr, const bool is_new_line = false );
+
+   template< typename TYPE >
+   void print( const std::optional< TYPE >& optional, const bool is_new_line = false );
+
+   template< typename TYPE >
+   void print( const std::list< TYPE >& list, const bool is_new_line = false );
+
+   template< typename TYPE >
+   void print( const std::vector< TYPE >& vector, const bool is_new_line = false );
+
+   template< typename TYPE >
+   void print( const std::set< TYPE >& set, const bool is_new_line = false );
+
+   template< typename TYPE_KEY, typename TYPE_VALUE >
+   void print( const std::pair< TYPE_KEY, TYPE_VALUE >& pair, const bool is_new_line = false );
+
+   template< typename TYPE_KEY, typename TYPE_VALUE >
+   void print( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool is_new_line = false );
+
+   template< typename... TYPES >
+   void print( const std::tuple< TYPES... >& tuple, const bool is_new_line = false );
+
+   template< typename T, typename...Ts >
+   void print_pack( T&& first, Ts&&... rest );
+
+
+
    /****************************************************************************************************
     *
     * This function prints array declared on the stack or heap:
@@ -78,7 +126,7 @@ namespace carpc {
     *
     ***************************************************************************************************/
    template< typename TYPE >
-   void print( const TYPE* array, const std::size_t size, const bool is_new_line = false )
+   void print( const TYPE* array, const std::size_t size, const bool is_new_line )
    {
       printf( "{ " );
       for ( std::size_t index = 0; index < size; ++index )
@@ -101,7 +149,7 @@ namespace carpc {
     *
     ***************************************************************************************************/
    template < typename T, std::size_t N >
-   void print( T (&array)[N], const bool is_new_line = false )
+   void print( T (&array)[N], const bool is_new_line )
    {
       printf( "{ " );
       for ( std::size_t index = 0; index < N; ++index )
@@ -122,10 +170,35 @@ namespace carpc {
     * 
     ***************************************************************************************************/
 
-   void print( const std::string& string, const bool is_new_line = false );
+   template< typename TYPE >
+   void print( const std::shared_ptr< TYPE >& shared_ptr, const bool is_new_line )
+   {
+      printf( "{ " );
+      printf( "%p", shared_ptr.get( ) );
+      printf( " }" );
+
+      if( is_new_line ) printf( "\n" );
+   }
 
    template< typename TYPE >
-   void print( const std::list< TYPE >& list, const bool is_new_line = false )
+   void print( const std::optional< TYPE >& optional, const bool is_new_line )
+   {
+      printf( "{ " );
+      if( optional.has_value( ) )
+      {
+         print( optional.value( ) );
+      }
+      else
+      {
+         printf( "std::nullopt" );
+      }
+      printf( " }" );
+
+      if( is_new_line ) printf( "\n" );
+   }
+
+   template< typename TYPE >
+   void print( const std::list< TYPE >& list, const bool is_new_line )
    {
       printf( "{ " );
       for ( const auto& value : list )
@@ -139,7 +212,7 @@ namespace carpc {
    }
 
    template< typename TYPE >
-   void print( const std::vector< TYPE >& vector, const bool is_new_line = false )
+   void print( const std::vector< TYPE >& vector, const bool is_new_line )
    {
       printf( "{ " );
       for ( const auto& value : vector )
@@ -153,7 +226,7 @@ namespace carpc {
    }
 
    template< typename TYPE >
-   void print( const std::set< TYPE >& set, const bool is_new_line = false )
+   void print( const std::set< TYPE >& set, const bool is_new_line )
    {
       printf( "{ " );
       for ( const auto& value : set )
@@ -167,7 +240,7 @@ namespace carpc {
    }
 
    template< typename TYPE_KEY, typename TYPE_VALUE >
-   void print( const std::pair< TYPE_KEY, TYPE_VALUE >& pair, const bool is_new_line = false )
+   void print( const std::pair< TYPE_KEY, TYPE_VALUE >& pair, const bool is_new_line )
    {
       printf( "{ " );
       print( pair.first );
@@ -179,7 +252,7 @@ namespace carpc {
    }
 
    template< typename TYPE_KEY, typename TYPE_VALUE >
-   void print( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool is_new_line = false )
+   void print( const std::map< TYPE_KEY, TYPE_VALUE >& map, const bool is_new_line )
    {
       printf( "{ " );
       for ( const auto& pair : map )
@@ -192,10 +265,75 @@ namespace carpc {
       if( is_new_line ) printf( "\n" );
    }
 
+   namespace _private_ {
+
+      namespace _compare_v1_ {
+
+         template< std::size_t I, typename... Tp >
+         constexpr bool Tp_more( )
+         {
+            return I < sizeof...( Tp );
+         }
+
+         template< std::size_t I, typename... Tp >
+         constexpr bool Tp_equal( )
+         {
+            return I == sizeof...( Tp );
+         }
+
+      }
+
+      namespace _compare_v2_ {
+
+         template< typename... Tp >
+         inline
+         constexpr bool Tp_more( const std::size_t& I )
+         {
+            return I < sizeof...( Tp );
+         }
+
+         template< typename... Tp >
+         inline
+         constexpr bool Tp_equal( const std::size_t& I )
+         {
+            return I == sizeof...( Tp );
+         }
+
+      }
+
+      template< std::size_t I = 0, typename... Tp >
+         inline typename std::enable_if< _compare_v2_::Tp_equal< Tp... >( I ), void >::type
+            print_tuple( const std::tuple< Tp... >& t )
+      {
+      }
+
+      template< std::size_t I = 0, typename... Tp >
+         // inline typename std::enable_if< I < sizeof...(Tp), void >::type
+         // inline typename std::enable_if< _compare_v1_::Tp_more< I, Tp... >( ), void >::type
+         inline typename std::enable_if< _compare_v2_::Tp_more< Tp... >( I ), void >::type
+            print_tuple( const std::tuple< Tp... >& t )
+      {
+         print( std::get< I >( t ) );
+         printf( " " );
+         print_tuple< I + 1 >( t );
+      }
+
+   }
+
+   template< typename... TYPES >
+   void print( const std::tuple< TYPES... >& tuple, const bool is_new_line )
+   {
+      printf( "{ " );
+      _private_::print_tuple( tuple );
+      printf( "}" );
+
+      if( is_new_line ) printf( "\n" );
+   }
+
    inline
    void print_pack( )
    {
-      std::cout << std::endl;
+      printf( "\n" );
    }
 
    template< typename T, typename...Ts >

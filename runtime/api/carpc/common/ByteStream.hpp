@@ -36,6 +36,11 @@ namespace carpc {
          template< typename TYPE >
             ByteStream& operator >> ( TYPE& value );
 
+         template< typename ... TYPES >
+            ByteStream& operator << ( const TYPES& ... value );
+         template< typename ... TYPES >
+            ByteStream& operator >> ( TYPES& ... value );
+
       public:
          // Serializing all arguments and result will be stored in raw_buffer.
          // In this case RawBuffer will point to allocated memory and this memory MUST be freed by user.
@@ -137,7 +142,7 @@ namespace carpc {
        *
        ****************************************/
       public:
-         // This method for multiple push
+         // This method for multiple pop
          template< typename ... TYPES >
             bool pop( TYPES& ... values );
 
@@ -233,6 +238,20 @@ namespace carpc {
    ByteStream& ByteStream::operator >> ( TYPE& value )
    {
       pop( value );
+      return *this;
+   }
+
+   template< typename ... TYPES >
+   ByteStream& ByteStream::operator << ( const TYPES& ... value )
+   {
+      push( value... );
+      return *this;
+   }
+
+   template< typename ... TYPES >
+   ByteStream& ByteStream::operator >> ( TYPES& ... value )
+   {
+      pop( value... );
       return *this;
    }
 
