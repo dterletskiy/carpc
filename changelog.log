@@ -1,3 +1,6 @@
+version 3.13.10
+   - Optimize "print_bin" method in helpers.
+
 version 3.13.9
    - Implement ByteStrem debug message functionality and build pearameter to activate it.
    - Split "push" method for integral and floating point type to two separate methods. 
