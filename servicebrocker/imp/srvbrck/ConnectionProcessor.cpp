@@ -16,7 +16,7 @@ namespace local {
       const void* buffer = nullptr;
       stream.buffer( buffer, size );
       p_socket->send( buffer, size );
-      stream.erase( size );
+      stream.reset( );
       return true;
    }
 

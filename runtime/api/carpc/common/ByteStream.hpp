@@ -211,12 +211,9 @@ namespace carpc {
 
       /*****************************************
        *
-       * Erase methods
+       * Other methods
        *
        ****************************************/
-      public:
-         void erase( const std::size_t size, const std::size_t offset = 0 );
-
       public:
          void buffer( const void*& pointer, std::size_t& size ) const;
          const void* const buffer( ) const;
@@ -719,12 +716,6 @@ namespace carpc {
    void ByteStream::reset( )
    {
       m_buffer.reset( );
-   }
-
-   inline
-   void ByteStream::erase( const std::size_t size, const std::size_t offset )
-   {
-      m_buffer.pop_front( size );
    }
  
    inline
