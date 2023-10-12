@@ -45,6 +45,9 @@ carpc_is_on_off( COLORED_TRACE COLORED_TRACE ON )
 # Enable dlt tracing
 carpc_is_on_off( DLT_TRACE DLT_TRACE ON )
 
+# Enable dlt tracing
+carpc_is_on_off( DEBUG_STREAM DEBUG_STREAM OFF )
+
 # Enable memory allocator hooks
 carpc_is_on_off( MEMORY_HOOK MEMORY_HOOK OFF )
 

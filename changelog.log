@@ -1,3 +1,7 @@
+version 3.13.9
+   - Implement ByteStrem debug message functionality and build pearameter to activate it.
+   - Split "push" method for integral and floating point type to two separate methods. 
+
 version 3.13.8
    - Extend ByteStream funtionality.
    - Extend helpers print functions functionality.
