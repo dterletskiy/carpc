@@ -1,3 +1,6 @@
+version 3.13.11
+   - Remove depricated stuff.
+
 version 3.13.10
    - Optimize "print_bin" method in helpers.
 
