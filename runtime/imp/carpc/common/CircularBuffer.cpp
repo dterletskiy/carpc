@@ -30,12 +30,14 @@ CircularBuffer::CircularBuffer(
          const std::size_t capacity,
          const bool is_overlap_allowed,
          const bool is_reallocate_allowed,
-         const bool auto_free
+         const bool auto_free,
+         const bool auto_zeroing
       )
    : m_capacity( capacity )
    , m_is_overlap_allowed( is_overlap_allowed )
    , m_is_reallocate_allowed( is_reallocate_allowed )
    , m_auto_free( auto_free )
+   , m_auto_zeroing( auto_zeroing )
 {
    SYS_INF( );
 
@@ -49,6 +51,7 @@ CircularBuffer::CircularBuffer( const CircularBuffer& other )
    , m_is_overlap_allowed( other.m_is_overlap_allowed )
    , m_is_reallocate_allowed( other.m_is_reallocate_allowed )
    , m_auto_free( other.m_auto_free )
+   , m_auto_zeroing( other.m_auto_zeroing )
 {
    SYS_INF( );
 
@@ -68,6 +71,7 @@ CircularBuffer::CircularBuffer( CircularBuffer&& other )
    , m_is_overlap_allowed( other.m_is_overlap_allowed )
    , m_is_reallocate_allowed( other.m_is_reallocate_allowed )
    , m_auto_free( other.m_auto_free )
+   , m_auto_zeroing( other.m_auto_zeroing )
 {
    SYS_INF( );
 
@@ -83,6 +87,7 @@ CircularBuffer::CircularBuffer( CircularBuffer&& other )
    other.m_capacity = 0;
    other.m_size = 0;
    other.m_auto_free = false;
+   other.m_auto_zeroing = false;
 }
 
 CircularBuffer::~CircularBuffer( )
@@ -178,7 +183,7 @@ void CircularBuffer::dump_raw( ) const
 {
    printf( "Raw dump: " );
    for( std::size_t i = 0; i < m_capacity; ++i )
-      printf( "%#x ", static_cast< uint8_t* >( mp_head )[i] );
+      printf( "0x%02x ", static_cast< uint8_t* >( mp_head )[i] );
 
    printf( "\n" );
 }
@@ -190,14 +195,14 @@ void CircularBuffer::dump_logic( ) const
    if( m_size > part_size )
    {
       for( std::size_t i = 0; i < part_size; ++i )
-         printf( "%#x ", static_cast< uint8_t* >( mp_begin )[i] );
+         printf( "0x%02x ", static_cast< uint8_t* >( mp_begin )[i] );
       for( std::size_t i = 0; i < m_size - part_size; ++i )
-         printf( "%#x ", static_cast< uint8_t* >( mp_head )[i] );
+         printf( "0x%02x ", static_cast< uint8_t* >( mp_head )[i] );
    }
    else
    {
       for( std::size_t i = 0; i < m_size; ++i )
-         printf( "%#x ", static_cast< uint8_t* >( mp_begin )[i] );
+         printf( "0x%02x ", static_cast< uint8_t* >( mp_begin )[i] );
    }
 
    printf( "\n" );
@@ -296,15 +301,21 @@ void CircularBuffer::pop_front( const std::size_t size )
    if( size > part_size )
    {
       // zeroing pop data bytes
-      std::memset( mp_begin, 0, part_size );
-      std::memset( mp_head, 0, size - part_size );
+      if( m_auto_zeroing )
+      {
+         std::memset( mp_begin, 0, part_size );
+         std::memset( mp_head, 0, size - part_size );
+      }
 
       mp_begin = inc( mp_head, size - part_size );
    }
    else
    {
       // zeroing pop data bytes
-      std::memset( mp_begin, 0, size );
+      if( m_auto_zeroing )
+      {
+         std::memset( mp_begin, 0, size );
+      }
 
       mp_begin = inc( mp_begin, size );
    }
@@ -329,15 +340,21 @@ void CircularBuffer::pop_back( const std::size_t size )
       mp_end = dec( mp_tail, size - part_size );
 
       // zeroing pop data bytes
-      std::memset( mp_head, 0, part_size );
-      std::memset( mp_end, 0, size - part_size );
+      if( m_auto_zeroing )
+      {
+         std::memset( mp_head, 0, part_size );
+         std::memset( mp_end, 0, size - part_size );
+      }
    }
    else
    {
       mp_end = dec( mp_end, size );
 
       // zeroing pop data bytes
-      std::memset( mp_end, 0, size );
+      if( m_auto_zeroing )
+      {
+         std::memset( mp_end, 0, size );
+      }
    }
 
    // if( mp_end == mp_tail )

@@ -1,3 +1,6 @@
+version 3.13.14
+   - Implement "auto_zeroing" poped data for CircularBuffer.
+
 version 3.13.13
    - "random" functionality implemented.
 

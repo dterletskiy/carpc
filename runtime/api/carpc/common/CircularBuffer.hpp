@@ -111,6 +111,7 @@ namespace carpc {
           *       reallocation will be performed only in case when you try to store data with size
           *       more then current buffer capacity.
           *    auto_free - automatically free allocated memory when 'CircularBuffer' is destroyed.
+          *    auto_zeroing - automatically fill memory region after poped data by zeroes.
           * 
           * It this contructor is possible to create nnext buffer types:
           *    The circular extendable buffer:
@@ -127,13 +128,15 @@ namespace carpc {
                            const std::size_t capacity = 1024,
                            const bool is_overlap_allowed = true,
                            const bool is_reallocate_allowed = false,
-                           const bool auto_free = true
+                           const bool auto_free = true,
+                           const bool auto_zeroing = false
                         );
          CircularBuffer( const CircularBuffer& other );
          CircularBuffer( CircularBuffer&& other );
          ~CircularBuffer( );
 
          void auto_free( const bool af );
+         void auto_zeroing( const bool az );
 
       public:
          /******************************************************************************
@@ -322,6 +325,7 @@ namespace carpc {
          const bool     m_is_overlap_allowed = true;
          const bool     m_is_reallocate_allowed = false;
          bool           m_auto_free = true;
+         bool           m_auto_zeroing = false;
    };
 
 
@@ -330,6 +334,12 @@ namespace carpc {
    void CircularBuffer::auto_free( const bool af )
    {
       m_auto_free = af;
+   }
+
+   inline
+   void CircularBuffer::auto_zeroing( const bool az )
+   {
+      m_auto_zeroing = az;
    }
 
    inline
@@ -353,6 +363,11 @@ namespace carpc {
       mp_begin = mp_head;
       mp_end = mp_head;
       m_size = 0;
+
+      if( m_auto_free )
+      {
+         fill( );
+      }
    }
 
    inline
