@@ -1,10 +1,10 @@
 #include <unistd.h>
 
-#include "carpc/helpers/functions/random.hpp"
+#include "carpc/helpers/functions/generate.hpp"
 
 
 
-namespace carpc::random {
+namespace carpc::generate::random {
 
    void init( )
    {

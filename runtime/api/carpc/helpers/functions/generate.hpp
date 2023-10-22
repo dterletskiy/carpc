@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdlib>
 #include <string>
 #include <type_traits>
 #include <functional>
@@ -13,11 +14,14 @@
 
 namespace carpc::generate {
 
-   /****************************************************************************************************
+   /***************************************************************************
     * 
-    * Function for genetating
+    * Function for genetating string name based on template type parameter.
+    * In case of allowed RTTI by build system "typeid( ... )" will be used.
+    * In case of RTTI is not allowed by build system "__PRETTY_FUNCTION__"
+    * macro will be used.
     * 
-    ***************************************************************************************************/
+    **************************************************************************/
    template< typename T >
    std::string name( )
    {
@@ -31,6 +35,13 @@ namespace carpc::generate {
       return value;
    }
 
+   /***************************************************************************
+    * 
+    * Function for genetating hash code based on template type parameter.
+    * In case of allowed RTTI by build system "typeid( ... )" will be used.
+    * In case of RTTI is not allowed by build system "std::hash" will be used.
+    * 
+    **************************************************************************/
    template< typename T >
    std::size_t hash( )
    {
@@ -45,6 +56,16 @@ namespace carpc::generate {
    }
 
 } // namespace carpc::generate
+
+
+
+namespace carpc::generate::random {
+
+   void init( );
+   std::string text( const std::size_t length );
+   std::size_t number( const std::size_t begin, const std::size_t end );
+
+}
 
 
 
