@@ -1,3 +1,7 @@
+version 3.13.17
+   - Extend linux socket wrapper functionality.
+   - Linux socket wrapper code refactoring.
+
 version 3.13.16
    - Implement template "carpc::print" function for "std::basic_string".
 

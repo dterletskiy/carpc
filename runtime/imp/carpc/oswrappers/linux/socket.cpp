@@ -153,33 +153,56 @@ namespace carpc::os::os_linux::socket {
          {
             // SYS_INF( "AF_UNIX" );
 
-            struct sockaddr_un* serv_addr_un = (sockaddr_un*)malloc( sizeof( sockaddr_un ) );
-            memset( serv_addr_un, 0, sizeof( sockaddr_un ) );
+            struct sockaddr_un* addr_un = (sockaddr_un*)malloc( sizeof( sockaddr_un ) );
+            memset( addr_un, 0, sizeof( sockaddr_un ) );
 
-            serv_addr_un->sun_family = _domain;
-            strncpy( serv_addr_un->sun_path, _address, sizeof( serv_addr_un->sun_path ) - 1 );
+            addr_un->sun_family = _domain;
+            strncpy( addr_un->sun_path, _address, sizeof( addr_un->sun_path ) - 1 );
 
-            m_addr = reinterpret_cast< sockaddr* >( serv_addr_un );
-            m_len = sizeof( serv_addr_un->sun_family ) + strlen( serv_addr_un->sun_path );
+            m_addr = reinterpret_cast< sockaddr* >( addr_un );
+            m_len = sizeof( addr_un->sun_family ) + strlen( addr_un->sun_path );
             break;
          }
          case AF_INET:
          {
             // SYS_INF( "AF_INET" );
 
-            struct sockaddr_in* serv_addr_in = (sockaddr_in*)malloc( sizeof( sockaddr_in ) );
-            memset( serv_addr_in, 0, sizeof( sockaddr_in ) );
+            struct sockaddr_in* addr_in = (sockaddr_in*)malloc( sizeof( sockaddr_in ) );
+            memset( addr_in, 0, sizeof( sockaddr_in ) );
 
-            serv_addr_in->sin_family = _domain;
-            serv_addr_in->sin_addr.s_addr = inet_addr( _address );
-            serv_addr_in->sin_port = htons( _port );
+            addr_in->sin_family = _domain;
+            addr_in->sin_addr.s_addr = inet_addr( _address );
+            addr_in->sin_port = htons( _port );
 
-            m_addr = reinterpret_cast< sockaddr* >( serv_addr_in );
+            m_addr = reinterpret_cast< sockaddr* >( addr_in );
             m_len = sizeof( sockaddr_in );
             break;
          }
          case AF_INET6:
-         default:          break;
+         {
+            // SYS_INF( "AF_INET6" );
+
+            break;
+         }
+         case AF_VSOCK:
+         {
+            // SYS_INF( "AF_VSOCK" );
+
+            struct sockaddr_vm* addr_vm = (sockaddr_vm*)malloc( sizeof( sockaddr_vm ) );
+            memset( addr_vm, 0, sizeof( sockaddr_vm ) );
+
+            addr_vm->svm_family = _domain;
+            addr_vm->svm_cid = atoi( _address );
+            addr_vm->svm_port = _port;
+
+            m_addr = reinterpret_cast< sockaddr* >( addr_vm );
+            m_len = sizeof( addr_vm );
+            break;
+         }
+         default:
+         {
+            break;
+         }
       }
 
       // print( m_addr );
@@ -320,7 +343,7 @@ namespace carpc::os::os_linux::socket {
    void print( const sockaddr* sa )
    {
       char* c_address = nullptr;
-      std::string domain( "Unknown AF" );
+      std::string domain( "AF_UNDEFINED" );
 
       switch( sa->sa_family )
       {
@@ -354,11 +377,23 @@ namespace carpc::os::os_linux::socket {
             break;
          }
 
+         case AF_VSOCK:
+         {
+            domain = "AF_VSOCK";
+            const size_t maxlen = 8;
+            c_address = (char*)malloc( maxlen );
+            struct sockaddr_vm* addr_vm = (struct sockaddr_vm*)sa;
+            // https://stackoverflow.com/a/8257728
+            // itoa( addr_vm->svm_cid, c_address, 10 );
+            sprintf( c_address, "%d", addr_vm->svm_cid );
+            break;
+         }
+
          default:
          {
             const size_t maxlen = 256;
             c_address = (char*)malloc( maxlen );
-            strncpy( c_address, "Unknown AF", maxlen );
+            strncpy( c_address, "AF_UNDEFINED", maxlen );
             break;
          }
       }
@@ -394,7 +429,7 @@ namespace carpc::os::os_linux::socket {
 
    }
 
-   const tSocket create_server( const configuration& _config )
+   tSocket create_server( const configuration& _config )
    {
       tSocket _socket = carpc::os::os_linux::socket::socket( _config );
       if( InvalidSocket == _socket )
@@ -407,7 +442,7 @@ namespace carpc::os::os_linux::socket {
       return _socket;
    }
 
-   const tSocket create_clint( const configuration& _config )
+   tSocket create_clint( const configuration& _config )
    {
       tSocket _socket = carpc::os::os_linux::socket::socket( _config );
       if( InvalidSocket == _socket )
@@ -418,7 +453,7 @@ namespace carpc::os::os_linux::socket {
       return _socket;
    }
 
-   const tSocket socket( const int _domain, const int _type, const int _protocole )
+   tSocket socket( const int _domain, const int _type, const int _protocole )
    {
       tSocket _socket = ::socket( _domain, _type, _protocole );
       error = errno;
@@ -432,12 +467,25 @@ namespace carpc::os::os_linux::socket {
       return _socket;
    }
 
-   const tSocket socket( const configuration _config )
+   tSocket socket( const configuration _config )
    {
       return socket( _config.domain, _config.type, _config.protocole );
    }
 
-   const bool bind( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
+   bool setsockopt( tSocket _socket, int level, int option_name, const void *option_value, socklen_t option_len )
+   {
+      int result = ::setsockopt( _socket, level, option_name, option_value, option_len );
+      error = errno;
+      if( -1 == result )
+      {
+         SYS_ERR( "setsockopt(%d) error: %d", _socket, error );
+         return false;
+      }
+      SYS_VRB( "setsockopt(%d)", _socket );
+      return true;
+   }
+
+   bool bind( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
    {
       if( nullptr == _address )
       {
@@ -456,18 +504,18 @@ namespace carpc::os::os_linux::socket {
       return true;
    }
 
-   const bool bind( const tSocket _socket, const int _domain, const char* const _address, const int _port )
+   bool bind( const tSocket _socket, const int _domain, const char* const _address, const int _port )
    {
       socket_addr sa( _domain, _address, _port );
       return carpc::os::os_linux::socket::bind( _socket, sa.addr( ), sa.len( ) );
    }
 
-   const bool bind( const tSocket _socket, const configuration _config )
+   bool bind( const tSocket _socket, const configuration _config )
    {
       return carpc::os::os_linux::socket::bind( _socket, _config.domain, _config.address.c_str( ), _config.port );
    }
 
-   const bool connect( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
+   bool connect( const tSocket _socket, const sockaddr* _address, const socklen_t _address_len )
    {
       if( nullptr == _address )
       {
@@ -486,18 +534,18 @@ namespace carpc::os::os_linux::socket {
       return true;
    }
 
-   const bool connect( const tSocket _socket, const int _domain, const char* const _address, const int _port )
+   bool connect( const tSocket _socket, const int _domain, const char* const _address, const int _port )
    {
       socket_addr sa( _domain, _address, _port );
       return carpc::os::os_linux::socket::connect( _socket, sa.addr( ), sa.len( ) );
    }
 
-   const bool connect( const tSocket _socket, const configuration _config )
+   bool connect( const tSocket _socket, const configuration _config )
    {
       return carpc::os::os_linux::socket::connect( _socket, _config.domain, _config.address.c_str( ), _config.port );
    }
 
-   const bool listen( const tSocket _socket, const int _backlog )
+   bool listen( const tSocket _socket, const int _backlog )
    {
       int result = ::listen( _socket, _backlog );
       error = errno;
@@ -510,7 +558,7 @@ namespace carpc::os::os_linux::socket {
       return true;
    }
 
-   const ssize_t send( const tSocket _socket, const void* _buffer, const size_t _size, const int _flags )
+   ssize_t send( const tSocket _socket, const void* _buffer, const size_t _size, const int _flags )
    {
       if( nullptr == _buffer )
       {
@@ -529,7 +577,7 @@ namespace carpc::os::os_linux::socket {
       return size;
    }
 
-   const ssize_t sendto( const tSocket _socket, const void* _buffer, const size_t _size, const int _flags,
+   ssize_t sendto( const tSocket _socket, const void* _buffer, const size_t _size, const int _flags,
                         const sockaddr* const _address, const socklen_t _address_len )
    {
       if( nullptr == _buffer )
@@ -549,7 +597,7 @@ namespace carpc::os::os_linux::socket {
       return size;
    }
 
-   const ssize_t sendmsg( const tSocket _socket, const msghdr* const _message, const int _flags )
+   ssize_t sendmsg( const tSocket _socket, const msghdr* const _message, const int _flags )
    {
       ssize_t size = ::sendmsg( _socket, _message, _flags );
       error = errno;
@@ -557,7 +605,7 @@ namespace carpc::os::os_linux::socket {
       return size;
    }
 
-   const ssize_t recv( const tSocket _socket, void* const _buffer, const size_t _size, const int _flags )
+   ssize_t recv( const tSocket _socket, void* const _buffer, const size_t _size, const int _flags )
    {
       if( nullptr == _buffer )
       {
@@ -576,7 +624,7 @@ namespace carpc::os::os_linux::socket {
       return size;
    }
 
-   const ssize_t recvfrom( const tSocket _socket, void* const _buffer, const size_t _size, const int _flags,
+   ssize_t recvfrom( const tSocket _socket, void* const _buffer, const size_t _size, const int _flags,
                         sockaddr* const _address, socklen_t* const _address_len )
    {
       if( nullptr == _buffer )
@@ -596,7 +644,7 @@ namespace carpc::os::os_linux::socket {
       return size;
    }
 
-   const ssize_t recvmsg( const tSocket _socket, msghdr* const _message, const int _flags )
+   ssize_t recvmsg( const tSocket _socket, msghdr* const _message, const int _flags )
    {
       ssize_t size = ::recvmsg( _socket, _message, _flags );
       error = errno;
@@ -604,7 +652,7 @@ namespace carpc::os::os_linux::socket {
       return size;
    }
 
-   const tSocket accept( const tSocket _socket, sockaddr* const _address, socklen_t* const _address_len )
+   tSocket accept( const tSocket _socket, sockaddr* const _address, socklen_t* const _address_len )
    {
       tSocket slave_socket = ::accept( _socket, _address, _address_len );
       error = errno;
@@ -617,7 +665,7 @@ namespace carpc::os::os_linux::socket {
       return slave_socket;
    }
 
-   const bool select( const tSocket _max_socket, fd_set* const _fd_set_read, fd_set* const _fd_set_write, fd_set* const _fd_set_except, timeval* const _timeout )
+   bool select( const tSocket _max_socket, fd_set* const _fd_set_read, fd_set* const _fd_set_write, fd_set* const _fd_set_except, timeval* const _timeout )
    {
       int result = ::select( _max_socket + 1, _fd_set_read, _fd_set_write, _fd_set_except, _timeout );
       error = errno;
@@ -630,7 +678,7 @@ namespace carpc::os::os_linux::socket {
       return true;
    }
 
-   const bool select( const tSocket _max_socket, fd& _fd, timeval* const _timeout )
+   bool select( const tSocket _max_socket, fd& _fd, timeval* const _timeout )
    {
       return carpc::os::os_linux::socket::select( _max_socket, _fd.read( ), _fd.write( ), _fd.except( ), _timeout );
    }
