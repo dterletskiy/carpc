@@ -32,9 +32,18 @@ namespace carpc {
       if( is_new_line ) printf( "\n" );
    }
 
-   void print( const std::string& string, const bool is_new_line )
+   template< >
+   void print( const std::basic_string< char >& string, const bool is_new_line )
    {
       printf( "\"%s\"", string.c_str( ) );
+
+      if( is_new_line ) printf( "\n" );
+   }
+
+   template< >
+   void print( const std::basic_string< wchar_t >& string, const bool is_new_line )
+   {
+      printf( "\"%ls\"", string.c_str( ) );
 
       if( is_new_line ) printf( "\n" );
    }

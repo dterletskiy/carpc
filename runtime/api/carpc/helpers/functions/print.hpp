@@ -86,13 +86,20 @@ namespace carpc {
    template < typename T, std::size_t N >
    void print( T (&array)[N], const bool is_new_line = false );
 
-   void print( const std::string& string, const bool is_new_line = false );
-
    template< typename TYPE >
    void print( const std::shared_ptr< TYPE >& shared_ptr, const bool is_new_line = false );
 
    template< typename TYPE >
    void print( const std::optional< TYPE >& optional, const bool is_new_line = false );
+
+   template< typename TYPE >
+   void print( const std::basic_string< TYPE >& string, const bool is_new_line = false );
+
+   template< >
+   void print( const std::basic_string< char >& string, const bool is_new_line );
+
+   template< >
+   void print( const std::basic_string< wchar_t >& string, const bool is_new_line );
 
    template< typename TYPE >
    void print( const std::list< TYPE >& list, const bool is_new_line = false );
@@ -192,6 +199,19 @@ namespace carpc {
          printf( "std::nullopt" );
       }
       printf( " }" );
+
+      if( is_new_line ) printf( "\n" );
+   }
+
+   template< typename TYPE >
+   void print( const std::basic_string< TYPE >& string, const bool is_new_line )
+   {
+      printf( "\"" );
+      for ( const auto& value : string )
+      {
+         print( value );
+      }
+      printf( "\"" );
 
       if( is_new_line ) printf( "\n" );
    }

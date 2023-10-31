@@ -1,3 +1,6 @@
+version 3.13.16
+   - Implement template "carpc::print" function for "std::basic_string".
+
 version 3.13.15
    - Move "random" functionality to "generate".
 
