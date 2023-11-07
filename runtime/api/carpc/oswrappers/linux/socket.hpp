@@ -63,14 +63,14 @@ namespace carpc::os::os_linux::socket {
          socklen_t m_len = 0;
    };
 
-   class fd
+   class fds
    {
       public:
          enum class eType { READ, WRITE, EXCEPT };
 
       public:
-         fd( );
-         ~fd( );
+         fds( );
+         ~fds( );
 
          void set( const tSocket _socket, const eType type );
          void set( const std::set< tSocket > socket_set, const std::set< eType > type_set );
@@ -220,11 +220,13 @@ namespace carpc::os::os_linux::socket {
 
    bool select(
                           const tSocket _max_socket
-                        , fd& _fd
+                        , fds& _fd
                         , timeval* const _timeout = nullptr
    );
 
-   void close( tSocket _socket );
+   bool shutdown( tSocket _socket, int _how = SHUT_RDWR );
+
+   bool close( tSocket _socket );
 
 } // namespace carpc::os::os_linux::socket
 

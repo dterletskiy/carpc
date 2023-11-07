@@ -225,73 +225,73 @@ namespace carpc::os::os_linux::socket {
 
 
 
-   fd::fd( )
+   fds::fds( )
    {
       mp_read = new fd_set;
       mp_write = new fd_set;
       mp_except = new fd_set;
    }
 
-   fd::~fd( )
+   fds::~fds( )
    {
       delete mp_read;
       delete mp_write;
       delete mp_except;
    }
 
-   void fd::reset( )
+   void fds::reset( )
    {
       FD_ZERO( mp_read );
       FD_ZERO( mp_write );
       FD_ZERO( mp_except );
    }
 
-   void fd::set( const tSocket _socket, const eType type )
+   void fds::set( const tSocket _socket, const eType type )
    {
       fd_set* p_fd_set = convert( type );
       FD_SET( _socket, p_fd_set );
    }
 
-   void fd::set( const std::set< tSocket > socket_set, const std::set< eType > type_set )
+   void fds::set( const std::set< tSocket > socket_set, const std::set< eType > type_set )
    {
       std::set< fd_set* > p_fd_set = convert( type_set );
       for( const auto& _socket : socket_set )
          set( _socket, p_fd_set );
    }
 
-   void fd::clear( const tSocket _socket, const eType type )
+   void fds::clear( const tSocket _socket, const eType type )
    {
       fd_set* p_fd_set = convert( type );
       FD_CLR( _socket, p_fd_set );
    }
 
-   void fd::clear( const std::set< tSocket > socket_set, const std::set< eType > type_set )
+   void fds::clear( const std::set< tSocket > socket_set, const std::set< eType > type_set )
    {
       std::set< fd_set* > p_fd_set = convert( type_set );
       for( const auto& _socket : socket_set )
          clear( _socket, p_fd_set );
    }
 
-   bool fd::is_set( const tSocket _socket, const eType type )
+   bool fds::is_set( const tSocket _socket, const eType type )
    {
       fd_set* p_fd_set = convert( type );
 
       return p_fd_set ? FD_ISSET( _socket, p_fd_set ) : false;
    }
 
-   void fd::set( tSocket _socket, std::set< fd_set* > p_fd_set )
+   void fds::set( tSocket _socket, std::set< fd_set* > p_fd_set )
    {
       for( const auto& item : p_fd_set )
          FD_SET( _socket, item );
    }
 
-   void fd::clear( tSocket _socket, std::set< fd_set* > p_fd_set )
+   void fds::clear( tSocket _socket, std::set< fd_set* > p_fd_set )
    {
       for( auto& item : p_fd_set )
          FD_CLR( _socket, item );
    }
 
-   fd_set* fd::convert( const eType type ) const
+   fd_set* fds::convert( const eType type ) const
    {
       switch( type )
       {
@@ -303,7 +303,7 @@ namespace carpc::os::os_linux::socket {
       return nullptr;
    }
 
-   std::set< fd_set* > fd::convert( const std::set< eType > type_set ) const
+   std::set< fd_set* > fds::convert( const std::set< eType > type_set ) const
    {
       std::set< fd_set* > fds;
       for( auto& type : type_set )
@@ -319,17 +319,17 @@ namespace carpc::os::os_linux::socket {
       return fds;
    }
    
-   fd_set* const fd::read( ) const
+   fd_set* const fds::read( ) const
    {
       return mp_read;
    }
    
-   fd_set* const fd::write( ) const
+   fd_set* const fds::write( ) const
    {
       return mp_write;
    }
    
-   fd_set* const fd::except( ) const
+   fd_set* const fds::except( ) const
    {
       return mp_except;
    }
@@ -678,16 +678,35 @@ namespace carpc::os::os_linux::socket {
       return true;
    }
 
-   bool select( const tSocket _max_socket, fd& _fd, timeval* const _timeout )
+   bool select( const tSocket _max_socket, fds& _fd, timeval* const _timeout )
    {
       return carpc::os::os_linux::socket::select( _max_socket, _fd.read( ), _fd.write( ), _fd.except( ), _timeout );
    }
 
-   void close( tSocket _socket )
+   bool shutdown( tSocket _socket, int _how )
    {
-      SYS_VRB( "%d", _socket );
-      ::shutdown( _socket, SHUT_RDWR );
-      ::close( _socket );
+      int result = ::shutdown( _socket, _how );
+      error = errno;
+      if( -1 == result )
+      {
+         SYS_ERR( "shutdown(%d) error: %d", _socket, error );
+         return false;
+      }
+      SYS_VRB( "shutdown(%d)", _socket );
+      return true;
+   }
+
+   bool close( tSocket _socket )
+   {
+      int result = ::close( _socket );
+      error = errno;
+      if( -1 == result )
+      {
+         SYS_ERR( "close(%d) error: %d", _socket, error );
+         return false;
+      }
+      SYS_VRB( "close(%d)", _socket );
+      return true;
    }
 
 } // namespace carpc::os::os_linux::socket

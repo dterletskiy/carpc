@@ -51,8 +51,8 @@ namespace carpc::application {
 
             virtual bool setup_connection( ) = 0;
 
-            virtual void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) = 0;
-            virtual void process_select( os::os_linux::socket::fd& ) = 0;
+            virtual void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fds& ) = 0;
+            virtual void process_select( os::os_linux::socket::fds& ) = 0;
 
             bool process_stream( ipc::tStream&, os::Socket::tSptr );
             bool process_packet( ipc::Packet&, os::Socket::tSptr );
@@ -72,8 +72,8 @@ namespace carpc::application {
 
             bool setup_connection( ) override;
 
-            void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
-            void process_select( os::os_linux::socket::fd& ) override;
+            void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fds& ) override;
+            void process_select( os::os_linux::socket::fds& ) override;
 
             bool process_package( ipc::Package&, os::Socket::tSptr ) override;
 
@@ -87,8 +87,8 @@ namespace carpc::application {
 
             bool setup_connection( ) override;
 
-            void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
-            void process_select( os::os_linux::socket::fd& ) override;
+            void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fds& ) override;
+            void process_select( os::os_linux::socket::fds& ) override;
 
             bool process_package( ipc::Package&, os::Socket::tSptr ) override;
 
@@ -261,8 +261,8 @@ namespace carpc::application {
 
                bool setup_connection( ) override;
 
-               void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fd& ) override;
-               void process_select( os::os_linux::socket::fd& ) override;
+               void prepare_select( os::os_linux::socket::tSocket&, os::os_linux::socket::fds& ) override;
+               void process_select( os::os_linux::socket::fds& ) override;
 
                bool process_package( ipc::Package&, os::Socket::tSptr ) override;
          };

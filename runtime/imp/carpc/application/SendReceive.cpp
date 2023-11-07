@@ -53,7 +53,7 @@ void SendReceive::thread_loop( )
    SYS_INF( "enter" );
    m_started.store( true );
 
-   os::os_linux::socket::fd fd_set;
+   os::os_linux::socket::fds fd_set;
    os::os_linux::socket::tSocket max_socket = os::os_linux::socket::InvalidSocket;
 
    while( m_started.load( ) )
@@ -183,16 +183,16 @@ bool SendReceive::ServiceBrocker::setup_connection( )
    return true;
 }
 
-void SendReceive::ServiceBrocker::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
+void SendReceive::ServiceBrocker::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fds& fd_set )
 {
-   fd_set.set( mp_socket->socket( ), os::os_linux::socket::fd::eType::READ );
+   fd_set.set( mp_socket->socket( ), os::os_linux::socket::fds::eType::READ );
    if( mp_socket->socket( ) > max_socket )
       max_socket = mp_socket->socket( );   
 }
 
-void SendReceive::ServiceBrocker::process_select( os::os_linux::socket::fd& fd_set )
+void SendReceive::ServiceBrocker::process_select( os::os_linux::socket::fds& fd_set )
 {
-   if( false == fd_set.is_set( mp_socket->socket( ), os::os_linux::socket::fd::eType::READ ) )
+   if( false == fd_set.is_set( mp_socket->socket( ), os::os_linux::socket::fds::eType::READ ) )
       return;
 
    const os::Socket::eResult result = mp_socket->recv( );
@@ -307,16 +307,16 @@ bool SendReceive::Master::setup_connection( )
    return true;
 }
 
-void SendReceive::Master::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
+void SendReceive::Master::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fds& fd_set )
 {
-   fd_set.set( mp_socket->socket( ), os::os_linux::socket::fd::eType::READ );
+   fd_set.set( mp_socket->socket( ), os::os_linux::socket::fds::eType::READ );
    if( mp_socket->socket( ) > max_socket )
       max_socket = mp_socket->socket( );   
 }
 
-void SendReceive::Master::process_select( os::os_linux::socket::fd& fd_set )
+void SendReceive::Master::process_select( os::os_linux::socket::fds& fd_set )
 {
-   if( false == fd_set.is_set( mp_socket->socket( ), os::os_linux::socket::fd::eType::READ ) )
+   if( false == fd_set.is_set( mp_socket->socket( ), os::os_linux::socket::fds::eType::READ ) )
       return;
 
    if( auto p_socket = mp_socket->accept( ) )
@@ -355,7 +355,7 @@ bool SendReceive::Connections::setup_connection( )
    return true;
 }
 
-void SendReceive::Connections::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fd& fd_set )
+void SendReceive::Connections::prepare_select( os::os_linux::socket::tSocket& max_socket, os::os_linux::socket::fds& fd_set )
 {
    for( const auto& pair : channel::recv::collection( ) )
    {
@@ -363,13 +363,13 @@ void SendReceive::Connections::prepare_select( os::os_linux::socket::tSocket& ma
       if( nullptr == p_socket )
          continue;
 
-      fd_set.set( p_socket->socket( ), os::os_linux::socket::fd::eType::READ );
+      fd_set.set( p_socket->socket( ), os::os_linux::socket::fds::eType::READ );
       if( p_socket->socket( ) > max_socket )
          max_socket = p_socket->socket( );
    }
 }
 
-void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set )
+void SendReceive::Connections::process_select( os::os_linux::socket::fds& fd_set )
 {
    auto iterator = channel::recv::collection( ).begin( );
    while( iterator != channel::recv::collection( ).end( ) )
@@ -382,7 +382,7 @@ void SendReceive::Connections::process_select( os::os_linux::socket::fd& fd_set 
          continue;
       }
 
-      if( false == fd_set.is_set( p_socket_recv->socket( ), os::os_linux::socket::fd::eType::READ ) )
+      if( false == fd_set.is_set( p_socket_recv->socket( ), os::os_linux::socket::fds::eType::READ ) )
       {
          ++iterator;
          continue;

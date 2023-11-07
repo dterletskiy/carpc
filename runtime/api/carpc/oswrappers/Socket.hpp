@@ -187,7 +187,7 @@ namespace carpc::os {
 
       private:
          tSptrList                     m_slave_sockets;
-         os_linux::socket::fd          m_fd;
+         os_linux::socket::fds         m_fd;
          IConsumer&                    m_consumer;
    };
 

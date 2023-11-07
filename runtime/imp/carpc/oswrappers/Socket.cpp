@@ -113,6 +113,7 @@ Socket& Socket::operator=( Socket&& other )
 
 void Socket::close( )
 {
+   os_linux::socket::shutdown( m_socket );
    os_linux::socket::close( m_socket );
 }
 
@@ -261,11 +262,11 @@ void SocketServer::fd_reset( )
 
 void SocketServer::fd_init( )
 {
-   m_fd.set( socket( ), os_linux::socket::fd::eType::READ );
+   m_fd.set( socket( ), os_linux::socket::fds::eType::READ );
    m_max_socket = socket( );
    for( const auto& p_slave_socket : m_slave_sockets )
    {
-      m_fd.set( p_slave_socket->socket( ), os_linux::socket::fd::eType::READ );
+      m_fd.set( p_slave_socket->socket( ), os_linux::socket::fds::eType::READ );
       if( p_slave_socket->socket( ) > m_max_socket )
          m_max_socket = p_slave_socket->socket( );
    }
@@ -280,7 +281,7 @@ bool SocketServer::select( )
 
    for( auto iterator = m_slave_sockets.begin( ); iterator != m_slave_sockets.end( ); ++iterator )
    {
-      if( false == m_fd.is_set( (*iterator)->socket( ), os_linux::socket::fd::eType::READ ) )
+      if( false == m_fd.is_set( (*iterator)->socket( ), os_linux::socket::fds::eType::READ ) )
          continue;
 
       const eResult result = (*iterator)->recv( );
@@ -298,7 +299,7 @@ bool SocketServer::select( )
       }
    }
 
-   if( true == m_fd.is_set( socket( ), os_linux::socket::fd::eType::READ ) )
+   if( true == m_fd.is_set( socket( ), os_linux::socket::fds::eType::READ ) )
    {
       if( auto p_socket = accept( ) )
       {

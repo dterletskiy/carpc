@@ -1,3 +1,6 @@
+version 3.13.18
+   - Socket wrapper refactoring.
+
 version 3.13.17
    - Extend linux socket wrapper functionality.
    - Linux socket wrapper code refactoring.
