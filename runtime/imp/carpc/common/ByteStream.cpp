@@ -207,6 +207,7 @@ bool ByteStream::pop( std::string& string )
    if( false == pop( size ) )
       return false;
 
+   // Variable Length Array [-Werror=vla] [-Wvla-extension]
    char p_string[ size + 1 ]; // +1 for termitating '\0'
 
    if( false == pop( (void*)p_string, size ) )
