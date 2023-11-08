@@ -1,3 +1,6 @@
+version 3.13.20
+   - TTypeInfo initial implementation with types defenitions for further usage.
+
 version 3.13.19
    - Major comment.
 
