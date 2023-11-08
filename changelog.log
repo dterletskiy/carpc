@@ -1,3 +1,6 @@
+version 3.13.22
+   - Remove deprecated "configuration.cfg" file.
+
 version 3.13.21
    - ByteStreamEx initial implementation without usage.
 
