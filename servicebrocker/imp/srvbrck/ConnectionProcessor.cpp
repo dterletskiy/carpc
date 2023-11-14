@@ -1,6 +1,5 @@
 #include "carpc/oswrappers/linux/kernel.hpp"
 #include "carpc/helpers/macros/strings.hpp"
-#include "carpc/tools/Tools.hpp"
 #include "ConnectionProcessor.hpp"
 
 #include "carpc/trace/Trace.hpp"

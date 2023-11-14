@@ -5,8 +5,6 @@
 #include <type_traits>
 #include <functional>
 
-#include "carpc/common/Definitions.hpp"
-
 #include "carpc/trace/Trace.hpp"
 #define CLASS_ABBR "HELPERS"
 
@@ -64,6 +62,9 @@ namespace carpc::generate::random {
    void init( );
    std::string text( const std::size_t length );
    std::size_t number( const std::size_t begin, const std::size_t end );
+
+   // link: https://stackoverflow.com/a/60198074/12978480
+   void uuid( std::string& );
 
 }
 

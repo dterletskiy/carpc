@@ -104,12 +104,3 @@ namespace carpc::tools::cmd {
    bool is_option_exists( int , char**, const std::string&  );
 
 } // namespace carpc::tools::cmd
-
-
-
-// link: https://stackoverflow.com/a/60198074/12978480
-namespace carpc::tools::uuid {
-
-   void generate_random( std::string& );
-
-} //namespace carpc::tools::uuid

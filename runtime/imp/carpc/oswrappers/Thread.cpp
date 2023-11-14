@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "carpc/tools/Tools.hpp"
 #include "carpc/oswrappers/Mutex.hpp"
 #include "carpc/oswrappers/Thread.hpp"
 

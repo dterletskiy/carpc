@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <random>
+#include <sstream>
 
 #include "carpc/helpers/functions/generate.hpp"
 
@@ -42,6 +44,29 @@ namespace carpc::generate::random {
       init( );
 
       return begin + ( rand( ) % ( end - begin + 1 ) );
+   }
+
+   // link: https://stackoverflow.com/a/60198074/12978480
+   static std::random_device                 rd;
+   static std::mt19937                       gen( rd( ) );
+   static std::uniform_int_distribution< >   dis( 0, 15 );
+   static std::uniform_int_distribution< >   dis2( 8, 11 );
+   void uuid( std::string& _uuid )
+   {
+      std::stringstream ss;
+      ss << std::hex;
+      for( std::size_t i = 0; i < 8; i++ ) ss << dis( gen );
+      ss << "-";
+      for( std::size_t i = 0; i < 4; i++ ) ss << dis( gen );
+      ss << "-4";
+      for( std::size_t i = 0; i < 3; i++ ) ss << dis( gen );
+      ss << "-";
+      ss << dis2( gen );
+      for( std::size_t i = 0; i < 3; i++ ) ss << dis( gen );
+      ss << "-";
+      for( std::size_t i = 0; i < 12; i++ ) ss << dis( gen );
+
+      _uuid = ss.str( );
    }
 
 }

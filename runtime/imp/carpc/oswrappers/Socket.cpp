@@ -1,4 +1,3 @@
-#include "carpc/tools/Tools.hpp"
 #include "carpc/oswrappers/Socket.hpp"
 
 #include "carpc/trace/Trace.hpp"
