@@ -1,10 +1,12 @@
 #pragma once
 
+#include <memory>
+
 #include "carpc/tools/parameters/Types.hpp"
 
 
 
-namespace carpc::parameters {
+namespace carpc::tools::parameters {
 
    class Base
    {
@@ -69,4 +71,4 @@ namespace carpc::parameters {
       return std::make_pair( value, true );
    }
 
-} // namespace carpc::parameters
+} // namespace carpc::tools::parameters

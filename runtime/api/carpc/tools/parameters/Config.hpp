@@ -4,7 +4,7 @@
 
 
 
-namespace carpc::parameters {
+namespace carpc::tools::parameters {
 
    class Config: public Base
    {
@@ -21,4 +21,4 @@ namespace carpc::parameters {
          static tSptr create( const std::string& file, const tMap& default_parameters = { } );
    };
 
-} // namespace carpc::parameters
+} // namespace carpc::tools::parameters

@@ -10,17 +10,21 @@
 
 
 
-using namespace carpc::parameters;
+using namespace carpc::tools::parameters;
 
 
 
 Params::Params(
-         int argc, char** argv, char** envp, const std::string& file, const tMap& default_parameters
+         int argc, char** argv, char** envp, const tMap& default_parameters
       )
 {
-   m_params.push_back( Config::create( file ) );
-   m_params.push_back( Env::create( envp ) );
    m_params.push_back( CmdLine::create( argc, argv ) );
+   m_params.push_back( Env::create( envp ) );
+
+   std::string file_name = std::filesystem::path( *argv ).filename( );
+   file_name += std::string( ".cfg" );
+   file_name = m_params[0]->value_or( "config", file_name ).first;
+   m_params.push_back( Config::create( file_name ) );
 }
 
 

@@ -4,7 +4,7 @@
 
 
 
-namespace carpc::parameters {
+namespace carpc::tools::parameters {
 
    class CmdLine: public Base
    {
@@ -21,4 +21,4 @@ namespace carpc::parameters {
          static tSptr create( int argc, char** argv, const tMap& default_parameters = { } );
    };
 
-} // namespace carpc::parameters
+} // namespace carpc::tools::parameters

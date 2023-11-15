@@ -1,12 +1,14 @@
 #pragma once
 
+#include <vector>
+
 #include "carpc/tools/parameters/CmdLine.hpp"
 #include "carpc/tools/parameters/Env.hpp"
 #include "carpc/tools/parameters/Config.hpp"
 
 
 
-namespace carpc::parameters {
+namespace carpc::tools::parameters {
 
    class Params
    {
@@ -15,7 +17,7 @@ namespace carpc::parameters {
 
       public:
          Params(
-               int argc, char** argv, char** envp, const std::string& file,
+               int argc, char** argv, char** envp,
                const tMap& default_parameters = { }
             );
          ~Params( ) = default;
@@ -27,6 +29,9 @@ namespace carpc::parameters {
          template< typename T >
             std::pair< std::optional< T >, bool > value( const tParameter& parameter ) const;
 
+         // Returns a pair:
+         //    - if parameter exists will return found value and true.
+         //    - if parameters does not exist will return 'default_value' and true.
          std::pair< tValue, bool > value_or( const tParameter& parameter, const tValue& default_value ) const;
          template< typename T >
             std::pair< T, bool > value_or( const tParameter& parameter, const T& default_value ) const;
@@ -74,4 +79,4 @@ namespace carpc::parameters {
       return std::make_pair( default_value, false );
    }
 
-} // namespace carpc::parameters
+} // namespace carpc::tools::parameters
