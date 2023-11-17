@@ -7,6 +7,7 @@
 #include "carpc/comm/Types.hpp"
 #include "carpc/helpers/functions/format.hpp"
 #include "carpc/helpers/functions/generate.hpp"
+#include "carpc/helpers/macros/arguments.hpp"
 
 #include "carpc/trace/Trace.hpp"
 #define CLASS_ABBR "BASE_ASYNC"
@@ -251,6 +252,13 @@ namespace __private_carpc_async_v2__ {
 
 }
 
+namespace carpc {
+
+   class IPC;
+   class NO_IPC;
+
+}
+
 namespace carpc::async {
 
    // using tAsyncTypeID = std::string;
@@ -261,6 +269,116 @@ namespace carpc::async {
    const char* c_str( const eAsyncType );
 
 } // namespace carpc::async
+
+
+
+
+#define CARPC_IS_IPC_TYPE( TYPE )                     CARPC_IS_SAME_TYPES( carpc::IPC, TYPE )
+#define CARPC_IS_NO_IPC_TYPE( TYPE )                  CARPC_IS_SAME_TYPES( carpc::NO_IPC, TYPE )
+
+/****************************************************************************************************
+ * 
+ * Special structure for "enum" and "class enum" substitution.
+ * This structure has the same meaning as "class enum" but extended by member functions what allow to use it in:
+ * "switch", "rage for", printing and other additional scopes where usual "enum" and "class enum" can't be used.
+ * Value "UNDEFINED" will be added automatically.
+ * !!! Default values for enumeration itemes should not be used !!!
+ * 
+ * Examples:
+ * DEFINE_ENUMERATION( eDigit, std::size_t, ONE, TWO, THREE )
+ * int main( int argc, char** argv, char** envp )
+ * {
+ *    eDigit digit = eDigit::THREE;
+ *    printf( "digit: %s", digit.c_str( ) );
+ * 
+ *    for( const auto& item : eDigit( ) )
+ *       std::cout << item.c_str( ) << std::endl;
+ * 
+ *    return 0;
+ * }
+ * 
+ ***************************************************************************************************/
+#define DEFINE_ENUMERATION( NAME, ENUM_TYPE, ... )                                           \
+   struct NAME                                                                               \
+   {                                                                                         \
+      using TYPE = ENUM_TYPE;                                                                \
+      enum eValue : TYPE                                                                     \
+      {                                                                                      \
+         __VA_ARGS__, UNDEFINED,                                                             \
+         _COUNT_,                                                                            \
+         _FIRST_ = __FIRST_ARG__( __VA_ARGS__ ),                                             \
+         _LAST_ = static_cast< TYPE >( __FIRST_ARG__( __VA_ARGS__ ) ) + _COUNT_ - 1,         \
+         _BEGIN_ = __FIRST_ARG__( __VA_ARGS__ ),                                             \
+         _END_ = static_cast< TYPE >( __FIRST_ARG__( __VA_ARGS__ ) ) + _COUNT_               \
+      };                                                                                     \
+                                                                                             \
+      NAME( ) = default;                                                                     \
+      constexpr NAME( eValue _value ) : value( _value ) { }                                  \
+                                                                                             \
+      operator eValue( ) const { return value; }                                             \
+      explicit operator bool( ) const { return NAME::UNDEFINED != value; }                   \
+                                                                                             \
+      constexpr bool operator==( const NAME& other ) const { return value == other.value; }  \
+      constexpr bool operator!=( const NAME& other ) const { return value != other.value; }  \
+      constexpr bool operator<=( const NAME& other ) const { return value <= other.value; }  \
+      constexpr bool operator>=( const NAME& other ) const { return value >= other.value; }  \
+      constexpr bool operator<( const NAME& other ) const { return value < other.value; }    \
+      constexpr bool operator>( const NAME& other ) const { return value > other.value; }    \
+                                                                                             \
+      NAME& operator++( )                                                                    \
+      {                                                                                      \
+         value = ( eValue )( static_cast< TYPE >( value ) + 1 );                             \
+         return *this;                                                                       \
+      };                                                                                     \
+      NAME& operator--( )                                                                    \
+      {                                                                                      \
+         value = ( eValue )( static_cast< TYPE >( value ) - 1 );                             \
+         return *this;                                                                       \
+      };                                                                                     \
+                                                                                             \
+      NAME& operator*( ) { return *this; };                                                  \
+                                                                                             \
+      NAME& begin( ) { static NAME _begin = NAME::_BEGIN_; return _begin; }                  \
+      NAME& end( ) { static NAME _end = NAME::_END_; return _end; }                          \
+                                                                                             \
+      const char* const c_str( ) const                                                       \
+      {                                                                                      \
+         static std::string enum_name = #NAME "::";                                          \
+         static std::string arguments = #__VA_ARGS__;                                        \
+         static std::vector< std::string > strings;                                          \
+         if( strings.empty( ) )                                                              \
+         {                                                                                   \
+            std::string argument;                                                            \
+            for( std::string::size_type i = 0; i < arguments.length( ); i++ )                \
+            {                                                                                \
+               if( isspace( arguments[i] ) ) continue;                                       \
+               else if( arguments[i] == ',' )                                                \
+               {                                                                             \
+                  strings.push_back( enum_name + argument );                                 \
+                  argument.clear( );                                                         \
+               }                                                                             \
+               else argument.push_back( arguments[i] );                                      \
+            }                                                                                \
+            strings.push_back( enum_name + argument );                                       \
+         }                                                                                   \
+                                                                                             \
+         if( strings.size( ) - 1 < static_cast< std::string::size_type >( value ) )          \
+            return #NAME "::UNDEFINED";                                                      \
+         else                                                                                \
+            return strings[ static_cast< std::string::size_type >( value ) ].c_str( );       \
+      };                                                                                     \
+                                                                                             \
+      bool to_stream( carpc::ipc::tStream& stream ) const                                    \
+      {                                                                                      \
+         return carpc::ipc::serialize( stream, value );                                      \
+      }                                                                                      \
+      bool from_stream( carpc::ipc::tStream& stream )                                        \
+      {                                                                                      \
+         return carpc::ipc::deserialize( stream, value );                                    \
+      }                                                                                      \
+                                                                                             \
+      eValue value = UNDEFINED;                                                              \
+   };
 
 
 

@@ -16,9 +16,6 @@
 #define CARPC_IS_FLOATING_POINT_TYPE( TYPE )          std::is_floating_point_v< TYPE >
 #define CARPC_IS_ENUM_TYPE( TYPE )                    std::is_enum_v< TYPE >
 
-#define CARPC_IS_IPC_TYPE( TYPE )                     CARPC_IS_SAME_TYPES( carpc::IPC, TYPE )
-#define CARPC_IS_NO_IPC_TYPE( TYPE )                  CARPC_IS_SAME_TYPES( carpc::NO_IPC, TYPE )
-
 #ifdef USE_GPB
    #define CARPC_IS_GPB_TYPE( TYPE )                  std::is_base_of_v< ::google::protobuf::Message, TYPE >
 #else

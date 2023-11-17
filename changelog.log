@@ -1,3 +1,7 @@
+version 3.13.25
+   - Moved 'carpc::IPC' and 'carpc::NO_IPC' types definitions and corresponding macros to communication part.
+     This is preparation for dividing into modules.
+
 version 3.13.24
    - tools::parameters refactoring.
 

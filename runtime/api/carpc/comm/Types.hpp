@@ -3,7 +3,6 @@
 #include "carpc/common/ID.hpp"
 #include "carpc/common/Name.hpp"
 #include "carpc/common/Version.hpp"
-#include "carpc/common/IPC.hpp"
 #include "carpc/common/Types.hpp"
 
 
