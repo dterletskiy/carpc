@@ -1,4 +1,0 @@
-service tda_servicebrocker_service /vendor/bin/tda/tda.carpc.servicebrocker config=/vendor/etc/tda/tda.carpc.servicebrocker.cfg trace_log=ANDROID
-    class main
-    user root
-    group root system inet
