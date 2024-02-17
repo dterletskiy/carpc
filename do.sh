@@ -182,7 +182,7 @@ function main( )
          install
       ;;
       world)
-         clean
+         pure
          config
          build
          install
