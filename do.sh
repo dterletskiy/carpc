@@ -101,8 +101,10 @@ function pure( )
 
 function run( )
 {
+   LOCAL_TARGET=${1}
+
    export LD_LIBRARY_PATH="${INSTALL_DIR}/lib/"
-   ${INSTALL_DIR}/bin/application config=${INSTALL_DIR}/etc/application.cfg
+   ${INSTALL_DIR}/bin/${LOCAL_TARGET} --config=${INSTALL_DIR}/etc/${LOCAL_TARGET}.cfg
 }
 
 function validate_parameters( )
@@ -188,7 +190,7 @@ function main( )
          install
       ;;
       run)
-         run
+         run ${CMD_TARGET}
       ;;
       *)
          echo "undefined action: '${CMD_ACTION}'"
