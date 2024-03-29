@@ -146,13 +146,23 @@ function parse_arguments( )
                exit 1
             fi
          ;;
+         --params=*)
+            if [ -z ${CMD_OPTIONS+x} ]; then
+               CMD_OPTIONS="${option#*=}"
+               shift # past argument=value
+               echo "CMD_OPTIONS: ${CMD_OPTIONS}"
+            else
+               echo "'--params' is already set to '${CMD_OPTIONS}'"
+               exit 1
+            fi
+         ;;
          --debug)
             CMD_DEBUG_FLAG=
             echo "CMD_DEBUG_FLAG: defined"
          ;;
          *)
             echo "undefined option: '${option}'"
-            CMD_OPTIONS+=(${option})
+            # CMD_OPTIONS+=(${option})
             shift # past argument=value
          ;;
       esac
