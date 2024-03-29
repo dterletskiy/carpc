@@ -104,7 +104,7 @@ function run( )
    LOCAL_TARGET=${1}
 
    export LD_LIBRARY_PATH="${INSTALL_DIR}/lib/"
-   ${INSTALL_DIR}/bin/${LOCAL_TARGET} --config=${INSTALL_DIR}/etc/${LOCAL_TARGET}.cfg
+   ${INSTALL_DIR}/bin/${LOCAL_TARGET} --config=${INSTALL_DIR}/etc/${LOCAL_TARGET}.cfg ${CMD_OPTIONS}
 }
 
 function validate_parameters( )
@@ -152,6 +152,7 @@ function parse_arguments( )
          ;;
          *)
             echo "undefined option: '${option}'"
+            CMD_OPTIONS+=(${option})
             shift # past argument=value
          ;;
       esac
@@ -163,6 +164,7 @@ function parse_arguments( )
 function main( )
 {
    parse_arguments $@
+   echo "------------------------" ${CMD_OPTIONS}
 
    case ${CMD_ACTION} in
       fetch)
