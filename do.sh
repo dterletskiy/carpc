@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# ./do.sh --action=run --target=lisot --params="--server" --params="--bind=192.168.0.100" --params="--port=10000"
+# ./do.sh --action=run --target=lisot --params="--client=192.168.0.100" --params="--port=10000" --params="--family=AF_INET" --params="--type=SOCK_STREAM"
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 ROOT_DIR=${SCRIPT_DIR}
@@ -28,6 +31,9 @@ BUILD_VARIABLES+=" -DUSE_DEBUG:STRING=no"
 BUILD_VARIABLES+=" -DUSE_GPB:STRING=yes"
 BUILD_VARIABLES+=" -DUSE_RTTI:STRING=yes"
 
+
+
+CMD_OPTIONS=""
 
 
 
@@ -147,14 +153,9 @@ function parse_arguments( )
             fi
          ;;
          --params=*)
-            if [ -z ${CMD_OPTIONS+x} ]; then
-               CMD_OPTIONS="${option#*=}"
-               shift # past argument=value
-               echo "CMD_OPTIONS: ${CMD_OPTIONS}"
-            else
-               echo "'--params' is already set to '${CMD_OPTIONS}'"
-               exit 1
-            fi
+            CMD_OPTIONS+=" ${option#*=}"
+            shift # past argument=value
+            echo "CMD_OPTIONS: '${CMD_OPTIONS}'"
          ;;
          --debug)
             CMD_DEBUG_FLAG=
