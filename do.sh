@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# ./do.sh --action=run --target=lisot --params="--server" --params="--bind=192.168.0.100" --params="--port=10000"
-# ./do.sh --action=run --target=lisot --params="--client=192.168.0.100" --params="--port=10000" --params="--family=AF_INET" --params="--type=SOCK_STREAM"
+# ./do.sh --action=run --target=lisot --params="--server --bind=192.168.0.100 --port=10000"
+# ./do.sh --action=run --target=lisot --params="--client=192.168.0.100 --port=10000 --family=AF_INET --type=SOCK_STREAM"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
@@ -33,7 +33,13 @@ BUILD_VARIABLES+=" -DUSE_RTTI:STRING=yes"
 
 
 
-CMD_OPTIONS=""
+SHELL_FW=submodules/dterletskiy/shell_fw/
+source ${SHELL_FW}/constants/console.sh
+source ${SHELL_FW}/constants/constants.sh
+source ${SHELL_FW}/base.sh
+source ${SHELL_FW}/print.sh
+source ${SHELL_FW}/ui.sh
+source ${SHELL_FW}/drive.sh
 
 
 
@@ -108,29 +114,31 @@ function pure( )
 function run( )
 {
    LOCAL_TARGET=${1}
+   shift
+   LOCAL_OPTIONS=${@}
 
    export LD_LIBRARY_PATH="${INSTALL_DIR}/lib/"
-   ${INSTALL_DIR}/bin/${LOCAL_TARGET} --config=${INSTALL_DIR}/etc/${LOCAL_TARGET}.cfg ${CMD_OPTIONS}
+   ${INSTALL_DIR}/bin/${LOCAL_TARGET} --config=${INSTALL_DIR}/etc/${LOCAL_TARGET}.cfg ${LOCAL_OPTIONS}
 }
 
 function validate_parameters( )
 {
    if [ -z ${CMD_ACTION+x} ]; then
-      echo "'--action' is not set"
+      print_error "'--action' is not set"
       exit 1
    fi
 
    if [ -z ${CMD_TARGET+x} ]; then
-      echo "'--target' is not set"
+      print_warning "'--target' is not set"
    fi
 }
 
 function parse_arguments( )
 {
-   echo "Parsing arguments..."
+   print_header "Parsing arguments..."
 
    for option in "$@"; do
-      echo "Processing option '${option}'"
+      print_info "Processing option '${option}'"
       case ${option} in
          --action=*)
             if [ -z ${CMD_ACTION+x} ]; then
@@ -138,7 +146,7 @@ function parse_arguments( )
                shift # past argument=value
                echo "CMD_ACTION: ${CMD_ACTION}"
             else
-               echo "'--action' is already set to '${CMD_ACTION}'"
+               print_error "'--action' is already set to '${CMD_ACTION}'"
                exit 1
             fi
          ;;
@@ -148,23 +156,28 @@ function parse_arguments( )
                shift # past argument=value
                echo "CMD_TARGET: ${CMD_TARGET}"
             else
-               echo "'--target' is already set to '${CMD_TARGET}'"
+               print_error "'--target' is already set to '${CMD_TARGET}'"
                exit 1
             fi
          ;;
          --params=*)
-            CMD_OPTIONS+=" ${option#*=}"
-            shift # past argument=value
-            echo "CMD_OPTIONS: '${CMD_OPTIONS}'"
+            if [ -z ${CMD_OPTIONS+x} ]; then
+               CMD_OPTIONS="${option#*=}"
+               shift # past argument=value
+               echo "CMD_OPTIONS: ${CMD_OPTIONS}"
+            else
+               print_error "'--params' is already set to '${CMD_OPTIONS}'"
+               exit 1
+            fi
          ;;
          --debug)
             CMD_DEBUG_FLAG=
             echo "CMD_DEBUG_FLAG: defined"
          ;;
          *)
-            echo "undefined option: '${option}'"
-            # CMD_OPTIONS+=(${option})
+            print_error "undefined option: '${option}'"
             shift # past argument=value
+            exit 1
          ;;
       esac
    done
@@ -174,8 +187,8 @@ function parse_arguments( )
 
 function main( )
 {
-   parse_arguments $@
-   echo "------------------------" ${CMD_OPTIONS}
+   parse_arguments "$@"
+   print_info "Processing action:" ${CMD_ACTION}
 
    case ${CMD_ACTION} in
       fetch)
@@ -203,34 +216,16 @@ function main( )
          install
       ;;
       run)
-         run ${CMD_TARGET}
+         run ${CMD_TARGET} "${CMD_OPTIONS}"
       ;;
       *)
-         echo "undefined action: '${CMD_ACTION}'"
+         print_warning "undefined action: '${CMD_ACTION}'"
+         exit 1
       ;;
    esac
 }
 
 
 
-
 cd ${ROOT_DIR}
-main $@
-
-
-
-
-
-
-
-
-# LD_LIBRARY_PATH="/mnt/host/tda/carpc/out/deploy/lib/" ./stream
-
-# export LD_LIBRARY_PATH="/mnt/host/tda/carpc/out/deploy/lib/"
-# /mnt/host/tda/carpc/out/deploy/bin/servicebrocker config=/mnt/host/tda/carpc/out/deploy/etc/servicebrocker.cfg
-
-# export LD_LIBRARY_PATH="/mnt/host/tda/carpc/out/deploy/lib/;/mnt/host/tda/carpc-examples/out/deploy/lib/"
-# /mnt/host/tda/carpc-examples/out/deploy/bin/core config=/mnt/host/tda/carpc-examples/out/deploy/etc/core.cfg
-# /mnt/host/tda/carpc-examples/out/deploy/bin/controller config=/mnt/host/tda/carpc-examples/out/deploy/etc/controller.cfg
-# /mnt/host/tda/carpc-examples/out/deploy/bin/hmi config=/mnt/host/tda/carpc-examples/out/deploy/etc/hmi.cfg
-# /mnt/host/tda/carpc-examples/out/deploy/bin/application config=/mnt/host/tda/carpc-examples/out/deploy/etc/application.cfg
+main "$@"
