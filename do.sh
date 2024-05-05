@@ -33,7 +33,7 @@ BUILD_VARIABLES+=" -DUSE_RTTI:STRING=yes"
 
 
 
-SHELL_FW=submodules/dterletskiy/shell_fw/
+SHELL_FW=${SCRIPT_DIR}/submodules/dterletskiy/shell_fw/
 source ${SHELL_FW}/constants/console.sh
 source ${SHELL_FW}/constants/constants.sh
 source ${SHELL_FW}/base.sh
