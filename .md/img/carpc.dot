@@ -1,0 +1,16 @@
+digraph CARPC {
+  "tracing"
+  "base"
+  "base" -> "tracing"
+  "tools"
+  "tools" -> "base"
+  "osw"
+  "osw" -> "base"
+  "runtime"
+  "runtime" -> "osw"
+  "runtime" -> "tools"
+  "servicebrocker"
+  "servicebrocker" -> "runtime"
+  "application"
+  "application" -> "runtime"
+}
