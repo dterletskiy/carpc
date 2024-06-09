@@ -32,6 +32,7 @@ Component Architecture, as defined, constitutes an application structure built u
 In CARPC, a Component stands as a pivotal element within the application framework. During application initialization, the CARPC runtime generates predefined components. All other entities within the application are instantiated within the context of these components, aligning their lifecycle with that of the parent component (with the exception of static objects).
 
 - Each Component operates autonomously, devoid of interdependence with other Components or entities.
+- Interaction between components is possible through the asynchronous interaction mechanism provided by the framework.
 - Uniqueness characterizes each Component within the system, assigned to execute specific functionality tailored to its implementation.
 - Typically, Components aren't designed for reuse within the same application instance. However, scenarios may arise where identical logic and functionality necessitate the instantiation of multiple Component entities within a process.
 

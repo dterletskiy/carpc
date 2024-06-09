@@ -15,6 +15,7 @@
   - [Getting sources](./.md/quickstart/getting_sources.md)
   - [Building](./.md/quickstart/building.md)
 - [Developer's Guide](./.md/guide/main.md)
+  - [Build system](./.md/guide/build_system.md)
 - [Abbreviations](./.md/abbreviations.md#abbreviations)
 
 
