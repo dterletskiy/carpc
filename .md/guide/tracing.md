@@ -2,7 +2,7 @@
 
 # ***Tracing***
 
-**CARPC** framework provides its own tracing mechanism. Using simple tracing macros developer could send logging messages with different log levels to **console**, **dlt-daemon** or event android **logcat** server in case of using **CARPC** for android. Logging destination called log stratagy in **CARPC** framework.
+**CARPC** framework provides its own tracing mechanism. Using simple tracing macros developer could send logging messages with different log levels to **console**, **dlt-daemon** or even android **logcat** server in case of using **CARPC** for android. Logging destination called log stratagy in **CARPC** framework.
 
 Log strategy could be configured in application configuration file, command line or environment variables during starting application and does not require recompilation.
 
@@ -14,16 +14,16 @@ There are 6 log levels supported by **CARPC** tracing system using different tra
    5. error (MSG_ERR)
    6. fatal (MSG_FTL)
 
-Each **CARPC** log message contains user message and some additional message header. By default message header has:
+Each **CARPC** log message contains user message and some additional message header with useful information for debugging. By default message header has:
 
 -----
 <pre>
-MICROSECONDS | PID TID |   [CLASS_ABBR:FUNCTION:LINE] ->
+TIMESTAMP | PID TID |   [CLASS_ABBR:FUNCTION:LINE] ->
 </pre>
 -----
 
 Where:
-   - MICROSECONDS - timestamp represented in nanoseconds since the Epoch
+   - TIMESTAMP - timestamp represented in nanoseconds since the Epoch
    - PID - OS process ID where log message has been emmited
    - TID - OS thread ID where log message has been emmited
    - CLASS_ABBR - user defined class abbreviation
@@ -38,7 +38,7 @@ To use **CARPC** tracing there must be included "carpc/trace/Trace.hpp", defined
 In this case code will look like:
 
 -----
-<pre>
+```c
 #include "carpc/trace/Trace.hpp"
 #define CLASS_ABBR "OnOff"
 ...
@@ -47,7 +47,7 @@ void OnOffComponent::init( const size_t id )
    MSG_DBG( "id = %zu", id );
 }
 ...
-</pre>
+```
 -----
 
 As a result there will be a message similar to:
@@ -58,7 +58,7 @@ As a result there will be a message similar to:
 </pre>
 -----
 
-**CARPC** tracing system has log buffer with predefined size what could be set in application configuration file. Inc ase if message size is more then message buffer size only part of this massage will be sent to corresponding server or console.
+***CARPC*** tracing system has log buffer with predefined size what could be set in application configuration file. Inc ase if message size is more then message buffer size only part of this massage will be sent to corresponding server or console.
 
 In case of error becomes during sending message or other system error (memory buffer can't be allocated) next message will be emmited:
 

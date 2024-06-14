@@ -1,8 +1,6 @@
 [Go to contents](../../README.md#table-of_contents)
 
-## Architecture
-
-### CARPC Framework Components
+## Components overview
 
 CARPC framework comprises a series of dynamic libraries and executable files, each providing specific functionality. This design is aimed at eliminating the need to link and load libraries whose functionality isn't utilized within the application. Below is the set of these libraries and executables along with descriptions of their purposes:
 
