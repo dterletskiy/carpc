@@ -18,19 +18,8 @@
 - [Developer's Guide](./.md/guide/main.md)
   - [Tracing](./.md/guide/tracing.md)
   - [Build system](./.md/guide/build_system.md)
-- [Abbreviations](./.md/abbreviations.md#abbreviations)
-
-
-
-
-
-- [What is CARPC](./.md/what_is_carpc.md#what-is-carpc)
-- [How to build](./.md/how_to_build.md#how-to-build)
-- [Runtime entities description](./.md/entities_description.md#entities-description)
-- [Tracing](./.md/tracing.md#tracing)
-- [Development](./.md/development.md#development)
-- [Configuration parameters](./.md/configuration_parameters.md#configuration-parameters)
-- [Abbreviations](./.md/abbreviations.md#abbreviations)
+- [Configuration parameters](./.md/configuration_parameters.md)
+- [Abbreviations](./.md/abbreviations.md)
 
 ----
 
