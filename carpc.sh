@@ -366,15 +366,15 @@ function update_build_variables( )
    LOCAL_BUILD_VARIABLES+=" -D CMAKE_CXX_COMPILER:STRING=${PROJECT_COMPILER["cxx"]}"
    LOCAL_BUILD_VARIABLES+=" -D CMAKE_VERBOSE_MAKEFILE=TRUE"
    LOCAL_BUILD_VARIABLES+=" -D SOURCE_DIR=${DIRECTORIES[source]}"
-   LOCAL_BUILD_VARIABLES+=" -D CARPC_API=$( get_parameter_value "carpc_api" )"
-   LOCAL_BUILD_VARIABLES+=" -D CARPC_LIB=$( get_parameter_value "carpc_lib" )"
+   LOCAL_BUILD_VARIABLES+=" -D CARPC_API=$( get_parameter_value_path "carpc_api" )"
+   LOCAL_BUILD_VARIABLES+=" -D CARPC_LIB=$( get_parameter_value_path "carpc_lib" )"
    echo ${LOCAL_BUILD_VARIABLES}
 }
 
 function config( )
 {
    execute "cmake \
-      -S $( process_parameter_builder ) \
+      -S $( get_parameter_value_path "builder" ) \
       -B ${DIRECTORIES[build]} \
       --install-prefix ${DIRECTORIES[deploy]} \
       --graphviz=${DIRECTORIES[doc]}/graph/project \
@@ -443,16 +443,11 @@ function run( )
 
 
 
-function process_parameter_source( )
+function get_parameter_value_path( )
 {
-   local SOURCE_DIR=$( get_parameter_value "source" )
-   echo $( adapt_path ${SOURCE_DIR} )
-}
-
-function process_parameter_builder( )
-{
-   local BUILDER_DIR=$( get_parameter_value "builder" )
-   echo $( adapt_path ${BUILDER_DIR} )
+   local LOCAL_PARAMETER_VALUE=${1}
+   local LOCAL_PATH=$( get_parameter_value ${LOCAL_PARAMETER_VALUE} )
+   echo $( adapt_path ${LOCAL_PATH} )
 }
 
 function adapt_path( )
@@ -477,7 +472,7 @@ function main( )
 {
    parse_arguments "$@"
 
-   SOURCE_DIR=$( process_parameter_source )
+   SOURCE_DIR=$( get_parameter_value_path "source" )
    init_directories ${SOURCE_DIR} DIRECTORIES
    print_map DIRECTORIES
 
