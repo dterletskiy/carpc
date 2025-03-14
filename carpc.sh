@@ -20,6 +20,7 @@
 #                       |                 |                  |
 #                       |                 |                  |
 # ./do_exp.sh --action=config --source=framework   --builder=builder/carpc-builder
+# ./do_exp.sh --action=config --source=examples    --builder=builder/carpc-builder  --carpc_api=framework/_product_/deploy/include  --carpc_lib=framework/_product_/deploy/lib/carpc
 
 # List of the targtes to build ------------------------------+
 # Project source directory to build ------+                  |
@@ -38,8 +39,6 @@
 #                       |                 |                  |
 # ./do_exp.sh --action=clean  --source=framework
 # ./do_exp.sh --action=pure   --source=framework
-
-# ./do_exp.sh --action=config --source=examples   --builder=builder/carpc-builder --carpc_api=/mnt/host/tda/_experimental_/framework//_product_//deploy/include --carpc_lib=/mnt/host/tda/_experimental_/framework//_product_//deploy/lib
 
 
 
