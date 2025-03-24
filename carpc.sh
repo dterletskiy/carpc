@@ -40,6 +40,8 @@
 # ./do_exp.sh --action=clean  --source=framework
 # ./do_exp.sh --action=pure   --source=framework
 
+# ./carpc/carpc.sh --action=run --source=framework --target=servicebrocker
+
 
 
 readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -435,9 +437,10 @@ function run( )
    shift
    LOCAL_OPTIONS=${@}
 
-   export LD_LIBRARY_PATH="${DIRECTORIES[deploy]}/lib/;$( get_parameter_value "carpc_lib" )"
-   ${DIRECTORIES[deploy]}/bin/${LOCAL_TARGET} \
-      --config=${DIRECTORIES[deploy]}/etc/${LOCAL_TARGET}.cfg ${LOCAL_OPTIONS}
+   export LD_LIBRARY_PATH="${DIRECTORIES[deploy]}/lib/;${DIRECTORIES[deploy]}/lib/carpc/;$( get_parameter_value "carpc_lib" )"
+   export PATH="${DIRECTORIES[deploy]}/bin/carpc/;${PATH}"
+   ./${LOCAL_TARGET} \
+      --config=${DIRECTORIES[deploy]}/etc/carpc/${LOCAL_TARGET}.cfg ${LOCAL_OPTIONS}
 }
 
 
