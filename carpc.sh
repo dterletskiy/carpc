@@ -8,10 +8,10 @@
 #                       |                 |                  |
 #                       |                 |                  |
 #                       |                 |                  |
-# ./do_exp.sh --action=fetch  --source=builder     --target=builder
-# ./do_exp.sh --action=fetch  --source=framework   --target=framework
-# ./do_exp.sh --action=fetch  --source=examples    --target=examples
-# ./do_exp.sh --action=fetch  --source=tutorial    --target=tutorial
+# ./carpc.sh --action=fetch  --source=builder     --target=builder
+# ./carpc.sh --action=fetch  --source=framework   --target=framework
+# ./carpc.sh --action=fetch  --source=examples    --target=examples
+# ./carpc.sh --action=fetch  --source=tutorial    --target=tutorial
 
 # Fetch predefined project ----------------------------------+
 # Project source directory to config -----+                  |
@@ -19,8 +19,8 @@
 #                       |                 |                  |
 #                       |                 |                  |
 #                       |                 |                  |
-# ./do_exp.sh --action=config --source=framework   --builder=builder/carpc-builder
-# ./do_exp.sh --action=config --source=examples    --builder=builder/carpc-builder  --carpc_api=framework/_product_/deploy/include  --carpc_lib=framework/_product_/deploy/lib/carpc
+# ./carpc.sh --action=config --source=framework   --builder=builder/carpc-builder
+# ./carpc.sh --action=config --source=examples    --builder=builder/carpc-builder  --carpc_api=framework/_product_/deploy/include  --carpc_lib=framework/_product_/deploy/lib/carpc
 
 # List of the targtes to build ------------------------------+
 # Project source directory to build ------+                  |
@@ -28,19 +28,19 @@
 #                       |                 |                  |
 #                       |                 |                  |
 #                       |                 |                  |
-# ./do_exp.sh --action=build  --source=framework
-# ./do_exp.sh --action=build  --source=framework   --target=all
-# ./do_exp.sh --action=build  --source=framework   --target=carpc-tracing,carpc-tools
+# ./carpc.sh --action=build  --source=framework
+# ./carpc.sh --action=build  --source=framework   --target=all
+# ./carpc.sh --action=build  --source=framework   --target=carpc-tracing,carpc-tools
 
 # Project source directory to clean ------+                  |
 # Clean action ---------+                 |                  |
 #                       |                 |                  |
 #                       |                 |                  |
 #                       |                 |                  |
-# ./do_exp.sh --action=clean  --source=framework
-# ./do_exp.sh --action=pure   --source=framework
+# ./carpc.sh --action=clean  --source=framework
+# ./carpc.sh --action=pure   --source=framework
 
-# ./carpc/carpc.sh --action=run --source=framework --target=servicebrocker
+# ./carpc.sh --action=run --source=framework --target=servicebrocker
 
 
 
@@ -437,9 +437,9 @@ function run( )
    shift
    LOCAL_OPTIONS=${@}
 
-   export LD_LIBRARY_PATH="${DIRECTORIES[deploy]}/lib/;${DIRECTORIES[deploy]}/lib/carpc/;$( get_parameter_value "carpc_lib" )"
-   export PATH="${DIRECTORIES[deploy]}/bin/carpc/;${PATH}"
-   ./${LOCAL_TARGET} \
+   export LD_LIBRARY_PATH="${DIRECTORIES[deploy]}/lib/:${DIRECTORIES[deploy]}/lib/carpc/:$( get_parameter_value "carpc_lib" )"
+   export PATH="${DIRECTORIES[deploy]}/bin/:${DIRECTORIES[deploy]}/bin/carpc/:${PATH}"
+   ${LOCAL_TARGET} \
       --config=${DIRECTORIES[deploy]}/etc/carpc/${LOCAL_TARGET}.cfg ${LOCAL_OPTIONS}
 }
 
