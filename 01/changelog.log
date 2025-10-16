@@ -1,0 +1,53 @@
+2023.11.22-rev.1
+   - Update "stream" example for testing new ByteStream implementation
+
+2023.06.18-rev.1
+   - Update build system from "carpc" versions 3.13.5
+
+2023.06.17-rev.1
+   - Add submodules/dterletskiy/python_fw
+
+2023.03.05-rev.1
+   - Update build system from "carpc" versions 3.11.9
+
+2023.02.26-rev.1
+   - Update build system from "carpc" versions 3.11.8
+
+2022.11.13-rev.2
+   - New project "event" initial implementation.
+
+2022.11.13-rev.1
+   - Extend some examples in "stream" project.
+
+2022.09.13-rev.1
+   - Update build system from "carpc" versions 3.10.7
+
+2022.07.04-rev.1
+   - Update build system from "carpc" versions 3.10.3
+
+2022.06.21-rev.2
+   - Update build system from "carpc" versions 3.10.0
+
+2022.06.21-rev.1
+   - Update build system from "carpc" versions 3.9.8
+
+2022.06.17-rev.1
+   - Update build system from "carpc" versions 3.9.8
+
+2022.06.14-rev.1
+   - Update build system from "carpc" versions 3.9.7
+
+2022.06.02-rev.1
+   - Update build system from "carpc" versions 3.9.5
+
+2022.05.28-rev.2
+   - Update build system from "carpc" versions 3.9.4
+
+2022.05.28-rev.1
+   - Update build system from "carpc" versions 3.9.3
+
+2022.05.24-rev.2
+   - Update all includes after "carpc" update version 3.9.1
+
+2022.05.24-rev.1
+   - Initial commit moved from "carpc"
