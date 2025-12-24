@@ -56,7 +56,7 @@ if [ ! -d "${SHELL_FW}/.git" ]; then
       exit ${RETURN_CODE}
    fi
 fi
-source ${SHELL_FW}/global.sh
+source ${SHELL_FW}/__init__
 
 
 
@@ -68,7 +68,7 @@ define_optional_argument "test" \
    --default="value_1 value_2"
 
 define_required_argument "action" \
-   --allowed="fetch clean pure config build install world run"
+   --allowed="fetch clean pure config build deploy world run"
 
 define_optional_argument "target"
 
@@ -141,42 +141,46 @@ define_optional_argument "carpc_lib" \
 
 
 
-declare -A DIRECTORIES=( )
+declare -A -g DIRECTORIES=( )
 
 function init_directories( )
 {
-   local LOCAL_SOURCE_DIR=${1}
-   local -n LOCAL_DIRECTORIES_REF=${2}
+   local LOCAL_SOURCE_DIR=$(get_parameter_value_path "source")
 
-   LOCAL_DIRECTORIES_REF[source]=${LOCAL_SOURCE_DIR}
-   LOCAL_DIRECTORIES_REF[product]=${LOCAL_SOURCE_DIR}/_product_/
-   LOCAL_DIRECTORIES_REF[build]=${LOCAL_DIRECTORIES_REF[product]}/build/
-   LOCAL_DIRECTORIES_REF[gen]=${LOCAL_DIRECTORIES_REF[product]}/gen/
-   LOCAL_DIRECTORIES_REF[deploy]=${LOCAL_DIRECTORIES_REF[product]}/deploy/
-   LOCAL_DIRECTORIES_REF[doc]=${LOCAL_DIRECTORIES_REF[product]}/doc/
+   DIRECTORIES[source]=${LOCAL_SOURCE_DIR}
+   DIRECTORIES[product]=${LOCAL_SOURCE_DIR}/_product_/
+   DIRECTORIES[build]=${DIRECTORIES[product]}/build/
+   DIRECTORIES[gen]=${DIRECTORIES[product]}/gen/
+   DIRECTORIES[deploy]=${DIRECTORIES[product]}/deploy/
+   DIRECTORIES[doc]=${DIRECTORIES[product]}/doc/
+
+   print_map DIRECTORIES
 }
 
 
 
+declare -a REPOSITORIES=( )
+
 function print_repositories( )
 {
-   local LOCAL_LIST_NAME=${1}
-   local -n LOCAL_LIST_REF=${LOCAL_LIST_NAME}
-
-   for PROJECT_NAME in "${LOCAL_LIST_REF[@]}"; do
+   for PROJECT_NAME in "${REPOSITORIES[@]}"; do
       declare -n PROJECT=${PROJECT_NAME}
-      print_ok "Repository: ${PROJECT_NAME}"
+      log_debug "Repository: ${PROJECT_NAME}"
       for key in "${!PROJECT[@]}"; do
-         echo "   $key: ${PROJECT[$key]}"
+         log_trace "   $key: ${PROJECT[$key]}"
       done
    done   
 }
 
+function init_repositories( )
+{
+   local LOCAL_TARGET=${1}
+   init_repositories_${LOCAL_TARGET}
+   print_repositories
+}
+
 function init_repositories_framework( )
 {
-   local LOCAL_LIST_NAME=${1}
-   local -n LOCAL_LIST_REF=${LOCAL_LIST_NAME}
-
    declare -g -A REPO_TRACING=(
          [url]="git@github.com:dterletskiy/carpc-tracing.git"
          [branch]="main"
@@ -208,147 +212,142 @@ function init_repositories_framework( )
          [directory]="carpc-servicebrocker"
       )
 
-   LOCAL_LIST_REF=( )
-   LOCAL_LIST_REF+=( REPO_TRACING )
-   LOCAL_LIST_REF+=( REPO_BASE )
-   LOCAL_LIST_REF+=( REPO_TOOLS )
-   LOCAL_LIST_REF+=( REPO_OSW )
-   LOCAL_LIST_REF+=( REPO_RUNTIME )
-   LOCAL_LIST_REF+=( REPO_SERVICEBROCKER )
+   REPOSITORIES=( )
+   REPOSITORIES+=( REPO_TRACING )
+   REPOSITORIES+=( REPO_BASE )
+   REPOSITORIES+=( REPO_TOOLS )
+   REPOSITORIES+=( REPO_OSW )
+   REPOSITORIES+=( REPO_RUNTIME )
+   REPOSITORIES+=( REPO_SERVICEBROCKER )
 }
 
 function init_repositories_builder( )
 {
-   local LOCAL_LIST_NAME=${1}
-   local -n LOCAL_LIST_REF=${LOCAL_LIST_NAME}
-
    declare -g -A REPO_BUILDER=(
          [url]="git@github.com:dterletskiy/carpc-builder.git"
          [branch]="main"
          [directory]="carpc-builder"
       )
 
-   LOCAL_LIST_REF=( )
-   LOCAL_LIST_REF+=( REPO_BUILDER )
+   REPOSITORIES=( )
+   REPOSITORIES+=( REPO_BUILDER )
 }
 
 function init_repositories_examples( )
 {
-   local LOCAL_LIST_NAME=${1}
-   local -n LOCAL_LIST_REF=${LOCAL_LIST_NAME}
-
    declare -g -A REPO_EXAMPLES=(
          [url]="git@github.com:dterletskiy/carpc-examples.git"
          [branch]="scorpius"
          [directory]="carpc-examples"
       )
 
-   LOCAL_LIST_REF=( )
-   LOCAL_LIST_REF+=( REPO_EXAMPLES )
+   REPOSITORIES=( )
+   REPOSITORIES+=( REPO_EXAMPLES )
 }
 
 function init_repositories_tutorial( )
 {
-   local LOCAL_LIST_NAME=${1}
-   local -n LOCAL_LIST_REF=${LOCAL_LIST_NAME}
-
    declare -g -A REPO_TUTORIAL=(
          [url]="git@github.com:dterletskiy/carpc-tutorial.git"
          [branch]="scorpius"
          [directory]="carpc-tutorial"
       )
 
-   LOCAL_LIST_REF=( )
-   LOCAL_LIST_REF+=( REPO_TUTORIAL )
+   REPOSITORIES=( )
+   REPOSITORIES+=( REPO_TUTORIAL )
 }
 
 declare -a PROJECTS_LIST=(
-   "framework"
-   "builder"
-   "examples"
-   "tutorial"
-)
+      "framework"
+      "builder"
+      "examples"
+      "tutorial"
+   )
+
+function project_exists( )
+{
+   local LOCAL_TARGET=${1}
+   local item
+
+   for item in "${PROJECTS_LIST[@]}"; do
+      log_info "Processing item '${item}'"
+      [[ ${item} == "$LOCAL_TARGET" ]] && return 0
+   done
+
+   return 1
+}
 
 function fetch( )
 {
    local LOCAL_TARGET=${1}
 
-   found=0
-   for item in "${PROJECTS_LIST[@]}"; do
-      print_info "Processing item '${item}'"
-      if [[ "${item}" == "${LOCAL_TARGET}" ]]; then
-         print_info "'${item}' == '${LOCAL_TARGET}'"
-         found=1
-         break
-      fi
-   done
-
-   if [[ ${found} -ne 1 ]]; then
-      print_error "target for fetch action is not defined or defined invalid"
+   if ! project_exists "${LOCAL_TARGET}"; then
+      log_error "target for fetch action is not defined or defined invalid"
       exit 1
    fi
 
-   declare -a REPOSITORIES=( )
-   execute "init_repositories_${LOCAL_TARGET} REPOSITORIES"
-   print_repositories REPOSITORIES
+   init_repositories "${LOCAL_TARGET}"
 
    mkdir -p ${DIRECTORIES[source]}
 
-   SOURCE_CMAKE_FILE="${DIRECTORIES[source]}/CMakeLists.txt"
+   local SOURCE_CMAKE_FILE="${DIRECTORIES[source]}/CMakeLists.txt"
    if [ "builder" != ${LOCAL_TARGET} ]; then
       if [ -f ${SOURCE_CMAKE_FILE} ]; then
-         print_error "Directory is not empty => repositories can't be cloned"
+         log_error "Directory is not empty => repositories can't be cloned"
          exit 2
       fi
+
+      execute "echo \"cmake_minimum_required( VERSION 3.16 FATAL_ERROR )\" > ${SOURCE_CMAKE_FILE}"
+      for REPOSITORY_NAME in "${REPOSITORIES[@]}"; do
+         declare -n REPOSITORY=${REPOSITORY_NAME}
+         execute "echo \"fenix_add_subdirectory( ${REPOSITORY[directory]} )\" >> ${SOURCE_CMAKE_FILE}"
+      done
    fi
 
-   if [ "builder" != ${LOCAL_TARGET} ]; then
-      execute "echo \"cmake_minimum_required( VERSION 3.16 FATAL_ERROR )\" > ${SOURCE_CMAKE_FILE}"
-   fi
    for REPOSITORY_NAME in "${REPOSITORIES[@]}"; do
       declare -n REPOSITORY=${REPOSITORY_NAME}
-      execute "git clone --recursive -b ${REPOSITORY[branch]} \
-         ${REPOSITORY[url]} \
-         \"${DIRECTORIES[source]}/${REPOSITORY[directory]}\" \
-      "
-      if [ "builder" != ${LOCAL_TARGET} ]; then
-         execute "echo \"fenix_add_subdirectory( ${REPOSITORY[directory]} )\" >> ${SOURCE_CMAKE_FILE}"
-      fi
+      local COMMAND=(
+            git clone --recursive
+            -b "${REPOSITORY[branch]}"
+            "${REPOSITORY[url]}"
+            "${DIRECTORIES[source]}/${REPOSITORY[directory]}"
+         )
+      execute_arr COMMAND
    done
 }
 
 
 
+declare -A -g COMPILER=( )
 function define_compiler_by_type( )
 {
-   local LOCAL_COMPILER_TYPE=${1}
-   local -n LOCAL_COMPILER=${2}
+   local LOCAL_COMPILER_TYPE=$(get_parameter_value "compiler")
+   case ${LOCAL_COMPILER_TYPE} in
+      clang)
+         COMPILER["c"]="clang"
+         COMPILER["cxx"]="clang++"
+      ;;
+      gnu)
+         COMPILER["c"]="gcc"
+         COMPILER["cxx"]="g++"
+      ;;
+      *)
+         log_error "Undefined compiler type '${LOCAL_COMPILER_TYPE}'"
+         exit 1
+      ;;
+   esac
 
    local COMPILER_PATH="/usr/bin/"
+   COMPILER["c"]="${COMPILER_PATH}${COMPILER["c"]}"
+   COMPILER["cxx"]="${COMPILER_PATH}${COMPILER["cxx"]}"
 
-   if [[ "${LOCAL_COMPILER_TYPE}" == "clang" ]]; then
-      LOCAL_COMPILER["c"]="clang"
-      LOCAL_COMPILER["cxx"]="clang++"
-   elif [[ "${LOCAL_COMPILER_TYPE}" == "gnu" ]]; then
-      LOCAL_COMPILER["c"]="gcc"
-      LOCAL_COMPILER["cxx"]="g++"
-   else
-      print_error "Undefined compiler type '${LOCAL_COMPILER_TYPE}'"
-      exit 1
-   fi
-
-   LOCAL_COMPILER["c"]="${COMPILER_PATH}${LOCAL_COMPILER["c"]}"
-   LOCAL_COMPILER["cxx"]="${COMPILER_PATH}${LOCAL_COMPILER["cxx"]}"
-
-   # export CC=${LOCAL_COMPILER["c"]}
-   # export CXX=${LOCAL_COMPILER["cxx"]}
+   # export CC=${COMPILER["c"]}
+   # export CXX=${COMPILER["cxx"]}
 }
 
 function update_build_variables( )
 {
-   declare -A PROJECT_COMPILER=( )
-   COMPILER_TYPE=$( get_parameter_value "compiler" )
-   define_compiler_by_type ${COMPILER_TYPE} PROJECT_COMPILER
+   define_compiler_by_type
 
    LOCAL_BUILD_VARIABLES=""
    LOCAL_BUILD_VARIABLES+=" -D ROOT_GEN_DIR:STRING=${DIRECTORIES[gen]}"
@@ -363,8 +362,8 @@ function update_build_variables( )
    LOCAL_BUILD_VARIABLES+=" -D USE_DEBUG:STRING=$( get_parameter_value "debug" )"
    LOCAL_BUILD_VARIABLES+=" -D USE_GPB:STRING=$( get_parameter_value "gpb" )"
    LOCAL_BUILD_VARIABLES+=" -D USE_RTTI:STRING=$( get_parameter_value "rtti" )"
-   LOCAL_BUILD_VARIABLES+=" -D CMAKE_C_COMPILER:STRING=${PROJECT_COMPILER["c"]}"
-   LOCAL_BUILD_VARIABLES+=" -D CMAKE_CXX_COMPILER:STRING=${PROJECT_COMPILER["cxx"]}"
+   LOCAL_BUILD_VARIABLES+=" -D CMAKE_C_COMPILER:STRING=${COMPILER["c"]}"
+   LOCAL_BUILD_VARIABLES+=" -D CMAKE_CXX_COMPILER:STRING=${COMPILER["cxx"]}"
    LOCAL_BUILD_VARIABLES+=" -D CMAKE_VERBOSE_MAKEFILE=TRUE"
    LOCAL_BUILD_VARIABLES+=" -D SOURCE_DIR=${DIRECTORIES[source]}"
    LOCAL_BUILD_VARIABLES+=" -D CARPC_API=$( get_parameter_value_path "carpc_api" )"
@@ -385,34 +384,25 @@ function config( )
 
 function build( )
 {
-   local LOCAL_TARGET=${1}
-   if [ -z ${LOCAL_TARGET+x} ]; then
-      PARAMETER_TARGET=""
-   elif [ -z ${LOCAL_TARGET} ]; then
-      PARAMETER_TARGET=""
-   else
-      PARAMETER_TARGET="--target ${LOCAL_TARGET}"
-   fi
+   local target=${1:-}
+   local parameter_target=${target:+--target "${target}"}
 
-   COMMAND="cmake --build ${DIRECTORIES[build]} --verbose -j$( get_parameter_value "jobs" 0 ) ${PARAMETER_TARGET}"
-   execute ${COMMAND}
+   local -a COMMAND=(
+      cmake --build "${DIRECTORIES[build]}"
+      --verbose
+      -j"$(get_parameter_value "jobs")"
+      ${parameter_target}
+   )
+
+   execute_arr COMMAND
 }
 
-function install( )
+function deploy( )
 {
-   local LOCAL_DESTINATION=${1}
-   if [ -z ${LOCAL_DESTINATION+x} ]; then
-      PARAMETER_DESTINATION="--prefix ${DIRECTORIES[deploy]}"
-   elif [ -z ${LOCAL_DESTINATION} ]; then
-      PARAMETER_DESTINATION="--prefix ${DIRECTORIES[deploy]}"
-   else
-      PARAMETER_DESTINATION="--prefix ${LOCAL_DESTINATION}"
-   fi
+   local target=${1:-}
+   local deploy_target="deploy${target:+_${target}}"
 
-   COMMAND="cmake --install ${DIRECTORIES[build]} ${PARAMETER_DESTINATION}"
-   execute ${COMMAND}
-
-   # build "install"
+   build "${deploy_target}"
 }
 
 function clean( )
@@ -447,26 +437,14 @@ function run( )
 
 function get_parameter_value_path( )
 {
-   local LOCAL_PARAMETER_VALUE=${1}
-   local LOCAL_PATH=$( get_parameter_value ${LOCAL_PARAMETER_VALUE} )
-   echo $( adapt_path ${LOCAL_PATH} )
+   echo $(adapt_path $(get_parameter_value "${1}"))
 }
 
 function adapt_path( )
 {
-   local LOCAL_PATH=${1}
-
-   if [[ "$(realpath "${LOCAL_PATH}")" == "${LOCAL_PATH}" ]]; then
-      # print_warning "'--${NAME}' is defined as absolute path => '${LOCAL_PATH}' will be used"
-      :
-   else
-      # print_warning "'--${NAME}' is defined as relative path => current path + '${LOCAL_PATH}' will be used"
-      LOCAL_PATH=${PWD}/${LOCAL_PATH}
-   fi
-
-   LOCAL_PATH=$(readlink -m "${LOCAL_PATH}")/
-   echo ${LOCAL_PATH}
+   echo "$(readlink -m "${1}")/"
 }
+
 
 
 
@@ -474,47 +452,42 @@ function main( )
 {
    parse_arguments "$@"
 
-   SOURCE_DIR=$( get_parameter_value_path "source" )
-   init_directories ${SOURCE_DIR} DIRECTORIES
-   print_map DIRECTORIES
+   init_directories
 
-   for ACTION in "${CMD_ACTION_DEFINED_VALUES[@]}"; do
-      case ${ACTION} in
-         fetch)
-            for TARGET in "${CMD_TARGET_DEFINED_VALUES[@]}"; do
-               fetch ${TARGET}
-            done
-         ;;
-         config)
-            config
-         ;;
-         build)
-            build "${CMD_TARGET_DEFINED_VALUES[*]}"
-         ;;
-         install)
-            install ${CMD_DESTINATION_DIR}
-         ;;
-         clean)
-            clean
-         ;;
-         pure)
-            pure
-         ;;
-         world)
-            pure
-            config
-            build "${CMD_TARGET_DEFINED_VALUES[*]}"
-            install ${CMD_DESTINATION_DIR}
-         ;;
-         run)
-            run $( get_parameter_value "target" ) "$( get_parameter_value "params" )"
-         ;;
-         *)
-            print_warning "undefined action: '${ACTION}'"
-            exit 1
-         ;;
-      esac
-   done
+   local ACTION=$(get_parameter_value "action")
+   case "${ACTION}" in
+      fetch)
+         fetch $(get_parameter_value "target")
+      ;;
+      config)
+         config
+      ;;
+      build)
+         build $(get_parameter_value "target")
+      ;;
+      deploy)
+         deploy $(get_parameter_value "target")
+      ;;
+      clean)
+         clean
+      ;;
+      pure)
+         pure
+      ;;
+      world)
+         pure
+         config
+         build $(get_parameter_value "target")
+         deploy $(get_parameter_value "target")
+      ;;
+      run)
+         run $(get_parameter_value "target") "$(get_parameter_value "params")"
+      ;;
+      *)
+         log_warning "undefined action: '${ACTION}'"
+         exit 1
+      ;;
+   esac
 }
 
 main "$@"
