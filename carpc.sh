@@ -89,27 +89,7 @@ define_optional_argument "compiler" \
    --allowed="gnu clang" \
    --default="gnu"
 
-define_optional_argument "os" \
-   --allowed="linux android" \
-   --default="linux"
-
-define_optional_argument "sys_trace" \
-   --allowed="yes no" \
-   --default="yes"
-
-define_optional_argument "msg_trace" \
-   --allowed="yes no" \
-   --default="yes"
-
-define_optional_argument "colored_trace" \
-   --allowed="yes no" \
-   --default="yes"
-
-define_optional_argument "dlt" \
-   --allowed="yes no" \
-   --default="yes"
-
-define_optional_argument "gpb" \
+define_optional_argument "trace" \
    --allowed="yes no" \
    --default="yes"
 
@@ -121,15 +101,7 @@ define_optional_argument "debug" \
    --allowed="yes no" \
    --default="yes"
 
-define_optional_argument "debug_stream" \
-   --allowed="yes no" \
-   --default="yes"
-
-define_optional_argument "memory_hook" \
-   --allowed="yes no" \
-   --default="no"
-
-define_optional_argument "instrumental" \
+define_optional_argument "policy_std" \
    --allowed="yes no" \
    --default="no"
 
@@ -183,32 +155,32 @@ function init_repositories_framework( )
 {
    declare -g -A REPO_TRACING=(
          [url]="git@github.com:dterletskiy/carpc-tracing.git"
-         [branch]="main"
+         [branch]="experimental"
          [directory]="carpc-tracing"
       )
    declare -g -A REPO_BASE=(
          [url]="git@github.com:dterletskiy/carpc-base.git"
-         [branch]="main"
+         [branch]="experimental"
          [directory]="carpc-base"
       )
    declare -g -A REPO_TOOLS=(
          [url]="git@github.com:dterletskiy/carpc-tools.git"
-         [branch]="main"
+         [branch]="experimental"
          [directory]="carpc-tools"
       )
    declare -g -A REPO_OSW=(
          [url]="git@github.com:dterletskiy/carpc-osw.git"
-         [branch]="main"
+         [branch]="experimental"
          [directory]="carpc-osw"
       )
    declare -g -A REPO_RUNTIME=(
          [url]="git@github.com:dterletskiy/carpc-runtime.git"
-         [branch]="main"
+         [branch]="experimental"
          [directory]="carpc-runtime"
       )
    declare -g -A REPO_SERVICEBROCKER=(
          [url]="git@github.com:dterletskiy/carpc-servicebrocker.git"
-         [branch]="main"
+         [branch]="experimental"
          [directory]="carpc-servicebrocker"
       )
 
@@ -351,17 +323,10 @@ function update_build_variables( )
 
    LOCAL_BUILD_VARIABLES=""
    LOCAL_BUILD_VARIABLES+=" -D ROOT_GEN_DIR:STRING=${DIRECTORIES[gen]}"
-   LOCAL_BUILD_VARIABLES+=" -D TARGET_OS:STRING=$( get_parameter_value "os" )"
-   LOCAL_BUILD_VARIABLES+=" -D DLT_TRACE:STRING=$( get_parameter_value "dlt" )"
-   LOCAL_BUILD_VARIABLES+=" -D SYS_TRACE:STRING=$( get_parameter_value "sys_trace" )"
-   LOCAL_BUILD_VARIABLES+=" -D MSG_TRACE:STRING=$( get_parameter_value "msg_trace" )"
-   LOCAL_BUILD_VARIABLES+=" -D COLORED_TRACE:STRING=$( get_parameter_value "colored_trace" )"
-   LOCAL_BUILD_VARIABLES+=" -D DEBUG_STREAM:STRING=$( get_parameter_value "debug_stream" )"
-   LOCAL_BUILD_VARIABLES+=" -D MEMORY_HOOK:STRING=$( get_parameter_value "memory_hook" )"
-   LOCAL_BUILD_VARIABLES+=" -D INSTRUMENTAL:STRING=$( get_parameter_value "instrumental" )"
-   LOCAL_BUILD_VARIABLES+=" -D USE_DEBUG:STRING=$( get_parameter_value "debug" )"
-   LOCAL_BUILD_VARIABLES+=" -D USE_GPB:STRING=$( get_parameter_value "gpb" )"
-   LOCAL_BUILD_VARIABLES+=" -D USE_RTTI:STRING=$( get_parameter_value "rtti" )"
+   LOCAL_BUILD_VARIABLES+=" -D CARPC_BUILD_TRACE_ENABLED:STRING=$( get_parameter_value "trace" )"
+   LOCAL_BUILD_VARIABLES+=" -D CARPC_BUILD_DEBUG:STRING=$( get_parameter_value "debug" )"
+   LOCAL_BUILD_VARIABLES+=" -D CARPC_BUILD_RTTI_ENABLED:STRING=$( get_parameter_value "rtti" )"
+   LOCAL_BUILD_VARIABLES+=" -D CARPC_BUILD_POLICY_STD:STRING=$( get_parameter_value "policy_std" )"
    LOCAL_BUILD_VARIABLES+=" -D CMAKE_C_COMPILER:STRING=${COMPILER["c"]}"
    LOCAL_BUILD_VARIABLES+=" -D CMAKE_CXX_COMPILER:STRING=${COMPILER["cxx"]}"
    LOCAL_BUILD_VARIABLES+=" -D CMAKE_VERBOSE_MAKEFILE=TRUE"
